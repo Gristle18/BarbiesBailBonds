@@ -639,6 +639,21 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         </div>
       </div>
 
+      <!-- STEP 13: Application Complete -->
+      <div class="section" data-step="22" id="completionSection">
+        <div style="text-align:center; padding:40px 20px;">
+          <div style="font-size:48px; margin-bottom:20px;">✅</div>
+          <h2 style="color:#fff; font-size:24px; margin-bottom:20px; font-weight:700;">Application Complete</h2>
+          <p style="color:#fff; font-size:16px; line-height:1.5; margin-bottom:30px;">
+            Call us now at <span style="color:#F5A00D; font-weight:bold;">561-247-0018</span> to finalize your bond.<br>
+            We're available 24/7.
+          </p>
+          <a href="tel:561-247-0018" style="display:inline-block; background:#F5A00D; color:#111; padding:16px 32px; border-radius:10px; font-weight:700; font-size:16px; text-decoration:none; cursor:pointer;">
+            CALL US
+          </a>
+        </div>
+      </div>
+
     </form>
   </div>
 
@@ -849,9 +864,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         google.script.run
           .withSuccessHandler(() => {
             submitBtn.disabled = false;
-            alert('Application submitted successfully! We will contact you soon.');
-            form.reset();
-            showStep(0);
+            showStep(22); // Show completion section
           })
           .withFailureHandler((error) => {
             submitBtn.disabled = false;
@@ -863,9 +876,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         console.log('Form submission data:', data);
         setTimeout(() => {
           submitBtn.disabled = false;
-          alert('Application submitted successfully! (Dev mode)');
-          form.reset();
-          showStep(0);
+          showStep(22); // Show completion section
         }, 500);
       }
     });
