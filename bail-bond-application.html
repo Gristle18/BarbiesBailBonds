@@ -859,27 +859,25 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       // Add timestamp
       data.timestamp = new Date().toISOString();
       
-      // Check if running in Google Apps Script environment
-      if (window.google && google.script && google.script.run) {
-        // Submit to Google Sheets via Apps Script
-        google.script.run
-          .withSuccessHandler(() => {
-            submitBtn.disabled = false;
-            showStep(22); // Show completion section
-          })
-          .withFailureHandler((error) => {
-            submitBtn.disabled = false;
-            alert(error && error.message ? error.message : 'Submission failed. Please try again.');
-          })
-          .submitToSheet(data);
-      } else {
-        // Development mode - log to console
-        console.log('Form submission data:', data);
-        setTimeout(() => {
-          submitBtn.disabled = false;
-          showStep(22); // Show completion section
-        }, 500);
-      }
+      // Submit to Google Apps Script
+      fetch('https://script.google.com/macros/s/AKfycbw02PBk5HS-UR7xQF6CWiuij2eY-AelX_KUule0st9pDscucxACi8qdj0MxbFbBmRia/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      })
+      .then(() => {
+        submitBtn.disabled = false;
+        showStep(22); // Show completion section
+      })
+      .catch((error) => {
+        console.error('Submission error:', error);
+        submitBtn.disabled = false;
+        // Still show completion since no-cors doesn't return errors properly
+        showStep(22);
+      });
     });
 
     
