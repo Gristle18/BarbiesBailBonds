@@ -45,8 +45,8 @@
             </select>
           </div>
           <div class="full">
-            <label for="howHeard">How did you hear about us?</label>
-            <input id="howHeard" name="howHeard" />
+            <label for="howHeard">How did you hear about us?<span class="req">*</span></label>
+            <input id="howHeard" name="howHeard" required />
           </div>
         </div>
         <div class="step-actions">
@@ -66,16 +66,16 @@
             <input id="relation" name="relation" required />
           </div>
           <div>
-            <label for="indemnitorDob">What is Your Date of Birth</label>
-            <input id="indemnitorDob" name="indemnitorDob" type="date" />
+            <label for="indemnitorDob">What is Your Date of Birth<span class="req">*</span></label>
+            <input id="indemnitorDob" name="indemnitorDob" type="date" required />
           </div>
           <div>
             <label for="indemnitorSsn">Social Security #</label>
             <input id="indemnitorSsn" name="indemnitorSsn" inputmode="numeric" />
           </div>
           <div>
-            <label for="indemnitorDl">Driver's License (or ID) #</label>
-            <input id="indemnitorDl" name="indemnitorDl" />
+            <label for="indemnitorDl">Driver's License (or ID) #<span class="req">*</span></label>
+            <input id="indemnitorDl" name="indemnitorDl" required />
           </div>
         </div>
         <div class="step-actions">
@@ -100,12 +100,12 @@
             <input id="indemnitorEmail" name="indemnitorEmail" type="email" />
           </div>
           <div class="full">
-            <label for="indemnitorAddress">Home Address</label>
-            <input id="indemnitorAddress" name="indemnitorAddress" />
+            <label for="indemnitorAddress">Home Address<span class="req">*</span></label>
+            <input id="indemnitorAddress" name="indemnitorAddress" required />
           </div>
           <div>
-            <label for="indemnitorHowLong">How Long Living at Current Address</label>
-            <input id="indemnitorHowLong" name="indemnitorHowLong" />
+            <label for="indemnitorHowLong">How Long Living at Current Address<span class="req">*</span></label>
+            <input id="indemnitorHowLong" name="indemnitorHowLong" required />
           </div>
         </div>
         <div class="step-actions">
@@ -118,12 +118,12 @@
       <div class="section" data-step="3">
         <div class="grid">
           <div>
-            <label for="indemnitorWorkType">Type of Work</label>
-            <input id="indemnitorWorkType" name="indemnitorWorkType" />
+            <label for="indemnitorWorkType">Type of Work<span class="req">*</span></label>
+            <input id="indemnitorWorkType" name="indemnitorWorkType" required />
           </div>
           <div>
-            <label for="indemnitorEmployer">Employer Name</label>
-            <input id="indemnitorEmployer" name="indemnitorEmployer" />
+            <label for="indemnitorEmployer">Employer Name<span class="req">*</span></label>
+            <input id="indemnitorEmployer" name="indemnitorEmployer" required />
           </div>
           <div>
             <label for="indemnitorWorkPhone">Work Phone # (will NOT be called)</label>
@@ -134,8 +134,8 @@
             <input id="indemnitorWorkAddress" name="indemnitorWorkAddress" />
           </div>
           <div class="full">
-            <label for="indemnitorVehicle">Indemnitor's Vehicle</label>
-            <input id="indemnitorVehicle" name="indemnitorVehicle" />
+            <label for="indemnitorVehicle">Indemnitor's Vehicle<span class="req">*</span></label>
+            <input id="indemnitorVehicle" name="indemnitorVehicle" required />
           </div>
         </div>
         <div class="step-actions">
@@ -156,8 +156,8 @@
             <input id="defendantNick" name="defendantNick" />
           </div>
           <div>
-            <label for="defendantDob">Date of Birth</label>
-            <input id="defendantDob" name="defendantDob" type="date" />
+            <label for="defendantDob">Date of Birth<span class="req">*</span></label>
+            <input id="defendantDob" name="defendantDob" type="date" required />
           </div>
           <div>
             <label for="defendantSsn">Social Security # (optional)</label>
@@ -186,8 +186,8 @@
             <input id="citizenship" name="citizenship" />
           </div>
           <div>
-            <label for="race">Race</label>
-            <select id="race" name="race">
+            <label for="race">Race<span class="req">*</span></label>
+            <select id="race" name="race" required>
               <option value="" hidden>Select…</option>
               <option>White</option>
               <option>Black / African American</option>
@@ -199,8 +199,8 @@
             </select>
           </div>
           <div>
-            <label for="defendantCell">Cell Phone #</label>
-            <input id="defendantCell" name="defendantCell" type="tel" inputmode="tel" data-phone />
+            <label for="defendantCell">Cell Phone #<span class="req">*</span></label>
+            <input id="defendantCell" name="defendantCell" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
             <label for="defendantHomePhone">Home Phone # (Skip if none)</label>
@@ -221,12 +221,12 @@
             <input id="defendantEmail" name="defendantEmail" type="email" />
           </div>
           <div class="full">
-            <label for="defendantAddress">Home Address</label>
-            <input id="defendantAddress" name="defendantAddress" />
+            <label for="defendantAddress">Home Address<span class="req">*</span></label>
+            <input id="defendantAddress" name="defendantAddress" required />
           </div>
           <div>
-            <label for="defendantHowLong">How Long has Defendant Lived at Current Address</label>
-            <input id="defendantHowLong" name="defendantHowLong" />
+            <label for="defendantHowLong">How Long has Defendant Lived at Current Address<span class="req">*</span></label>
+            <input id="defendantHowLong" name="defendantHowLong" required />
           </div>
           <div>
             <label for="homeStatus">Is This Home Owned or Rented?</label>
@@ -291,8 +291,8 @@
             </div>
           </div>
           <div class="full">
-            <label for="defendantVehicle">Defendant's Vehicle to get to Court</label>
-            <input id="defendantVehicle" name="defendantVehicle" />
+            <label for="defendantVehicle">Defendant's Vehicle to get to Court<span class="req">*</span></label>
+            <input id="defendantVehicle" name="defendantVehicle" required />
           </div>
         </div>
         <div class="step-actions">
@@ -427,24 +427,24 @@
       <div class="section" data-step="14">
         <div class="grid">
           <div>
-            <label for="ref1Name">Reference #1 - Full Name</label>
-            <input id="ref1Name" name="ref1Name" />
+            <label for="ref1Name">Reference #1 - Full Name<span class="req">*</span></label>
+            <input id="ref1Name" name="ref1Name" required />
           </div>
           <div>
-            <label for="ref1Relation">Reference #1 - Relation</label>
-            <input id="ref1Relation" name="ref1Relation" />
+            <label for="ref1Relation">Reference #1 - Relation<span class="req">*</span></label>
+            <input id="ref1Relation" name="ref1Relation" required />
           </div>
           <div>
-            <label for="ref1Phone">Reference #1 - Phone #</label>
-            <input id="ref1Phone" name="ref1Phone" type="tel" inputmode="tel" data-phone />
+            <label for="ref1Phone">Reference #1 - Phone #<span class="req">*</span></label>
+            <input id="ref1Phone" name="ref1Phone" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
-            <label for="ref2Name">Reference #2 - Full Name</label>
-            <input id="ref2Name" name="ref2Name" />
+            <label for="ref2Name">Reference #2 - Full Name<span class="req">*</span></label>
+            <input id="ref2Name" name="ref2Name" required />
           </div>
           <div>
-            <label for="ref2Relation">Reference #2 - Relation</label>
-            <input id="ref2Relation" name="ref2Relation" />
+            <label for="ref2Relation">Reference #2 - Relation<span class="req">*</span></label>
+            <input id="ref2Relation" name="ref2Relation" required />
           </div>
         </div>
         <div class="step-actions">
@@ -457,20 +457,20 @@
       <div class="section" data-step="15">
         <div class="grid">
           <div>
-            <label for="ref2Phone">Reference #2 - Phone #</label>
-            <input id="ref2Phone" name="ref2Phone" type="tel" inputmode="tel" data-phone />
+            <label for="ref2Phone">Reference #2 - Phone #<span class="req">*</span></label>
+            <input id="ref2Phone" name="ref2Phone" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
-            <label for="ref3Name">Reference #3 - Full Name</label>
-            <input id="ref3Name" name="ref3Name" />
+            <label for="ref3Name">Reference #3 - Full Name<span class="req">*</span></label>
+            <input id="ref3Name" name="ref3Name" required />
           </div>
           <div>
-            <label for="ref3Relation">Reference #3 - Relation</label>
-            <input id="ref3Relation" name="ref3Relation" />
+            <label for="ref3Relation">Reference #3 - Relation<span class="req">*</span></label>
+            <input id="ref3Relation" name="ref3Relation" required />
           </div>
           <div>
-            <label for="ref3Phone">Reference #3 - Phone #</label>
-            <input id="ref3Phone" name="ref3Phone" type="tel" inputmode="tel" data-phone />
+            <label for="ref3Phone">Reference #3 - Phone #<span class="req">*</span></label>
+            <input id="ref3Phone" name="ref3Phone" type="tel" inputmode="tel" data-phone required />
           </div>
         </div>
         <div class="step-actions">
@@ -483,7 +483,7 @@
       <div class="section" data-step="16">
         <div class="grid">
           <div>
-            <label for="emergency1Name">Emergency Contact #1 (REQUIRED)</label>
+            <label for="emergency1Name">Emergency Contact #1<span class="req">*</span></label>
             <input id="emergency1Name" name="emergency1Name" required />
           </div>
           <div>
@@ -495,7 +495,7 @@
             <input id="emergency1Relation" name="emergency1Relation" />
           </div>
           <div>
-            <label for="emergency2Name">Emergency Contact #2 (REQUIRED)</label>
+            <label for="emergency2Name">Emergency Contact #2<span class="req">*</span></label>
             <input id="emergency2Name" name="emergency2Name" required />
           </div>
           <div>
