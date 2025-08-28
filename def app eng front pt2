@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bond Application</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:transparent; color:#fff; }
+    .wrap { max-width: 880px; margin: 24px auto 40px; padding: 0 16px; }
+    .section { margin: 28px 0; padding: 20px; display:none; background:transparent; }
+    .section.active { display:block; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .full { grid-column: 1 / -1; }
+    label { display:block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+    .req { color: #ff6666; margin-left: 2px; }
+    input, textarea, select { width: 100%; padding: 12px; border: 1px solid #555; border-radius: 10px; font-size: 15px; background:#222; color:#fff; }
+    textarea { min-height: 120px; resize: vertical; }
+    .actions, .step-actions { display:flex; gap:10px; margin-top:20px; }
+    button { border:0; border-radius:10px; padding:12px 16px; font-weight:700; cursor:pointer; }
+    .primary { background:#F5A00D; color:#111; }
+    .ghost { background:#444; color:#fff; }
+    .error { color:#ff6666; font-size:14px; display:none; }
+    .hint { color:#bbb; font-size:13px; margin-top:-6px; margin-bottom:10px; }
+    .checks { display:flex; flex-direction:column; gap:10px; padding:12px; border:1px solid #555; border-radius:10px; background:#222; }
+    .checks label { font-weight:500; display:flex; align-items:center; gap:10px; margin:0; }
+    .agreement-text { white-space: pre-line; font-size:14px; line-height:1.4; color:#ddd; padding:20px; border:1px solid #555; border-radius:10px; background:#222; }
+    @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <form id="f" novalidate>
+
+      <!-- All previous steps remain here -->
+
+            <!-- STEP 9: Terms and Conditions -->
+      <div class="section" data-step="19">
+        <div class="agreement-text">
+Terms and Conditions of Application for Appearance Bond
+The following terms and conditions for the Appearance Bond for which U.S. Fire Insurance Company (USFIC) or its Agent and the parties agree that said appearance bond is conditioned upon full compliance of all said terms and conditions and is a part of said bond and application therefore.
+
+The following terms and conditions for the Appearance Bond for which U.S. Fire Insurance Company (USFIC) or its Agent and the parties agree that said appearance bond is conditioned upon full compliance of all said terms and conditions and is a part of said bond and application therefore.
+
+1. USFIC as the Surety Company, through its duly appointed agent, shall have control and jurisdiction over the principal during the term for which the bond is executed and shall have the right to apprehend, arrest and surrender the principal to the proper officials at any time as provided by law.
+2. In the event surrender of principal is made prior to the time set for the principal's appearances, and for reasons other than as enumerated below in paragraph 3, then principal shall
+be entitled to a refund of the bond premium.
+3. It is understood and agreed that the happening of any one of the following events shall constitute a breach of principal's obligation to USFIC hereunder, and USFIC shall have the right to forthwith apprehend, arrest, and surrender principal, and principal shall have no right to any refund of premium whatsoever. Said events which shall constitute a breach of principal's obligations hereunder are:
+   (a) If principal shall depart the jurisdiction of the court without the written consent of the court and the Surety Company or its Agent.
+   (b) If principal shall move from one address to another without notifying the Surety Company or its Agent in writing prior to such move.
+   (c) If principal shall commit any act which shall constitute reasonable evidence of principal's intention to cause a forfeiture of said bond.
+   (d) If principal is arrested and incarcerated for any offense other than a minor traffic violation.
+   (e) If principal shall make any material false statements in the application for appearance bond.
+
+
+Under penalties of perjury, I declare that I have read the foregoing, and the information provided is true and correct without reservation. The information and representations made in this Application are for the purpose of inducing the Surety to undertake the bond(s) for which I have applied with the intent that the Surety fully rely upon the information and representations contained herein. I agree to indemnify and hold harmless the Surety Company and its Agents for any and all losses that may arise from the execution of the bond(s) applied for herein, unless prohibited by applicable law or regulation.
+
+
+***ONLY PROCEED IF YOU AGREE TO THE ABOVE***
+
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Back</button>
+          <button class="primary" type="button" data-next>Next</button>
+        </div>
+      </div>
+
+            <!-- STEP 10: Contingent Promissory Note -->
+      <div class="section" data-step="20">
+        <div class="agreement-text">
+Contingent Promissory Note
+For value received the undersigned, jointly and severally promise(s) to pay U.S. FIRE INSURANCE COMPANY or its Agent, Jerry Casal Bail Bonds, LLC on demand the principal sum of the bond if and only if there occurs a breach of the terms and conditions of the surety bail bond or bonds posted on behalf of defendant
+
+The defendant for which this is being submitted written out previously on this form (hereinafter "Defendant"), together with any continuations and modifications, any extensions, substitutions, increments or appeals thereof (hereinafter "Bond"), or upon payment of any expenses incurred by the payee or holder (hereinafter “Payee") to produce the Defendant before the appropriate court or courts of Competent jurisdiction in the above case, with interest thereon at the rate of FOURTEEN percent ( 14%), per annum, from the date of occurrence of the above stated Contingency, until fully paid. All makers or endorsers, now or hereafter becoming parties hereto, jointly and severally waive demand, notice of non-payment and protest: and in case this note becomes in default and placed in hands of an attorney for collection, the foregoing agree(s) to pay reasonable attorney's fees and all other costs for making such collection and further agree(s) that courts of original jurisdictioN and appellate courts may award reasonable attorney's fees to the Payee in the event of litigation and/or appeals.
+
+It is further agreed and specifically understood between the parties to this Note that there is presently no outstanding loan or debt represented by this Contingent Promissory Note, and that this Note is given to secure advances up to and including the amount set forth above together with interest if and when there is a breach of the terms and conditions, including but not limited to forfeiture or estreature, of the Bond. It is further agreed and specifically understood that this Note shall become null and void at such time as all of the obligations under the Bond posted on behalf of the Defendant have been fulfilled and the Payee has been discharged of all liability and duly exonerated in writing and until such time as same occurs the note shall remain in full force and effect.
+(a) Any and all liability, loss, costs, damages, expenses, premiums and attorneys fees arising or incurred by Payee in connection with the above captioned Bond, or any other recognizance, undertaking or other obligation, heretofore or hereafter executed, assumed or procured by Payee at the instance or request or on behalf of either of owner of
+the property encumbered by the Mortgage securing the Note (hereinafter, "Owner") or of the principal's name; This Note and the Mortgage of even date herewith shall serve to secure:
+(b) For the payment of all premiums on such Bonds;
+(c) For the performance of every agreement (including continuations or modifications, any extensions, substitutions,increments or appeals thereof, with or without consent of Owner) made by Owner or Defendant in connection with said Bonds;
+(d) Against any liability, loss, costs, expenses, and attorneys fees in connection with any claim to the collateral security by person claiming adversely to Owner or to Principals named in the Bonds;
+(e) Any and all future advances made with or without consent of the Owner by Payee on behalf of the Defendant including but not necessarily limited to increments, modifications, extensions or substitutions, or the creation of any future obligation by the Payee in connection with the above described matter, or any bail bonds or obligation undertaken by Payee on behalf of Defendant including, without limiting, to the posting of a new bond for and on
+behalf of the Defendant in the nature of an appeal bond or substitution extension or modification of the existing Bond.
+
+This Promissory Note is Executed on the date this form is submitted.
+
+
+***ONLY PROCEED IF YOU AGREE TO THE ABOVE***
+
+      <!-- STEP 11: Indemnity Agreement -->
+      <div class="section" data-step="18">
+        <div class="agreement-text">
+Indemnity Agreement for Bail Bond
+The undersigned Indemnitor(s) (“Indemnitors”) make(s) application to U.S. Fire Insurance Company through its duly licensed and appointed Producer Agent Jerry Casal Bail Bonds, LLC (collectively referred to herein as “Surety”) for execution of a bail undertaking (“Bail Bond”) in the Penal Amount of given bond amount for defendant herein after referred to as the “Principal” and “Indemnitor” and in consideration of Surety arranging for execution or continuance of this Bail Bond, Indemnitor(s) jointly and severally agree(s) as follows:
+
+For good and valuable consideration, the undersigned Principal and Indemnitor(s) hereby agree to indemnify and hold harmless the Surety company and/or its agent(s) for all losses not otherwise prohibited by law or rules of the Florida Department of Financial Institutions and Insurance, and
+
+1) To pay Surety the Florida set premium for this Bail Bond. The premium is earned upon the release of Principal from the detaining facility. The fact that Defendant may have been improperly arrested, or his bail reduced or his case dismissed, shall not obligate the return of any portion of said premium.
+
+2) To reimburse Surety for actual expenses it incurs caused by any breach by the Principal of the terms of the application and Bail Bond, including expenses or liabilities incurred as a result of searching for, recapturing or returning Principal to custody or in apprehending or endeavoring to apprehend Principal, including legal fees for making application to a court for an order to vacate or set aside an order of forfeiture or judgment entered thereon. In the event the Defendant fails to follow any and all instructions or should the court forfeit or revoke the bond and it becomes necessary for the Bail Bondsman or Surety to investigate, apprehend and surrender the Defendant to the court, Fugitive Fees will be governed by a separate Fugitive Fee Contract between Indemnitor and Surety.
+
+3) To pay the Surety a reasonable attorney's fee, no less than Five Hundred Dollars ($500.00), in the event that it is necessary to institute legal action arising from this Agreement.
+
+4) To provide Surety upon demand, a monetary amount equal to the Penal Amount to be held as collateral if Surety discovers any information was concealed or misrepresented by the Indemnitor or Principal, or upon other reasonable cause material to the Surety’s assumed risk. If the court increases the penal amount of the Bail Bond over the amount set forth above, Indemnitor(s) and Principal agree to provide additional collateral as Surety may require if Surety, in its sole discretion, desires to remain on the Bail Bond.
+
+5) To pay Surety immediately upon demand the penal amount of the Bail Bond after any breach of bond conditions or entry of Estreature (forfeiture) pursuant to governing statutes.
+
+6) To aid Surety in securing release or exoneration of Surety from all liability under the Bail Bond, including the surrender of the Principal to the Court upon direction of the Surety.
+
+7) Indemnitor(s) and Principal hereby grant to Surety a Security Interest in all money or other property in their possession or hereafter acquired from time to time pursuant to Chapter 679, Florida Statutes and/or Article 9 of the Uniform Commercial Code. The Surety is authorized to lawfully levy upon said money or property in the manner provided by law and to apply any deposit(s) and/or proceeds without notice toward any liabilities, losses, costs, damages and expenses incurred by Surety as provided in this Agreement. If collateral placed with Surety is in excess of the bail forfeited, such excess shall be timely returned to the Indemnitor and/or Principal as appropriate after first applying the collateral to any forfeiture and subject to any claim of Surety for unpaid Premium or other lawful charges, including but not limited to reimbursement of document recording fees and stamps and filing fees, credit card charges, and any electronic monitoring charges.
+
+8) The obligations of the Indemnitor(s) and Principal hereunder are joint and several. Any amounts due shall bear interest at the maximum rate allowed by law. The Surety shall not be first obligated to proceed against the Principal on Bail Bond before having recourse against the Indemnitor(s) or any one of them. Indemnitors expressly waive any benefits of law requiring the Surety to make claim upon or to proceed or enforce its remedies against the Principal before making demand upon or proceeding and/or enforcing its remedies against any one or more of the Indemnitor(s). For good and valuable consideration, the undersigned Principal hereby agrees to indemnify and/or hold harmless the Surety for 100% of any and all losses not otherwise prohibited by law or rules and regulations promulgated under any applicable statute.
+
+9) As an inducement for Surety to underwrite the Bail Bond, Indemnitor(s) and Principal warrant all statements made by them on the Application for Bail be true and agree to advise Surety of any change, including but not limited to change of phone number, address or employment of either the Principal or of any of the Indemnitor(s) or any other material change in circumstances within forty-eight (48) hours after such change shall have occurred. ANY FAILURE BY PRINCIPAL TO SO NOTIFY SURETY SHALL CONSTITUTE GROUNDS TO BELIEVE PRINCIPAL INTENDS TO FLEE AND SHALL BE CAUSE FOR IMMEDIATE SURRENDER OF THE PRINCIPAL.
+
+10) The undersigned agrees that these obligations apply to any and all Bail Bonds executed for the same charge for which the above mentioned Bail Bond was executed or any charge arising out of the same transaction regardless of whether said Bail Bonds are filed before or after conviction, including appeals, but not in a greater amount.
+
+11) The undersigned authorizes any person, agency, partnership or corporation having any information concerning my character, credit, and financial reputation to release such information to Surety, including but not limited to credit reports and background investigations. Such information is to be used to secure the Principal's appearance in court or apprehension in the case of a bond estreature. The undersigned hereby releases such person, agency, partnership or corporation from any liability which may be incurred in releasing this information to Surety including liability under Federal Law.
+
+I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECEIPT OF A COPY OF THE INDEMNTIY AGREEMENT OR HAVE PRINTED OUT A COPY. I AM THE TRUE AND LAWFUL OWNER OF THE PROPERTY, WHETHER REAL OR PERSONAL, SET FORTH IN THE APPLICATION FOR BAIL (WHICH ENTIRE APPLICATION IS MADE A PART HEREOF BY REFERENCE). I OWN SUCH PROPERTY FREE AND CLEAR OF ALL LIENS OR ENCUMBRANCES EXCEPT AS I HAVE DISCLOSED IN WRITING. I PROMISE NOT TO TRANSFER OR ENCUMBER ANY OF SAID PROPERTY UNTIL MY LIABILITY UNDER THIS INDEMNITY AGREEMENT AND THE APPLICATION FOR BAIL HAS BEEN RELEASED. I UNDERSTAND THE SURETY IS PERMITTING THE BAIL BOND TO REMAIN IN FORCE RELYING ON THE STATEMENTS MADE BY ME.
+
+
+
+
+
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Back</button>
+          <button class="primary" type="button" data-next>Next</button>
+        </div>
+      </div>
+
+
+
+
+
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Back</button>
+          <button class="primary" type="button" data-next>Next</button>
+        </div>
+      </div>
+
+      <!-- STEP 12: Agreement (Signature) -->
+      <div class="section" data-step="21">
+        <div class="grid">
+          <div class="full">
+            <label for="agreeName">BY TYPING YOUR NAME AND SUBMITTING BELOW YOU AGREE TO ALL THE ABOVE TERMS AND CONDITIONS AND THAT THE INFORMATION IS ENTIRELY CORRECT AND TRUE AND THAT YOU ARE THE PERSON SUBMITTING THE APPLICATION.<span class="req">*</span></label>
+            <input id="agreeName" name="agreeName" required />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="ghost" type="button" data-back>Back</button>
+          <button class="primary" id="submitBtn" type="submit">Submit</button>
+          <button class="ghost" type="button" id="resetBtn">Clear</button>
+          <div class="error" id="err">Please fill the required fields in this step.</div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <script>
+    const sections = Array.from(document.querySelectorAll('.section'));
+    function showStep(idx){ sections.forEach((s,i)=>{ s.classList.toggle('active', i===idx); }); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function validateStep(idx){ const step = sections[idx]; const fields = step.querySelectorAll('input, select, textarea'); for (const el of fields) { if (!el.checkValidity()) { el.reportValidity(); return false; } } return true; }
+    sections.forEach((sec, idx) => {
+      sec.querySelector('[data-next]')?.addEventListener('click', () => { if (!validateStep(idx)) return; if (idx+1 < sections.length) showStep(idx+1); });
+      sec.querySelector('[data-back]')?.addEventListener('click', () => { if (idx-1 >= 0) showStep(idx-1); });
+    });
+    showStep(0);
+    document.querySelectorAll('input[data-phone]').forEach(el => { el.addEventListener('blur', () => { const d = (el.value||'').replace(/[^0-9]/g,''); if (d.length===10) el.value = `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`; }); });
+    const f=document.getElementById('f'); const err=document.getElementById('err'); const submitBtn=document.getElementById('submitBtn');
+    f.addEventListener('submit',(e)=>{ e.preventDefault(); if (!validateStep(sections.length-1)) { err && (err.style.display='block'); return; } if (!f.checkValidity()) { f.reportValidity(); return; } submitBtn.disabled=true; const data=Object.fromEntries(new FormData(f).entries()); if (window.google&&google.script&&google.script.run) { google.script.run.withSuccessHandler(()=>{submitBtn.disabled=false;alert('Submitted!');f.reset();showStep(0);}).withFailureHandler(e=>{submitBtn.disabled=false;alert(e&&e.message?e.message:'Submission failed');}).submitToSheet(data);} else { console.log('Dev mode: payload',data); setTimeout(()=>{submitBtn.disabled=false;alert('Submitted!');f.reset();showStep(0);},300);} });
+    document.getElementById('resetBtn')?.addEventListener('click',()=>{f.reset();showStep(0);});
+  </script>
+</body>
+</html>
