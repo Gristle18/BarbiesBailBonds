@@ -57,7 +57,7 @@
       <!-- STEP 2A: Indemnitor (first 5) -->
       <div class="section" data-step="1">
         <div class="section-info" style="margin-bottom:20px; color:#fff; font-size:14px; line-height:1.4; text-align:center;">
-          Please provide the following information about the person who is bonding the arrested person out. <span style="color:#F5A00D; font-weight:bold;">Incomplete information will delay processing or require redoing the application.</span>
+          Please provide the following information about the person who is bonding the arrested person out.
         </div>
         <div class="grid">
           <div>
@@ -150,7 +150,7 @@
       <!-- STEP 3A: Defendant (first 5) -->
       <div class="section" data-step="4">
         <div class="section-info" style="margin-bottom:20px; color:#fff; font-size:14px; line-height:1.4; text-align:center;">
-          The following questions are about the defendant (the arrested person or person needing a bond). <span style="color:#F5A00D; font-weight:bold;">Incomplete information will delay processing or require redoing the application.</span>
+          The following questions are about the defendant (the arrested person or person needing a bond).
         </div>
         <div class="grid">
           <div>
@@ -683,12 +683,12 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         // Update section info messages for indemnitors
         const indemnitorSectionInfo = document.querySelector('.section[data-step="1"] .section-info');
         if (indemnitorSectionInfo) {
-          indemnitorSectionInfo.innerHTML = 'Please provide the following information about yourself (the person bonding the arrested person out). <span style="color:#F5A00D; font-weight:bold;">Incomplete information will delay processing or require redoing the application.</span>';
+          indemnitorSectionInfo.innerHTML = 'Please provide the following information about yourself (the person bonding the arrested person out).';
         }
         
         const defendantSectionInfo = document.querySelector('.section[data-step="4"] .section-info');
         if (defendantSectionInfo) {
-          defendantSectionInfo.innerHTML = 'The following questions are about the defendant (the arrested person or person needing a bond). <span style="color:#F5A00D; font-weight:bold;">Incomplete information will delay processing or require redoing the application.</span>';
+          defendantSectionInfo.innerHTML = 'The following questions are about the defendant (the arrested person or person needing a bond).';
         }
         
         // Defendant section labels remain as "Defendant's"
@@ -735,12 +735,12 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         // Update section info messages for defendants
         const indemnitorSectionInfo = document.querySelector('.section[data-step="1"] .section-info');
         if (indemnitorSectionInfo) {
-          indemnitorSectionInfo.innerHTML = 'Please provide the following information about your indemnitor (the person bonding you out). <span style="color:#F5A00D; font-weight:bold;">Incomplete information will delay processing or require redoing the application.</span>';
+          indemnitorSectionInfo.innerHTML = 'Please provide the following information about your indemnitor (the person bonding you out).';
         }
         
         const defendantSectionInfo = document.querySelector('.section[data-step="4"] .section-info');
         if (defendantSectionInfo) {
-          defendantSectionInfo.innerHTML = 'The following questions are about you (the defendant or person needing a bond). <span style="color:#F5A00D; font-weight:bold;">Incomplete information will delay processing or require redoing the application.</span>';
+          defendantSectionInfo.innerHTML = 'The following questions are about you (the defendant or person needing a bond).';
         }
       }
     }
