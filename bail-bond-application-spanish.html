@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barbie's Bail Bonds - Formulario de Solicitud</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:transparent; color:#fff; }
+    .wrap { max-width: 880px; margin: 24px auto 40px; padding: 0 16px; }
+    .section { margin: 28px 0; padding: 20px; display:none; background:transparent; }
+    .section.active { display:block; }
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .full { grid-column: 1 / -1; }
+    label { display:block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+    .req { color: #ff6666; margin-left: 2px; }
+    input, textarea, select { width: 100%; padding: 12px; border: 1px solid #555; border-radius: 10px; font-size: 15px; background:#222; color:#fff; }
+    textarea { min-height: 120px; resize: vertical; }
+    .actions, .step-actions { display:flex; gap:10px; margin-top:20px; }
+    button { border:0; border-radius:10px; padding:12px 16px; font-weight:700; cursor:pointer; }
+    .primary { background:#F5A00D; color:#111; }
+    .ghost { background:#444; color:#fff; }
+    .error { color:#ff6666; font-size:14px; display:none; }
+    .hint { color:#bbb; font-size:13px; margin-top:-6px; margin-bottom:10px; }
+    .checks { display:flex; flex-direction:column; gap:10px; margin-top: 10px; }
+    .checks label { font-weight:500; display:flex; align-items:center; gap:10px; margin:0; cursor:pointer; }
+    .checks input[type="checkbox"] { margin: 0; width: auto; flex-shrink: 0; }
+    .agreement-text { white-space: pre-line; font-size:14px; line-height:1.4; color:#ddd; padding:20px; border:1px solid #555; border-radius:10px; background:#222; max-height: 400px; overflow-y: auto; }
+    @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <form id="f" novalidate>
+
+      <!-- STEP 1: Intake (2 questions) -->
+      <div class="section active" data-step="0">
+        <div class="grid">
+          <div class="full">
+            <label for="whoAreYou">¿Quién eres?<span class="req">*</span></label>
+            <select id="whoAreYou" name="whoAreYou" required>
+              <option value="" hidden>Seleccionar…</option>
+              <option value="Indemnitor">Garante — garantía financiera que promete al tribunal que el acusado comparecerá</option>
+              <option value="Defendant">Acusado — la persona en la cárcel / siendo afianzada</option>
+            </select>
+          </div>
+          <div class="full">
+            <label for="howHeard">¿Cómo se enteró de nosotros?<span class="req">*</span></label>
+            <input id="howHeard" name="howHeard" required />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 2A: Indemnitor (first 5) -->
+      <div class="section" data-step="1">
+        <div class="section-info" style="margin-bottom:20px; color:#fff; font-size:14px; line-height:1.4; text-align:center; font-weight:bold;">
+          Por favor proporcione la siguiente información sobre la persona que está afianzando a la persona arrestada.
+        </div>
+        <div class="grid">
+          <div>
+            <label for="indemnitorName">Nombre Completo del Garante<span class="req">*</span></label>
+            <input id="indemnitorName" name="indemnitorName" required />
+          </div>
+          <div>
+            <label for="relation">¿Su Relación con la Persona en la Cárcel y/o Siendo Afianzada?<span class="req">*</span></label>
+            <input id="relation" name="relation" required />
+          </div>
+          <div>
+            <label for="indemnitorDob">¿Cuál es Su Fecha de Nacimiento?<span class="req">*</span></label>
+            <input id="indemnitorDob" name="indemnitorDob" type="date" required />
+          </div>
+          <div>
+            <label for="indemnitorSsn">Número de Seguro Social</label>
+            <input id="indemnitorSsn" name="indemnitorSsn" inputmode="numeric" />
+          </div>
+          <div>
+            <label for="indemnitorDl">Licencia de Conducir (o ID) #<span class="req">*</span></label>
+            <input id="indemnitorDl" name="indemnitorDl" required />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 2B: Indemnitor (next 5) -->
+      <div class="section" data-step="2">
+        <div class="grid">
+          <div>
+            <label for="indemnitorCell">Teléfono Celular #<span class="req">*</span></label>
+            <input id="indemnitorCell" name="indemnitorCell" type="tel" inputmode="tel" data-phone required />
+          </div>
+          <div>
+            <label for="indemnitorHomePhone">Teléfono de Casa #</label>
+            <input id="indemnitorHomePhone" name="indemnitorHomePhone" type="tel" inputmode="tel" data-phone />
+          </div>
+          <div>
+            <label for="indemnitorEmail">Dirección de Correo Electrónico</label>
+            <input id="indemnitorEmail" name="indemnitorEmail" type="email" />
+          </div>
+          <div class="full">
+            <label for="indemnitorAddress">Dirección de Casa<span class="req">*</span></label>
+            <input id="indemnitorAddress" name="indemnitorAddress" required />
+          </div>
+          <div>
+            <label for="indemnitorHowLong">¿Cuánto Tiempo Viviendo en la Dirección Actual?<span class="req">*</span></label>
+            <input id="indemnitorHowLong" name="indemnitorHowLong" required />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 2C: Indemnitor (final 5) -->
+      <div class="section" data-step="3">
+        <div class="grid">
+          <div>
+            <label for="indemnitorWorkType">Tipo de Trabajo<span class="req">*</span></label>
+            <input id="indemnitorWorkType" name="indemnitorWorkType" required />
+          </div>
+          <div>
+            <label for="indemnitorEmployer">Nombre del Empleador<span class="req">*</span></label>
+            <input id="indemnitorEmployer" name="indemnitorEmployer" required />
+          </div>
+          <div>
+            <label for="indemnitorWorkPhone">Teléfono del Trabajo # (NO será llamado)</label>
+            <input id="indemnitorWorkPhone" name="indemnitorWorkPhone" type="tel" inputmode="tel" data-phone />
+          </div>
+          <div class="full">
+            <label for="indemnitorWorkAddress">Dirección del Trabajo</label>
+            <input id="indemnitorWorkAddress" name="indemnitorWorkAddress" />
+          </div>
+          <div class="full">
+            <label for="indemnitorVehicle">Vehículo del Garante<span class="req">*</span></label>
+            <input id="indemnitorVehicle" name="indemnitorVehicle" required />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 3A: Defendant (first 5) -->
+      <div class="section" data-step="4">
+        <div class="section-info" style="margin-bottom:20px; color:#fff; font-size:14px; line-height:1.4; text-align:center; font-weight:bold;">
+          Las siguientes preguntas son sobre el acusado (la persona arrestada o persona que necesita una fianza).
+        </div>
+        <div class="grid">
+          <div>
+            <label for="defendantName">Nombre Completo del Acusado<span class="req">*</span></label>
+            <input id="defendantName" name="defendantName" required />
+          </div>
+          <div>
+            <label for="defendantNick">Apodo del Acusado (Si no es el nombre real)</label>
+            <input id="defendantNick" name="defendantNick" />
+          </div>
+          <div>
+            <label for="defendantDob">Fecha de Nacimiento<span class="req">*</span></label>
+            <input id="defendantDob" name="defendantDob" type="date" required />
+          </div>
+          <div>
+            <label for="defendantSsn">Número de Seguro Social # (opcional)</label>
+            <input id="defendantSsn" name="defendantSsn" inputmode="numeric" />
+          </div>
+          <div>
+            <label for="defendantDl">Licencia de Conducir o ID # (opcional)</label>
+            <input id="defendantDl" name="defendantDl" />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 3B: Defendant (next 5) -->
+      <div class="section" data-step="5">
+        <div class="grid">
+          <div>
+            <label for="birthCityState">Ciudad y Estado de Nacimiento</label>
+            <input id="birthCityState" name="birthCityState" />
+          </div>
+          <div>
+            <label for="citizenship">País de Ciudadanía</label>
+            <input id="citizenship" name="citizenship" />
+          </div>
+          <div>
+            <label for="race">Raza<span class="req">*</span></label>
+            <select id="race" name="race" required>
+              <option value="" hidden>Seleccionar…</option>
+              <option>Blanco</option>
+              <option>Negro / Afroamericano</option>
+              <option>Hispano / Latino</option>
+              <option>Asiático</option>
+              <option>Nativo Americano</option>
+              <option>Isleño del Pacífico</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div>
+            <label for="defendantCell">Teléfono Celular #<span class="req">*</span></label>
+            <input id="defendantCell" name="defendantCell" type="tel" inputmode="tel" data-phone required />
+          </div>
+          <div>
+            <label for="defendantHomePhone">Teléfono de Casa # (Omitir si no tiene)</label>
+            <input id="defendantHomePhone" name="defendantHomePhone" type="tel" inputmode="tel" data-phone />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 3C: Defendant (next 5) -->
+      <div class="section" data-step="6">
+        <div class="grid">
+          <div>
+            <label for="defendantEmail">Dirección de Correo Electrónico</label>
+            <input id="defendantEmail" name="defendantEmail" type="email" />
+          </div>
+          <div class="full">
+            <label for="defendantAddress">Dirección de Casa<span class="req">*</span></label>
+            <input id="defendantAddress" name="defendantAddress" required />
+          </div>
+          <div>
+            <label for="defendantHowLong">¿Cuánto Tiempo ha Vivido el Acusado en la Dirección Actual?<span class="req">*</span></label>
+            <input id="defendantHowLong" name="defendantHowLong" required />
+          </div>
+          <div>
+            <label for="homeStatus">¿Esta Casa es Propia o Alquilada?</label>
+            <select id="homeStatus" name="homeStatus">
+              <option value="" hidden>Seleccionar…</option>
+              <option>Propia</option>
+              <option>Alquilada</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="full">
+            <label for="landlordName">Nombre de la Comunidad / Propietario / Dueño</label>
+            <input id="landlordName" name="landlordName" />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 3D: Defendant (next 5) -->
+      <div class="section" data-step="7">
+        <div class="grid">
+          <div>
+            <label for="defendantWorkType">Tipo de Trabajo del Acusado</label>
+            <input id="defendantWorkType" name="defendantWorkType" />
+          </div>
+          <div>
+            <label for="defendantEmployer">Nombre del Empleador del Acusado</label>
+            <input id="defendantEmployer" name="defendantEmployer" />
+          </div>
+          <div>
+            <label for="defendantWorkPhone">Teléfono del Trabajo del Acusado # (NO será llamado)</label>
+            <input id="defendantWorkPhone" name="defendantWorkPhone" type="tel" inputmode="tel" data-phone />
+          </div>
+          <div class="full">
+            <label for="defendantWorkAddress">Dirección del Trabajo del Acusado</label>
+            <input id="defendantWorkAddress" name="defendantWorkAddress" />
+          </div>
+          <div class="full">
+            <label for="recentArrest">Arresto Más Reciente del Acusado (Sin incluir el Arresto Actual)</label>
+            <textarea id="recentArrest" name="recentArrest"></textarea>
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 3E: Defendant (final 2) -->
+      <div class="section" data-step="8">
+        <div class="grid">
+          <div class="full">
+            <label>Por favor Seleccione o Toque con su Dedo SOLO si la respuesta es "Sí":</label>
+            <div class="hint">Estas preguntas son sobre la persona siendo afianzada</div>
+            <div class="checks">
+              <label><input type="checkbox" id="q_fta" name="q_fta" value="Yes"> ¿Ha Faltado a Comparecer en la Corte en el Pasado?</label>
+              <label><input type="checkbox" id="q_supervision" name="q_supervision" value="Yes"> ¿Está Actualmente en Libertad Condicional, Libertad Vigilada, o SOR?</label>
+              <label><input type="checkbox" id="q_otherBond" name="q_otherBond" value="Yes"> ¿Está Actualmente en Fianza por Otro Caso?</label>
+            </div>
+          </div>
+          <div class="full">
+            <label for="defendantVehicle">Vehículo del Acusado para llegar a la Corte<span class="req">*</span></label>
+            <input id="defendantVehicle" name="defendantVehicle" required />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 4A: Relationship (5) -->
+      <div class="section" data-step="9">
+        <div class="grid">
+          <div>
+            <label for="relationshipStatus">Estado de Relación</label>
+            <select id="relationshipStatus" name="relationshipStatus">
+              <option value="" hidden>Seleccionar…</option>
+              <option>Soltero</option>
+              <option>Casado</option>
+              <option>Unión Doméstica</option>
+              <option>Separado</option>
+              <option>Divorciado</option>
+              <option>Viudo</option>
+            </select>
+          </div>
+          <div>
+            <label for="partnerName">Nombre Completo de la Pareja del Acusado</label>
+            <input id="partnerName" name="partnerName" />
+          </div>
+          <div>
+            <label for="partnerDob">Fecha de Nacimiento de la Pareja</label>
+            <input id="partnerDob" name="partnerDob" type="date" />
+          </div>
+          <div>
+            <label for="partnerCell">Teléfono Celular # de la Pareja</label>
+            <input id="partnerCell" name="partnerCell" type="tel" inputmode="tel" data-phone />
+          </div>
+          <div>
+            <label for="partnerWorkType">Tipo de Trabajo de la Pareja</label>
+            <input id="partnerWorkType" name="partnerWorkType" />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 4B: Relationship (1) -->
+      <div class="section" data-step="10">
+        <div class="grid">
+          <div class="full">
+            <label for="partnerWorkName">Nombre del Trabajo de la Pareja</label>
+            <input id="partnerWorkName" name="partnerWorkName" />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 5A: Parents (5) -->
+      <div class="section" data-step="11">
+        <div class="grid">
+          <div>
+            <label for="motherName">Nombre de la Madre</label>
+            <input id="motherName" name="motherName" />
+          </div>
+          <div>
+            <label for="motherPhone">Teléfono # de la Madre</label>
+            <input id="motherPhone" name="motherPhone" type="tel" inputmode="tel" data-phone />
+          </div>
+          <div class="full">
+            <label for="motherAddress">Dirección de Casa de la Madre</label>
+            <input id="motherAddress" name="motherAddress" />
+          </div>
+          <div>
+            <label for="fatherName">Nombre del Padre</label>
+            <input id="fatherName" name="fatherName" />
+          </div>
+          <div>
+            <label for="fatherPhone">Teléfono # del Padre</label>
+            <input id="fatherPhone" name="fatherPhone" type="tel" inputmode="tel" data-phone />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 5B: Parents (1) -->
+      <div class="section" data-step="12">
+        <div class="grid">
+          <div class="full">
+            <label for="fatherAddress">Dirección de Casa del Padre</label>
+            <input id="fatherAddress" name="fatherAddress" />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 6: Siblings (4) -->
+      <div class="section" data-step="13">
+        <div class="grid">
+          <div>
+            <label for="sibling1Name">1. Nombre del Hermano/Hermana</label>
+            <input id="sibling1Name" name="sibling1Name" />
+          </div>
+          <div>
+            <label for="sibling1Phone">1. Teléfono # del Hermano/Hermana</label>
+            <input id="sibling1Phone" name="sibling1Phone" type="tel" inputmode="tel" data-phone />
+          </div>
+          <div>
+            <label for="sibling2Name">2. Nombre del Hermano/Hermana</label>
+            <input id="sibling2Name" name="sibling2Name" />
+          </div>
+          <div>
+            <label for="sibling2Phone">2. Teléfono # del Hermano/Hermana</label>
+            <input id="sibling2Phone" name="sibling2Phone" type="tel" inputmode="tel" data-phone />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 7A: References (5) -->
+      <div class="section" data-step="14">
+        <div class="grid">
+          <div>
+            <label for="ref1Name">Referencia #1 - Nombre Completo<span class="req">*</span></label>
+            <input id="ref1Name" name="ref1Name" required />
+          </div>
+          <div>
+            <label for="ref1Relation">Referencia #1 - Relación<span class="req">*</span></label>
+            <input id="ref1Relation" name="ref1Relation" required />
+          </div>
+          <div>
+            <label for="ref1Phone">Referencia #1 - Teléfono #<span class="req">*</span></label>
+            <input id="ref1Phone" name="ref1Phone" type="tel" inputmode="tel" data-phone required />
+          </div>
+          <div>
+            <label for="ref2Name">Referencia #2 - Nombre Completo<span class="req">*</span></label>
+            <input id="ref2Name" name="ref2Name" required />
+          </div>
+          <div>
+            <label for="ref2Relation">Referencia #2 - Relación<span class="req">*</span></label>
+            <input id="ref2Relation" name="ref2Relation" required />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 7B: References (4) -->
+      <div class="section" data-step="15">
+        <div class="grid">
+          <div>
+            <label for="ref2Phone">Referencia #2 - Teléfono #<span class="req">*</span></label>
+            <input id="ref2Phone" name="ref2Phone" type="tel" inputmode="tel" data-phone required />
+          </div>
+          <div>
+            <label for="ref3Name">Referencia #3 - Nombre Completo<span class="req">*</span></label>
+            <input id="ref3Name" name="ref3Name" required />
+          </div>
+          <div>
+            <label for="ref3Relation">Referencia #3 - Relación<span class="req">*</span></label>
+            <input id="ref3Relation" name="ref3Relation" required />
+          </div>
+          <div>
+            <label for="ref3Phone">Referencia #3 - Teléfono #<span class="req">*</span></label>
+            <input id="ref3Phone" name="ref3Phone" type="tel" inputmode="tel" data-phone required />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 8A: Emergency Contacts (5) -->
+      <div class="section" data-step="16">
+        <div class="grid">
+          <div>
+            <label for="emergency1Name">Contacto de Emergencia #1<span class="req">*</span></label>
+            <input id="emergency1Name" name="emergency1Name" required />
+          </div>
+          <div>
+            <label for="emergency1Phone">Teléfono de Emergencia #1<span class="req">*</span></label>
+            <input id="emergency1Phone" name="emergency1Phone" type="tel" inputmode="tel" data-phone required />
+          </div>
+          <div class="full">
+            <label for="emergency1Relation">Relación de Emergencia #1<span class="req">*</span></label>
+            <input id="emergency1Relation" name="emergency1Relation" required />
+          </div>
+          <div>
+            <label for="emergency2Name">Contacto de Emergencia #2<span class="req">*</span></label>
+            <input id="emergency2Name" name="emergency2Name" required />
+          </div>
+          <div>
+            <label for="emergency2Phone">Teléfono de Emergencia #2<span class="req">*</span></label>
+            <input id="emergency2Phone" name="emergency2Phone" type="tel" inputmode="tel" data-phone required />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 8B: Emergency Contacts (1) -->
+      <div class="section" data-step="17">
+        <div class="grid">
+          <div class="full">
+            <label for="emergency2Relation">Relación de Emergencia #2<span class="req">*</span></label>
+            <input id="emergency2Relation" name="emergency2Relation" required />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 9: Terms and Conditions -->
+      <div class="section" data-step="18">
+        <div class="agreement-text">
+Términos y Condiciones de la Solicitud para Fianza de Comparecencia
+
+Los siguientes términos y condiciones para la Fianza de Comparecencia para la cual U.S. Fire Insurance Company (USFIC) o su Agente y las partes acuerdan que dicha fianza de comparecencia está condicionada al cumplimiento total de todos dichos términos y condiciones y es parte de dicha fianza y solicitud por lo tanto.
+
+1. USFIC como la Compañía de Fianza, a través de su agente debidamente designado, tendrá control y jurisdicción sobre el principal durante el término para el cual la fianza es ejecutada y tendrá el derecho de aprehender, arrestar y entregar el principal a los funcionarios apropiados en cualquier momento según lo provisto por la ley.
+
+2. En el evento de que la entrega del principal sea hecha antes del tiempo fijado para las comparecencias del principal, y por razones distintas a las enumeradas abajo en el párrafo 3, entonces el principal tendrá derecho a un reembolso de la prima de la fianza.
+
+3. Se entiende y acuerda que la ocurrencia de cualquiera de los siguientes eventos constituirá una violación de la obligación del principal a USFIC aquí bajo, y USFIC tendrá el derecho de inmediatamente aprehender, arrestar, y entregar al principal, y el principal no tendrá derecho a ningún reembolso de prima en absoluto. Dichos eventos que constituirán una violación de las obligaciones del principal aquí bajo son:
+   (a) Si el principal debe partir de la jurisdicción de la corte sin el consentimiento escrito de la corte y la Compañía de Fianza o su Agente.
+   (b) Si el principal debe mudarse de una dirección a otra sin notificar a la Compañía de Fianza o su Agente por escrito antes de tal mudanza.
+   (c) Si el principal debe cometer cualquier acto que constituya evidencia razonable de la intención del principal de causar una pérdida de dicha fianza.
+   (d) Si el principal es arrestado e encarcelado por cualquier ofensa distinta a una violación menor de tráfico.
+   (e) Si el principal debe hacer cualquier declaración falsa material en la solicitud para fianza de comparecencia.
+
+Bajo penas de perjurio, declaro que he leído lo anterior, y la información proporcionada es verdadera y correcta sin reservas. La información y representaciones hechas en esta Solicitud son con el propósito de inducir a la Fianza a emprender la(s) fianza(s) para la cual he aplicado con la intención de que la Fianza confíe completamente en la información y representaciones contenidas aquí. Acepto indemnizar y mantener libre de daño a la Compañía de Fianza y sus Agentes por todas y cualesquiera pérdidas que puedan surgir de la ejecución de la(s) fianza(s) solicitada(s) aquí, a menos que esté prohibido por la ley o regulación aplicable.
+
+***SOLO PROCEDA SI ESTÁ DE ACUERDO CON LO ANTERIOR***
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 10: Contingent Promissory Note -->
+      <div class="section" data-step="19">
+        <div class="agreement-text">
+Pagaré Contingente
+
+Por valor recibido el suscrito, conjunta y separadamente promete(n) pagar a U.S. FIRE INSURANCE COMPANY o su Agente, Jerry Casal Bail Bonds, LLC a la demanda la suma principal de la fianza si y solo si ocurre una violación de los términos y condiciones de la fianza de caución o fianzas colocadas en nombre del acusado.
+
+El acusado para el cual esto está siendo presentado escrito anteriormente en este formulario (en adelante "Acusado"), junto con cualquier continuación y modificaciones, cualquier extensión, sustitución, incremento o apelación de los mismos (en adelante "Fianza"), o sobre el pago de cualquier gasto incurrido por el beneficiario o tenedor (en adelante "Beneficiario") para producir al Acusado ante la corte o cortes apropiadas de jurisdicción competente en el caso anterior, con interés sobre la misma a la tasa de CATORCE por ciento (14%), por año, desde la fecha de ocurrencia de la Contingencia antes mencionada, hasta ser pagado completamente. Todos los creadores o endosantes, ahora o en el futuro convirtiéndose en partes de este documento, conjunta y separadamente renuncian a la demanda, aviso de no pago y protesta: y en caso de que este pagaré entre en incumplimiento y sea puesto en manos de un abogado para cobro, los anteriores aceptan pagar honorarios razonables de abogado y todos los otros costos para hacer tal cobro y además aceptan que las cortes de jurisdicción original y cortes de apelación pueden otorgar honorarios razonables de abogado al Beneficiario en el evento de litigio y/o apelaciones.
+
+Se acuerda además y se entiende específicamente entre las partes a este Pagaré que actualmente no hay préstamo pendiente o deuda representada por este Pagaré Contingente, y que este Pagaré es dado para asegurar adelantos hasta e incluyendo la cantidad establecida arriba junto con interés si y cuando hay una violación de los términos y condiciones, incluyendo pero no limitado a pérdida o confiscación, de la Fianza. Se acuerda además y se entiende específicamente que este Pagaré se volverá nulo y sin efecto en tal momento como todas las obligaciones bajo la Fianza colocada en nombre del Acusado hayan sido cumplidas y el Beneficiario haya sido descargado de toda responsabilidad y debidamente exonerado por escrito y hasta tal momento como lo mismo ocurra el pagaré permanecerá en plena fuerza y efecto.
+
+(a) Toda y cualquier responsabilidad, pérdida, costos, daños, gastos, primas y honorarios de abogados surgiendo o incurridos por el Beneficiario en conexión con la Fianza titulada arriba, o cualquier otra reconocimiento, empresa u otra obligación, hasta ahora o en el futuro ejecutada, asumida o procurada por el Beneficiario a instancia o solicitud o en nombre de cualquiera de dueño de la propiedad gravada por la Hipoteca asegurando el Pagaré (en adelante, "Dueño") o del nombre del principal; Este Pagaré y la Hipoteca de fecha par con este servirán para asegurar:
+(b) Para el pago de todas las primas en tales Fianzas;
+(c) Para el desempeño de cada acuerdo (incluyendo continuaciones o modificaciones, cualquier extensión, sustitución, incremento o apelación de los mismos, con o sin consentimiento del Dueño) hecho por el Dueño o Acusado en conexión con dichas Fianzas;
+(d) Contra cualquier responsabilidad, pérdida, costos, gastos, y honorarios de abogados en conexión con cualquier reclamo a la seguridad colateral por persona reclamando adversamente al Dueño o a los Principales nombrados en las Fianzas;
+(e) Cualquier y todos los adelantos futuros hechos con o sin consentimiento del Dueño por el Beneficiario en nombre del Acusado incluyendo pero no necesariamente limitado a incrementos, modificaciones, extensiones o sustituciones, o la creación de cualquier obligación futura por el Beneficiario en conexión con el asunto descrito arriba, o cualquier fianza de caución u obligación emprendida por el Beneficiario en nombre del Acusado incluyendo, sin limitar, al colocar una nueva fianza para y en nombre del Acusado en la naturaleza de una fianza de apelación o sustitución extensión o modificación de la Fianza existente.
+
+Este Pagaré es Ejecutado en la fecha en que este formulario es enviado.
+
+***SOLO PROCEDA SI ESTÁ DE ACUERDO CON LO ANTERIOR***
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 11: Indemnity Agreement -->
+      <div class="section" data-step="20">
+        <div class="agreement-text">
+Acuerdo de Indemnización para Fianza de Caución
+
+El(los) Garante(s) suscrito(s) ("Garantes") hace(n) solicitud a U.S. Fire Insurance Company a través de su Agente Productor debidamente licenciado y designado Jerry Casal Bail Bonds, LLC (colectivamente referido aquí como "Fianza") para la ejecución de una empresa de caución ("Fianza de Caución") en la Cantidad Penal de cantidad de fianza dada para el acusado en adelante referido como el "Principal" y "Garante" y en consideración de que la Fianza arregle para la ejecución o continuación de esta Fianza de Caución, el(los) Garante(s) conjunta y separadamente acepta(n) lo siguiente:
+
+Por buena y valiosa consideración, el Principal suscrito y Garante(s) por este medio acuerdan indemnizar y mantener libre de daño a la compañía de Fianza y/o su(s) agente(s) por todas las pérdidas no prohibidas de otra manera por la ley o reglas del Departamento de Instituciones Financieras y Seguros de Florida, y
+
+1) Pagar a la Fianza la prima establecida por Florida para esta Fianza de Caución. La prima es ganada sobre la liberación del Principal de la facilidad de detención. El hecho de que el Acusado pueda haber sido arrestado impropiamente, o su fianza reducida o su caso desestimado, no obligará el retorno de ninguna porción de dicha prima.
+
+2) Reembolsar a la Fianza por gastos reales que incurra causados por cualquier violación por el Principal de los términos de la solicitud y Fianza de Caución, incluyendo gastos o responsabilidades incurridas como resultado de buscar, recapturar o retornar al Principal a custodia o en aprehender o esforzarse por aprehender al Principal, incluyendo honorarios legales por hacer solicitud a una corte por una orden para anular o dejar sin efecto una orden de pérdida o juicio entrado en la misma. En el evento de que el Acusado falle en seguir cualquier y todas las instrucciones o si la corte confisca o revoca la fianza y se vuelve necesario para el Fiancista de Caución o Fianza investigar, aprehender y entregar al Acusado a la corte, los Honorarios de Fugitivo serán gobernados por un Contrato de Honorarios de Fugitivo separado entre el Garante y la Fianza.
+
+3) Pagar a la Fianza un honorario razonable de abogado, no menos de Quinientos Dólares ($500.00), en el evento de que sea necesario instituir acción legal surgiendo de este Acuerdo.
+
+4) Proporcionar a la Fianza sobre demanda, una cantidad monetaria igual a la Cantidad Penal para ser mantenida como colateral si la Fianza descubre que cualquier información fue ocultada o mal representada por el Garante o Principal, o sobre otra causa razonable material al riesgo asumido por la Fianza. Si la corte incrementa la cantidad penal de la Fianza de Caución sobre la cantidad establecida arriba, el(los) Garante(s) y Principal acuerdan proporcionar colateral adicional como la Fianza pueda requerir si la Fianza, a su sola discreción, desea permanecer en la Fianza de Caución.
+
+5) Pagar a la Fianza inmediatamente sobre demanda la cantidad penal de la Fianza de Caución después de cualquier violación de condiciones de fianza o entrada de Confiscación (pérdida) conforme a estatutos gobernantes.
+
+6) Ayudar a la Fianza en asegurar liberación o exoneración de la Fianza de toda responsabilidad bajo la Fianza de Caución, incluyendo la entrega del Principal a la Corte sobre dirección de la Fianza.
+
+7) El(los) Garante(s) y Principal por este medio otorgan a la Fianza un Interés de Seguridad en todo dinero u otra propiedad en su posesión o en adelante adquirida de tiempo en tiempo conforme al Capítulo 679, Estatutos de Florida y/o Artículo 9 del Código Comercial Uniforme. La Fianza está autorizada a legalmente gravamen sobre dicho dinero o propiedad en la manera proporcionada por la ley y para aplicar cualquier depósito(s) y/o procedimientos sin aviso hacia cualquier responsabilidad, pérdidas, costos, daños y gastos incurridos por la Fianza como proporcionado en este Acuerdo. Si el colateral colocado con la Fianza está en exceso de la fianza confiscada, tal exceso será retornado oportunamente al Garante y/o Principal según apropiado después de primero aplicar el colateral a cualquier confiscación y sujeto a cualquier reclamo de la Fianza por Prima impaga u otros cargos legales, incluyendo pero no limitado a reembolso de honorarios de registro de documentos y sellos y honorarios de archivo, cargos de tarjeta de crédito, y cualquier cargo de monitoreo electrónico.
+
+8) Las obligaciones del(de los) Garante(s) y Principal aquí bajo son conjuntas y separadas. Cualquier cantidad debida llevará interés a la tasa máxima permitida por la ley. La Fianza no estará primero obligada a proceder contra el Principal en la Fianza de Caución antes de tener recurso contra el(los) Garante(s) o cualquiera de ellos. Los Garantes expresamente renuncian a cualquier beneficio de ley requiriendo que la Fianza haga reclamo sobre o proceder o hacer cumplir sus remedios contra el Principal antes de hacer demanda sobre o proceder y/o hacer cumplir sus remedios contra cualquiera uno o más de los Garante(s). Por buena y valiosa consideración, el Principal suscrito por este medio acuerda indemnizar y/o mantener libre de daño a la Fianza por 100% de cualquier y todas las pérdidas no prohibidas de otra manera por la ley o reglas y regulaciones promulgadas bajo cualquier estatuto aplicable.
+
+9) Como un inducement para que la Fianza suscriba la Fianza de Caución, el(los) Garante(s) y Principal garantizan que todas las declaraciones hechas por ellos en la Solicitud para Fianza sean verdaderas y acuerdan avisar a la Fianza de cualquier cambio, incluyendo pero no limitado a cambio de número de teléfono, dirección o empleo de cualquier el Principal o de cualquiera de los Garante(s) o cualquier otro cambio material en circunstancias dentro de cuarenta y ocho (48) horas después de que tal cambio haya ocurrido. CUALQUIER FALLA POR EL PRINCIPAL PARA ASÍ NOTIFICAR A LA FIANZA CONSTITUIRÁ RAZONES PARA CREER QUE EL PRINCIPAL INTENTA HUIR Y SERÁ CAUSA PARA ENTREGA INMEDIATA DEL PRINCIPAL.
+
+10) El suscrito acuerda que estas obligaciones aplican a cualquier y todas las Fianzas de Caución ejecutadas por el mismo cargo por el cual la Fianza de Caución mencionada arriba fue ejecutada o cualquier cargo surgiendo de la misma transacción sin importar si dichas Fianzas de Caución son archivadas antes o después de convicción, incluyendo apelaciones, pero no en una cantidad mayor.
+
+11) El suscrito autoriza a cualquier persona, agencia, sociedad o corporación teniendo cualquier información concerniente a mi carácter, crédito, y reputación financiera a liberar tal información a la Fianza, incluyendo pero no limitado a reportes de crédito e investigaciones de antecedentes. Tal información es para ser usada para asegurar la comparecencia del Principal en corte o aprehensión en el caso de una confiscación de fianza. El suscrito por este medio libera a tal persona, agencia, sociedad o corporación de cualquier responsabilidad que pueda ser incurrida en liberar esta información a la Fianza incluyendo responsabilidad bajo Ley Federal.
+
+HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIBO DE UNA COPIA DEL ACUERDO DE INDEMNIZACIÓN O HE IMPRESO UNA COPIA. SOY EL VERDADERO Y LEGAL DUEÑO DE LA PROPIEDAD, YA SEA REAL O PERSONAL, ESTABLECIDA EN LA SOLICITUD PARA FIANZA (CUAL SOLICITUD COMPLETA ES HECHA PARTE DE ESTO POR REFERENCIA). POSEO TAL PROPIEDAD LIBRE Y CLARA DE TODOS LOS GRAVÁMENES O CARGAS EXCEPTO COMO HE REVELADO POR ESCRITO. PROMETO NO TRANSFERIR O GRAVAR NINGUNA DE DICHA PROPIEDAD HASTA QUE MI RESPONSABILIDAD BAJO ESTE ACUERDO DE INDEMNIZACIÓN Y LA SOLICITUD PARA FIANZA HAYA SIDO LIBERADA. ENTIENDO QUE LA FIANZA ESTÁ PERMITIENDO QUE LA FIANZA DE CAUCIÓN PERMANEZCA EN FUERZA CONFIANDO EN LAS DECLARACIONES HECHAS POR MÍ.
+        </div>
+        <div class="step-actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
+        </div>
+      </div>
+
+      <!-- STEP 12: Final Agreement (Signature) -->
+      <div class="section" data-step="21">
+        <div class="grid">
+          <div class="full">
+            <label for="agreeName">AL ESCRIBIR SU NOMBRE Y ENVIAR ABAJO USTED ACEPTA TODOS LOS TÉRMINOS Y CONDICIONES ANTERIORES Y QUE LA INFORMACIÓN ES COMPLETAMENTE CORRECTA Y VERDADERA Y QUE USTED ES LA PERSONA ENVIANDO LA SOLICITUD.<span class="req">*</span></label>
+            <input id="agreeName" name="agreeName" required />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" id="submitBtn" type="submit">Enviar Solicitud</button>
+          <button class="ghost" type="button" id="resetBtn">Limpiar Formulario</button>
+          <div class="error" id="err">Por favor complete los campos requeridos en este paso.</div>
+        </div>
+      </div>
+
+      <!-- STEP 13: Application Complete -->
+      <div class="section" data-step="22" id="completionSection">
+        <div style="text-align:center; padding:40px 20px;">
+          <div style="font-size:48px; margin-bottom:20px;">⚠️</div>
+          <h2 style="color:#fff; font-size:24px; margin-bottom:20px; font-weight:700;">Paso Siguiente Requerido</h2>
+          <p style="color:#fff; font-size:16px; line-height:1.5; margin-bottom:10px;">
+            Su solicitud ha sido enviada.
+          </p>
+          <p style="color:#fff; font-size:16px; line-height:1.5; margin-bottom:30px;">
+            👉 Llámenos inmediatamente al <span style="color:#F5A00D; font-weight:bold;">561-247-0018</span> para completar su proceso de fianza.
+          </p>
+          <a href="tel:561-247-0018" style="display:inline-block; background:#F5A00D; color:#111; padding:16px 32px; border-radius:10px; font-weight:700; font-size:16px; text-decoration:none; cursor:pointer;">
+            LLÁMANOS
+          </a>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <script>
+    // Wizard logic
+    const sections = Array.from(document.querySelectorAll('.section'));
+    let userRole = ''; // 'Indemnitor' or 'Defendant'
+
+    function showStep(idx) {
+      sections.forEach((s, i) => {
+        s.classList.toggle('active', i === idx);
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Update labels based on user role
+    function updateLabelsForRole(role) {
+      userRole = role;
+      
+      if (role === 'Indemnitor') {
+        // Update indemnitor section labels (steps 1-3) to refer to "Your" info
+        document.querySelector('label[for="indemnitorName"]').innerHTML = 'Su Nombre Completo<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorDob"]').innerHTML = 'Su Fecha de Nacimiento<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorCell"]').innerHTML = 'Su Teléfono Celular #<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorEmail"]').innerHTML = 'Su Dirección de Correo Electrónico';
+        document.querySelector('label[for="indemnitorAddress"]').innerHTML = 'Su Dirección de Casa<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorHowLong"]').innerHTML = '¿Cuánto Tiempo Ha Vivido en la Dirección Actual?<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorWorkType"]').innerHTML = 'Su Tipo de Trabajo<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorEmployer"]').innerHTML = 'Su Nombre del Empleador<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorWorkPhone"]').innerHTML = 'Su Teléfono del Trabajo # (NO será llamado)';
+        document.querySelector('label[for="indemnitorWorkAddress"]').innerHTML = 'Su Dirección del Trabajo';
+        document.querySelector('label[for="indemnitorVehicle"]').innerHTML = 'Su Vehículo<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorHomePhone"]').innerHTML = 'Su Teléfono de Casa #';
+        document.querySelector('label[for="relation"]').innerHTML = 'Su Relación con la Persona en la Cárcel y/o Siendo Afianzada?<span class="req">*</span>';
+        
+        // Keep checkbox section hint as default for indemnitors (about defendant)
+        const checkboxHint = document.querySelector('.section[data-step="8"] .hint');
+        if (checkboxHint) {
+          checkboxHint.innerHTML = 'Estas preguntas son sobre la persona siendo afianzada';
+        }
+        
+        // Update section info messages for indemnitors
+        const indemnitorSectionInfo = document.querySelector('.section[data-step="1"] .section-info');
+        if (indemnitorSectionInfo) {
+          indemnitorSectionInfo.innerHTML = 'Por favor proporcione la siguiente información sobre usted (la persona afianzando a la persona arrestada).';
+        }
+        
+        const defendantSectionInfo = document.querySelector('.section[data-step="4"] .section-info');
+        if (defendantSectionInfo) {
+          defendantSectionInfo.innerHTML = 'Las siguientes preguntas son sobre el acusado (la persona arrestada o persona que necesita una fianza).';
+        }
+        
+        // Defendant section labels remain as "Defendant's"
+      } else if (role === 'Defendant') {
+        // Update indemnitor section labels (steps 1-3) to refer to "Indemnitor's" info
+        document.querySelector('label[for="indemnitorName"]').innerHTML = 'Nombre Completo del Garante<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorDob"]').innerHTML = 'Fecha de Nacimiento del Garante<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorCell"]').innerHTML = 'Teléfono Celular del Garante #<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorEmail"]').innerHTML = 'Dirección de Correo Electrónico del Garante';
+        document.querySelector('label[for="indemnitorAddress"]').innerHTML = 'Dirección de Casa del Garante<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorHowLong"]').innerHTML = '¿Cuánto Tiempo Ha Vivido el Garante en la Dirección Actual?<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorWorkType"]').innerHTML = 'Tipo de Trabajo del Garante<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorEmployer"]').innerHTML = 'Nombre del Empleador del Garante<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorWorkPhone"]').innerHTML = 'Teléfono del Trabajo del Garante # (NO será llamado)';
+        document.querySelector('label[for="indemnitorWorkAddress"]').innerHTML = 'Dirección del Trabajo del Garante';
+        document.querySelector('label[for="indemnitorVehicle"]').innerHTML = 'Vehículo del Garante<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorHomePhone"]').innerHTML = 'Teléfono de Casa del Garante #';
+        document.querySelector('label[for="relation"]').innerHTML = '¿Relación del Garante con Usted?<span class="req">*</span>';
+        
+        // Update defendant section labels to refer to "Your" info
+        document.querySelector('label[for="defendantName"]').innerHTML = 'Su Nombre Completo<span class="req">*</span>';
+        document.querySelector('label[for="defendantNick"]').innerHTML = 'Su Apodo (Si no es el nombre real)';
+        document.querySelector('label[for="defendantDob"]').innerHTML = 'Su Fecha de Nacimiento<span class="req">*</span>';
+        document.querySelector('label[for="defendantSsn"]').innerHTML = 'Su Número de Seguro Social # (opcional)';
+        document.querySelector('label[for="defendantDl"]').innerHTML = 'Su Licencia de Conducir o ID # (opcional)';
+        document.querySelector('label[for="defendantCell"]').innerHTML = 'Su Teléfono Celular #<span class="req">*</span>';
+        document.querySelector('label[for="defendantHomePhone"]').innerHTML = 'Su Teléfono de Casa # (Omitir si no tiene)';
+        document.querySelector('label[for="defendantEmail"]').innerHTML = 'Su Dirección de Correo Electrónico';
+        document.querySelector('label[for="defendantAddress"]').innerHTML = 'Su Dirección de Casa<span class="req">*</span>';
+        document.querySelector('label[for="defendantHowLong"]').innerHTML = '¿Cuánto Tiempo Ha Vivido en la Dirección Actual?<span class="req">*</span>';
+        document.querySelector('label[for="defendantWorkType"]').innerHTML = 'Su Tipo de Trabajo';
+        document.querySelector('label[for="defendantEmployer"]').innerHTML = 'Su Nombre del Empleador';
+        document.querySelector('label[for="defendantWorkPhone"]').innerHTML = 'Su Teléfono del Trabajo # (NO será llamado)';
+        document.querySelector('label[for="defendantWorkAddress"]').innerHTML = 'Su Dirección del Trabajo';
+        document.querySelector('label[for="defendantVehicle"]').innerHTML = 'Su Vehículo para llegar a la Corte<span class="req">*</span>';
+        document.querySelector('label[for="recentArrest"]').innerHTML = 'Su Arresto Más Reciente (Sin incluir el Arresto Actual)';
+        
+        // Update checkbox section hint for defendants
+        const checkboxHint = document.querySelector('.section[data-step="8"] .hint');
+        if (checkboxHint) {
+          checkboxHint.innerHTML = 'Estas preguntas son sobre usted';
+        }
+        
+        // Update section info messages for defendants
+        const indemnitorSectionInfo = document.querySelector('.section[data-step="1"] .section-info');
+        if (indemnitorSectionInfo) {
+          indemnitorSectionInfo.innerHTML = 'Por favor proporcione la siguiente información sobre su garante (la persona afianzándolo).';
+        }
+        
+        const defendantSectionInfo = document.querySelector('.section[data-step="4"] .section-info');
+        if (defendantSectionInfo) {
+          defendantSectionInfo.innerHTML = 'Las siguientes preguntas son sobre usted (el acusado o persona que necesita una fianza).';
+        }
+      }
+    }
+
+    function validateStep(idx) {
+      const step = sections[idx];
+      
+      // Special validation for first step - ensure role is selected and labels are updated
+      if (idx === 0) {
+        const whoAreYouSelect = document.getElementById('whoAreYou');
+        if (!whoAreYouSelect.value) {
+          whoAreYouSelect.reportValidity();
+          return false;
+        }
+        
+        // Ensure labels have been updated for the selected role
+        if (whoAreYouSelect.value && !userRole) {
+          updateLabelsForRole(whoAreYouSelect.value);
+        }
+      }
+      
+      const fields = step.querySelectorAll('input[required], select[required], textarea[required]');
+      for (const el of fields) {
+        if (!el.checkValidity()) {
+          el.reportValidity();
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // Setup navigation buttons
+    sections.forEach((sec, idx) => {
+      const nextBtn = sec.querySelector('[data-next]');
+      if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+          if (!validateStep(idx)) return;
+          const next = idx + 1;
+          if (next < sections.length) showStep(next);
+        });
+      }
+      
+      const backBtn = sec.querySelector('[data-back]');
+      if (backBtn) {
+        backBtn.addEventListener('click', () => {
+          const prev = idx - 1;
+          if (prev >= 0) showStep(prev);
+        });
+      }
+    });
+
+    // Add listener to "Who are you?" dropdown to update labels
+    const whoAreYouSelect = document.getElementById('whoAreYou');
+    whoAreYouSelect.addEventListener('change', function() {
+      if (this.value) {
+        updateLabelsForRole(this.value);
+      }
+    });
+
+    // Start at first step
+    showStep(0);
+
+    // Phone formatting: (XXX) XXX-XXXX
+    document.querySelectorAll('input[data-phone]').forEach(el => {
+      el.addEventListener('blur', () => {
+        const digits = (el.value || '').replace(/[^0-9]/g, '');
+        if (digits.length === 10) {
+          el.value = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+        }
+      });
+    });
+
+    // Form submission
+    const form = document.getElementById('f');
+    const errorDiv = document.getElementById('err');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Validate final step
+      if (!validateStep(sections.length - 1)) {
+        if (errorDiv) errorDiv.style.display = 'block';
+        return;
+      }
+      
+      // Check form validity
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      // Disable submit button
+      submitBtn.disabled = true;
+      
+      // Collect form data
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      
+      // Add timestamp
+      data.timestamp = new Date().toISOString();
+      
+      // Check if running in Google Apps Script environment
+      if (window.google && google.script && google.script.run) {
+        // Submit to Google Sheets via Apps Script
+        google.script.run
+          .withSuccessHandler(() => {
+            submitBtn.disabled = false;
+            showStep(22); // Show completion section
+          })
+          .withFailureHandler((error) => {
+            submitBtn.disabled = false;
+            alert(error && error.message ? error.message : 'Error en el envío. Por favor intente de nuevo.');
+          })
+          .submitToSheet(data);
+      } else {
+        // Development mode - log to console
+        console.log('Form submission data:', data);
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          showStep(22); // Show completion section
+        }, 500);
+      }
+    });
+
+    
+  </script>
+</body>
+</html>
