@@ -56,6 +56,9 @@
 
       <!-- STEP 2A: Indemnitor (first 5) -->
       <div class="section" data-step="1">
+        <div class="section-info" style="background:#333; padding:12px; border-radius:8px; margin-bottom:20px; color:#ddd; font-size:14px; line-height:1.4;">
+          Please provide the following information about the person who is bonding the arrested person out. Incomplete information will delay processing or require redoing the application.
+        </div>
         <div class="grid">
           <div>
             <label for="indemnitorName">Indemnitor's Complete Name<span class="req">*</span></label>
@@ -146,6 +149,9 @@
 
       <!-- STEP 3A: Defendant (first 5) -->
       <div class="section" data-step="4">
+        <div class="section-info" style="background:#333; padding:12px; border-radius:8px; margin-bottom:20px; color:#ddd; font-size:14px; line-height:1.4;">
+          The following questions are about the defendant (the arrested person or person needing a bond). Incomplete information will delay processing or require redoing the application.
+        </div>
         <div class="grid">
           <div>
             <label for="defendantName">Defendant's Complete Name<span class="req">*</span></label>
@@ -674,6 +680,17 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
           checkboxHint.innerHTML = 'These questions are about the person being bonded';
         }
         
+        // Update section info messages for indemnitors
+        const indemnitorSectionInfo = document.querySelector('.section[data-step="1"] .section-info');
+        if (indemnitorSectionInfo) {
+          indemnitorSectionInfo.innerHTML = 'Please provide the following information about yourself (the person bonding the arrested person out). Incomplete information will delay processing or require redoing the application.';
+        }
+        
+        const defendantSectionInfo = document.querySelector('.section[data-step="4"] .section-info');
+        if (defendantSectionInfo) {
+          defendantSectionInfo.innerHTML = 'The following questions are about the defendant (the arrested person or person needing a bond). Incomplete information will delay processing or require redoing the application.';
+        }
+        
         // Defendant section labels remain as "Defendant's"
       } else if (role === 'Defendant') {
         // Update indemnitor section labels (steps 1-3) to refer to "Indemnitor's" info
@@ -713,6 +730,17 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         const checkboxHint = document.querySelector('.section[data-step="8"] .hint');
         if (checkboxHint) {
           checkboxHint.innerHTML = 'These questions are about you';
+        }
+        
+        // Update section info messages for defendants
+        const indemnitorSectionInfo = document.querySelector('.section[data-step="1"] .section-info');
+        if (indemnitorSectionInfo) {
+          indemnitorSectionInfo.innerHTML = 'Please provide the following information about your indemnitor (the person bonding you out). Incomplete information will delay processing or require redoing the application.';
+        }
+        
+        const defendantSectionInfo = document.querySelector('.section[data-step="4"] .section-info');
+        if (defendantSectionInfo) {
+          defendantSectionInfo.innerHTML = 'The following questions are about you (the defendant or person needing a bond). Incomplete information will delay processing or require redoing the application.';
         }
       }
     }
