@@ -9,6 +9,32 @@ function doGet() {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
+function doPost(e) {
+  try {
+    // Parse the JSON data from the request
+    const formData = JSON.parse(e.postData.contents);
+    
+    // Submit to sheet
+    const result = submitToSheet(formData);
+    
+    // Return success response
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+      
+  } catch (error) {
+    console.error('Error in doPost:', error);
+    
+    // Return error response
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        success: false,
+        message: 'Error processing request: ' + error.toString()
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
 function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
