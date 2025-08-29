@@ -26,6 +26,8 @@
     .checks label { font-weight:500; display:flex; align-items:center; gap:10px; margin:0; cursor:pointer; }
     .checks input[type="checkbox"] { margin: 0; width: auto; flex-shrink: 0; }
     .agreement-text { white-space: pre-line; font-size:14px; line-height:1.4; color:#ddd; padding:20px; border:1px solid #555; border-radius:10px; background:#222; max-height: 400px; overflow-y: auto; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+    .loading-indicator { display: none; text-align: center; margin: 20px 0; color: #F5A00D; font-weight: 600; }
     @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -636,6 +638,9 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
           <button class="primary" id="submitBtn" type="submit">Submit Application</button>
           <div class="error" id="err">Please fill the required fields in this step.</div>
         </div>
+        <div class="loading-indicator" id="loadingIndicator">
+          Submitting your application...
+        </div>
       </div>
 
       <!-- STEP 13: Application Complete -->
@@ -833,6 +838,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
     const form = document.getElementById('f');
     const errorDiv = document.getElementById('err');
     const submitBtn = document.getElementById('submitBtn');
+    const loadingIndicator = document.getElementById('loadingIndicator');
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -849,8 +855,9 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         return;
       }
 
-      // Disable submit button
+      // Disable submit button and show loading
       submitBtn.disabled = true;
+      loadingIndicator.style.display = 'block';
       
       // Collect form data
       const formData = new FormData(form);
@@ -870,11 +877,13 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       })
       .then(() => {
         submitBtn.disabled = false;
+        loadingIndicator.style.display = 'none';
         showStep(22); // Show completion section
       })
       .catch((error) => {
         console.error('Submission error:', error);
         submitBtn.disabled = false;
+        loadingIndicator.style.display = 'none';
         // Still show completion since no-cors doesn't return errors properly
         showStep(22);
       });

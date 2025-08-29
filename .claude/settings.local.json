@@ -6,7 +6,8 @@
       "Bash(git config:*)",
       "Bash(git branch:*)",
       "Bash(gh repo create:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []
