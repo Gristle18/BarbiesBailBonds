@@ -25,10 +25,22 @@
             font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
             line-height: 1.6;
             color: var(--dark);
+        }
+
+        /* Prevent text selection on non-interactive elements */
+        h1, h2, h3, p:not(.footer-content p), .service-title, .service-description, .hero-tagline, .badges, .bbb-text, .bbb-meta, .location-text {
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+        }
+
+        /* Allow selection on footer content for copy/paste */
+        .footer-content p {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         /* Hero Video Banner Section */
