@@ -45,14 +45,15 @@
             cursor: pointer;
         }
 
-        .container {
-            max-width: 600px;
-            padding: 60px 40px;
+        .banner {
+            width: 100%;
+            max-width: 800px;
+            padding: 40px 40px 60px;
             background: var(--white);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(0,0,0,.08);
+            border-radius: 0;
+            box-shadow: none;
             text-align: center;
-            margin: 20px;
+            margin: 0;
         }
 
         .header {
@@ -84,10 +85,11 @@
             gap: 30px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-top: 20px;
         }
 
         .language-option {
-            background: var(--white);
+            background: var(--cream);
             border: 3px solid var(--light-gray);
             border-radius: 16px;
             padding: 40px 50px;
@@ -95,7 +97,7 @@
             text-decoration: none;
             color: var(--dark);
             min-width: 200px;
-            box-shadow: 0 4px 16px rgba(0,0,0,.06);
+            box-shadow: 0 4px 16px rgba(0,0,0,.08);
         }
 
         .language-option:hover {
@@ -169,7 +171,7 @@
 <body>
     <img src="https://www.dropbox.com/scl/fi/ehl0exnjk5inzqtojzg38/BarbiesBailBonds.png?rlkey=4ataihk42x5zv4qldzwp1iz8r&st=a8hz4s74&raw=1" alt="Barbie's Bail Bonds" class="logo">
     
-    <div class="container">
+    <div class="banner">
         <div class="header">
             <div class="main-title">Start Application</div>
             <div class="subtitle">Please pick a language to complete your application</div>
