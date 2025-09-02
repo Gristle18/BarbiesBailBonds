@@ -48,7 +48,7 @@
 
         .banner {
             width: 100%;
-            max-width: 800px;
+            max-width: 1200px;
             padding: 40px 40px 60px;
             background: var(--white);
             border-radius: 0;
@@ -63,7 +63,7 @@
 
         .logo {
             width: 100%;
-            max-width: 800px;
+            max-width: 1200px;
             height: auto;
             margin: 0 auto 40px;
             display: block;
@@ -86,20 +86,22 @@
         .language-selection {
             display: flex;
             gap: 30px;
-            justify-content: center;
+            justify-content: space-between;
             flex-wrap: wrap;
             margin-top: 20px;
+            width: 100%;
         }
 
         .language-option {
             background: var(--white);
             border: 1px solid var(--black);
             border-radius: 16px;
-            padding: 30px 120px;
+            padding: 40px 30px;
             transition: all 0.3s ease;
             text-decoration: none;
             color: var(--black);
-            min-width: 360px;
+            flex: 1;
+            max-width: calc(50% - 15px);
             box-shadow: 0 4px 16px rgba(0,0,0,.08);
         }
 
