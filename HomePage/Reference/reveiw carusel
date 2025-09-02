@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Barbies Bail Bonds — Reviews (Seamless Carousel)</title>
+<style>
+:root { --brand:#F5A00D; --ink:#111; --muted:#666; --line:#eee; }
+* { box-sizing: border-box; }
+body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; color:var(--ink); }
+.bbb-reviews { max-width: 980px; margin: 0 auto; padding: 8px; }
+.bbb-title { font-weight:600; margin: 10px 2px 14px; }
+
+/* Seamless marquee wrapper */
+.bbb-marquee { overflow: hidden; position: relative; }
+.bbb-track { display: flex; gap: 12px; width: max-content; will-change: transform; }
+
+/* Cards */
+.bbb-card { border:1px solid var(--line); border-radius:16px; box-shadow:0 4px 14px rgba(0,0,0,.06);
+            padding:16px; background:#fff; flex: 0 0 clamp(260px, 60vw, 360px); }
+.bbb-stars { color: var(--brand); font-size: 18px; letter-spacing: 2px; }
+.bbb-text { margin:8px 0 10px; line-height:1.45; }
+.bbb-meta { font-size: 13px; color:var(--muted); }
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .bbb-marquee { overflow: auto; }
+}
+</style>
+</head>
+<body>
+<div class="bbb-reviews">
+
+  <!-- Seamless scrolling wrapper (JS will clone at runtime to keep it continuous) -->
+  <div class="bbb-marquee" aria-label="Client reviews scrolling">
+    <div class="bbb-track" id="bbb-track">
+      <!-- SINGLE SET ONLY (no hard-coded duplicates) -->
+
+      <div class="bbb-card">
+        <div class="bbb-content">
+          <div class="bbb-stars">★★★★★</div>
+          <div class="bbb-text">"Jerry was great! Very informative and helpful, thank you."</div>
+          <div class="bbb-meta">— \ Rani Foster • 2 weeks ago • Google</div>
+        </div>
+      </div>
+
+      <div class="bbb-card">
+        <div class="bbb-content">
+          <div class="bbb-stars">★★★★★</div>
+          <div class="bbb-text">"Great service , Great staff , Would recommend there services 100%. Hopefully wont need too"</div>
+          <div class="bbb-meta">— Bryan Moore O) • 26 weeks ago • Google</div>
+        </div>
+      </div>
+
+      <div class="bbb-card">
+        <div class="bbb-content">
+          <div class="bbb-stars">★★★★★</div>
+          <div class="bbb-text">"Super helpful, kind and respectful. Glad to have ran into Jerry, I really appreciate him for"</div>
+          <div class="bbb-meta">— Belmarie Woods • 52 weeks ago • Google</div>
+        </div>
+      </div>
+
+      <div class="bbb-card">
+        <div class="bbb-content">
+          <div class="bbb-stars">★★★★★</div>
+          <div class="bbb-text">"I loved everything about my experience he was very fast, very clear, responds clearly and he is"</div>
+          <div class="bbb-meta">— Valentina O • 45 weeks ago • Google</div>
+        </div>
+      </div>
+
+      <div class="bbb-card">
+        <div class="bbb-content">
+          <div class="bbb-stars">★★★★★</div>
+          <div class="bbb-text">"Very nice people very helpful and well spoken thank you so much"</div>
+          <div class="bbb-meta">— Todd Archer • 45 weeks ago • Google</div>
+        </div>
+      </div>
+
+      <div class="bbb-card">
+        <div class="bbb-content">
+          <div class="bbb-stars">★★★★★</div>
+          <div class="bbb-text">"I was really able to speed through the application process since it was already on a Google"</div>
+          <div class="bbb-meta">— JonBkid • 14 weeks ago • Google</div>
+        </div>
+      </div>
+
+      <div class="bbb-card">
+        <div class="bbb-content">
+          <div class="bbb-stars">★★★★★</div>
+          <div class="bbb-text">"He answered the phone everytime i called his phone and the help was outstanding! Thanks"</div>
+          <div class="bbb-meta">— Latoya Williams • 17 weeks ago • Google</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Pixels per second (tweak speed here)
+  const SPEED = 20; 
+  const marquee = document.querySelector('.bbb-marquee');
+  const track = document.getElementById('bbb-track');
+  if (!marquee || !track) return;
+
+  // If user prefers reduced motion, don't animate
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  // Clone children until we have 2x the viewport width to allow seamless cycling
+  const originals = Array.from(track.children);
+  function totalWidth(){ return track.scrollWidth; }
+  function needMore(){ return totalWidth() < marquee.clientWidth * 2; }
+  while (needMore()) {
+    for (const el of originals) track.appendChild(el.cloneNode(true));
+  }
+
+  let x = 0; // current translateX
+  let last = performance.now();
+  let paused = false;
+  const gap = parseFloat(getComputedStyle(track).gap || '0');
+
+  marquee.addEventListener('mouseenter', () => paused = true);
+  marquee.addEventListener('mouseleave', () => paused = false);
+
+  function step(t){
+    const dt = (t - last) / 1000; last = t;
+    if (!paused) {
+      x -= SPEED * dt;
+      // Recycle first card when fully out of view for seamless loop
+      let first = track.firstElementChild;
+      if (first) {
+        const w = first.getBoundingClientRect().width + gap;
+        if (-x >= w) { x += w; track.appendChild(first); }
+      }
+      track.style.transform = `translateX(${x}px)`;
+    }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+})();
+</script>
+
+</body>
+</html>
