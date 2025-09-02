@@ -27,12 +27,18 @@
             color: var(--dark);
         }
 
-        /* Prevent text cursor/caret from appearing while allowing text selection */
+        /* Remove focus outline and prevent text editing cursor */
         * {
-            caret-color: transparent;
+            outline: none;
+            cursor: default;
         }
 
-        /* Ensure text is selectable but no blinking cursor appears */
+        /* Restore pointer cursor for interactive elements */
+        a, button, .btn, .service-button {
+            cursor: pointer;
+        }
+
+        /* Allow text selection but prevent editing appearance */
         body {
             -webkit-touch-callout: none;
             -webkit-tap-highlight-color: transparent;
