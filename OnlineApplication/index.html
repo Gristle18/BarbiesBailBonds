@@ -95,11 +95,11 @@
             background: var(--white);
             border: 1px solid var(--black);
             border-radius: 16px;
-            padding: 30px 80px;
+            padding: 30px 120px;
             transition: all 0.3s ease;
             text-decoration: none;
             color: var(--black);
-            min-width: 300px;
+            min-width: 360px;
             box-shadow: 0 4px 16px rgba(0,0,0,.08);
         }
 
@@ -128,9 +128,8 @@
         }
 
         @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                padding: 40px 30px;
+            .banner {
+                padding: 30px 30px 50px;
             }
             
             .language-selection {
@@ -139,11 +138,11 @@
             }
             
             .language-option {
-                padding: 30px 40px;
-                min-width: auto;
+                padding: 30px 80px;
+                min-width: 300px;
             }
             
-            .logo {
+            .main-title {
                 font-size: 24px;
             }
             
@@ -153,13 +152,19 @@
         }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
+            .banner {
+                padding: 20px 20px 40px;
             }
             
             .language-option {
-                padding: 25px 50px;
-                min-width: 280px;
+                padding: 40px 40px;
+                min-width: auto;
+                width: 280px;
+                height: 280px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
             }
             
             .language-flag {
