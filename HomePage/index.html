@@ -284,6 +284,9 @@
             height: 80px;
             margin: 0 auto 25px;
             border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .service-title {
@@ -519,24 +522,72 @@
         <div class="services-grid">
             
             <div class="service-box">
-                <img src="E:\BarbiesBailBonds\HomePage\Reference\20250827_1129_Key Release Icon_simple_compose_01k3p29gz3edeszkgx4trhcycr.png" 
-                     alt="Bond Someone Out" class="service-icon">
+                <div class="service-icon">
+                    <svg width="80" height="80" viewBox="0 0 80 80" style="background: var(--brand); border-radius: 16px;">
+                        <g transform="translate(10,10)">
+                            <!-- Hand -->
+                            <path d="M20 35 C15 35, 12 38, 12 42 L12 48 C12 52, 15 55, 20 55 L40 55 C45 55, 48 52, 48 48 L48 42 C48 38, 45 35, 40 35" fill="#F5F5DC" stroke="#333" stroke-width="2"/>
+                            <!-- Key -->
+                            <circle cx="25" cy="20" r="4" fill="#333"/>
+                            <circle cx="25" cy="20" r="1.5" fill="white"/>
+                            <rect x="23" y="24" width="4" height="15" fill="#333"/>
+                            <rect x="27" y="32" width="3" height="2" fill="#333"/>
+                            <rect x="27" y="35" width="2" height="2" fill="#333"/>
+                            <!-- Lock -->
+                            <rect x="35" y="25" width="12" height="8" rx="2" fill="#333"/>
+                            <path d="M38 25 L38 20 C38 17, 40 15, 43 15 C46 15, 48 17, 48 20 L48 22" stroke="#333" stroke-width="2" fill="none"/>
+                            <circle cx="41" cy="29" r="1" fill="white"/>
+                        </g>
+                    </svg>
+                </div>
                 <h3 class="service-title">Bond Someone Out Now!</h3>
                 <p class="service-description">Need help fast? We're on-call 24/7 to post bail now. For the quickest release, complete the Online Application first, then call us to finalize.</p>
                 <div class="service-cta">Arrest just happened? [Start Application] • [Call Now]</div>
             </div>
             
             <div class="service-box">
-                <img src="E:\BarbiesBailBonds\HomePage\Reference\Untitled design-2.png" 
-                     alt="Inmate Lookup" class="service-icon">
+                <div class="service-icon">
+                    <svg width="80" height="80" viewBox="0 0 80 80" style="background: var(--brand); border-radius: 16px;">
+                        <g transform="translate(10,10)">
+                            <!-- Jail bars background -->
+                            <rect x="8" y="8" width="44" height="40" rx="4" fill="white" stroke="#333" stroke-width="3"/>
+                            <!-- Vertical bars -->
+                            <rect x="12" y="12" width="2" height="32" fill="#333"/>
+                            <rect x="18" y="12" width="2" height="32" fill="#333"/>
+                            <rect x="24" y="12" width="2" height="32" fill="#333"/>
+                            <rect x="30" y="12" width="2" height="32" fill="#333"/>
+                            <rect x="36" y="12" width="2" height="32" fill="#333"/>
+                            <rect x="42" y="12" width="2" height="32" fill="#333"/>
+                            <rect x="48" y="12" width="2" height="32" fill="#333"/>
+                            <!-- Person silhouette -->
+                            <circle cx="30" cy="20" r="4" fill="#333"/>
+                            <path d="M22 30 C22 27, 25 25, 30 25 C35 25, 38 27, 38 30 L38 42 L22 42 Z" fill="#333"/>
+                        </g>
+                    </svg>
+                </div>
                 <h3 class="service-title">Palm Beach Inmate Lookup</h3>
                 <p class="service-description">Find someone in Palm Beach County custody—fast. Use the Palm Beach Inmate Locator to search by name.</p>
                 <div class="service-cta">Someone you know arrested? [Inmate Locator] • [Call Now]</div>
             </div>
             
             <div class="service-box">
-                <img src="E:\BarbiesBailBonds\HomePage\Reference\Untitled design-4.png" 
-                     alt="Warrant Check" class="service-icon">
+                <div class="service-icon">
+                    <svg width="80" height="80" viewBox="0 0 80 80" style="background: var(--brand); border-radius: 16px;">
+                        <g transform="translate(10,10)">
+                            <!-- Document -->
+                            <rect x="15" y="8" width="28" height="40" rx="2" fill="white" stroke="#333" stroke-width="2"/>
+                            <path d="M35 8 L43 16 L43 8 Z" fill="white" stroke="#333" stroke-width="2"/>
+                            <!-- Text lines -->
+                            <rect x="20" y="18" width="12" height="1.5" fill="#333"/>
+                            <rect x="20" y="22" width="18" height="1.5" fill="#333"/>
+                            <rect x="20" y="26" width="10" height="1.5" fill="#333"/>
+                            <!-- Star badge -->
+                            <circle cx="35" cy="38" r="8" fill="#333"/>
+                            <circle cx="35" cy="38" r="6" fill="white"/>
+                            <path d="M35 33 L36.5 37 L41 37 L37.5 40 L39 44 L35 41 L31 44 L32.5 40 L29 37 L33.5 37 Z" fill="#333"/>
+                        </g>
+                    </svg>
+                </div>
                 <h3 class="service-title">Warrant?</h3>
                 <p class="service-description">Think you might have a warrant in Palm Beach County? Contact us for a confidential status check. If one exists, we'll arrange a walk-through surrender with a pre-approved bond to minimize time in custody.</p>
                 <div class="service-cta">Have a warrant? [Learn More] • [Call Now]</div>
