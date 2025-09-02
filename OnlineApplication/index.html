@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Application • Barbie's Bail Bonds</title>
+    <style>
+        :root {
+            --brand: #F28C00;
+            --brand-dark: #D67700;
+            --dark: #111;
+            --muted: #666;
+            --light-gray: #eee;
+            --white: #fff;
+            --cream: #fff2d1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--cream);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Remove focus outline and prevent text editing cursor */
+        * {
+            outline: none;
+            cursor: default;
+        }
+
+        /* Restore pointer cursor for interactive elements */
+        a, button, .language-option {
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 60px 40px;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,.08);
+            text-align: center;
+            margin: 20px;
+        }
+
+        .header {
+            margin-bottom: 50px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--brand);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        .language-selection {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .language-option {
+            background: var(--white);
+            border: 3px solid var(--light-gray);
+            border-radius: 16px;
+            padding: 40px 50px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--dark);
+            min-width: 200px;
+            box-shadow: 0 4px 16px rgba(0,0,0,.06);
+        }
+
+        .language-option:hover {
+            border-color: var(--brand);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(242,140,0,.15);
+        }
+
+        .language-flag {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .language-name {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .language-desc {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 40px 30px;
+            }
+            
+            .language-selection {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .language-option {
+                padding: 30px 40px;
+                min-width: auto;
+            }
+            
+            .logo {
+                font-size: 24px;
+            }
+            
+            .subtitle {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .language-option {
+                padding: 25px 30px;
+            }
+            
+            .language-flag {
+                font-size: 40px;
+            }
+            
+            .language-name {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Barbie's Bail Bonds</div>
+            <div class="subtitle">Online Application</div>
+        </div>
+        
+        <div class="language-selection">
+            <a href="#" class="language-option">
+                <span class="language-flag">🇺🇸</span>
+                <div class="language-name">English</div>
+                <div class="language-desc">Continue in English</div>
+            </a>
+            
+            <a href="#" class="language-option">
+                <span class="language-flag">🇪🇸</span>
+                <div class="language-name">Español</div>
+                <div class="language-desc">Continuar en Español</div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
