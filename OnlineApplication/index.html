@@ -26,7 +26,7 @@
             font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
             line-height: 1.6;
             color: var(--white);
-            background: transparent;
+            background: var(--white);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -226,6 +226,15 @@
             margin: 0 auto;
         }
 
+        /* Infinitely tall black section after footer */
+        .black-void {
+            width: 100%;
+            height: 100vh;
+            background: var(--black);
+            flex: 1;
+            min-height: 500px;
+        }
+
 
         @media (max-width: 768px) {
             .banner {
@@ -357,5 +366,8 @@
             <p>Copyright © 2024 Barbie's Bail Bonds | Bail Bond Services</p>
         </div>
     </footer>
+
+    <!-- Infinitely tall black section -->
+    <div class="black-void"></div>
 </body>
 </html>
