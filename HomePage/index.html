@@ -27,20 +27,15 @@
             color: var(--dark);
         }
 
-        /* Prevent text selection on non-interactive elements */
-        h1, h2, h3, p:not(.footer-content p), .service-title, .service-description, .hero-tagline, .badges, .bbb-text, .bbb-meta, .location-text {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
+        /* Prevent text cursor/caret from appearing while allowing text selection */
+        * {
+            caret-color: transparent;
         }
 
-        /* Allow selection on footer content for copy/paste */
-        .footer-content p {
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
+        /* Ensure text is selectable but no blinking cursor appears */
+        body {
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* Hero Video Banner Section */
