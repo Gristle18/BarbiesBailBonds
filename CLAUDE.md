@@ -67,6 +67,14 @@ This is the Barbie's Bail Bonds website project. The main goal is to create a fo
 - Positioned Traffic & Misdemeanor section at top after subtitle
 - Changed section backgrounds to white with black text for readability
 
+### Step 4: Interactive Features Implementation
+- Added warrant type selection buttons (Traffic/Misdemeanor vs Felony)
+- Implemented smooth scrolling JavaScript functionality with preventDefault
+- Added proper scroll offset using scroll-margin-top: 100px CSS
+- Created card-style selection buttons with hover effects and icons (🚗, ⚖️)
+- Added descriptive text for each warrant type option
+- Positioned selection buttons prominently under subtitle text
+
 ## Remember
 
 - Always commit after EVERY file change
