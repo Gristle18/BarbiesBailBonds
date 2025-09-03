@@ -9,4 +9,4 @@ Contents:
 
 Subfolders:
 - scripts/: JavaScript files for this page (currently empty)
-- assets/: Images, videos, and other media files for this page (currently empty)
+- assets/: Images, videos, and other media files for this page (contains reference folder)
