@@ -8,7 +8,10 @@
       "Bash(gh repo create:*)",
       "Bash(git push:*)",
       "WebSearch",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(git fetch:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)"
     ],
     "deny": [],
     "ask": []
