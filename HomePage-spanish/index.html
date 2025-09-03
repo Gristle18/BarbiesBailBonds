@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbie's Bail Bonds • Palm Beach | Liberación Rápida 24/7</title>
+    <style>
+        :root {
+            --brand: #F28C00;
+            --brand-dark: #D67700;
+            --dark: #111;
+            --muted: #666;
+            --light-gray: #eee;
+            --white: #fff;
+            --cream: #fff2d1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+        }
+
+        /* Remove focus outline and prevent text editing cursor */
+        * {
+            outline: none;
+            cursor: default;
+        }
+
+        /* Restore pointer cursor for interactive elements */
+        a, button, .btn, .service-button {
+            cursor: pointer;
+        }
+
+        /* Allow text selection but prevent editing appearance */
+        body {
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hero Video Banner Section */
+        #bbb-hero {
+            position: relative;
+            height: 600px;
+            max-height: 80vh;
+            color: var(--white);
+            background: #000;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            overflow: hidden;
+            --focusY: 50%;
+            --brightness: 0.80;
+        }
+        
+        .bg {
+            position: absolute;
+            inset: 0;
+        }
+        
+        video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 50% var(--focusY);
+            filter: brightness(var(--brightness)) saturate(1.05);
+            display: block;
+            pointer-events: none;
+        }
+        
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,.30), rgba(0,0,0,.18) 40%, rgba(0,0,0,.40));
+        }
+        
+        .inner {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 0 16px;
+        }
+
+        h1 {
+            margin: 0 0 .5rem;
+            font-weight: 800;
+            letter-spacing: .2px;
+            font-size: clamp(26px, 5vw, 56px);
+            line-height: 1.08;
+        }
+        
+        #bbb-hero .sep {
+            padding: 0 .35rem;
+        }
+        
+        .only-mobile-break {
+            display: none;
+        }
+
+        .hero-tagline {
+            margin: 0 0 1rem;
+            font-size: clamp(14px, 2.2vw, 18px);
+            color: #ededed;
+        }
+        
+        .ctas {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .6rem;
+            justify-content: center;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: .78rem 1.1rem;
+            border-radius: 999px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform .12s ease, opacity .12s ease;
+        }
+        
+        .btn-primary {
+            background: var(--brand);
+            color: var(--white);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,.12);
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,.22);
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            opacity: .96;
+        }
+        
+        .badges {
+            margin-top: .9rem;
+            font-size: 13.5px;
+            color: #d5d5d5;
+        }
+
+        @media (max-width: 1024px) {
+            #bbb-hero {
+                --focusY: 46%;
+                --brightness: 0.82;
+            }
+            h1 {
+                font-size: clamp(24px, 5.2vw, 48px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            #bbb-hero {
+                --focusY: 44%;
+                --brightness: 0.84;
+            }
+            h1 {
+                margin-bottom: .35rem;
+                font-size: clamp(22px, 6.2vw, 28px);
+                line-height: 1.06;
+            }
+            #bbb-hero .sep {
+                display: none;
+            }
+            .only-mobile-break {
+                display: block;
+            }
+            .hero-tagline, .badges {
+                display: none;
+            }
+            .ctas {
+                gap: .35rem;
+                max-width: 340px;
+                margin-inline: auto;
+            }
+            .ctas a:first-child {
+                display: block;
+                width: 100%;
+                max-width: 340px;
+                padding: .64rem .9rem;
+                font-size: 1rem;
+            }
+            .ctas a:not(:first-child) {
+                padding: .44rem .66rem;
+                font-size: .85rem;
+                border-radius: 999px;
+            }
+        }
+
+        /* Reviews Section */
+        .bbb-reviews {
+            margin: 0;
+            padding: 0;
+            background: var(--white);
+        }
+        
+        .bbb-title {
+            font-weight: 600;
+            margin: 20px 0 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .bbb-marquee {
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .bbb-track {
+            display: flex;
+            gap: 12px;
+            width: max-content;
+            will-change: transform;
+        }
+
+        .bbb-card {
+            border: 1px solid var(--light-gray);
+            border-radius: 16px;
+            box-shadow: 0 4px 14px rgba(0,0,0,.06);
+            padding: 16px;
+            background: var(--white);
+            flex: 0 0 clamp(260px, 60vw, 360px);
+        }
+        
+        .bbb-stars {
+            color: var(--brand);
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+        
+        .bbb-text {
+            margin: 8px 0 10px;
+            line-height: 1.45;
+        }
+        
+        .bbb-meta {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .bbb-marquee {
+                overflow: auto;
+            }
+        }
+
+        /* Service Boxes Section */
+        .services-section {
+            padding: 80px 20px;
+            background: var(--cream);
+        }
+        
+        .services-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .services-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 50px;
+            color: var(--dark);
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .service-box {
+            background: var(--cream);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .service-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0,0,0,.12);
+        }
+        
+        .service-icon {
+            width: 219px;
+            height: 219px;
+            margin: 0 auto 25px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .service-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .service-description {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: var(--muted);
+        }
+        
+        .service-cta {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .service-cta a {
+            color: var(--brand);
+            text-decoration: none;
+        }
+
+        .service-cta a:hover {
+            color: var(--brand-dark);
+            text-decoration: underline;
+        }
+
+        .service-button {
+            background: var(--dark);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .service-button:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        /* How to Get to Us Section */
+        .location-section {
+            padding: 80px 20px;
+            background: var(--dark);
+        }
+        
+        .location-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .location-content h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+        
+        .location-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: var(--white);
+        }
+        
+        .location-link {
+            color: var(--brand);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .location-link:hover {
+            text-decoration: underline;
+        }
+        
+        .location-map {
+            background: var(--light-gray);
+            border-radius: 12px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .location-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .services-section {
+                padding: 60px 20px;
+            }
+            
+            .location-section {
+                padding: 60px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Footer Section */
+        .footer {
+            background: var(--white);
+            color: var(--dark);
+            padding: 60px 20px 30px;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-content {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        
+        .footer-contact {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--brand);
+            text-decoration: none;
+        }
+        
+        .footer-contact:hover {
+            color: var(--brand-dark);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* Copyright Footer */
+        .copyright-footer {
+            background: var(--black);
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .copyright-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero Video Banner Section -->
+<section id="bbb-hero" aria-label="Palm Beach video banner">
+    <div class="bg" aria-hidden="true">
+        <video id="pbVideo" autoplay muted loop playsinline preload="auto"
+            poster="https://via.placeholder.com/1600x900/111111/ffffff?text=Palm+Beach">
+            <source src="https://www.dropbox.com/scl/fi/kbamh1bu53tj0w39hx39i/Barbies-bail-bonds-site-palm-beach-drone-broll-2.m4v?rlkey=m3u96gozhi7aoq7qhi3x6jefp&st=zw6m7wlk&raw=1">
+            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="overlay" aria-hidden="true"></div>
+    </div>
+
+    <div class="inner">
+        <div>
+            <h1>
+                Barbie's Bail Bonds
+                <span class="sep" aria-hidden="true"> • </span>
+                <span class="only-mobile-break"></span>
+                Palm Beach
+            </h1>
+            <p class="hero-tagline">Liberación rápida 24/7 • Local a la cárcel • Servicio en español</p>
+            <div class="ctas" role="group" aria-label="Primary actions">
+                <a class="btn btn-primary" href="tel:+15612470018">Llamar 24/7</a>
+                <a class="btn btn-secondary" href="sms:+15612470018">Envíanos Mensaje</a>
+                <a class="btn btn-secondary" href="https://sites.google.com/view/barbiesbailbonds31-alex/start-here/online-application/onlineapp-es">Solicitar En Línea</a>
+                <a class="btn btn-secondary" href="https://sites.google.com/view/barbiesbailbonds31-alex/start-here">In English</a>
+            </div>
+            <div class="badges">★ ★ ★ ★ ★ Confianza de las familias de Palm Beach</div>
+        </div>
+    </div>
+</section>
+
+<!-- Reviews Section -->
+<div class="bbb-reviews">
+    <h2 class="bbb-title">Lo Que Dicen Nuestros Clientes</h2>
+    <div class="bbb-marquee" aria-label="Client reviews scrolling">
+        <div class="bbb-track" id="bbb-track">
+            <div class="bbb-card">
+                <div class="bbb-content">
+                    <div class="bbb-stars">★★★★★</div>
+                    <div class="bbb-text">"Jerry fue excelente! Muy informativo y útil, gracias."</div>
+                    <div class="bbb-meta">— Rani Foster • hace 2 semanas • Google</div>
+                </div>
+            </div>
+
+            <div class="bbb-card">
+                <div class="bbb-content">
+                    <div class="bbb-stars">★★★★★</div>
+                    <div class="bbb-text">"Excelente servicio, excelente personal, recomiendo sus servicios 100%. Espero no necesitarlos de nuevo"</div>
+                    <div class="bbb-meta">— Bryan Moore • hace 26 semanas • Google</div>
+                </div>
+            </div>
+
+            <div class="bbb-card">
+                <div class="bbb-content">
+                    <div class="bbb-stars">★★★★★</div>
+                    <div class="bbb-text">"Súper útil, amable y respetuoso. Me alegra haber conocido a Jerry, realmente lo aprecio"</div>
+                    <div class="bbb-meta">— Belmarie Woods • hace 52 semanas • Google</div>
+                </div>
+            </div>
+
+            <div class="bbb-card">
+                <div class="bbb-content">
+                    <div class="bbb-stars">★★★★★</div>
+                    <div class="bbb-text">"Me encantó todo sobre mi experiencia, fue muy rápido, muy claro, responde claramente"</div>
+                    <div class="bbb-meta">— Valentina O • hace 45 semanas • Google</div>
+                </div>
+            </div>
+
+            <div class="bbb-card">
+                <div class="bbb-content">
+                    <div class="bbb-stars">★★★★★</div>
+                    <div class="bbb-text">"Gente muy agradable, muy servicial y bien hablada, muchas gracias"</div>
+                    <div class="bbb-meta">— Todd Archer • hace 45 semanas • Google</div>
+                </div>
+            </div>
+
+            <div class="bbb-card">
+                <div class="bbb-content">
+                    <div class="bbb-stars">★★★★★</div>
+                    <div class="bbb-text">"Realmente pude acelerar el proceso de solicitud ya que estaba en Google"</div>
+                    <div class="bbb-meta">— JonBkid • hace 14 semanas • Google</div>
+                </div>
+            </div>
+
+            <div class="bbb-card">
+                <div class="bbb-content">
+                    <div class="bbb-stars">★★★★★</div>
+                    <div class="bbb-text">"Contestó el teléfono cada vez que llamé y la ayuda fue excepcional! Gracias"</div>
+                    <div class="bbb-meta">— Latoya Williams • hace 17 semanas • Google</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Service Boxes Section -->
+<section class="services-section">
+    <div class="services-container">
+        <div class="services-grid">
+            
+            <div class="service-box">
+                <div class="service-icon">
+                    <img src="https://www.dropbox.com/scl/fi/o7yzjfolzmopk25nqv5xq/20250827_1129_Key-Release-Icon_simple_compose_01k3p29gz3edeszkgx4trhcycr.png?rlkey=8tn96m6zssttq0b3odfmb4ob4&st=mfv6hgxl&raw=1" alt="Key Release Icon" width="219" height="219">
+                </div>
+                <h3 class="service-title">¡Saque a Alguien de la Cárcel Ahora!</h3>
+                <p class="service-description">¿Necesita ayuda rápido? Estamos disponibles 24/7 para pagar la fianza ahora. Para la liberación más rápida, complete la Solicitud En Línea primero, luego llámenos para finalizar.</p>
+                <div class="service-cta">¿Acaba de ocurrir un arresto? <a href="https://sites.google.com/view/barbiesbailbonds31-alex/start-here/online-application/onlineapp-es">[Iniciar Solicitud]</a> • <a href="tel:5612470018">[Llamar Ahora]</a></div>
+                <a href="https://sites.google.com/view/barbiesbailbonds31-alex/start-here/online-application/onlineapp-es" class="service-button">Iniciar Solicitud</a>
+            </div>
+            
+            <div class="service-box">
+                <div class="service-icon">
+                    <img src="https://www.dropbox.com/scl/fi/0ky8l5ly99ycdjp5qg8bm/Untitled-design-2.png?rlkey=kg41rp9b543d3u7rulipm22on&st=8fpibp47&raw=1" alt="Inmate Lookup Icon" width="219" height="219">
+                </div>
+                <h3 class="service-title">Búsqueda de Reclusos de Palm Beach</h3>
+                <p class="service-description">Encuentre a alguien bajo custodia del Condado de Palm Beach—rápido. Use el Localizador de Reclusos de Palm Beach para buscar por nombre.</p>
+                <div class="service-cta">¿Arrestaron a alguien que conoce? <a href="https://www3.pbso.org/blotter/" target="_blank">[Localizador de Reclusos]</a> • <a href="tel:5612470018">[Llamar Ahora]</a></div>
+                <a href="https://www3.pbso.org/blotter/" class="service-button" target="_blank">Localizar Recluso</a>
+            </div>
+            
+            <div class="service-box">
+                <div class="service-icon">
+                    <img src="https://www.dropbox.com/scl/fi/49yryycxcaq865sxn7yjx/Untitled-design-4.png?rlkey=o6ff093yirfixyqzcmhd06gsp&st=n31ipnpv&raw=1" alt="Warrant Icon" width="219" height="219">
+                </div>
+                <h3 class="service-title">¿Orden de Arresto?</h3>
+                <p class="service-description">¿Cree que puede tener una orden de arresto en el Condado de Palm Beach? Contáctenos para una verificación confidencial de estado. Si existe una, organizaremos una entrega programada con una fianza pre-aprobada para minimizar el tiempo en custodia.</p>
+                <div class="service-cta">¿Tiene una orden de arresto? <a href="https://sites.google.com/view/barbiesbailbonds31-alex/start-here/warrant">[Más Información]</a> • <a href="tel:5612470018">[Llamar Ahora]</a></div>
+                <a href="https://sites.google.com/view/barbiesbailbonds31-alex/start-here/warrant" class="service-button">Más Información</a>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<!-- How to Get to Us Section -->
+<section class="location-section">
+    <div class="location-container">
+        <div class="location-content">
+            <h2>Cómo Llegar a Nosotros</h2>
+            <p class="location-text">Encuentre a Barbie's Bail Bonds en 1015 S Congress Ave #1, West Palm Beach. Después del horario use el timbre de la puerta principal o llame.</p>
+            <a href="https://www.google.com/url?q=https%3A%2F%2Fyoutu.be%2FK6WxiOXH4XQ%3Fsi%3DojtFf2Q4ZpYMpeL9&sa=D" 
+               class="location-link" target="_blank">
+                Haga clic AQUÍ para ver un video que muestra cómo llegar a la cárcel desde nuestra oficina
+            </a>
+        </div>
+        <div class="location-map">
+            <a href="https://www.google.com/maps/place/1015+S+Congress+Ave+%231,+West+Palm+Beach,+FL+33406" target="_blank" style="display: block; width: 100%; height: 100%; text-decoration: none;">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3574.8165962158!2d-80.06932368489576!3d26.368123083362943!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d92bdd7f1e7d9f%3A0x6e1b77e1f0b6e2c7!2s1015+S+Congress+Ave+%231%2C+West+Palm+Beach%2C+FL+33406!5e0!3m2!1sen!2sus!4v1693920000000!5m2!1sen!2sus"
+                    width="100%" 
+                    height="100%" 
+                    style="border:0; border-radius: 12px;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Barbies Bail Bonds Location">
+                </iframe>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Footer Section -->
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-content">
+            <p>Desde 1993, Jerry & Barbie's Bail Bonds ha sido una agencia familiar confiable comprometida con aquellos que necesitan un agente de fianzas en el Sur de Florida. Nos especializamos en una amplia gama de Fianzas de Libertad Bajo Fianza y en el manejo de Órdenes de Arresto a través de nuestro Servicio de Fianzas de Entrega Programada. Nuestro servicio es 100% confidencial y estará tratando con agentes de fianzas experimentados todo el tiempo.</p>
+            
+            <p>Nuestra oficina está ubicada a solo unos minutos al sur de la Cárcel del Condado de Palm Beach donde brindamos servicio en el Condado de Palm Beach, Condado de Broward, Condado de Miami Dade, Condado de Martin, Condado de St Lucie, Condado de Indian River, y la mayoría de otros condados de Florida.</p>
+            
+            <p>Si un miembro de la familia, amigo, o cualquier otro ser querido ha sido arrestado y necesita un agente de fianzas, contáctenos al <a href="tel:+15612470018" class="footer-contact">561-247-0018</a> para servicio inmediato. Nuestros agentes experimentados son bilingües y están disponibles para servicio de fianzas en inglés y español!</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Copyright Footer -->
+<footer class="copyright-footer">
+    <div class="copyright-content">
+        <p>Copyright © 2024 Barbie's Bail Bonds | Servicios de Fianzas</p>
+    </div>
+</footer>
+
+<script>
+// Reviews carousel animation
+(function(){
+    const SPEED = 20; 
+    const marquee = document.querySelector('.bbb-marquee');
+    const track = document.getElementById('bbb-track');
+    if (!marquee || !track) return;
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const originals = Array.from(track.children);
+    function totalWidth(){ return track.scrollWidth; }
+    function needMore(){ return totalWidth() < marquee.clientWidth * 2; }
+    while (needMore()) {
+        for (const el of originals) track.appendChild(el.cloneNode(true));
+    }
+
+    let x = 0;
+    let last = performance.now();
+    let paused = false;
+    const gap = parseFloat(getComputedStyle(track).gap || '0');
+
+    marquee.addEventListener('mouseenter', () => paused = true);
+    marquee.addEventListener('mouseleave', () => paused = false);
+
+    function step(t){
+        const dt = (t - last) / 1000; 
+        last = t;
+        if (!paused) {
+            x -= SPEED * dt;
+            let first = track.firstElementChild;
+            if (first) {
+                const w = first.getBoundingClientRect().width + gap;
+                if (-x >= w) { 
+                    x += w; 
+                    track.appendChild(first); 
+                }
+            }
+            track.style.transform = `translateX(${x}px)`;
+        }
+        requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+})();
+</script>
+
+</body>
+</html>

@@ -11,7 +11,8 @@
       "Bash(python:*)",
       "Bash(git fetch:*)",
       "Bash(mkdir:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "WebFetch(domain:support.google.com)"
     ],
     "deny": [],
     "ask": []

@@ -1,0 +1,74 @@
+========================================
+SECTION 1: HERO VIDEO BANNER
+========================================
+[Already have complete code in "website banner" file]
+
+========================================
+SECTION 2: REVIEW CAROUSEL  
+========================================
+[Already have complete code in "reveiw carusel" file]
+
+========================================
+SECTION 3: SERVICE BOXES
+========================================
+
+BOX 1: Bond Someone Out Now!
+------------------------------
+Need help fast? We’re on-call 24/7 to post bail now. For the quickest release, complete the Online Application first, then call us to finalize.
+Arrest just happened? [Start Application] • [Call Now]
+
+BOX 2: Palm Beach Inmate Lookup
+------------------------------
+Find someone in Palm Beach County custody—fast. Use the Palm Beach Inmate Locator to search by name.
+
+Someone you know arrested? [Inmate Locator] • [Call Now]
+
+BOX 3: Warrant?
+------------------------------
+Think you might have a warrant in Palm Beach County? Contact us for a confidential status check. If one exists, we’ll arrange a walk-through surrender with a pre-approved bond to minimize time in custody.
+Have a warrent? [Learn More] • [Call Now]
+
+========================================
+SECTION 4: HOW TO GET TO US
+========================================
+Find Barbies Bail Bonds at 1015 S Congress Ave #1, West Palm Beach, after hours use the front door buzzer or call.
+
+- Section heading
+
+How to Get to Us
+
+
+-text
+
+Find Barbies Bail Bonds at 1015 S Congress Ave #1, West Palm Beach, after hours use the front door buzzer or call.
+
+
+
+- Any links or additional info]
+
+
+Click HERE to watch a video showing how to get to the jail from our office
+(this will be hyperlinked to this url:https://www.google.com/url?q=https%3A%2F%2Fyoutu.be%2FK6WxiOXH4XQ%3Fsi%3DojtFf2Q4ZpYMpeL9&sa=D)
+
+========================================
+SECTION 5: FOOTER
+========================================
+Footer text:
+
+Since 1993, Jerry & Barbies Bail Bonds has been a trusted, family-owned agency committed to those in need of a bail bondsman in South Florida. We specialize in a wide range of Bail Bonds and in handling Warrants through our Walkthrough Bonds Service. Our service is 100% confidential and you will be dealing with experienced bail bonds agents the entire time. 
+Our office is located just a few minutes south of the Palm Beach County Jail where we provide service in Palm Beach County, Broward County, Miami Dade County, Martin County, St Lucie County, Indian River County, and most other Florida counties.
+If a family member, friend, or any other loved one has been arrested and is in needs of a bail bondsman, contact us at 561-247-0018 for immediate service. Our experienced agents are bilingual and available for bail bond service in English and Spanish!
+
+========================================
+NOTES FOR IMPLEMENTATION:
+========================================
+- Icons already provided for service boxes
+- Hero video and review carousel code already complete
+Those Are here: E:\BarbiesBailBonds\HomePage\Reference\website banner , E:\BarbiesBailBonds\HomePage\Reference\reveiw carusel
+
+- Map will be placeholder for Google Sites to embed interactive map
+- Buttons won't be linked initially as requested
+
+-Please reference this picture to figure out how the page will look: E:\BarbiesBailBonds\HomePage\Reference\Start-Here-08-29-2025_05_17_PM.png
+
+The icon images are here: E:\BarbiesBailBonds\HomePage\Reference\Start-Here-08-29-2025_05_17_PM.png , E:\BarbiesBailBonds\HomePage\Reference\Untitled design-4.png , E:\BarbiesBailBonds\HomePage\Reference\20250827_1129_Key Release Icon_simple_compose_01k3p29gz3edeszkgx4trhcycr.png

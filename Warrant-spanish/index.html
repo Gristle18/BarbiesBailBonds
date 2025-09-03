@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información de Órdenes de Arresto • Barbie's Bail Bonds</title>
+    <style>
+        :root {
+            --brand: #F28C00;
+            --brand-dark: #D67700;
+            --dark: #111;
+            --muted: #666;
+            --light-gray: #eee;
+            --white: #fff;
+            --cream: #fff2d1;
+            --black: #000;
+            --red: #dc3545;
+            --green: #28a745;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--white);
+            background: transparent;
+        }
+
+        /* Remove focus outline and prevent text editing cursor */
+        * {
+            outline: none;
+            cursor: default;
+        }
+
+        /* Restore pointer cursor for interactive elements */
+        a, button {
+            cursor: pointer;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .main-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: var(--white);
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .urgent-banner {
+            background: var(--cream);
+            color: var(--black);
+            padding: 40px 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 50px;
+            box-shadow: 0 8px 24px rgba(255, 242, 209, 0.2);
+        }
+
+        .urgent-banner h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .urgent-banner .phone-number {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 20px 0;
+            letter-spacing: 2px;
+        }
+
+        .urgent-banner .phone-number a {
+            color: var(--brand);
+            text-decoration: none;
+        }
+
+        .urgent-banner .phone-number a:hover {
+            font-weight: bold;
+        }
+
+        .video-embed {
+            margin-top: 30px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        .video-embed iframe {
+            width: 100%;
+            height: 315px;
+            border: none;
+        }
+
+        .misdemeanor-banner {
+            background: var(--white);
+            color: var(--black);
+            margin: 50px -20px;
+            padding: 40px 20px;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+            scroll-margin-top: 100px;
+        }
+
+        .felony-banner {
+            background: var(--white);
+            color: var(--black);
+            margin: 50px -20px;
+            padding: 40px 20px;
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+            scroll-margin-top: 100px;
+        }
+
+        .misdemeanor-banner h2 {
+            font-size: 32px;
+            color: var(--black);
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .felony-banner h2 {
+            font-size: 32px;
+            color: var(--black);
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .banner-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .warrant-card {
+            background: var(--white);
+            color: var(--dark);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.15);
+            margin-bottom: 20px;
+        }
+
+        .no-arrest {
+            background: var(--white);
+            color: var(--black);
+            padding: 20px;
+            border: 1px solid var(--black);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .warrant-card p {
+            font-size: 17px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .warrant-card h3 {
+            font-size: 24px;
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .warrant-card ol {
+            padding-left: 20px;
+        }
+
+        .warrant-card li {
+            font-size: 16px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            color: var(--dark);
+        }
+
+        .cta-button {
+            background: var(--black);
+            color: var(--white);
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            display: block;
+            margin: 20px auto;
+            text-align: center;
+            width: fit-content;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: var(--dark);
+            transform: translateY(-2px);
+        }
+
+        .phone-link {
+            color: var(--brand);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .phone-link:hover {
+            color: var(--brand-dark);
+            font-weight: bold;
+        }
+
+        .highlight {
+            font-weight: bold;
+        }
+
+        .warrant-selection {
+            display: flex;
+            gap: 30px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 40px 0 50px;
+            width: 100%;
+        }
+
+        .warrant-option {
+            background: var(--white);
+            border: 1px solid var(--black);
+            border-radius: 16px;
+            padding: 40px 30px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--black);
+            flex: 1;
+            max-width: calc(50% - 15px);
+            box-shadow: 0 4px 16px rgba(0,0,0,.08);
+            text-align: center;
+        }
+
+        .warrant-option:hover {
+            border-color: var(--brand);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(242,140,0,.15);
+        }
+
+        .warrant-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .warrant-type {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--black);
+            margin-bottom: 8px;
+        }
+
+        .warrant-desc {
+            font-size: 16px;
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 32px;
+            }
+            
+            .warrant-banner {
+                padding: 30px 20px;
+            }
+
+            .warrant-card {
+                padding: 25px 20px;
+            }
+
+            .urgent-banner .phone-number {
+                font-size: 28px;
+            }
+
+            .video-embed iframe {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .urgent-banner .phone-number {
+                font-size: 24px;
+            }
+
+            .warrant-banner h2 {
+                font-size: 26px;
+            }
+
+            .video-embed iframe {
+                height: 200px;
+            }
+
+            .warrant-option {
+                padding: 30px 20px;
+                min-width: auto;
+                width: 100%;
+                max-width: 100%;
+                margin-bottom: 20px;
+            }
+            
+            .warrant-icon {
+                font-size: 40px;
+            }
+            
+            .warrant-type {
+                font-size: 18px;
+            }
+            
+            .warrant-desc {
+                font-size: 14px;
+            }
+
+            .warrant-card {
+                border-radius: 12px;
+                margin-left: -20px;
+                margin-right: -20px;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .no-arrest {
+                border-radius: 8px;
+                margin-left: -20px;
+                margin-right: -20px;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .urgent-banner {
+                border-radius: 12px;
+                margin-left: -20px;
+                margin-right: -20px;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="main-title">¿Tienes una Orden de Arresto?</div>
+            <div class="subtitle">Obtén ayuda inmediata con verificaciones de órdenes y fianzas de entrega programada en el Condado de Palm Beach</div>
+            <div style="font-size: 18px; color: var(--white); margin-bottom: 30px; opacity: 0.8;">Selecciona tu tipo de orden abajo para información específica y asistencia</div>
+            
+            <div class="warrant-selection">
+                <a href="#misdemeanor" class="warrant-option">
+                    <span class="warrant-icon">🚗</span>
+                    <div class="warrant-type">Órdenes de Tráfico y Delitos Menores</div>
+                    <div class="warrant-desc">No se requiere arresto o ingreso</div>
+                </a>
+                
+                <a href="#felony" class="warrant-option">
+                    <span class="warrant-icon">⚖️</span>
+                    <div class="warrant-type">Órdenes de Delitos Graves</div>
+                    <div class="warrant-desc">Se requiere ingreso pero liberación rápida</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="urgent-banner">
+            <h2>PARA SERVICIO INMEDIATO POR FAVOR LLÁMANOS AL:</h2>
+            <div class="phone-number">
+                <a href="tel:+15612470018">561-247-0018</a>
+            </div>
+            <p>Disponible 24/7 para verificación de órdenes y fianzas de entrega programada</p>
+            
+            <div class="video-embed">
+                <iframe 
+                    src="https://www.youtube.com/embed/K6WxiOXH4XQ" 
+                    title="Cómo llegar a la Cárcel del Condado de Palm Beach desde nuestra oficina"
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <div class="misdemeanor-banner" id="misdemeanor">
+            <div class="banner-container">
+                <h2>Órdenes de Tráfico y Delitos Menores</h2>
+                
+                <div class="no-arrest">
+                    NO HAY ARRESTO O INGRESO PARA ACLARAR ESTA ORDEN
+                </div>
+
+                <div class="warrant-card">
+                    <p>Si tienes una <span class="highlight">orden activa de delito menor o tráfico</span> en el Condado de Palm Beach, Florida, Barbie's Bail Bonds puede establecer una <strong>Fianza de Entrega Programada</strong> donde <strong>no se requiere ingreso o arresto</strong>. Todo el proceso usualmente dura aproximadamente <strong>15-20 minutos</strong> donde permanecerás con nuestro agente todo el tiempo. <strong>Nunca te dejaremos solo.</strong></p>
+
+                    <a href="tel:+15612470018" class="cta-button">Llamar Ahora para Verificación de Orden</a>
+                </div>
+
+                <div class="warrant-card">
+                    <h3>Proceso de Fianza de Entrega Programada:</h3>
+                    <ol>
+                        <li><strong>Llámanos al <a href="tel:+15612470018" class="phone-link">561-247-0018</a></strong> para verificar la información de la orden</li>
+                        <li><strong>Completa nuestra Solicitud de Fianzas en Línea</strong> - te guiaremos a través de esto</li>
+                        <li><strong>Programa una cita</strong> con uno de nuestros agentes expertos en fianzas en el Lobby de Liberación de la Cárcel del Condado de Palm Beach</li>
+                        <li><strong>En la cárcel,</strong> los documentos de la Fianza serán entregados directamente al oficial de liberación quien te dará una nueva fecha de corte que debe ser firmada</li>
+                        <li><strong>Firma por tu nueva fecha de corte</strong> (La única razón por la que se requiere que estés ahí es simplemente para firmar por la nueva fecha de corte)</li>
+                        <li><strong>Recibe tu copia de la fecha de corte</strong> - La fecha de corte está programada para 3 a 4 semanas después</li>
+                        <li><strong>¡Eres libre de irte!</strong> La orden se borra del sistema y la fecha de corte está programada</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="felony-banner" id="felony">
+            <div class="banner-container">
+                <h2>Órdenes de Delitos Graves</h2>
+                
+                <div class="warrant-card">
+                    <p><strong>Las órdenes de delitos graves requieren ingreso</strong> pero al programarlo con nuestros agentes y permitirnos coordinar con la cárcel, es <span class="highlight">la forma más rápida de salir</span>. Todas las cárceles son diferentes pero la cárcel del Condado de Palm Beach usualmente te tiene ingresado en un par de horas.</p>
+
+                    <p>Hemos desarrollado un proceso que llamamos <strong>"Ingreso Rápido"</strong> donde establecemos todo el proceso de fianzas <strong>antes de que pongas un pie en la cárcel</strong> asegurando que entres y salgas lo más rápido posible.</p>
+
+                    <a href="tel:+15612470018" class="cta-button">Llamar para Ayuda con Orden de Delito Grave</a>
+                </div>
+            </div>
+        </div>
+
+        <p style="margin-top: 40px; text-align: center; font-size: 14px; opacity: 0.8; color: var(--white);">
+            Copyright © 2024 Barbie's Bail Bonds | Servicios de Fianzas
+        </p>
+    </div>
+
+    <script>
+        // Smooth scrolling for warrant type selection buttons
+        document.querySelectorAll('.warrant-option').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

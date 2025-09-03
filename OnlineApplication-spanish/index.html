@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud En Línea • Barbie's Bail Bonds</title>
+    <style>
+        :root {
+            --brand: #F28C00;
+            --brand-dark: #D67700;
+            --dark: #111;
+            --muted: #666;
+            --light-gray: #eee;
+            --white: #fff;
+            --cream: #fff2d1;
+            --black: #000;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--white);
+            background: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        /* Remove focus outline and prevent text editing cursor */
+        * {
+            outline: none;
+            cursor: default;
+        }
+
+        /* Restore pointer cursor for interactive elements */
+        a, button, .language-option {
+            cursor: pointer;
+        }
+
+        .banner {
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px 40px 60px;
+            background: var(--white);
+            border-radius: 0;
+            box-shadow: none;
+            text-align: center;
+            margin: 0;
+        }
+
+        .header {
+            margin-bottom: 50px;
+        }
+
+        .logo {
+            width: 100%;
+            max-width: 1200px;
+            height: auto;
+            margin: 0 auto 30px;
+            display: block;
+            padding: 0 20px;
+        }
+
+        .divider {
+            width: 100%;
+            height: 2px;
+            background: var(--black);
+            margin: 30px 0;
+        }
+
+        .main-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--black);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 22px;
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        .language-selection {
+            display: flex;
+            gap: 30px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .language-option {
+            background: var(--white);
+            border: 1px solid var(--black);
+            border-radius: 16px;
+            padding: 40px 30px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--black);
+            flex: 1;
+            max-width: calc(50% - 15px);
+            box-shadow: 0 4px 16px rgba(0,0,0,.08);
+        }
+
+        .language-option:hover {
+            border-color: var(--brand);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(242,140,0,.15);
+        }
+
+        .language-flag {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .language-name {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--black);
+            margin-bottom: 8px;
+        }
+
+        .language-desc {
+            font-size: 14px;
+            color: var(--black);
+        }
+
+        /* How to Get to Us Section */
+        .location-section {
+            padding: 80px 20px;
+            background: var(--black);
+            width: 100%;
+        }
+        
+        .location-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .location-content h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+        
+        .location-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: var(--white);
+        }
+        
+        .location-link {
+            color: var(--brand);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .location-link:hover {
+            text-decoration: underline;
+        }
+        
+        .location-map {
+            background: var(--light-gray);
+            border-radius: 12px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        /* About Us Section */
+        .about-section {
+            background: var(--white);
+            color: var(--dark);
+            padding: 60px 20px 30px;
+            width: 100%;
+        }
+        
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .about-content {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        
+        .about-contact {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--brand);
+            text-decoration: none;
+        }
+        
+        .about-contact:hover {
+            color: var(--brand-dark);
+        }
+
+        /* Footer Section */
+        .footer {
+            background: var(--black);
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Infinitely tall black section after footer */
+        .black-void {
+            width: 100%;
+            height: 100vh;
+            background: var(--black);
+            flex: 1;
+            min-height: 500px;
+        }
+
+
+        @media (max-width: 768px) {
+            .banner {
+                padding: 30px 30px 50px;
+            }
+            
+            .language-selection {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .language-option {
+                padding: 30px 80px;
+                min-width: 300px;
+                max-width: 100%;
+            }
+            
+            .main-title {
+                font-size: 24px;
+            }
+            
+            .subtitle {
+                font-size: 16px;
+            }
+
+            .location-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .location-section {
+                padding: 60px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .banner {
+                padding: 20px 20px 40px;
+            }
+            
+            .language-option {
+                padding: 40px 40px;
+                min-width: auto;
+                width: 100%;
+                height: 280px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .language-flag {
+                font-size: 40px;
+            }
+            
+            .language-name {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <div class="header">
+            <div class="main-title">Iniciar Solicitud</div>
+            <div style="font-size: 16px; color: var(--muted); margin: 20px 0 30px; line-height: 1.5; text-align: center;">
+                Para sacar a alguien de la cárcel bajo fianza, por favor complete esta solicitud en su totalidad. Si aún no nos ha llamado, por favor llame al <strong style="color: var(--brand); white-space: nowrap;">561-247-0018</strong> después de completar la solicitud. Si ya ha hablado con nosotros, le devolveremos la llamada una vez que su solicitud sea enviada.
+            </div>
+            <div class="subtitle">Por favor seleccione un idioma para completar su solicitud</div>
+        </div>
+        
+        <div class="language-selection">
+            <a href="https://sites.google.com/view/barbiesbailbonds31-alex/start-here/online-application/onlineapp-en" class="language-option">
+                <span class="language-flag">🇺🇸</span>
+                <div class="language-name">English</div>
+                <div class="language-desc">Continuar en Inglés</div>
+            </a>
+            
+            <a href="https://sites.google.com/view/barbiesbailbonds31-alex/start-here/online-application/onlineapp-es" class="language-option">
+                <span class="language-flag">🇪🇸</span>
+                <div class="language-name">Español</div>
+                <div class="language-desc">Continuar en Español</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- How to Get to Us Section -->
+    <section class="location-section">
+        <div class="location-container">
+            <div class="location-content">
+                <h2>Cómo Llegar a Nosotros</h2>
+                <p class="location-text">Encuentre a Barbie's Bail Bonds en 1015 S Congress Ave #1, West Palm Beach. Después del horario use el timbre de la puerta principal o llame.</p>
+                <a href="https://www.google.com/url?q=https%3A%2F%2Fyoutu.be%2FK6WxiOXH4XQ%3Fsi%3DojtFf2Q4ZpYMpeL9&sa=D" 
+                   class="location-link" target="_blank">
+                    Haga clic AQUÍ para ver un video que muestra cómo llegar a la cárcel desde nuestra oficina
+                </a>
+            </div>
+            <div class="location-map">
+                <a href="https://www.google.com/maps/place/1015+S+Congress+Ave+%231,+West+Palm+Beach,+FL+33406" target="_blank" style="display: block; width: 100%; height: 100%; text-decoration: none;">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3574.8165962158!2d-80.06932368489576!3d26.368123083362943!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d92bdd7f1e7d9f%3A0x6e1b77e1f0b6e2c7!2s1015+S+Congress+Ave+%231%2C+West+Palm+Beach%2C+FL+33406!5e0!3m2!1sen!2sus!4v1693920000000!5m2!1sen!2sus"
+                        width="100%" 
+                        height="100%" 
+                        style="border:0; border-radius: 12px;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Barbies Bail Bonds Location">
+                    </iframe>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section class="about-section">
+        <div class="about-container">
+            <div class="about-content">
+                <p>Desde 1993, Jerry & Barbie's Bail Bonds ha sido una agencia familiar confiable comprometida con aquellos que necesitan un agente de fianzas en el Sur de Florida. Nos especializamos en una amplia gama de Fianzas de Libertad Bajo Fianza y en el manejo de Órdenes de Arresto a través de nuestro Servicio de Fianzas de Entrega Programada. Nuestro servicio es 100% confidencial y estará tratando con agentes de fianzas experimentados todo el tiempo.</p>
+                
+                <p>Nuestra oficina está ubicada a solo unos minutos al sur de la Cárcel del Condado de Palm Beach donde brindamos servicio en el Condado de Palm Beach, Condado de Broward, Condado de Miami Dade, Condado de Martin, Condado de St Lucie, Condado de Indian River, y la mayoría de otros condados de Florida.</p>
+                
+                <p>Si un miembro de la familia, amigo, o cualquier otro ser querido ha sido arrestado y necesita un agente de fianzas, contáctenos al <a href="tel:+15612470018" class="about-contact">561-247-0018</a> para servicio inmediato. Nuestros agentes experimentados son bilingües y están disponibles para servicio de fianzas en inglés y español!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>Copyright © 2024 Barbie's Bail Bonds | Servicios de Fianzas</p>
+        </div>
+    </footer>
+
+    <!-- Infinitely tall black section -->
+    <div class="black-void"></div>
+</body>
+</html>

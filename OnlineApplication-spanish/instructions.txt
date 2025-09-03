@@ -1,0 +1,29 @@
+# Online Application Page Instructions
+
+## Overview
+Create a simple, clean online application page with language selection between English and Spanish. The page should look professional and match the homepage branding.
+
+## Color Scheme (from homepage)
+- --brand: #F28C00 (orange)
+- --brand-dark: #D67700 (darker orange)
+- --dark: #111 (black)
+- --muted: #666 (gray)
+- --light-gray: #eee (light gray)
+- --white: #fff (white)
+- --cream: #fff2d1 (cream background)
+
+## Page Requirements
+1. **Language Selection Only**: Two options - English and Spanish
+2. **Clean Design**: Simple, professional appearance
+3. **Brand Consistency**: Use the same colors and fonts as homepage
+4. **Nice Appearance**: Well-designed layout that looks good
+
+## Design Elements
+- Use the same font family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif
+- Maintain consistent branding with homepage
+- Simple, centered layout
+- Two prominent language selection options
+- Professional styling
+
+## Note
+This page serves as a language gateway - users select their preferred language for the application process.

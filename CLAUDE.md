@@ -1,0 +1,53 @@
+# Claude Instructions for BarbiesBailBonds Repository
+
+## Git Commit Policy
+
+**IMPORTANT**: After making ANY change to files in this repository, you MUST:
+
+1. **Commit immediately** after each file modification
+2. Use descriptive commit messages following this format:
+   - `feat:` for new features
+   - `fix:` for bug fixes  
+   - `docs:` for documentation changes
+   - `style:` for formatting changes
+   - `refactor:` for code refactoring
+   - `test:` for test additions/changes
+   - `chore:` for maintenance tasks
+
+3. **Example workflow**:
+   - Make a change to a file
+   - Run: `git add .`
+   - Run: `git commit -m "feat: add form validation"`
+   - Continue with next task
+
+4. **Push to GitHub** after every 3-5 commits or when explicitly requested
+
+## Repository Context
+
+This is the Barbie's Bail Bonds website project. The main goal is to create a form that connects to Google Sheets for managing bail bond inquiries.
+
+## Link Behavior Rules
+
+**IMPORTANT**: Follow these link behavior rules for all pages:
+
+- **Internal navigation** (within Barbie's Bail Bonds site): Links should open in the same tab (no `target="_blank"`)
+  - Examples: Navigation between pages, application links to Google Sites forms
+- **External links** (to other websites): Links should open in new tab (`target="_blank"`)
+  - Examples: PBSO Inmate Locator, YouTube videos, Google Maps, external resources
+
+## Phone Number Formatting Rules
+
+**IMPORTANT**: Ensure phone numbers never break across lines:
+
+- **Always** add `white-space: nowrap;` CSS property to phone numbers
+- This prevents phone numbers from wrapping and breaking across multiple lines
+- Apply to all instances of the phone number 561-247-0018
+- Example: `<strong style="color: var(--brand); white-space: nowrap;">561-247-0018</strong>`
+
+## Remember
+
+- Always commit after EVERY file change
+- Keep commits atomic and focused
+- Write clear, concise commit messages
+- Follow link behavior rules for consistent user experience
+- This ensures full tracking of all development progress
