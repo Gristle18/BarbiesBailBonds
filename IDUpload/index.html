@@ -1210,8 +1210,17 @@
             debugLog(`File preview updated for ${targetId}: ${file.name}`);
           };
 
-          // Note: Click to upload now handled directly by overlaid file input
+          // Click handler with proper event delegation
           zone.addEventListener('click', (e) => {
+            // If clicking on a preview image, open preview modal
+            if (e.target.classList.contains('preview-thumb') || e.target.id.includes('_preview')) {
+              debugLog(`PREVIEW IMAGE CLICKED: ${e.target.id}`);
+              e.stopPropagation();
+              e.preventDefault();
+              previewFile(e.target);
+              return;
+            }
+            // Otherwise, handle as dropzone click for file input
             debugLog(`DROPZONE CLICKED: ${targetId} (should be handled by file input overlay)`);
           });
 
@@ -1346,15 +1355,16 @@
       console.log('Upload forms found:', document.querySelectorAll('#uploadFormEn, #uploadFormEs').length);
     });
 
-    // File Preview Functionality - Global variables for modal
+    // File Preview Functionality - Global state management
     window.previewState = {
       currentZoom: 1,
       currentFile: null,
       isDragging: false,
-      startX: 0,
-      startY: 0,
+      lastX: 0,
+      lastY: 0,
       translateX: 0,
-      translateY: 0
+      translateY: 0,
+      element: null
     };
 
     window.previewFile = function(targetId, fileIndex) {
@@ -1478,23 +1488,7 @@
         // Set initial cursor based on zoom
         previewImage.style.cursor = window.previewState.currentZoom > 1 ? 'grab' : 'pointer';
         
-        previewImage.addEventListener('mousedown', (e) => {
-          console.log('Mousedown on image, currentZoom:', window.previewState.currentZoom);
-          if (window.previewState.currentZoom > 1) {
-            window.previewState.isDragging = true;
-            window.previewState.startX = e.clientX - window.previewState.translateX;
-            window.previewState.startY = e.clientY - window.previewState.translateY;
-            previewImage.style.cursor = 'grabbing';
-            console.log('Started dragging, startX:', window.previewState.startX, 'startY:', window.previewState.startY, 'isDragging:', window.previewState.isDragging);
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Capture mouse for this element
-            if (previewImage.setCapture) {
-              previewImage.setCapture();
-            }
-          }
-        });
+        // Mouse events now handled by global document listeners above
 
         // Update cursor when zoom changes
         previewImage.addEventListener('wheel', (e) => {
@@ -1550,27 +1544,47 @@
       }
     });
 
-    // Global mouse event listeners for panning (can be attached during page load)
+    // Enhanced pan and zoom event handlers based on best practices
+    document.addEventListener('mousedown', (e) => {
+      const modal = document.getElementById('previewModal');
+      const previewImage = document.getElementById('previewImage');
+      
+      if (modal && modal.style.display === 'block' && e.target === previewImage && window.previewState.currentZoom > 1) {
+        window.previewState.isDragging = true;
+        window.previewState.lastX = e.clientX;
+        window.previewState.lastY = e.clientY;
+        window.previewState.element = previewImage;
+        previewImage.style.cursor = 'grabbing';
+        console.log('DRAG START - lastX:', window.previewState.lastX, 'lastY:', window.previewState.lastY);
+        e.preventDefault();
+      }
+    });
+
     document.addEventListener('mousemove', (e) => {
-      if (window.previewState.isDragging) {
-        console.log('Mouse move detected, isDragging:', window.previewState.isDragging, 'currentZoom:', window.previewState.currentZoom);
-        if (window.previewState.currentZoom > 1) {
-          window.previewState.translateX = e.clientX - window.previewState.startX;
-          window.previewState.translateY = e.clientY - window.previewState.startY;
-          console.log('Panning - translateX:', window.previewState.translateX, 'translateY:', window.previewState.translateY);
-          updateImageTransform();
-        }
+      if (window.previewState.isDragging && window.previewState.element) {
+        const deltaX = e.clientX - window.previewState.lastX;
+        const deltaY = e.clientY - window.previewState.lastY;
+        
+        window.previewState.translateX += deltaX;
+        window.previewState.translateY += deltaY;
+        
+        window.previewState.lastX = e.clientX;
+        window.previewState.lastY = e.clientY;
+        
+        console.log('DRAGGING - deltaX:', deltaX, 'deltaY:', deltaY, 'translateX:', window.previewState.translateX, 'translateY:', window.previewState.translateY);
+        updateImageTransform();
+        e.preventDefault();
       }
     });
 
     document.addEventListener('mouseup', () => {
       if (window.previewState.isDragging) {
-        console.log('Mouse up - stopping drag');
         window.previewState.isDragging = false;
         const previewImage = document.getElementById('previewImage');
         if (previewImage) {
           previewImage.style.cursor = window.previewState.currentZoom > 1 ? 'grab' : 'pointer';
         }
+        console.log('DRAG END');
       }
     });
 
