@@ -168,6 +168,115 @@
         font-size: 20px;
       }
     }
+
+    /* How to Get to Us Section */
+    .location-section {
+      padding: 80px 20px;
+      background: var(--dark);
+      width: 100%;
+    }
+    
+    .location-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    
+    .location-content h2 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--white);
+    }
+    
+    .location-text {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 25px;
+      color: var(--white);
+    }
+    
+    .location-link {
+      color: var(--brand);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .location-link:hover {
+      text-decoration: underline;
+    }
+    
+    .location-map {
+      background: var(--light-gray);
+      border-radius: 12px;
+      height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* About Us Section */
+    .about-section {
+      background: var(--white);
+      color: var(--dark);
+      padding: 60px 20px 30px;
+      width: 100%;
+    }
+    
+    .about-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .about-content {
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 30px;
+    }
+    
+    .about-contact {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--brand);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    
+    .about-contact:hover {
+      color: var(--brand-dark);
+    }
+
+    /* Footer Section */
+    .footer {
+      background: var(--black);
+      color: var(--white);
+      padding: 20px;
+      text-align: center;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .location-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      
+      .location-section {
+        padding: 60px 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -324,10 +433,55 @@
       <div class="error" id="errorMsgEs" style="text-align:center; margin-top:10px;">Carga aún no configurada. Por favor envíe sus fotos por texto a <span style="white-space: nowrap;">561-247-0018</span>.</div>
     </form>
 
-    <p style="margin-top: 24px; text-align: center; font-size: 14px; opacity: 0.85; color: var(--white);">
-      Copyright © 2024 Barbie's Bail Bonds | Bail Bond Services
-    </p>
   </div>
+
+  <!-- How to Get to Us Section -->
+  <section class="location-section">
+    <div class="location-container">
+      <div class="location-content">
+        <h2>How to Get to Us</h2>
+        <p class="location-text">Find Barbie's Bail Bonds at 1015 S Congress Ave #1, West Palm Beach. After hours use the front door buzzer or call.</p>
+        <a href="https://www.google.com/url?q=https%3A%2F%2Fyoutu.be%2FK6WxiOXH4XQ%3Fsi%3DojtFf2Q4ZpYMpeL9&sa=D" 
+           class="location-link" target="_blank">
+          Click HERE to watch a video showing how to get to the jail from our office
+        </a>
+      </div>
+      <div class="location-map">
+        <a href="https://www.google.com/maps/place/1015+S+Congress+Ave+%231,+West+Palm+Beach,+FL+33406" target="_blank" style="display: block; width: 100%; height: 100%; text-decoration: none;">
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3574.8165962158!2d-80.06932368489576!3d26.368123083362943!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d92bdd7f1e7d9f%3A0x6e1b77e1f0b6e2c7!2s1015+S+Congress+Ave+%231%2C+West+Palm+Beach%2C+FL+33406!5e0!3m2!1sen!2sus!4v1693920000000!5m2!1sen!2sus"
+            width="100%" 
+            height="100%" 
+            style="border:0; border-radius: 12px;" 
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Barbies Bail Bonds Location">
+          </iframe>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Us Section -->
+  <section class="about-section">
+    <div class="about-container">
+      <div class="about-content">
+        <p>Since 1993, Jerry & Barbie's Bail Bonds has been a trusted, family-owned agency committed to those in need of a bail bondsman in South Florida. We specialize in a wide range of Bail Bonds and in handling Warrants through our Walkthrough Bonds Service. Our service is 100% confidential and you will be dealing with experienced bail bonds agents the entire time.</p>
+        
+        <p>Our office is located just a few minutes south of the Palm Beach County Jail where we provide service in Palm Beach County, Broward County, Miami Dade County, Martin County, St Lucie County, Indian River County, and most other Florida counties.</p>
+        
+        <p>If a family member, friend, or any other loved one has been arrested and is in need of a bail bondsman, contact us at <a href="tel:+15612470018" class="about-contact">561-247-0018</a> for immediate service. Our experienced agents are bilingual and available for bail bond service in English and Spanish!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>Copyright © 2024 Barbie's Bail Bonds | Bail Bond Services</p>
+    </div>
+  </footer>
 
   <script>
     // Language selection functionality
