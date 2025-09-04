@@ -1,0 +1,33 @@
+ID & Document Upload – Wiring Instructions
+=========================================
+
+This page includes a client-side form and a JavaScript submit stub.
+To actually receive files, connect the form to a backend endpoint.
+
+Option A: Google Apps Script (Drive upload)
+-------------------------------------------
+1) Create a new Google Apps Script project and add a script that:
+   - Accepts a `multipart/form-data` POST request
+   - Saves uploaded files to a Drive folder
+   - Persists form fields (JSON) into a Google Sheet
+2) Deploy as Web App (Anyone with the link can access).
+3) Copy the Web App URL and set it as `UPLOAD_ENDPOINT` in `scripts/upload.js`.
+
+Option B: File form to Google Forms
+-----------------------------------
+If you prefer not to host a custom script, you can point users to a Google Form
+with File Upload fields enabled (requires Google Workspace). In that case, link
+the form in the page and remove the custom submit stub.
+
+Client-side Constraints & Tips
+------------------------------
+- Allowed types: images (jpg, png, heic, webp), and PDF
+- Suggested limit: <= 10MB per file
+- Multiple additional documents are supported
+- On success, show a confirmation message; on failure, show a fallback
+
+Fallback Instructions (no backend yet)
+-------------------------------------
+- If `UPLOAD_ENDPOINT` is not configured, the form will not POST files.
+- The page provides a fallback: call or text photos to 561-247-0018.
+
