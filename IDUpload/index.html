@@ -1416,48 +1416,60 @@
       modal.style.top = scrollTop + 'px';
       modal.style.left = scrollLeft + 'px';
       document.body.style.overflow = 'hidden';
+      
+      // Setup button controls after modal is shown
+      setupPreviewControls();
     };
 
-    // Preview controls
-    function addButtonFeedback(button, callback) {
-      button.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        
-        // Visual feedback
-        button.style.transform = 'scale(0.9)';
-        button.style.background = 'rgba(255, 255, 255, 1)';
-        
-        setTimeout(() => {
-          button.style.transform = 'scale(1)';
-          button.style.background = 'rgba(255, 255, 255, 0.9)';
-        }, 150);
-        
-        callback();
+    // Preview controls - setup function to be called when modal opens
+    function setupPreviewControls() {
+      function addButtonFeedback(buttonId, callback) {
+        const button = document.getElementById(buttonId);
+        if (button) {
+          // Remove any existing listeners first
+          button.replaceWith(button.cloneNode(true));
+          const newButton = document.getElementById(buttonId);
+          
+          newButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            // Visual feedback
+            newButton.style.transform = 'scale(0.9)';
+            newButton.style.background = 'rgba(255, 255, 255, 1)';
+            
+            setTimeout(() => {
+              newButton.style.transform = 'scale(1)';
+              newButton.style.background = 'rgba(255, 255, 255, 0.9)';
+            }, 150);
+            
+            callback();
+          });
+        }
+      }
+
+      // Add event listeners with visual feedback
+      addButtonFeedback('zoomIn', () => {
+        currentZoom = Math.min(currentZoom * 1.2, 5);
+        updateImageTransform();
+      });
+
+      addButtonFeedback('zoomOut', () => {
+        currentZoom = Math.max(currentZoom / 1.2, 0.1);
+        updateImageTransform();
+      });
+
+      addButtonFeedback('resetZoom', () => {
+        currentZoom = 1;
+        translateX = 0;
+        translateY = 0;
+        updateImageTransform();
+      });
+
+      addButtonFeedback('closePreview', () => {
+        closePreview();
       });
     }
-
-    // Add event listeners with visual feedback
-    addButtonFeedback(document.getElementById('zoomIn'), () => {
-      currentZoom = Math.min(currentZoom * 1.2, 5);
-      updateImageTransform();
-    });
-
-    addButtonFeedback(document.getElementById('zoomOut'), () => {
-      currentZoom = Math.max(currentZoom / 1.2, 0.1);
-      updateImageTransform();
-    });
-
-    addButtonFeedback(document.getElementById('resetZoom'), () => {
-      currentZoom = 1;
-      translateX = 0;
-      translateY = 0;
-      updateImageTransform();
-    });
-
-    addButtonFeedback(document.getElementById('closePreview'), () => {
-      closePreview();
-    });
 
     function updateImageTransform() {
       const image = document.getElementById('previewImage');
