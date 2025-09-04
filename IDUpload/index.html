@@ -281,104 +281,6 @@
       }
     }
 
-    /* File Preview Modal Styles */
-    .preview-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.9);
-      z-index: 10000;
-      cursor: pointer;
-    }
-
-    .preview-content {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: flex-start;
-      justify-content: flex-start;
-      padding: 20px;
-    }
-
-    .preview-wrapper {
-      position: relative;
-      display: inline-block;
-    }
-
-    .preview-image {
-      max-width: calc(100% - 40px);
-      max-height: calc(100% - 40px);
-      object-fit: contain;
-      transition: transform 0.3s ease;
-      cursor: grab;
-      position: relative;
-    }
-
-    .preview-image:active {
-      cursor: grabbing;
-    }
-
-    .preview-pdf {
-      width: calc(100% - 40px);
-      height: calc(100% - 40px);
-      border: none;
-      position: relative;
-    }
-
-    .preview-controls {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      gap: 8px;
-      z-index: 10001;
-    }
-
-    .preview-btn {
-      background: rgba(255, 255, 255, 0.9);
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 18px;
-      color: var(--dark);
-      transition: all 0.3s ease;
-    }
-
-    .preview-btn:hover {
-      background: rgba(255, 255, 255, 1);
-      transform: scale(1.1);
-    }
-
-    .close-btn {
-      background: rgba(220, 53, 69, 0.9);
-      color: white;
-    }
-
-    .close-btn:hover {
-      background: rgba(220, 53, 69, 1);
-    }
-
-    .preview-filename {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 20px;
-      font-size: 14px;
-      z-index: 10001;
-    }
 
     /* File list preview thumbnails */
     .file-item {
@@ -1046,7 +948,7 @@
                     font-size: 11px;
                     pointer-events: none;
                     z-index: 10;
-                  ">Scroll: Zoom • Drag: Pan • Click: Full View</div>
+                  ">Scroll: Zoom • Drag: Pan</div>
                 `;
                 
                 // Add zoom and pan functionality
@@ -1115,16 +1017,7 @@
                   previewImg.style.cursor = 'pointer';
                 });
                 
-                // Single click for full preview (but not when dragging)
-                let clickTimeout;
-                previewImg.addEventListener('click', (e) => {
-                  clearTimeout(clickTimeout);
-                  clickTimeout = setTimeout(() => {
-                    if (!isDragging && currentScale === 1) {
-                      previewFile(targetId, 0);
-                    }
-                  }, 200);
-                });
+                // Single click removed - no modal preview
                 
                 function updatePreviewTransform() {
                   previewImg.style.transform = `scale(${currentScale}) translate(${currentTranslateX/currentScale}px, ${currentTranslateY/currentScale}px)`;
@@ -1155,8 +1048,8 @@
                   justify-content: center; 
                   font-size: 24px; 
                   font-weight: bold;
-                  cursor: pointer;
-                " onclick="previewFile('${targetId}', 0)">
+                  cursor: default;
+                ">
                   <div>📄</div>
                   <div style="font-size: 14px; margin-top: 8px;">PDF</div>
                 </div>
@@ -1210,17 +1103,13 @@
             debugLog(`File preview updated for ${targetId}: ${file.name}`);
           };
 
-          // Click handler with proper event delegation
+          // Simple click handler - no preview modal
           zone.addEventListener('click', (e) => {
-            // If clicking on a preview image, open preview modal
+            // No preview modal functionality - just log clicks
             if (e.target.classList.contains('preview-thumb') || e.target.id.includes('_preview')) {
-              debugLog(`PREVIEW IMAGE CLICKED: ${e.target.id}`);
-              e.stopPropagation();
-              e.preventDefault();
-              previewFile(e.target);
+              debugLog(`PREVIEW IMAGE CLICKED: ${e.target.id} (no modal)`);
               return;
             }
-            // Otherwise, handle as dropzone click for file input
             debugLog(`DROPZONE CLICKED: ${targetId} (should be handled by file input overlay)`);
           });
 
@@ -1355,291 +1244,9 @@
       console.log('Upload forms found:', document.querySelectorAll('#uploadFormEn, #uploadFormEs').length);
     });
 
-    // File Preview Functionality - Global state management
-    window.previewState = {
-      currentZoom: 1,
-      currentFile: null,
-      isDragging: false,
-      lastX: 0,
-      lastY: 0,
-      translateX: 0,
-      translateY: 0,
-      element: null
-    };
-
-    window.previewFile = function(targetId, fileIndex) {
-      // Try to get file from image preview element first
-      let file = null;
-      const imgPreview = document.getElementById(targetId + '_preview');
-      const pdfPreview = document.getElementById(targetId + '_pdf_preview');
-      
-      if (imgPreview && imgPreview._fileData) {
-        file = imgPreview._fileData;
-      } else if (pdfPreview && pdfPreview._fileData) {
-        file = pdfPreview._fileData;
-      } else {
-        // Fallback to looking for input element (for backward compatibility)
-        const input = document.getElementById(targetId);
-        if (input && input.files && input.files[fileIndex]) {
-          file = input.files[fileIndex];
-        }
-      }
-      
-      if (!file) {
-        debugLog(`No file found for preview: ${targetId}[${fileIndex}]`);
-        return;
-      }
-      
-      window.previewState.currentFile = file;
-      
-      const modal = document.getElementById('previewModal');
-      const image = document.getElementById('previewImage');
-      const pdf = document.getElementById('previewPdf');
-      const filename = document.getElementById('previewFilename');
-      
-      // Reset zoom and position
-      window.previewState.currentZoom = 1;
-      window.previewState.translateX = 0;
-      window.previewState.translateY = 0;
-      
-      filename.textContent = file.name;
-      
-      if (file.type.startsWith('image/')) {
-        const url = URL.createObjectURL(file);
-        image.src = url;
-        image.style.display = 'block';
-        image.style.transform = 'scale(1) translate(0px, 0px)';
-        pdf.style.display = 'none';
-        
-        // Clean up URL when modal closes
-        modal.addEventListener('hidden', () => URL.revokeObjectURL(url), { once: true });
-      } else if (file.type === 'application/pdf') {
-        const url = URL.createObjectURL(file);
-        pdf.src = url;
-        pdf.style.display = 'block';
-        image.style.display = 'none';
-        
-        // Clean up URL when modal closes
-        modal.addEventListener('hidden', () => URL.revokeObjectURL(url), { once: true });
-      }
-      
-      // Position modal at current scroll position
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-      
-      modal.style.display = 'block';
-      modal.style.top = scrollTop + 'px';
-      modal.style.left = scrollLeft + 'px';
-      document.body.style.overflow = 'hidden';
-      
-      // Setup button controls after modal is shown
-      setupPreviewControls();
-    };
-
-    // Preview controls - setup function to be called when modal opens
-    function setupPreviewControls() {
-      function addButtonFeedback(buttonId, callback) {
-        const button = document.getElementById(buttonId);
-        if (button) {
-          // Remove any existing listeners first
-          button.replaceWith(button.cloneNode(true));
-          const newButton = document.getElementById(buttonId);
-          
-          newButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            
-            // Visual feedback
-            newButton.style.transform = 'scale(0.9)';
-            newButton.style.background = 'rgba(255, 255, 255, 1)';
-            
-            setTimeout(() => {
-              newButton.style.transform = 'scale(1)';
-              newButton.style.background = 'rgba(255, 255, 255, 0.9)';
-            }, 150);
-            
-            callback();
-          });
-        }
-      }
-
-      // Add event listeners with visual feedback
-      addButtonFeedback('zoomIn', () => {
-        window.previewState.currentZoom = Math.min(window.previewState.currentZoom * 1.2, 5);
-        updateImageTransform();
-      });
-
-      addButtonFeedback('zoomOut', () => {
-        window.previewState.currentZoom = Math.max(window.previewState.currentZoom / 1.2, 0.1);
-        updateImageTransform();
-      });
-
-      addButtonFeedback('closePreview', () => {
-        // Reset zoom and position when closing
-        window.previewState.currentZoom = 1;
-        window.previewState.translateX = 0;
-        window.previewState.translateY = 0;
-        closePreview();
-      });
-      
-      // Setup image panning functionality for modal
-      const previewImage = document.getElementById('previewImage');
-      if (previewImage) {
-        // Set initial cursor based on zoom
-        previewImage.style.cursor = window.previewState.currentZoom > 1 ? 'grab' : 'pointer';
-        
-        // Mouse events now handled by global document listeners above
-
-        // Update cursor when zoom changes
-        previewImage.addEventListener('wheel', (e) => {
-          e.preventDefault();
-          const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-          window.previewState.currentZoom = Math.max(0.5, Math.min(3, window.previewState.currentZoom * zoomFactor));
-          updateImageTransform();
-          previewImage.style.cursor = window.previewState.currentZoom > 1 ? 'grab' : 'pointer';
-        });
-      }
-    }
-
-    function updateImageTransform() {
-      const image = document.getElementById('previewImage');
-      image.style.transform = `scale(${window.previewState.currentZoom}) translate(${window.previewState.translateX}px, ${window.previewState.translateY}px)`;
-    }
-
-    function closePreview() {
-      const modal = document.getElementById('previewModal');
-      modal.style.display = 'none';
-      modal.style.top = '0px';
-      modal.style.left = '0px';
-      document.body.style.overflow = 'auto';
-      
-      // Clean up
-      const image = document.getElementById('previewImage');
-      const pdf = document.getElementById('previewPdf');
-      if (image.src.startsWith('blob:')) URL.revokeObjectURL(image.src);
-      if (pdf.src.startsWith('blob:')) URL.revokeObjectURL(pdf.src);
-      
-      image.src = '';
-      pdf.src = '';
-      currentFile = null;
-      
-      // Dispatch hidden event for cleanup
-      modal.dispatchEvent(new Event('hidden'));
-    }
-
-    // Click to close modal (but not on content or buttons)
-    document.getElementById('previewModal').addEventListener('click', (e) => {
-      // Don't close if clicking on buttons, controls, or content
-      if (e.target.tagName === 'BUTTON' || 
-          e.target.classList.contains('preview-btn') ||
-          e.target.classList.contains('preview-controls') ||
-          e.target.classList.contains('preview-wrapper') ||
-          e.target.id === 'previewImage' ||
-          e.target.id === 'previewPdf') {
-        return;
-      }
-      
-      if (e.target.id === 'previewModal' || e.target.classList.contains('preview-content')) {
-        closePreview();
-      }
-    });
-
-    // Enhanced pan and zoom event handlers based on best practices
-    document.addEventListener('mousedown', (e) => {
-      const modal = document.getElementById('previewModal');
-      const previewImage = document.getElementById('previewImage');
-      
-      if (modal && modal.style.display === 'block' && e.target === previewImage && window.previewState.currentZoom > 1) {
-        window.previewState.isDragging = true;
-        window.previewState.lastX = e.clientX;
-        window.previewState.lastY = e.clientY;
-        window.previewState.element = previewImage;
-        previewImage.style.cursor = 'grabbing';
-        console.log('DRAG START - lastX:', window.previewState.lastX, 'lastY:', window.previewState.lastY);
-        e.preventDefault();
-      }
-    });
-
-    document.addEventListener('mousemove', (e) => {
-      if (window.previewState.isDragging && window.previewState.element) {
-        const deltaX = e.clientX - window.previewState.lastX;
-        const deltaY = e.clientY - window.previewState.lastY;
-        
-        window.previewState.translateX += deltaX;
-        window.previewState.translateY += deltaY;
-        
-        window.previewState.lastX = e.clientX;
-        window.previewState.lastY = e.clientY;
-        
-        console.log('DRAGGING - deltaX:', deltaX, 'deltaY:', deltaY, 'translateX:', window.previewState.translateX, 'translateY:', window.previewState.translateY);
-        updateImageTransform();
-        e.preventDefault();
-      }
-    });
-
-    document.addEventListener('mouseup', () => {
-      if (window.previewState.isDragging) {
-        window.previewState.isDragging = false;
-        const previewImage = document.getElementById('previewImage');
-        if (previewImage) {
-          previewImage.style.cursor = window.previewState.currentZoom > 1 ? 'grab' : 'pointer';
-        }
-        console.log('DRAG END');
-      }
-    });
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      const modal = document.getElementById('previewModal');
-      if (modal.style.display === 'block') {
-        switch(e.key) {
-          case 'Escape':
-            // Reset zoom and position when closing via escape key
-            window.previewState.currentZoom = 1;
-            window.previewState.translateX = 0;
-            window.previewState.translateY = 0;
-            closePreview();
-            break;
-          case '+':
-          case '=':
-            window.previewState.currentZoom = Math.min(window.previewState.currentZoom * 1.2, 5);
-            updateImageTransform();
-            break;
-          case '-':
-            window.previewState.currentZoom = Math.max(window.previewState.currentZoom / 1.2, 0.1);
-            updateImageTransform();
-            break;
-        }
-      }
-    });
-
-    // Mouse wheel zoom
-    previewImage.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      if (e.deltaY < 0) {
-        window.previewState.currentZoom = Math.min(window.previewState.currentZoom * 1.1, 5);
-      } else {
-        window.previewState.currentZoom = Math.max(window.previewState.currentZoom / 1.1, 0.1);
-      }
-      updateImageTransform();
-    });
+    // Modal preview functionality removed - keeping only in-box thumbnails
   </script>
 
-  <!-- File Preview Modal -->
-  <div id="previewModal" class="preview-modal">
-    <div class="preview-content">
-      <div class="preview-wrapper">
-        <img id="previewImage" class="preview-image" src="" alt="Preview" style="display: none;" />
-        <iframe id="previewPdf" class="preview-pdf" src="" style="display: none;"></iframe>
-        <div class="preview-controls">
-          <button class="preview-btn" id="zoomOut" title="Zoom Out">−</button>
-          <button class="preview-btn" id="zoomIn" title="Zoom In">+</button>
-          <button class="preview-btn close-btn" id="closePreview" title="Close">×</button>
-        </div>
-      </div>
-      <div id="previewFilename" class="preview-filename"></div>
-    </div>
-  </div>
 
 </body>
 </html>
