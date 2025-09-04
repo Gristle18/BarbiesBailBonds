@@ -1439,7 +1439,10 @@
       updateImageTransform();
     });
 
-    document.getElementById('closePreview').addEventListener('click', closePreview);
+    document.getElementById('closePreview').addEventListener('click', (e) => {
+      e.stopPropagation();
+      closePreview();
+    });
 
     function updateImageTransform() {
       const image = document.getElementById('previewImage');
@@ -1467,8 +1470,18 @@
       modal.dispatchEvent(new Event('hidden'));
     }
 
-    // Click to close modal (but not on content)
+    // Click to close modal (but not on content or buttons)
     document.getElementById('previewModal').addEventListener('click', (e) => {
+      // Don't close if clicking on buttons, controls, or content
+      if (e.target.tagName === 'BUTTON' || 
+          e.target.classList.contains('preview-btn') ||
+          e.target.classList.contains('preview-controls') ||
+          e.target.classList.contains('preview-wrapper') ||
+          e.target.id === 'previewImage' ||
+          e.target.id === 'previewPdf') {
+        return;
+      }
+      
       if (e.target.id === 'previewModal' || e.target.classList.contains('preview-content')) {
         closePreview();
       }
