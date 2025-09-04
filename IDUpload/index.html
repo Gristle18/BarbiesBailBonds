@@ -1041,7 +1041,7 @@
 
       debugLog(`Creating previews for ${files.length} files in ${targetId}`);
 
-      // Create preview elements similar to existing functionality
+      // Create preview elements using the original system's CSS classes
       const previews = Array.from(files).map((file, index) => {
         let thumbnail = '';
         if (file.type.startsWith('image/')) {
@@ -1054,7 +1054,7 @@
           </div>`;
         }
 
-        return `<div class="file-preview">
+        return `<div class="file-item">
           ${thumbnail}
           <div class="file-info">
             <div class="file-name">${file.name}</div>
