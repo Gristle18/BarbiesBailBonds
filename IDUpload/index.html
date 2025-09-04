@@ -1470,14 +1470,29 @@
       // Setup image panning functionality for modal
       const previewImage = document.getElementById('previewImage');
       if (previewImage) {
+        // Set initial cursor based on zoom
+        previewImage.style.cursor = currentZoom > 1 ? 'grab' : 'pointer';
+        
         previewImage.addEventListener('mousedown', (e) => {
+          console.log('Mousedown on image, currentZoom:', currentZoom);
           if (currentZoom > 1) {
             isDragging = true;
             startX = e.clientX - translateX;
             startY = e.clientY - translateY;
             previewImage.style.cursor = 'grabbing';
+            console.log('Started dragging, startX:', startX, 'startY:', startY);
             e.preventDefault();
+            e.stopPropagation();
           }
+        });
+
+        // Update cursor when zoom changes
+        previewImage.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+          currentZoom = Math.max(0.5, Math.min(3, currentZoom * zoomFactor));
+          updateImageTransform();
+          previewImage.style.cursor = currentZoom > 1 ? 'grab' : 'pointer';
         });
       }
     }
@@ -1530,12 +1545,14 @@
       if (isDragging && currentZoom > 1) {
         translateX = e.clientX - startX;
         translateY = e.clientY - startY;
+        console.log('Panning - translateX:', translateX, 'translateY:', translateY);
         updateImageTransform();
       }
     });
 
     document.addEventListener('mouseup', () => {
       if (isDragging) {
+        console.log('Mouse up - stopping drag');
         isDragging = false;
         const previewImage = document.getElementById('previewImage');
         if (previewImage) {
