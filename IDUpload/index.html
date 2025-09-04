@@ -921,10 +921,21 @@
       // Insert before the add button
       container.insertBefore(section, addButton);
       
-      // Initialize dropzone functionality for the new section after a brief delay
-      // to ensure the DOM is fully updated
+      // Initialize dropzone functionality for the new section using the original system
       setTimeout(() => {
-        initializeDropzone(inputId);
+        // Find the new dropzone and initialize it using the original system's method
+        const zone = document.querySelector(`.dropzone[data-target="${inputId}"]`);
+        const input = document.getElementById(inputId);
+        const list = document.getElementById(inputId + 'List');
+        
+        if (zone && input && list) {
+          debugLog(`Using original system initialization for: ${inputId}`);
+          
+          // Call the original system's dropzone initialization logic
+          initializeOriginalDropzone(inputId, zone, input, list);
+        } else {
+          debugLog(`Failed to find elements for original system init: ${inputId}`);
+        }
       }, 50);
       
       debugLog(`Document section added: ${sectionId}`);
@@ -946,20 +957,102 @@
       }
     };
 
-    // Function to initialize dropzone for a specific input
-    function initializeDropzone(targetId) {
-      debugLog(`Initializing dropzone for: ${targetId}`);
+    // Initialize dropzone using the original system's exact logic
+    function initializeOriginalDropzone(targetId, zone, input, list) {
+      debugLog(`Initializing original dropzone for: ${targetId}`);
       
-      const zone = document.querySelector(`.dropzone[data-target="${targetId}"]`);
-      const input = document.getElementById(targetId);
-      const list = document.getElementById(targetId + 'List');
-      
-      if (!zone || !input || !list) {
-        debugLog(`Missing elements for ${targetId}: zone=${!!zone}, input=${!!input}, list=${!!list}`);
-        return;
-      }
+      // This is the exact logic from the original initializeAllDropzones function
+      const updateList = (files) => {
+        if (!files || files.length === 0) { 
+          // Reset dropzone to original state
+          const isSpanish = targetId.endsWith('Es');
+          const isMultiple = input.multiple;
+          
+          let hintText;
+          if (isSpanish) {
+            hintText = isMultiple ? 'Arrastre y suelte archivos aquí o haga clic para seleccionar' : 'Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar';
+          } else {
+            hintText = isMultiple ? 'Drag & drop files here or click to select' : 'Drag & drop image/PDF here or click to select';
+          }
+          
+          zone.innerHTML = `
+            <div class="drop-hint">${hintText}</div>
+            <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+          `;
+          
+          // Reset zone styles
+          zone.style.width = '';
+          zone.style.height = '';
+          zone.style.padding = '20px';
+          zone.style.border = '2px dashed #ccc';
+          zone.style.position = 'relative';
+          
+          list.innerHTML = '';
+          debugLog(`${targetId} reset to original state`);
+          return;
+        }
 
-      // Drag and drop functionality
+        // Handle file preview using original system logic
+        const file = files[0]; // Take first file
+        const isImage = file.type.startsWith('image/');
+        const isPdf = file.type === 'application/pdf';
+        
+        if (isImage) {
+          const url = URL.createObjectURL(file);
+          zone.innerHTML = `
+            <img src="${url}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" alt="Preview">
+            <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+          `;
+          
+          list.innerHTML = `
+            <div class="file-item">
+              <img src="${url}" class="file-thumbnail" alt="Preview">
+              <div class="file-info">
+                <div class="file-name">${file.name}</div>
+                <div class="file-size">${(file.size/1024/1024).toFixed(2)} MB</div>
+              </div>
+              <button type="button" class="remove-file" onclick="removeFile('${targetId}', 0)" title="Remove">×</button>
+            </div>
+          `;
+        } else if (isPdf) {
+          zone.innerHTML = `
+            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white; font-weight: bold; font-size: 18px;">PDF</div>
+            <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+          `;
+          
+          list.innerHTML = `
+            <div class="file-item">
+              <div class="pdf-preview">
+                <div class="pdf-gradient"></div>
+                <div class="pdf-text">PDF</div>
+              </div>
+              <div class="file-info">
+                <div class="file-name">${file.name}</div>
+                <div class="file-size">${(file.size/1024/1024).toFixed(2)} MB</div>
+              </div>
+              <button type="button" class="remove-file" onclick="removeFile('${targetId}', 0)" title="Remove">×</button>
+            </div>
+          `;
+        }
+        
+        debugLog(`FILE INPUT CHANGED: ${targetId} - ${files.length} files`);
+        debugLog(`File preview updated for ${targetId}: ${file.name}`);
+        
+        // Re-attach event listeners to the new input
+        const newInput = document.getElementById(targetId);
+        if (newInput) {
+          newInput.addEventListener('change', () => {
+            updateList(newInput.files);
+          });
+        }
+      };
+
+      // Set up initial event listeners
+      input.addEventListener('change', () => {
+        updateList(input.files);
+      });
+
+      // Drag and drop
       zone.addEventListener('dragover', (e) => {
         e.preventDefault();
         zone.classList.add('dragover');
@@ -975,33 +1068,20 @@
         e.preventDefault();
         zone.classList.remove('dragover');
         
-        debugLog(`Files dropped for: ${targetId}, Files: ${e.dataTransfer.files.length}`);
-        
+        const files = e.dataTransfer.files;
         if (input.multiple) {
-          input.files = e.dataTransfer.files;
+          input.files = files;
         } else {
           const dt = new DataTransfer();
-          if (e.dataTransfer.files[0]) {
-            dt.items.add(e.dataTransfer.files[0]);
+          if (files[0]) {
+            dt.items.add(files[0]);
           }
           input.files = dt.files;
         }
-        updateList(targetId, input.files);
-      });
-
-      // File input change event
-      input.addEventListener('change', () => {
-        debugLog(`File input changed for: ${targetId}, Files: ${input.files.length}`);
-        updateList(targetId, input.files);
+        updateList(input.files);
       });
       
-      // Also add to the input directly as backup
-      input.onchange = () => {
-        debugLog(`BACKUP: File input changed for: ${targetId}, Files: ${input.files.length}`);
-        updateList(targetId, input.files);
-      };
-      
-      debugLog(`Dropzone initialized for: ${targetId} - input overlay should handle clicks`);
+      debugLog(`Original system dropzone initialized for: ${targetId}`);
     }
 
     // Update file list display - supports both calling patterns
