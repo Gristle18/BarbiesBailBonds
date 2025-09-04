@@ -913,7 +913,7 @@
         </div>
         <div class="dropzone" data-target="${inputId}" style="position: relative;">
           <div class="drop-hint">Drag & drop files here or click to select</div>
-          <input id="${inputId}" name="dynamic_docs[]" type="file" accept="image/*,application/pdf" multiple style="display: none;" />
+          <input id="${inputId}" name="dynamic_docs[]" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
         </div>
         <div class="file-list" id="${inputId}List"></div>
       `;
@@ -956,21 +956,7 @@
         return;
       }
 
-      // Remove any existing click listeners to prevent duplicates
-      zone.onclick = null;
-      
-      // Click to upload - use onclick instead of addEventListener to avoid conflicts
-      zone.onclick = (e) => {
-        debugLog(`Dropzone clicked for: ${targetId}`);
-        e.preventDefault();
-        e.stopPropagation();
-        // Clear the input value first to allow re-selection of same file
-        input.value = '';
-        // Trigger the file dialog
-        input.click();
-      };
-
-      // Drag and drop
+      // Drag and drop functionality
       zone.addEventListener('dragover', (e) => {
         e.preventDefault();
         zone.classList.add('dragover');
@@ -1000,11 +986,13 @@
         updateList(targetId, input.files);
       });
 
-      // File input change
-      input.onchange = () => {
+      // File input change event
+      input.addEventListener('change', () => {
         debugLog(`File input changed for: ${targetId}, Files: ${input.files.length}`);
         updateList(targetId, input.files);
-      };
+      });
+      
+      debugLog(`Dropzone initialized for: ${targetId} - input overlay should handle clicks`);
     }
 
     // Update file list display
