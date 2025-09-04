@@ -814,6 +814,34 @@
       debugLog(`File removed from ${targetId}. Remaining files: ${input.files.length}`);
     };
 
+    window.changeFile = function(targetId) {
+      debugLog(`Changing file for ${targetId}`);
+      
+      // Create a temporary file input
+      const tempInput = document.createElement('input');
+      tempInput.type = 'file';
+      
+      // Get the original input to copy its attributes
+      const originalInput = document.getElementById(targetId);
+      if (originalInput) {
+        tempInput.accept = originalInput.accept;
+        tempInput.multiple = originalInput.multiple;
+      }
+      
+      tempInput.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+          // Replace the files in the original input
+          if (originalInput) {
+            originalInput.files = this.files;
+            originalInput.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }
+      });
+      
+      // Trigger file selection
+      tempInput.click();
+    };
+
     // Upload functionality - embedded in HTML
     (function () {
       // Initialize when DOM is loaded
@@ -922,39 +950,135 @@
                 zone.style.overflow = 'hidden';
                 
                 zone.innerHTML = `
-                  <img src="${url}" style="
+                  <img id="${targetId}_preview" src="${url}" style="
                     width: 100%; 
                     height: 100%; 
                     object-fit: cover; 
-                    cursor: pointer;
-                  " onclick="previewFile('${targetId}', 0)" alt="Preview" />
-                  <button onclick="removeFile('${targetId}', 0)" style="
+                    cursor: grab;
+                    transition: transform 0.3s ease;
+                    transform-origin: center center;
+                  " alt="Preview" />
+                  <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
+                    <button onclick="changeFile('${targetId}')" style="
+                      background: rgba(0, 123, 255, 0.9); 
+                      color: white; 
+                      border: none; 
+                      border-radius: 50%; 
+                      width: 30px; 
+                      height: 30px; 
+                      font-size: 14px; 
+                      cursor: pointer; 
+                      display: flex; 
+                      align-items: center; 
+                      justify-content: center;
+                      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    " title="Change file">📁</button>
+                    <button onclick="removeFile('${targetId}', 0)" style="
+                      background: rgba(220, 53, 69, 0.9); 
+                      color: white; 
+                      border: none; 
+                      border-radius: 50%; 
+                      width: 30px; 
+                      height: 30px; 
+                      font-size: 16px; 
+                      cursor: pointer; 
+                      display: flex; 
+                      align-items: center; 
+                      justify-content: center;
+                      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    " title="Remove file">×</button>
+                  </div>
+                  <div style="
                     position: absolute;
-                    top: 8px;
-                    right: 8px;
-                    background: rgba(220, 53, 69, 0.9); 
-                    color: white; 
-                    border: none; 
-                    border-radius: 50%; 
-                    width: 30px; 
-                    height: 30px; 
-                    font-size: 16px; 
-                    cursor: pointer; 
-                    display: flex; 
-                    align-items: center; 
-                    justify-content: center;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                  " title="Remove file">×</button>
-                  <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                    bottom: 8px;
+                    left: 8px;
+                    background: rgba(0,0,0,0.7);
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    pointer-events: none;
+                    z-index: 10;
+                  ">Scroll: Zoom • Drag: Pan • Click: Full View</div>
                 `;
                 
-                // Re-attach event listeners to the new input
-                const newInput = document.getElementById(targetId);
-                newInput.files = files; // Preserve the files
-                newInput.addEventListener('change', () => {
-                  debugLog(`File input changed for: ${targetId}`, 'Files:', newInput.files.length);
-                  updateList(newInput.files);
+                // Add zoom and pan functionality
+                const previewImg = document.getElementById(targetId + '_preview');
+                let currentScale = 1;
+                let currentTranslateX = 0;
+                let currentTranslateY = 0;
+                let isDragging = false;
+                let startX, startY, initialTranslateX, initialTranslateY;
+                
+                // Mouse wheel zoom
+                previewImg.addEventListener('wheel', (e) => {
+                  e.preventDefault();
+                  const rect = previewImg.getBoundingClientRect();
+                  const centerX = rect.left + rect.width / 2;
+                  const centerY = rect.top + rect.height / 2;
+                  
+                  const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+                  const newScale = Math.max(0.5, Math.min(3, currentScale * zoomFactor));
+                  
+                  if (newScale !== currentScale) {
+                    currentScale = newScale;
+                    updatePreviewTransform();
+                  }
                 });
+                
+                // Mouse drag to pan
+                previewImg.addEventListener('mousedown', (e) => {
+                  if (currentScale > 1) {
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    initialTranslateX = currentTranslateX;
+                    initialTranslateY = currentTranslateY;
+                    previewImg.style.cursor = 'grabbing';
+                    e.preventDefault();
+                  }
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                  if (isDragging) {
+                    currentTranslateX = initialTranslateX + (e.clientX - startX);
+                    currentTranslateY = initialTranslateY + (e.clientY - startY);
+                    updatePreviewTransform();
+                  }
+                });
+                
+                document.addEventListener('mouseup', () => {
+                  if (isDragging) {
+                    isDragging = false;
+                    previewImg.style.cursor = currentScale > 1 ? 'grab' : 'pointer';
+                  }
+                });
+                
+                // Double click to reset zoom
+                previewImg.addEventListener('dblclick', (e) => {
+                  e.preventDefault();
+                  currentScale = 1;
+                  currentTranslateX = 0;
+                  currentTranslateY = 0;
+                  updatePreviewTransform();
+                  previewImg.style.cursor = 'pointer';
+                });
+                
+                // Single click for full preview (but not when dragging)
+                let clickTimeout;
+                previewImg.addEventListener('click', (e) => {
+                  clearTimeout(clickTimeout);
+                  clickTimeout = setTimeout(() => {
+                    if (!isDragging && currentScale === 1) {
+                      previewFile(targetId, 0);
+                    }
+                  }, 200);
+                });
+                
+                function updatePreviewTransform() {
+                  previewImg.style.transform = `scale(${currentScale}) translate(${currentTranslateX/currentScale}px, ${currentTranslateY/currentScale}px)`;
+                  previewImg.style.cursor = currentScale > 1 ? 'grab' : 'pointer';
+                }
                 
                 URL.revokeObjectURL(url); // Clean up
               };
@@ -985,33 +1109,37 @@
                   <div>📄</div>
                   <div style="font-size: 14px; margin-top: 8px;">PDF</div>
                 </div>
-                <button onclick="removeFile('${targetId}', 0)" style="
-                  position: absolute;
-                  top: 8px;
-                  right: 8px;
-                  background: rgba(220, 53, 69, 0.9); 
-                  color: white; 
-                  border: none; 
-                  border-radius: 50%; 
-                  width: 30px; 
-                  height: 30px; 
-                  font-size: 16px; 
-                  cursor: pointer; 
-                  display: flex; 
-                  align-items: center; 
-                  justify-content: center;
-                  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                " title="Remove file">×</button>
-                <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
+                  <button onclick="changeFile('${targetId}')" style="
+                    background: rgba(0, 123, 255, 0.9); 
+                    color: white; 
+                    border: none; 
+                    border-radius: 50%; 
+                    width: 30px; 
+                    height: 30px; 
+                    font-size: 14px; 
+                    cursor: pointer; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                  " title="Change file">📁</button>
+                  <button onclick="removeFile('${targetId}', 0)" style="
+                    background: rgba(220, 53, 69, 0.9); 
+                    color: white; 
+                    border: none; 
+                    border-radius: 50%; 
+                    width: 30px; 
+                    height: 30px; 
+                    font-size: 16px; 
+                    cursor: pointer; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                  " title="Remove file">×</button>
+                </div>
               `;
-              
-              // Re-attach event listeners to the new input
-              const newInput = document.getElementById(targetId);
-              newInput.files = files; // Preserve the files
-              newInput.addEventListener('change', () => {
-                debugLog(`File input changed for: ${targetId}`, 'Files:', newInput.files.length);
-                updateList(newInput.files);
-              });
             }
             
             // Update the file list area below with file info
