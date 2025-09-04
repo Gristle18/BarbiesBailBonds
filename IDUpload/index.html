@@ -433,6 +433,12 @@
       <div class="error" id="errorMsgEs" style="text-align:center; margin-top:10px;">Carga aún no configurada. Por favor envíe sus fotos por texto a <span style="white-space: nowrap;">561-247-0018</span>.</div>
     </form>
 
+    <!-- DEBUG SECTION -->
+    <div style="position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.9); color: #00ff00; font-family: monospace; font-size: 12px; padding: 10px; max-height: 200px; overflow-y: auto; z-index: 9999; border-top: 2px solid #00ff00;">
+      <div style="margin-bottom: 5px; font-weight: bold; color: #ffff00;">DEBUG OUTPUT:</div>
+      <div id="debugOutput">Ready for debugging...</div>
+    </div>
+
   </div>
 
   <!-- How to Get to Us Section -->
@@ -484,8 +490,40 @@
   </footer>
 
   <script>
+    // DEBUG FUNCTIONALITY
+    let debugOutput = null;
+    let debugCount = 0;
+    
+    function debugLog(message) {
+      if (!debugOutput) {
+        debugOutput = document.getElementById('debugOutput');
+      }
+      if (debugOutput) {
+        debugCount++;
+        const timestamp = new Date().toLocaleTimeString();
+        debugOutput.innerHTML += `<div>[${debugCount}] ${timestamp}: ${message}</div>`;
+        debugOutput.scrollTop = debugOutput.scrollHeight;
+      }
+      console.log(message);
+    }
+
+    // Global click listener to debug all clicks
+    document.addEventListener('click', function(e) {
+      debugLog(`CLICK: ${e.target.tagName} ${e.target.className ? '.' + e.target.className.replace(/\s+/g, '.') : ''} ${e.target.id ? '#' + e.target.id : ''}`);
+    }, true);
+
+    // Global change listener for form inputs
+    document.addEventListener('change', function(e) {
+      if (e.target.type === 'file') {
+        debugLog(`FILE CHANGE: ${e.target.id} - ${e.target.files.length} files selected`);
+      } else {
+        debugLog(`INPUT CHANGE: ${e.target.id} = "${e.target.value}"`);
+      }
+    });
+
     // Language selection functionality
     function showUploadForm(language) {
+      debugLog(`showUploadForm called with: ${language}`);
       // Hide language selection
       document.getElementById('languageSelection').style.display = 'none';
       
@@ -502,6 +540,7 @@
     }
     
     function showLanguageSelection() {
+      debugLog('showLanguageSelection called');
       // Hide both forms
       document.getElementById('uploadFormEn').style.display = 'none';
       document.getElementById('uploadFormEs').style.display = 'none';
@@ -521,13 +560,14 @@
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
       });
+      debugLog('Language selection shown, forms reset');
     }
 
     // Upload functionality - embedded in HTML
     (function () {
       // Initialize when DOM is loaded
       document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM loaded, initializing upload functionality...');
+        debugLog('DOM LOADED - Starting initialization');
         
         // Initialize dropzones for both forms
         initializeAllDropzones();
@@ -535,47 +575,59 @@
         // Initialize form functionality
         initializeForm('En'); // English form
         initializeForm('Es'); // Spanish form
+        
+        debugLog('Initialization complete');
       });
 
       function initializeAllDropzones() {
         // Find all dropzones in the document
         const dropzones = document.querySelectorAll('.dropzone');
-        console.log('Found dropzones:', dropzones.length);
+        debugLog(`Found ${dropzones.length} dropzones in document`);
         
         dropzones.forEach(zone => {
           const targetId = zone.getAttribute('data-target');
           const input = document.getElementById(targetId);
           const list = document.getElementById(targetId + 'List');
           
-          console.log('Initializing dropzone for:', targetId, 'Input found:', !!input, 'List found:', !!list);
+          debugLog(`Initializing dropzone: ${targetId}, Input: ${!!input}, List: ${!!list}`);
           
-          if (!input || !list) return;
+          if (!input || !list) {
+            debugLog(`SKIPPING ${targetId} - missing input or list element`);
+            return;
+          }
 
           const updateList = (files) => {
             if (!files || files.length === 0) { 
               list.textContent = ''; 
+              debugLog(`File list cleared for ${targetId}`);
               return; 
             }
-            list.innerHTML = Array.from(files).map(f => `${f.name} · ${(f.size/1024/1024).toFixed(2)} MB`).join('<br>');
+            const fileInfo = Array.from(files).map(f => `${f.name} · ${(f.size/1024/1024).toFixed(2)} MB`).join('<br>');
+            list.innerHTML = fileInfo;
+            debugLog(`File list updated for ${targetId}: ${files.length} files`);
           };
 
           // Click to upload
           zone.addEventListener('click', (e) => {
-            console.log('Dropzone clicked for:', targetId);
+            debugLog(`DROPZONE CLICKED: ${targetId}`);
             e.preventDefault();
+            e.stopPropagation();
             input.click();
+            debugLog(`Triggered input.click() for ${targetId}`);
           });
 
           // Drag and drop
           zone.addEventListener('dragover', (e) => {
             e.preventDefault();
             zone.classList.add('dragover');
+            debugLog(`DRAGOVER: ${targetId}`);
           });
 
           zone.addEventListener('dragleave', (e) => {
             // Only remove dragover if we're really leaving the dropzone
             if (!zone.contains(e.relatedTarget)) {
               zone.classList.remove('dragover');
+              debugLog(`DRAGLEAVE: ${targetId}`);
             }
           });
 
@@ -583,7 +635,7 @@
             e.preventDefault();
             zone.classList.remove('dragover');
             
-            console.log('Files dropped for:', targetId, 'Files:', e.dataTransfer.files.length);
+            debugLog(`FILES DROPPED: ${targetId} - ${e.dataTransfer.files.length} files`);
             
             if (input.multiple) {
               input.files = e.dataTransfer.files;
@@ -600,7 +652,7 @@
 
           // File input change
           input.addEventListener('change', () => {
-            console.log('File input changed for:', targetId, 'Files:', input.files.length);
+            debugLog(`FILE INPUT CHANGED: ${targetId} - ${input.files.length} files`);
             updateList(input.files);
           });
         });
@@ -614,11 +666,11 @@
         const errorMsg = document.getElementById('errorMsg' + suffix);
 
         if (!form) {
-          console.log('Form not found for suffix:', suffix);
+          debugLog(`FORM NOT FOUND: uploadForm${suffix}`);
           return;
         }
 
-        console.log('Initializing form:', 'uploadForm' + suffix);
+        debugLog(`INITIALIZING FORM: uploadForm${suffix}`);
 
         // Simple phone formatting on blur (USA)
         const phone = document.getElementById('yourPhone' + suffix);
