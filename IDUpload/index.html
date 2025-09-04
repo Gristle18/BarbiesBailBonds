@@ -992,18 +992,32 @@
         updateList(targetId, input.files);
       });
       
+      // Also add to the input directly as backup
+      input.onchange = () => {
+        debugLog(`BACKUP: File input changed for: ${targetId}, Files: ${input.files.length}`);
+        updateList(targetId, input.files);
+      };
+      
       debugLog(`Dropzone initialized for: ${targetId} - input overlay should handle clicks`);
     }
 
     // Update file list display
     function updateList(targetId, files) {
+      debugLog(`updateList called for ${targetId} with ${files ? files.length : 0} files`);
+      
       const list = document.getElementById(targetId + 'List');
-      if (!list) return;
+      if (!list) {
+        debugLog(`ERROR: Could not find list element: ${targetId}List`);
+        return;
+      }
 
       if (!files || files.length === 0) {
+        debugLog(`Clearing file list for ${targetId}`);
         list.innerHTML = '';
         return;
       }
+
+      debugLog(`Creating previews for ${files.length} files in ${targetId}`);
 
       // Create preview elements similar to existing functionality
       const previews = Array.from(files).map((file, index) => {
@@ -1029,6 +1043,7 @@
       }).join('');
 
       list.innerHTML = previews;
+      debugLog(`File previews updated for ${targetId}: ${files[0].name}`);
     }
 
     // Global function to remove files
