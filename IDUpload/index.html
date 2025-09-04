@@ -299,16 +299,23 @@
       width: 100%;
       height: 100%;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 20px;
+    }
+
+    .preview-wrapper {
+      position: relative;
+      display: inline-block;
     }
 
     .preview-image {
-      max-width: 90%;
-      max-height: 90%;
+      max-width: calc(100% - 40px);
+      max-height: calc(100% - 40px);
       object-fit: contain;
       transition: transform 0.3s ease;
       cursor: grab;
+      position: relative;
     }
 
     .preview-image:active {
@@ -316,17 +323,18 @@
     }
 
     .preview-pdf {
-      width: 90%;
-      height: 90%;
+      width: calc(100% - 40px);
+      height: calc(100% - 40px);
       border: none;
+      position: relative;
     }
 
     .preview-controls {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 10px;
+      right: 10px;
       display: flex;
-      gap: 10px;
+      gap: 8px;
       z-index: 10001;
     }
 
@@ -1400,7 +1408,13 @@
         modal.addEventListener('hidden', () => URL.revokeObjectURL(url), { once: true });
       }
       
+      // Position modal at current scroll position
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+      
       modal.style.display = 'block';
+      modal.style.top = scrollTop + 'px';
+      modal.style.left = scrollLeft + 'px';
       document.body.style.overflow = 'hidden';
     };
 
@@ -1435,6 +1449,8 @@
     function closePreview() {
       const modal = document.getElementById('previewModal');
       modal.style.display = 'none';
+      modal.style.top = '0px';
+      modal.style.left = '0px';
       document.body.style.overflow = 'auto';
       
       // Clean up
@@ -1527,14 +1543,16 @@
   <!-- File Preview Modal -->
   <div id="previewModal" class="preview-modal">
     <div class="preview-content">
-      <div class="preview-controls">
-        <button class="preview-btn" id="zoomOut" title="Zoom Out">−</button>
-        <button class="preview-btn" id="zoomIn" title="Zoom In">+</button>
-        <button class="preview-btn" id="resetZoom" title="Reset">⌂</button>
-        <button class="preview-btn close-btn" id="closePreview" title="Close">×</button>
+      <div class="preview-wrapper">
+        <img id="previewImage" class="preview-image" src="" alt="Preview" style="display: none;" />
+        <iframe id="previewPdf" class="preview-pdf" src="" style="display: none;"></iframe>
+        <div class="preview-controls">
+          <button class="preview-btn" id="zoomOut" title="Zoom Out">−</button>
+          <button class="preview-btn" id="zoomIn" title="Zoom In">+</button>
+          <button class="preview-btn" id="resetZoom" title="Reset">⌂</button>
+          <button class="preview-btn close-btn" id="closePreview" title="Close">×</button>
+        </div>
       </div>
-      <img id="previewImage" class="preview-image" src="" alt="Preview" style="display: none;" />
-      <iframe id="previewPdf" class="preview-pdf" src="" style="display: none;"></iframe>
       <div id="previewFilename" class="preview-filename"></div>
     </div>
   </div>
