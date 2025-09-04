@@ -1037,41 +1037,40 @@
               
               img.src = url;
             } else if (isPdf) {
-              // Show actual PDF preview
-              const url = URL.createObjectURL(file);
+              // Show PDF info with styled preview (Chrome blocks PDF iframes from blob URLs)
+              const fileSize = (file.size/1024/1024).toFixed(2);
               
               // Calculate responsive dimensions
               const maxWidth = zone.clientWidth || 300;
-              const maxHeight = Math.min(window.innerHeight * 0.4, 400);
+              const maxHeight = Math.min(window.innerHeight * 0.4, 200);
               
-              // Use standard aspect ratio for PDFs (8.5:11 or ~0.77)
-              const aspectRatio = 0.77;
-              let displayWidth, displayHeight;
-              
-              if (aspectRatio > maxWidth / maxHeight) {
-                // PDF is wider - fit to width
-                displayWidth = maxWidth;
-                displayHeight = maxWidth / aspectRatio;
-              } else {
-                // PDF is taller - fit to height
-                displayHeight = Math.min(maxHeight, maxWidth / aspectRatio);
-                displayWidth = displayHeight * aspectRatio;
-              }
-              
-              zone.style.width = displayWidth + 'px';
-              zone.style.height = displayHeight + 'px';
+              zone.style.width = maxWidth + 'px';
+              zone.style.height = maxHeight + 'px';
               zone.style.padding = '0';
               zone.style.border = '2px solid var(--brand)';
               zone.style.position = 'relative';
               zone.style.overflow = 'hidden';
               
               zone.innerHTML = `
-                <iframe id="${targetId}_pdf_preview" src="${url}" style="
+                <div id="${targetId}_pdf_preview" style="
                   width: 100%; 
                   height: 100%; 
-                  border: none;
-                  background: white;
-                " title="PDF Preview"></iframe>
+                  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+                  color: white; 
+                  display: flex; 
+                  flex-direction: column;
+                  align-items: center; 
+                  justify-content: center; 
+                  font-size: 20px; 
+                  font-weight: bold;
+                  cursor: default;
+                  position: relative;
+                ">
+                  <div style="font-size: 48px; margin-bottom: 8px;">📄</div>
+                  <div style="font-size: 16px; margin-bottom: 4px;">PDF Document</div>
+                  <div style="font-size: 12px; opacity: 0.9;">${file.name}</div>
+                  <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">${fileSize} MB</div>
+                </div>
                 <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
                   <button onclick="changeFile('${targetId}')" style="
                     background: rgba(0, 123, 255, 0.9); 
@@ -1102,18 +1101,6 @@
                     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
                   " title="Remove file">×</button>
                 </div>
-                <div style="
-                  position: absolute;
-                  bottom: 8px;
-                  left: 8px;
-                  background: rgba(0,0,0,0.7);
-                  color: white;
-                  padding: 4px 8px;
-                  border-radius: 4px;
-                  font-size: 11px;
-                  pointer-events: none;
-                  z-index: 10;
-                ">PDF Preview</div>
               `;
               
               // Store the file data on the PDF element for later use
@@ -1121,12 +1108,6 @@
               if (pdfPreview) {
                 pdfPreview._fileData = file;
               }
-              
-              // Clean up URL when needed (but keep it for the iframe)
-              setTimeout(() => {
-                // The iframe should have loaded by now, but we keep the URL active
-                // It will be cleaned up when the file is removed
-              }, 1000);
             }
             
             // Update the file list area below with file info
