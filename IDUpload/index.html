@@ -1029,26 +1029,191 @@
         const isPdf = file.type === 'application/pdf';
         
         if (isImage) {
+          // EXACT Image logic from original system (lines 1550-1640)
           const url = URL.createObjectURL(file);
-          zone.innerHTML = `
-            <img src="${url}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" alt="Preview">
-            <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-          `;
+          const img = new Image();
           
-          list.innerHTML = `
-            <div class="file-item">
-              <img src="${url}" class="file-thumbnail" alt="Preview">
-              <div class="file-info">
-                <div class="file-name">${file.name}</div>
-                <div class="file-size">${(file.size/1024/1024).toFixed(2)} MB</div>
+          img.onload = function() {
+            // Calculate responsive dimensions
+            const maxWidth = zone.clientWidth || 300;
+            const maxHeight = Math.min(window.innerHeight * 0.4, 400); // Max 40% of viewport height or 400px
+            
+            const aspectRatio = img.naturalWidth / img.naturalHeight;
+            let displayWidth, displayHeight;
+            
+            if (aspectRatio > maxWidth / maxHeight) {
+              // Image is wider - fit to width
+              displayWidth = maxWidth;
+              displayHeight = maxWidth / aspectRatio;
+            } else {
+              // Image is taller - fit to height
+              displayHeight = Math.min(maxHeight, maxWidth / aspectRatio);
+              displayWidth = displayHeight * aspectRatio;
+            }
+            
+            zone.style.width = displayWidth + 'px';
+            zone.style.height = displayHeight + 'px';
+            zone.style.padding = '0';
+            zone.style.border = '2px solid var(--brand)';
+            zone.style.position = 'relative';
+            zone.style.overflow = 'hidden';
+            
+            zone.innerHTML = `
+              <img id="${targetId}_preview" src="${url}" data-target-id="${targetId}" style="
+                width: 100%; 
+                height: 100%; 
+                object-fit: cover; 
+                cursor: grab;
+                transition: transform 0.3s ease;
+                transform-origin: center center;
+              " alt="Preview" />
+              <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
+              <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
+                <button onclick="event.stopPropagation(); event.preventDefault(); changeFile('${targetId}')" style="
+                  background: rgba(0, 123, 255, 0.9); 
+                  color: white; 
+                  border: none; 
+                  border-radius: 50%; 
+                  width: 30px; 
+                  height: 30px; 
+                  font-size: 14px; 
+                  cursor: pointer; 
+                  display: flex; 
+                  align-items: center; 
+                  justify-content: center;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                " title="Change file">📁</button>
+                <button onclick="event.stopPropagation(); event.preventDefault(); removeFile('${targetId}', 0)" style="
+                  background: rgba(220, 53, 69, 0.9); 
+                  color: white; 
+                  border: none; 
+                  border-radius: 50%; 
+                  width: 30px; 
+                  height: 30px; 
+                  font-size: 16px; 
+                  cursor: pointer; 
+                  display: flex; 
+                  align-items: center; 
+                  justify-content: center;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                " title="Remove file">×</button>
               </div>
-              <button type="button" class="remove-file" onclick="removeFile('${targetId}', 0)" title="Remove">×</button>
-            </div>
-          `;
+              <div style="
+                position: absolute;
+                bottom: 8px;
+                left: 8px;
+                background: rgba(0,0,0,0.7);
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                pointer-events: none;
+                z-index: 10;
+              ">Scroll: Zoom • Drag: Pan</div>
+            `;
+            
+            // Add zoom and pan functionality - simplified version
+            const previewImg = document.getElementById(targetId + '_preview');
+            if (previewImg) {
+              let currentScale = 1;
+              
+              // Mouse wheel zoom
+              previewImg.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+                currentScale = Math.max(0.5, Math.min(3, currentScale * zoomFactor));
+                previewImg.style.transform = `scale(${currentScale})`;
+                previewImg.style.cursor = currentScale > 1 ? 'grab' : 'pointer';
+              });
+              
+              // Double click to reset zoom
+              previewImg.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                currentScale = 1;
+                previewImg.style.transform = 'scale(1)';
+                previewImg.style.cursor = 'pointer';
+              });
+            }
+            
+            list.innerHTML = `
+              <div class="file-item">
+                <img src="${url}" class="file-thumbnail" alt="Preview">
+                <div class="file-info">
+                  <div class="file-name">${file.name}</div>
+                  <div class="file-size">${(file.size/1024/1024).toFixed(2)} MB</div>
+                </div>
+                <button type="button" class="remove-file" onclick="removeFile('${targetId}', 0)" title="Remove">×</button>
+              </div>
+            `;
+          };
+          
+          img.src = url;
         } else if (isPdf) {
+          // EXACT PDF logic from original system (lines 1720-1780)
+          const fileSize = (file.size/1024/1024).toFixed(2);
+          
+          // Calculate responsive dimensions
+          const maxWidth = zone.clientWidth || 300;
+          const maxHeight = Math.min(window.innerHeight * 0.4, 200);
+          
+          zone.style.width = maxWidth + 'px';
+          zone.style.height = maxHeight + 'px';
+          zone.style.padding = '0';
+          zone.style.border = '2px solid var(--brand)';
+          zone.style.position = 'relative';
+          zone.style.overflow = 'hidden';
+          
           zone.innerHTML = `
-            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white; font-weight: bold; font-size: 18px;">PDF</div>
-            <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+            <div id="${targetId}_pdf_preview" style="
+              width: 100%; 
+              height: 100%; 
+              background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+              color: white; 
+              display: flex; 
+              flex-direction: column;
+              align-items: center; 
+              justify-content: center; 
+              font-size: 20px; 
+              font-weight: bold;
+              cursor: default;
+              position: relative;
+            ">
+              <div style="font-size: 48px; margin-bottom: 8px;">📄</div>
+              <div style="font-size: 16px; margin-bottom: 4px;">PDF Document</div>
+              <div style="font-size: 12px; opacity: 0.9;">${file.name}</div>
+              <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">${fileSize} MB</div>
+            </div>
+            <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
+            <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
+              <button onclick="event.stopPropagation(); event.preventDefault(); changeFile('${targetId}')" style="
+                background: rgba(0, 123, 255, 0.9); 
+                color: white; 
+                border: none; 
+                border-radius: 50%; 
+                width: 30px; 
+                height: 30px; 
+                font-size: 14px; 
+                cursor: pointer; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+              " title="Change file">📁</button>
+              <button onclick="event.stopPropagation(); event.preventDefault(); removeFile('${targetId}', 0)" style="
+                background: rgba(220, 53, 69, 0.9); 
+                color: white; 
+                border: none; 
+                border-radius: 50%; 
+                width: 30px; 
+                height: 30px; 
+                font-size: 16px; 
+                cursor: pointer; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+              " title="Remove file">×</button>
+            </div>
           `;
           
           list.innerHTML = `
@@ -1059,7 +1224,7 @@
               </div>
               <div class="file-info">
                 <div class="file-name">${file.name}</div>
-                <div class="file-size">${(file.size/1024/1024).toFixed(2)} MB</div>
+                <div class="file-size">${fileSize} MB</div>
               </div>
               <button type="button" class="remove-file" onclick="removeFile('${targetId}', 0)" title="Remove">×</button>
             </div>
