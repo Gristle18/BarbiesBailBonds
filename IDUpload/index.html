@@ -496,24 +496,24 @@
           <div class="dropzone" data-target="idFrontEn" style="position: relative;">
             <div class="drop-hint">Drag & drop image/PDF here or click to select</div>
             <input id="idFrontEn" name="idFront" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-            <div class="file-list" id="idFrontEnList"></div>
           </div>
+          <div class="file-list" id="idFrontEnList"></div>
         </div>
         <div class="full">
           <label for="idBackEn">Government ID – Back</label>
           <div class="dropzone" data-target="idBackEn" style="position: relative;">
             <div class="drop-hint">Drag & drop image/PDF here or click to select</div>
             <input id="idBackEn" name="idBack" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-            <div class="file-list" id="idBackEnList"></div>
           </div>
+          <div class="file-list" id="idBackEnList"></div>
         </div>
         <div class="full">
           <label for="docsEn">Additional Documents (Court papers, etc.)</label>
           <div class="dropzone" data-target="docsEn" style="position: relative;">
             <div class="drop-hint">Drag & drop files here or click to select</div>
             <input id="docsEn" name="docs" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-            <div class="file-list" id="docsEnList"></div>
           </div>
+          <div class="file-list" id="docsEnList"></div>
           <div class="note">Allowed types: JPG, PNG, HEIC, WEBP, PDF • Max 10MB per file.</div>
         </div>
       </div>
@@ -560,24 +560,24 @@
           <div class="dropzone" data-target="idFrontEs" style="position: relative;">
             <div class="drop-hint">Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar</div>
             <input id="idFrontEs" name="idFront" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-            <div class="file-list" id="idFrontEsList"></div>
           </div>
+          <div class="file-list" id="idFrontEsList"></div>
         </div>
         <div class="full">
           <label for="idBackEs">ID Gubernamental – Reverso</label>
           <div class="dropzone" data-target="idBackEs" style="position: relative;">
             <div class="drop-hint">Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar</div>
             <input id="idBackEs" name="idBack" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-            <div class="file-list" id="idBackEsList"></div>
           </div>
+          <div class="file-list" id="idBackEsList"></div>
         </div>
         <div class="full">
           <label for="docsEs">Documentos Adicionales (Papeles de la corte, etc.)</label>
           <div class="dropzone" data-target="docsEs" style="position: relative;">
             <div class="drop-hint">Arrastre y suelte archivos aquí o haga clic para seleccionar</div>
             <input id="docsEs" name="docs" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-            <div class="file-list" id="docsEsList"></div>
           </div>
+          <div class="file-list" id="docsEsList"></div>
           <div class="note">Tipos permitidos: JPG, PNG, HEIC, WEBP, PDF • Máximo 10MB por archivo.</div>
         </div>
       </div>
@@ -850,11 +850,29 @@
           const updateList = (files) => {
             if (!files || files.length === 0) { 
               // Reset dropzone to original state
+              const isSpanish = targetId.endsWith('Es');
+              const isMultiple = input.multiple;
+              
+              let hintText;
+              if (isSpanish) {
+                hintText = isMultiple ? 'Arrastre y suelte archivos aquí o haga clic para seleccionar' : 'Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar';
+              } else {
+                hintText = isMultiple ? 'Drag & drop files here or click to select' : 'Drag & drop image/PDF here or click to select';
+              }
+              
               zone.innerHTML = `
-                <div class="drop-hint">Drag & drop image/PDF here or click to select</div>
+                <div class="drop-hint">${hintText}</div>
                 <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-                <div class="file-list" id="${targetId}List"></div>
               `;
+              
+              // Reset zone styles
+              zone.style.width = '';
+              zone.style.height = '';
+              zone.style.padding = '18px';
+              zone.style.border = '2px dashed #bbb';
+              
+              // Clear file list
+              list.innerHTML = '';
               
               // Re-attach event listeners to the new input
               const newInput = document.getElementById(targetId);
