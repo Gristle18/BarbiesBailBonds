@@ -2,85 +2,85 @@
 // Endpoint is configured via scripts/config.js as window.UPLOAD_ENDPOINT
 
 (function () {
-  // Initialize dropzones when DOM is loaded
+  // Initialize when DOM is loaded
   document.addEventListener('DOMContentLoaded', function() {
-    initializeDropzones();
+    console.log('DOM loaded, initializing upload functionality...');
+    
+    // Initialize dropzones for both forms
+    initializeAllDropzones();
+    
+    // Initialize form functionality
     initializeForm('En'); // English form
     initializeForm('Es'); // Spanish form
   });
 
-  function initializeDropzones() {
-    // Initialize all dropzones (works even when forms are hidden)
-    document.addEventListener('click', function(e) {
-      const dropzone = e.target.closest('.dropzone');
-      if (dropzone) {
-        const targetId = dropzone.getAttribute('data-target');
-        const input = document.getElementById(targetId);
-        if (input) {
-          input.click();
-        }
-      }
-    });
-
-    // Handle drag and drop for all dropzones
-    document.addEventListener('dragover', function(e) {
-      const dropzone = e.target.closest('.dropzone');
-      if (dropzone) {
-        e.preventDefault();
-        dropzone.classList.add('dragover');
-      }
-    });
-
-    document.addEventListener('dragleave', function(e) {
-      const dropzone = e.target.closest('.dropzone');
-      if (dropzone && !dropzone.contains(e.relatedTarget)) {
-        dropzone.classList.remove('dragover');
-      }
-    });
-
-    document.addEventListener('drop', function(e) {
-      const dropzone = e.target.closest('.dropzone');
-      if (dropzone) {
-        e.preventDefault();
-        dropzone.classList.remove('dragover');
-        
-        const targetId = dropzone.getAttribute('data-target');
-        const input = document.getElementById(targetId);
-        if (input) {
-          if (input.multiple) {
-            input.files = e.dataTransfer.files;
-          } else {
-            // For single input, take the first file
-            const dt = new DataTransfer();
-            if (e.dataTransfer.files[0]) dt.items.add(e.dataTransfer.files[0]);
-            input.files = dt.files;
-          }
-          updateFileList(input);
-        }
-      }
-    });
-
-    // Handle file input changes
-    document.addEventListener('change', function(e) {
-      if (e.target.type === 'file') {
-        updateFileList(e.target);
-      }
-    });
-  }
-
-  function updateFileList(input) {
-    const targetId = input.id;
-    const list = document.getElementById(targetId + 'List');
-    if (!list) return;
-
-    if (!input.files || input.files.length === 0) {
-      list.textContent = '';
-      return;
-    }
+  function initializeAllDropzones() {
+    // Find all dropzones in the document
+    const dropzones = document.querySelectorAll('.dropzone');
+    console.log('Found dropzones:', dropzones.length);
     
-    list.innerHTML = Array.from(input.files).map(f => 
-      `${f.name} · ${(f.size/1024/1024).toFixed(2)} MB`
-    ).join('<br>');
+    dropzones.forEach(zone => {
+      const targetId = zone.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      const list = document.getElementById(targetId + 'List');
+      
+      console.log('Initializing dropzone for:', targetId, 'Input found:', !!input, 'List found:', !!list);
+      
+      if (!input || !list) return;
+
+      const updateList = (files) => {
+        if (!files || files.length === 0) { 
+          list.textContent = ''; 
+          return; 
+        }
+        list.innerHTML = Array.from(files).map(f => `${f.name} · ${(f.size/1024/1024).toFixed(2)} MB`).join('<br>');
+      };
+
+      // Click to upload
+      zone.addEventListener('click', (e) => {
+        console.log('Dropzone clicked for:', targetId);
+        e.preventDefault();
+        input.click();
+      });
+
+      // Drag and drop
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('dragover');
+      });
+
+      zone.addEventListener('dragleave', (e) => {
+        // Only remove dragover if we're really leaving the dropzone
+        if (!zone.contains(e.relatedTarget)) {
+          zone.classList.remove('dragover');
+        }
+      });
+
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        
+        console.log('Files dropped for:', targetId, 'Files:', e.dataTransfer.files.length);
+        
+        if (input.multiple) {
+          input.files = e.dataTransfer.files;
+        } else {
+          // For single input, take the first file
+          const dt = new DataTransfer();
+          if (e.dataTransfer.files[0]) {
+            dt.items.add(e.dataTransfer.files[0]);
+          }
+          input.files = dt.files;
+        }
+        updateList(input.files);
+      });
+
+      // File input change
+      input.addEventListener('change', () => {
+        console.log('File input changed for:', targetId, 'Files:', input.files.length);
+        updateList(input.files);
+      });
+    });
   }
 
   function initializeForm(suffix) {
@@ -90,7 +90,12 @@
     const successMsg = document.getElementById('successMsg' + suffix);
     const errorMsg = document.getElementById('errorMsg' + suffix);
 
-    if (!form) return; // Form doesn't exist yet
+    if (!form) {
+      console.log('Form not found for suffix:', suffix);
+      return;
+    }
+
+    console.log('Initializing form:', 'uploadForm' + suffix);
 
     // Simple phone formatting on blur (USA)
     const phone = document.getElementById('yourPhone' + suffix);
