@@ -277,6 +277,158 @@
         padding: 60px 20px;
       }
     }
+
+    /* File Preview Modal Styles */
+    .preview-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 10000;
+      cursor: pointer;
+    }
+
+    .preview-content {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview-image {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+      cursor: grab;
+    }
+
+    .preview-image:active {
+      cursor: grabbing;
+    }
+
+    .preview-pdf {
+      width: 90%;
+      height: 90%;
+      border: none;
+    }
+
+    .preview-controls {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 10001;
+    }
+
+    .preview-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--dark);
+      transition: all 0.3s ease;
+    }
+
+    .preview-btn:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: scale(1.1);
+    }
+
+    .close-btn {
+      background: rgba(220, 53, 69, 0.9);
+      color: white;
+    }
+
+    .close-btn:hover {
+      background: rgba(220, 53, 69, 1);
+    }
+
+    .preview-filename {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      z-index: 10001;
+    }
+
+    /* File list preview thumbnails */
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 5px 0;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .file-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .file-thumbnail {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+
+    .file-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .file-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .file-size {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .remove-file {
+      background: var(--error);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 10px;
+    }
+
+    .remove-file:hover {
+      background: #c82333;
+    }
   </style>
 </head>
 <body>
@@ -701,10 +853,28 @@
             
             const fileItems = Array.from(files).map((f, index) => {
               const fileSize = (f.size/1024/1024).toFixed(2);
+              const isImage = f.type.startsWith('image/');
+              const isPdf = f.type === 'application/pdf';
+              
+              // Create thumbnail for images
+              let thumbnailHtml = '';
+              if (isImage) {
+                const url = URL.createObjectURL(f);
+                thumbnailHtml = `<img class="file-thumbnail" src="${url}" alt="Thumbnail" />`;
+              } else if (isPdf) {
+                thumbnailHtml = `<div class="file-thumbnail" style="background: #dc3545; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">PDF</div>`;
+              }
+              
               return `
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; padding: 4px 8px; background: #f5f5f5; border-radius: 4px;">
-                  <span style="flex: 1; font-size: 12px;">${f.name} · ${fileSize} MB</span>
-                  <button onclick="removeFile('${targetId}', ${index})" style="
+                <div class="file-item" onclick="previewFile('${targetId}', ${index})" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; padding: 8px; background: #f5f5f5; border-radius: 8px; transition: background 0.3s ease;">
+                  <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                    ${thumbnailHtml}
+                    <div style="flex: 1;">
+                      <div class="file-name" style="font-weight: 600; font-size: 12px; color: #333;">${f.name}</div>
+                      <div class="file-size" style="font-size: 10px; color: #666;">${fileSize} MB</div>
+                    </div>
+                  </div>
+                  <button onclick="event.stopPropagation(); removeFile('${targetId}', ${index})" style="
                     background: #dc3545; 
                     color: white; 
                     border: none; 
@@ -861,6 +1031,189 @@
       console.log('Dropzones found:', document.querySelectorAll('.dropzone').length);
       console.log('Upload forms found:', document.querySelectorAll('#uploadFormEn, #uploadFormEs').length);
     });
+
+    // File Preview Functionality
+    let currentZoom = 1;
+    let currentFile = null;
+    let isDragging = false;
+    let startX, startY, translateX = 0, translateY = 0;
+
+    window.previewFile = function(targetId, fileIndex) {
+      const input = document.getElementById(targetId);
+      if (!input || !input.files || !input.files[fileIndex]) return;
+      
+      const file = input.files[fileIndex];
+      currentFile = file;
+      
+      const modal = document.getElementById('previewModal');
+      const image = document.getElementById('previewImage');
+      const pdf = document.getElementById('previewPdf');
+      const filename = document.getElementById('previewFilename');
+      
+      // Reset zoom and position
+      currentZoom = 1;
+      translateX = 0;
+      translateY = 0;
+      
+      filename.textContent = file.name;
+      
+      if (file.type.startsWith('image/')) {
+        const url = URL.createObjectURL(file);
+        image.src = url;
+        image.style.display = 'block';
+        image.style.transform = 'scale(1) translate(0px, 0px)';
+        pdf.style.display = 'none';
+        
+        // Clean up URL when modal closes
+        modal.addEventListener('hidden', () => URL.revokeObjectURL(url), { once: true });
+      } else if (file.type === 'application/pdf') {
+        const url = URL.createObjectURL(file);
+        pdf.src = url;
+        pdf.style.display = 'block';
+        image.style.display = 'none';
+        
+        // Clean up URL when modal closes
+        modal.addEventListener('hidden', () => URL.revokeObjectURL(url), { once: true });
+      }
+      
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    };
+
+    // Preview controls
+    document.getElementById('zoomIn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentZoom = Math.min(currentZoom * 1.2, 5);
+      updateImageTransform();
+    });
+
+    document.getElementById('zoomOut').addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentZoom = Math.max(currentZoom / 1.2, 0.1);
+      updateImageTransform();
+    });
+
+    document.getElementById('resetZoom').addEventListener('click', (e) => {
+      e.stopPropagation();
+      currentZoom = 1;
+      translateX = 0;
+      translateY = 0;
+      updateImageTransform();
+    });
+
+    document.getElementById('closePreview').addEventListener('click', closePreview);
+
+    function updateImageTransform() {
+      const image = document.getElementById('previewImage');
+      image.style.transform = `scale(${currentZoom}) translate(${translateX}px, ${translateY}px)`;
+    }
+
+    function closePreview() {
+      const modal = document.getElementById('previewModal');
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+      
+      // Clean up
+      const image = document.getElementById('previewImage');
+      const pdf = document.getElementById('previewPdf');
+      if (image.src.startsWith('blob:')) URL.revokeObjectURL(image.src);
+      if (pdf.src.startsWith('blob:')) URL.revokeObjectURL(pdf.src);
+      
+      image.src = '';
+      pdf.src = '';
+      currentFile = null;
+      
+      // Dispatch hidden event for cleanup
+      modal.dispatchEvent(new Event('hidden'));
+    }
+
+    // Click to close modal (but not on content)
+    document.getElementById('previewModal').addEventListener('click', (e) => {
+      if (e.target.id === 'previewModal' || e.target.classList.contains('preview-content')) {
+        closePreview();
+      }
+    });
+
+    // Image dragging functionality
+    const previewImage = document.getElementById('previewImage');
+    
+    previewImage.addEventListener('mousedown', (e) => {
+      if (currentZoom > 1) {
+        isDragging = true;
+        startX = e.clientX - translateX;
+        startY = e.clientY - translateY;
+        previewImage.style.cursor = 'grabbing';
+      }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging && currentZoom > 1) {
+        translateX = e.clientX - startX;
+        translateY = e.clientY - startY;
+        updateImageTransform();
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        previewImage.style.cursor = 'grab';
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('previewModal');
+      if (modal.style.display === 'block') {
+        switch(e.key) {
+          case 'Escape':
+            closePreview();
+            break;
+          case '+':
+          case '=':
+            currentZoom = Math.min(currentZoom * 1.2, 5);
+            updateImageTransform();
+            break;
+          case '-':
+            currentZoom = Math.max(currentZoom / 1.2, 0.1);
+            updateImageTransform();
+            break;
+          case '0':
+            currentZoom = 1;
+            translateX = 0;
+            translateY = 0;
+            updateImageTransform();
+            break;
+        }
+      }
+    });
+
+    // Mouse wheel zoom
+    previewImage.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (e.deltaY < 0) {
+        currentZoom = Math.min(currentZoom * 1.1, 5);
+      } else {
+        currentZoom = Math.max(currentZoom / 1.1, 0.1);
+      }
+      updateImageTransform();
+    });
   </script>
+
+  <!-- File Preview Modal -->
+  <div id="previewModal" class="preview-modal">
+    <div class="preview-content">
+      <div class="preview-controls">
+        <button class="preview-btn" id="zoomOut" title="Zoom Out">−</button>
+        <button class="preview-btn" id="zoomIn" title="Zoom In">+</button>
+        <button class="preview-btn" id="resetZoom" title="Reset">⌂</button>
+        <button class="preview-btn close-btn" id="closePreview" title="Close">×</button>
+      </div>
+      <img id="previewImage" class="preview-image" src="" alt="Preview" style="display: none;" />
+      <iframe id="previewPdf" class="preview-pdf" src="" style="display: none;"></iframe>
+      <div id="previewFilename" class="preview-filename"></div>
+    </div>
+  </div>
+
 </body>
 </html>
