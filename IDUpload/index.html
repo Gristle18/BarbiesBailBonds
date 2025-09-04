@@ -913,7 +913,7 @@
         </div>
         <div class="dropzone" data-target="${inputId}" style="position: relative;">
           <div class="drop-hint">Drag & drop files here or click to select</div>
-          <input id="${inputId}" name="dynamic_docs[]" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+          <input id="${inputId}" name="dynamic_docs[]" type="file" accept="image/*,application/pdf" multiple style="display: none;" />
         </div>
         <div class="file-list" id="${inputId}List"></div>
       `;
@@ -931,12 +931,15 @@
     window.removeDocumentSection = function(sectionId) {
       debugLog(`removeDocumentSection called: ${sectionId}`);
       
-      const section = document.querySelector(`[class*="${sectionId}"]`)?.closest('.dynamic-doc-section');
+      // Find by the input ID within the section since that contains our sectionId
+      const input = document.getElementById(`${sectionId}_input`);
+      const section = input?.closest('.dynamic-doc-section');
+      
       if (section) {
         section.remove();
         debugLog(`Document section removed: ${sectionId}`);
       } else {
-        debugLog(`Could not find section to remove: ${sectionId}`);
+        debugLog(`Could not find section to remove: ${sectionId} (input found: ${!!input})`);
       }
     };
 
@@ -953,13 +956,19 @@
         return;
       }
 
-      // Click to upload
-      zone.addEventListener('click', (e) => {
+      // Remove any existing click listeners to prevent duplicates
+      zone.onclick = null;
+      
+      // Click to upload - use onclick instead of addEventListener to avoid conflicts
+      zone.onclick = (e) => {
         debugLog(`Dropzone clicked for: ${targetId}`);
         e.preventDefault();
         e.stopPropagation();
+        // Clear the input value first to allow re-selection of same file
+        input.value = '';
+        // Trigger the file dialog
         input.click();
-      });
+      };
 
       // Drag and drop
       zone.addEventListener('dragover', (e) => {
@@ -992,10 +1001,10 @@
       });
 
       // File input change
-      input.addEventListener('change', () => {
+      input.onchange = () => {
         debugLog(`File input changed for: ${targetId}, Files: ${input.files.length}`);
         updateList(targetId, input.files);
-      });
+      };
     }
 
     // Update file list display
