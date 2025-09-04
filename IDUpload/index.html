@@ -757,6 +757,14 @@
         list.innerHTML = '';
       }
       
+      // Clean up any blob URLs from removed previews
+      const existingPreviews = zone.querySelectorAll('img[src^="blob:"], iframe[src^="blob:"]');
+      existingPreviews.forEach(preview => {
+        if (preview.src && preview.src.startsWith('blob:')) {
+          URL.revokeObjectURL(preview.src);
+        }
+      });
+      
       // Re-initialize all dropzones to restore functionality
       initializeAllDropzones();
       
@@ -1029,30 +1037,41 @@
               
               img.src = url;
             } else if (isPdf) {
-              // Show PDF placeholder
-              zone.style.width = '300px';
-              zone.style.height = '200px';
-              zone.style.padding = '20px';
+              // Show actual PDF preview
+              const url = URL.createObjectURL(file);
+              
+              // Calculate responsive dimensions
+              const maxWidth = zone.clientWidth || 300;
+              const maxHeight = Math.min(window.innerHeight * 0.4, 400);
+              
+              // Use standard aspect ratio for PDFs (8.5:11 or ~0.77)
+              const aspectRatio = 0.77;
+              let displayWidth, displayHeight;
+              
+              if (aspectRatio > maxWidth / maxHeight) {
+                // PDF is wider - fit to width
+                displayWidth = maxWidth;
+                displayHeight = maxWidth / aspectRatio;
+              } else {
+                // PDF is taller - fit to height
+                displayHeight = Math.min(maxHeight, maxWidth / aspectRatio);
+                displayWidth = displayHeight * aspectRatio;
+              }
+              
+              zone.style.width = displayWidth + 'px';
+              zone.style.height = displayHeight + 'px';
+              zone.style.padding = '0';
               zone.style.border = '2px solid var(--brand)';
               zone.style.position = 'relative';
+              zone.style.overflow = 'hidden';
               
               zone.innerHTML = `
-                <div id="${targetId}_pdf_preview" style="
+                <iframe id="${targetId}_pdf_preview" src="${url}" style="
                   width: 100%; 
                   height: 100%; 
-                  background: #dc3545; 
-                  color: white; 
-                  display: flex; 
-                  flex-direction: column;
-                  align-items: center; 
-                  justify-content: center; 
-                  font-size: 24px; 
-                  font-weight: bold;
-                  cursor: default;
-                ">
-                  <div>📄</div>
-                  <div style="font-size: 14px; margin-top: 8px;">PDF</div>
-                </div>
+                  border: none;
+                  background: white;
+                " title="PDF Preview"></iframe>
                 <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
                   <button onclick="changeFile('${targetId}')" style="
                     background: rgba(0, 123, 255, 0.9); 
@@ -1083,6 +1102,18 @@
                     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
                   " title="Remove file">×</button>
                 </div>
+                <div style="
+                  position: absolute;
+                  bottom: 8px;
+                  left: 8px;
+                  background: rgba(0,0,0,0.7);
+                  color: white;
+                  padding: 4px 8px;
+                  border-radius: 4px;
+                  font-size: 11px;
+                  pointer-events: none;
+                  z-index: 10;
+                ">PDF Preview</div>
               `;
               
               // Store the file data on the PDF element for later use
@@ -1090,6 +1121,12 @@
               if (pdfPreview) {
                 pdfPreview._fileData = file;
               }
+              
+              // Clean up URL when needed (but keep it for the iframe)
+              setTimeout(() => {
+                // The iframe should have loaded by now, but we keep the URL active
+                // It will be cleaned up when the file is removed
+              }, 1000);
             }
             
             // Update the file list area below with file info
