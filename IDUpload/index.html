@@ -67,7 +67,10 @@
 
     .dropzone {
       border: 2px dashed #bbb; border-radius: 12px; padding: 18px; text-align: center; background: #fafafa;
-      transition: border-color .15s ease, background-color .15s ease;
+      transition: all .15s ease;
+      position: relative;
+      max-width: 100%;
+      margin: 0 auto;
     }
     .dropzone.dragover { border-color: var(--brand); background: #fff8ec; }
     .drop-hint { color:#444; font-size: 14px; }
@@ -846,54 +849,162 @@
 
           const updateList = (files) => {
             if (!files || files.length === 0) { 
-              list.textContent = ''; 
+              // Reset dropzone to original state
+              zone.innerHTML = `
+                <div class="drop-hint">Drag & drop image/PDF here or click to select</div>
+                <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                <div class="file-list" id="${targetId}List"></div>
+              `;
+              
+              // Re-attach event listeners to the new input
+              const newInput = document.getElementById(targetId);
+              newInput.addEventListener('change', () => {
+                debugLog(`File input changed for: ${targetId}`, 'Files:', newInput.files.length);
+                updateList(newInput.files);
+              });
+              
               debugLog(`File list cleared for ${targetId}`);
               return; 
             }
             
-            const fileItems = Array.from(files).map((f, index) => {
-              const fileSize = (f.size/1024/1024).toFixed(2);
-              const isImage = f.type.startsWith('image/');
-              const isPdf = f.type === 'application/pdf';
+            // For now, handle single file (first file if multiple)
+            const file = files[0];
+            const fileSize = (file.size/1024/1024).toFixed(2);
+            const isImage = file.type.startsWith('image/');
+            const isPdf = file.type === 'application/pdf';
+            
+            if (isImage) {
+              // Create image preview that fills the dropzone
+              const url = URL.createObjectURL(file);
+              const img = new Image();
               
-              // Create thumbnail for images
-              let thumbnailHtml = '';
-              if (isImage) {
-                const url = URL.createObjectURL(f);
-                thumbnailHtml = `<img class="file-thumbnail" src="${url}" alt="Thumbnail" />`;
-              } else if (isPdf) {
-                thumbnailHtml = `<div class="file-thumbnail" style="background: #dc3545; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">PDF</div>`;
-              }
-              
-              return `
-                <div class="file-item" onclick="previewFile('${targetId}', ${index})" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; padding: 8px; background: #f5f5f5; border-radius: 8px; transition: background 0.3s ease;">
-                  <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
-                    ${thumbnailHtml}
-                    <div style="flex: 1;">
-                      <div class="file-name" style="font-weight: 600; font-size: 12px; color: #333;">${f.name}</div>
-                      <div class="file-size" style="font-size: 10px; color: #666;">${fileSize} MB</div>
-                    </div>
-                  </div>
-                  <button onclick="event.stopPropagation(); removeFile('${targetId}', ${index})" style="
-                    background: #dc3545; 
+              img.onload = function() {
+                // Calculate responsive dimensions
+                const maxWidth = zone.clientWidth || 300;
+                const maxHeight = Math.min(window.innerHeight * 0.4, 400); // Max 40% of viewport height or 400px
+                
+                const aspectRatio = img.naturalWidth / img.naturalHeight;
+                let displayWidth, displayHeight;
+                
+                if (aspectRatio > maxWidth / maxHeight) {
+                  // Image is wider - fit to width
+                  displayWidth = maxWidth;
+                  displayHeight = maxWidth / aspectRatio;
+                } else {
+                  // Image is taller - fit to height
+                  displayHeight = Math.min(maxHeight, maxWidth / aspectRatio);
+                  displayWidth = displayHeight * aspectRatio;
+                }
+                
+                zone.style.width = displayWidth + 'px';
+                zone.style.height = displayHeight + 'px';
+                zone.style.padding = '0';
+                zone.style.border = '2px solid var(--brand)';
+                zone.style.position = 'relative';
+                zone.style.overflow = 'hidden';
+                
+                zone.innerHTML = `
+                  <img src="${url}" style="
+                    width: 100%; 
+                    height: 100%; 
+                    object-fit: cover; 
+                    cursor: pointer;
+                  " onclick="previewFile('${targetId}', 0)" alt="Preview" />
+                  <button onclick="removeFile('${targetId}', 0)" style="
+                    position: absolute;
+                    top: 8px;
+                    right: 8px;
+                    background: rgba(220, 53, 69, 0.9); 
                     color: white; 
                     border: none; 
                     border-radius: 50%; 
-                    width: 20px; 
-                    height: 20px; 
-                    font-size: 12px; 
+                    width: 30px; 
+                    height: 30px; 
+                    font-size: 16px; 
                     cursor: pointer; 
                     display: flex; 
                     align-items: center; 
                     justify-content: center;
-                    margin-left: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
                   " title="Remove file">×</button>
+                  <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                `;
+                
+                // Re-attach event listeners to the new input
+                const newInput = document.getElementById(targetId);
+                newInput.files = files; // Preserve the files
+                newInput.addEventListener('change', () => {
+                  debugLog(`File input changed for: ${targetId}`, 'Files:', newInput.files.length);
+                  updateList(newInput.files);
+                });
+                
+                URL.revokeObjectURL(url); // Clean up
+              };
+              
+              img.src = url;
+            } else if (isPdf) {
+              // Show PDF placeholder
+              zone.style.width = '300px';
+              zone.style.height = '200px';
+              zone.style.padding = '20px';
+              zone.style.border = '2px solid var(--brand)';
+              zone.style.position = 'relative';
+              
+              zone.innerHTML = `
+                <div style="
+                  width: 100%; 
+                  height: 100%; 
+                  background: #dc3545; 
+                  color: white; 
+                  display: flex; 
+                  flex-direction: column;
+                  align-items: center; 
+                  justify-content: center; 
+                  font-size: 24px; 
+                  font-weight: bold;
+                  cursor: pointer;
+                " onclick="previewFile('${targetId}', 0)">
+                  <div>📄</div>
+                  <div style="font-size: 14px; margin-top: 8px;">PDF</div>
                 </div>
+                <button onclick="removeFile('${targetId}', 0)" style="
+                  position: absolute;
+                  top: 8px;
+                  right: 8px;
+                  background: rgba(220, 53, 69, 0.9); 
+                  color: white; 
+                  border: none; 
+                  border-radius: 50%; 
+                  width: 30px; 
+                  height: 30px; 
+                  font-size: 16px; 
+                  cursor: pointer; 
+                  display: flex; 
+                  align-items: center; 
+                  justify-content: center;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                " title="Remove file">×</button>
+                <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
               `;
-            }).join('');
+              
+              // Re-attach event listeners to the new input
+              const newInput = document.getElementById(targetId);
+              newInput.files = files; // Preserve the files
+              newInput.addEventListener('change', () => {
+                debugLog(`File input changed for: ${targetId}`, 'Files:', newInput.files.length);
+                updateList(newInput.files);
+              });
+            }
             
-            list.innerHTML = fileItems;
-            debugLog(`File list updated for ${targetId}: ${files.length} files`);
+            // Update the file list area below with file info
+            list.innerHTML = `
+              <div style="margin-top: 10px; padding: 8px; background: #f0f0f0; border-radius: 6px; color: #333; font-size: 14px;">
+                <div style="font-weight: 600;">${file.name}</div>
+                <div style="font-size: 12px; color: #666;">${fileSize} MB</div>
+              </div>
+            `;
+            
+            debugLog(`File preview updated for ${targetId}: ${file.name}`);
           };
 
           // Note: Click to upload now handled directly by overlaid file input
