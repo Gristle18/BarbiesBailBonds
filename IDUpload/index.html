@@ -1347,10 +1347,15 @@
     });
 
     // File Preview Functionality - Global variables for modal
-    let currentZoom = 1;
-    let currentFile = null;
-    let isDragging = false;
-    let startX, startY, translateX = 0, translateY = 0;
+    window.previewState = {
+      currentZoom: 1,
+      currentFile: null,
+      isDragging: false,
+      startX: 0,
+      startY: 0,
+      translateX: 0,
+      translateY: 0
+    };
 
     window.previewFile = function(targetId, fileIndex) {
       // Try to get file from image preview element first
@@ -1375,7 +1380,7 @@
         return;
       }
       
-      currentFile = file;
+      window.previewState.currentFile = file;
       
       const modal = document.getElementById('previewModal');
       const image = document.getElementById('previewImage');
@@ -1383,9 +1388,9 @@
       const filename = document.getElementById('previewFilename');
       
       // Reset zoom and position
-      currentZoom = 1;
-      translateX = 0;
-      translateY = 0;
+      window.previewState.currentZoom = 1;
+      window.previewState.translateX = 0;
+      window.previewState.translateY = 0;
       
       filename.textContent = file.name;
       
@@ -1450,20 +1455,20 @@
 
       // Add event listeners with visual feedback
       addButtonFeedback('zoomIn', () => {
-        currentZoom = Math.min(currentZoom * 1.2, 5);
+        window.previewState.currentZoom = Math.min(window.previewState.currentZoom * 1.2, 5);
         updateImageTransform();
       });
 
       addButtonFeedback('zoomOut', () => {
-        currentZoom = Math.max(currentZoom / 1.2, 0.1);
+        window.previewState.currentZoom = Math.max(window.previewState.currentZoom / 1.2, 0.1);
         updateImageTransform();
       });
 
       addButtonFeedback('closePreview', () => {
         // Reset zoom and position when closing
-        currentZoom = 1;
-        translateX = 0;
-        translateY = 0;
+        window.previewState.currentZoom = 1;
+        window.previewState.translateX = 0;
+        window.previewState.translateY = 0;
         closePreview();
       });
       
@@ -1471,16 +1476,16 @@
       const previewImage = document.getElementById('previewImage');
       if (previewImage) {
         // Set initial cursor based on zoom
-        previewImage.style.cursor = currentZoom > 1 ? 'grab' : 'pointer';
+        previewImage.style.cursor = window.previewState.currentZoom > 1 ? 'grab' : 'pointer';
         
         previewImage.addEventListener('mousedown', (e) => {
-          console.log('Mousedown on image, currentZoom:', currentZoom);
-          if (currentZoom > 1) {
-            isDragging = true;
-            startX = e.clientX - translateX;
-            startY = e.clientY - translateY;
+          console.log('Mousedown on image, currentZoom:', window.previewState.currentZoom);
+          if (window.previewState.currentZoom > 1) {
+            window.previewState.isDragging = true;
+            window.previewState.startX = e.clientX - window.previewState.translateX;
+            window.previewState.startY = e.clientY - window.previewState.translateY;
             previewImage.style.cursor = 'grabbing';
-            console.log('Started dragging, startX:', startX, 'startY:', startY, 'isDragging:', isDragging);
+            console.log('Started dragging, startX:', window.previewState.startX, 'startY:', window.previewState.startY, 'isDragging:', window.previewState.isDragging);
             e.preventDefault();
             e.stopPropagation();
             
@@ -1495,16 +1500,16 @@
         previewImage.addEventListener('wheel', (e) => {
           e.preventDefault();
           const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
-          currentZoom = Math.max(0.5, Math.min(3, currentZoom * zoomFactor));
+          window.previewState.currentZoom = Math.max(0.5, Math.min(3, window.previewState.currentZoom * zoomFactor));
           updateImageTransform();
-          previewImage.style.cursor = currentZoom > 1 ? 'grab' : 'pointer';
+          previewImage.style.cursor = window.previewState.currentZoom > 1 ? 'grab' : 'pointer';
         });
       }
     }
 
     function updateImageTransform() {
       const image = document.getElementById('previewImage');
-      image.style.transform = `scale(${currentZoom}) translate(${translateX}px, ${translateY}px)`;
+      image.style.transform = `scale(${window.previewState.currentZoom}) translate(${window.previewState.translateX}px, ${window.previewState.translateY}px)`;
     }
 
     function closePreview() {
@@ -1547,24 +1552,24 @@
 
     // Global mouse event listeners for panning (can be attached during page load)
     document.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        console.log('Mouse move detected, isDragging:', isDragging, 'currentZoom:', currentZoom);
-        if (currentZoom > 1) {
-          translateX = e.clientX - startX;
-          translateY = e.clientY - startY;
-          console.log('Panning - translateX:', translateX, 'translateY:', translateY);
+      if (window.previewState.isDragging) {
+        console.log('Mouse move detected, isDragging:', window.previewState.isDragging, 'currentZoom:', window.previewState.currentZoom);
+        if (window.previewState.currentZoom > 1) {
+          window.previewState.translateX = e.clientX - window.previewState.startX;
+          window.previewState.translateY = e.clientY - window.previewState.startY;
+          console.log('Panning - translateX:', window.previewState.translateX, 'translateY:', window.previewState.translateY);
           updateImageTransform();
         }
       }
     });
 
     document.addEventListener('mouseup', () => {
-      if (isDragging) {
+      if (window.previewState.isDragging) {
         console.log('Mouse up - stopping drag');
-        isDragging = false;
+        window.previewState.isDragging = false;
         const previewImage = document.getElementById('previewImage');
         if (previewImage) {
-          previewImage.style.cursor = currentZoom > 1 ? 'grab' : 'pointer';
+          previewImage.style.cursor = window.previewState.currentZoom > 1 ? 'grab' : 'pointer';
         }
       }
     });
@@ -1576,18 +1581,18 @@
         switch(e.key) {
           case 'Escape':
             // Reset zoom and position when closing via escape key
-            currentZoom = 1;
-            translateX = 0;
-            translateY = 0;
+            window.previewState.currentZoom = 1;
+            window.previewState.translateX = 0;
+            window.previewState.translateY = 0;
             closePreview();
             break;
           case '+':
           case '=':
-            currentZoom = Math.min(currentZoom * 1.2, 5);
+            window.previewState.currentZoom = Math.min(window.previewState.currentZoom * 1.2, 5);
             updateImageTransform();
             break;
           case '-':
-            currentZoom = Math.max(currentZoom / 1.2, 0.1);
+            window.previewState.currentZoom = Math.max(window.previewState.currentZoom / 1.2, 0.1);
             updateImageTransform();
             break;
         }
@@ -1598,9 +1603,9 @@
     previewImage.addEventListener('wheel', (e) => {
       e.preventDefault();
       if (e.deltaY < 0) {
-        currentZoom = Math.min(currentZoom * 1.1, 5);
+        window.previewState.currentZoom = Math.min(window.previewState.currentZoom * 1.1, 5);
       } else {
-        currentZoom = Math.max(currentZoom / 1.1, 0.1);
+        window.previewState.currentZoom = Math.max(window.previewState.currentZoom / 1.1, 0.1);
       }
       updateImageTransform();
     });
