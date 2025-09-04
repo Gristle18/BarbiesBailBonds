@@ -531,6 +531,9 @@
       document.getElementById('uploadFormEn').style.display = 'none';
       document.getElementById('uploadFormEs').style.display = 'none';
       
+      // Update page content based on language
+      updatePageLanguage(language);
+      
       // Show the selected language form
       if (language === 'en') {
         document.getElementById('uploadFormEn').style.display = 'block';
@@ -538,12 +541,80 @@
         document.getElementById('uploadFormEs').style.display = 'block';
       }
     }
+
+    function updatePageLanguage(language) {
+      const isSpanish = language === 'es';
+      
+      // Update page title and header
+      document.querySelector('.title').textContent = isSpanish ? 
+        'Subir ID y Documentos' : 'Upload ID & Documents';
+      document.querySelector('.subtitle').textContent = isSpanish ? 
+        'Envíe de forma segura su ID gubernamental y documentos para acelerar la aprobación de su fianza.' : 
+        'Securely send your government ID and paperwork to speed up your bond approval.';
+      
+      // Update debug panel title
+      const debugTitle = document.querySelector('#debugOutput').parentElement.querySelector('div');
+      if (debugTitle) {
+        debugTitle.textContent = isSpanish ? 'SALIDA DE DEPURACIÓN:' : 'DEBUG OUTPUT:';
+      }
+      
+      // Update How to Get to Us section
+      const locationSection = document.querySelector('.location-content h2');
+      const locationText = document.querySelector('.location-text');
+      const locationLink = document.querySelector('.location-link');
+      
+      if (locationSection) {
+        locationSection.textContent = isSpanish ? 'Cómo Llegar a Nosotros' : 'How to Get to Us';
+      }
+      if (locationText) {
+        locationText.textContent = isSpanish ? 
+          'Encuentre Barbie\'s Bail Bonds en 1015 S Congress Ave #1, West Palm Beach. Después del horario use el timbre de la puerta principal o llame.' :
+          'Find Barbie\'s Bail Bonds at 1015 S Congress Ave #1, West Palm Beach. After hours use the front door buzzer or call.';
+      }
+      if (locationLink) {
+        locationLink.textContent = isSpanish ? 
+          'Haga clic AQUÍ para ver un video que muestra cómo llegar a la cárcel desde nuestra oficina' :
+          'Click HERE to watch a video showing how to get to the jail from our office';
+      }
+      
+      // Update About Us section
+      const aboutSection = document.querySelector('.about-section');
+      if (aboutSection) {
+        const aboutContent = aboutSection.querySelector('.about-content');
+        if (aboutContent) {
+          aboutContent.innerHTML = isSpanish ? 
+            `<p>Desde 1993, Jerry & Barbie's Bail Bonds ha sido una agencia familiar confiable comprometida con aquellos que necesitan un fiancista en el Sur de Florida. Nos especializamos en una amplia gama de Fianzas y en manejar Órdenes de Arresto a través de nuestro Servicio de Fianzas de Entrega Voluntaria. Nuestro servicio es 100% confidencial y estará tratando con agentes de fianzas experimentados todo el tiempo.</p>
+            
+            <p>Nuestra oficina está ubicada a solo unos minutos al sur de la Cárcel del Condado de Palm Beach donde proporcionamos servicio en el Condado de Palm Beach, Condado de Broward, Condado de Miami Dade, Condado de Martin, Condado de St Lucie, Condado de Indian River, y la mayoría de otros condados de Florida.</p>
+            
+            <p>Si un miembro de la familia, amigo, o cualquier otro ser querido ha sido arrestado y necesita un fiancista, contáctenos al <a href="tel:+15612470018" class="about-contact">561-247-0018</a> para servicio inmediato. ¡Nuestros agentes experimentados son bilingües y están disponibles para servicio de fianzas en inglés y español!</p>` :
+            `<p>Since 1993, Jerry & Barbie's Bail Bonds has been a trusted, family-owned agency committed to those in need of a bail bondsman in South Florida. We specialize in a wide range of Bail Bonds and in handling Warrants through our Walkthrough Bonds Service. Our service is 100% confidential and you will be dealing with experienced bail bonds agents the entire time.</p>
+            
+            <p>Our office is located just a few minutes south of the Palm Beach County Jail where we provide service in Palm Beach County, Broward County, Miami Dade County, Martin County, St Lucie County, Indian River County, and most other Florida counties.</p>
+            
+            <p>If a family member, friend, or any other loved one has been arrested and is in need of a bail bondsman, contact us at <a href="tel:+15612470018" class="about-contact">561-247-0018</a> for immediate service. Our experienced agents are bilingual and available for bail bond service in English and Spanish!</p>`;
+        }
+      }
+      
+      // Update footer
+      const footer = document.querySelector('.footer-content p');
+      if (footer) {
+        footer.textContent = isSpanish ? 
+          'Copyright © 2024 Barbie\'s Bail Bonds | Servicios de Fianzas' :
+          'Copyright © 2024 Barbie\'s Bail Bonds | Bail Bond Services';
+      }
+      
+      debugLog(`Page language updated to: ${isSpanish ? 'Spanish' : 'English'}`);
+    }
     
     function showLanguageSelection() {
       debugLog('showLanguageSelection called');
       // Hide both forms
       document.getElementById('uploadFormEn').style.display = 'none';
       document.getElementById('uploadFormEs').style.display = 'none';
+      
+      // Reset page language to English
+      updatePageLanguage('en');
       
       // Show language selection
       document.getElementById('languageSelection').style.display = 'block';
@@ -560,7 +631,7 @@
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
       });
-      debugLog('Language selection shown, forms reset');
+      debugLog('Language selection shown, forms reset, page language reset to English');
     }
 
     // Global function to remove files
