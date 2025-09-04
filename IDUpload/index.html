@@ -338,25 +338,25 @@
       <div class="grid">
         <div class="full">
           <label for="idFrontEn">Government ID – Front<span style="color:#dc3545">*</span></label>
-          <div class="dropzone" data-target="idFrontEn">
+          <div class="dropzone" data-target="idFrontEn" style="position: relative;">
             <div class="drop-hint">Drag & drop image/PDF here or click to select</div>
-            <input id="idFrontEn" name="idFront" type="file" accept="image/*,application/pdf" style="position: absolute; left: -9999px; opacity: 0;" required />
+            <input id="idFrontEn" name="idFront" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" required />
             <div class="file-list" id="idFrontEnList"></div>
           </div>
         </div>
         <div class="full">
           <label for="idBackEn">Government ID – Back</label>
-          <div class="dropzone" data-target="idBackEn">
+          <div class="dropzone" data-target="idBackEn" style="position: relative;">
             <div class="drop-hint">Drag & drop image/PDF here or click to select</div>
-            <input id="idBackEn" name="idBack" type="file" accept="image/*,application/pdf" style="position: absolute; left: -9999px; opacity: 0;" />
+            <input id="idBackEn" name="idBack" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
             <div class="file-list" id="idBackEnList"></div>
           </div>
         </div>
         <div class="full">
           <label for="docsEn">Additional Documents (Court papers, etc.)</label>
-          <div class="dropzone" data-target="docsEn">
+          <div class="dropzone" data-target="docsEn" style="position: relative;">
             <div class="drop-hint">Drag & drop files here or click to select</div>
-            <input id="docsEn" name="docs" type="file" accept="image/*,application/pdf" multiple style="position: absolute; left: -9999px; opacity: 0;" />
+            <input id="docsEn" name="docs" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
             <div class="file-list" id="docsEnList"></div>
           </div>
           <div class="note">Allowed types: JPG, PNG, HEIC, WEBP, PDF • Max 10MB per file.</div>
@@ -402,25 +402,25 @@
       <div class="grid">
         <div class="full">
           <label for="idFrontEs">ID Gubernamental – Frente<span style="color:#dc3545">*</span></label>
-          <div class="dropzone" data-target="idFrontEs">
+          <div class="dropzone" data-target="idFrontEs" style="position: relative;">
             <div class="drop-hint">Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar</div>
-            <input id="idFrontEs" name="idFront" type="file" accept="image/*,application/pdf" style="position: absolute; left: -9999px; opacity: 0;" required />
+            <input id="idFrontEs" name="idFront" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" required />
             <div class="file-list" id="idFrontEsList"></div>
           </div>
         </div>
         <div class="full">
           <label for="idBackEs">ID Gubernamental – Reverso</label>
-          <div class="dropzone" data-target="idBackEs">
+          <div class="dropzone" data-target="idBackEs" style="position: relative;">
             <div class="drop-hint">Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar</div>
-            <input id="idBackEs" name="idBack" type="file" accept="image/*,application/pdf" style="position: absolute; left: -9999px; opacity: 0;" />
+            <input id="idBackEs" name="idBack" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
             <div class="file-list" id="idBackEsList"></div>
           </div>
         </div>
         <div class="full">
           <label for="docsEs">Documentos Adicionales (Papeles de la corte, etc.)</label>
-          <div class="dropzone" data-target="docsEs">
+          <div class="dropzone" data-target="docsEs" style="position: relative;">
             <div class="drop-hint">Arrastre y suelte archivos aquí o haga clic para seleccionar</div>
-            <input id="docsEs" name="docs" type="file" accept="image/*,application/pdf" multiple style="position: absolute; left: -9999px; opacity: 0;" />
+            <input id="docsEs" name="docs" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
             <div class="file-list" id="docsEsList"></div>
           </div>
           <div class="note">Tipos permitidos: JPG, PNG, HEIC, WEBP, PDF • Máximo 10MB por archivo.</div>
@@ -607,13 +607,9 @@
             debugLog(`File list updated for ${targetId}: ${files.length} files`);
           };
 
-          // Click to upload
+          // Note: Click to upload now handled directly by overlaid file input
           zone.addEventListener('click', (e) => {
-            debugLog(`DROPZONE CLICKED: ${targetId}`);
-            e.preventDefault();
-            e.stopPropagation();
-            input.click();
-            debugLog(`Triggered input.click() for ${targetId}`);
+            debugLog(`DROPZONE CLICKED: ${targetId} (should be handled by file input overlay)`);
           });
 
           // Drag and drop
