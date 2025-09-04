@@ -1346,7 +1346,7 @@
       console.log('Upload forms found:', document.querySelectorAll('#uploadFormEn, #uploadFormEs').length);
     });
 
-    // File Preview Functionality
+    // File Preview Functionality - Global variables for modal
     let currentZoom = 1;
     let currentFile = null;
     let isDragging = false;
@@ -1418,60 +1418,46 @@
       document.body.style.overflow = 'hidden';
     };
 
-    // Preview controls with debugging
-    const zoomInBtn = document.getElementById('zoomIn');
-    const zoomOutBtn = document.getElementById('zoomOut');
-    const resetZoomBtn = document.getElementById('resetZoom');
-    const closePreviewBtn = document.getElementById('closePreview');
-
-    if (zoomInBtn) {
-      zoomInBtn.addEventListener('click', (e) => {
-        console.log('ZOOM IN clicked');
+    // Preview controls
+    function addButtonFeedback(button, callback) {
+      button.addEventListener('click', (e) => {
         e.stopPropagation();
         e.preventDefault();
-        currentZoom = Math.min(currentZoom * 1.2, 5);
-        updateImageTransform();
+        
+        // Visual feedback
+        button.style.transform = 'scale(0.9)';
+        button.style.background = 'rgba(255, 255, 255, 1)';
+        
+        setTimeout(() => {
+          button.style.transform = 'scale(1)';
+          button.style.background = 'rgba(255, 255, 255, 0.9)';
+        }, 150);
+        
+        callback();
       });
-    } else {
-      console.log('ERROR: zoomIn button not found');
     }
 
-    if (zoomOutBtn) {
-      zoomOutBtn.addEventListener('click', (e) => {
-        console.log('ZOOM OUT clicked');
-        e.stopPropagation();
-        e.preventDefault();
-        currentZoom = Math.max(currentZoom / 1.2, 0.1);
-        updateImageTransform();
-      });
-    } else {
-      console.log('ERROR: zoomOut button not found');
-    }
+    // Add event listeners with visual feedback
+    addButtonFeedback(document.getElementById('zoomIn'), () => {
+      currentZoom = Math.min(currentZoom * 1.2, 5);
+      updateImageTransform();
+    });
 
-    if (resetZoomBtn) {
-      resetZoomBtn.addEventListener('click', (e) => {
-        console.log('RESET ZOOM clicked');
-        e.stopPropagation();
-        e.preventDefault();
-        currentZoom = 1;
-        translateX = 0;
-        translateY = 0;
-        updateImageTransform();
-      });
-    } else {
-      console.log('ERROR: resetZoom button not found');
-    }
+    addButtonFeedback(document.getElementById('zoomOut'), () => {
+      currentZoom = Math.max(currentZoom / 1.2, 0.1);
+      updateImageTransform();
+    });
 
-    if (closePreviewBtn) {
-      closePreviewBtn.addEventListener('click', (e) => {
-        console.log('CLOSE PREVIEW clicked');
-        e.stopPropagation();
-        e.preventDefault();
-        closePreview();
-      });
-    } else {
-      console.log('ERROR: closePreview button not found');
-    }
+    addButtonFeedback(document.getElementById('resetZoom'), () => {
+      currentZoom = 1;
+      translateX = 0;
+      translateY = 0;
+      updateImageTransform();
+    });
+
+    addButtonFeedback(document.getElementById('closePreview'), () => {
+      closePreview();
+    });
 
     function updateImageTransform() {
       const image = document.getElementById('previewImage');
@@ -1501,8 +1487,6 @@
 
     // Click to close modal (but not on content or buttons)
     document.getElementById('previewModal').addEventListener('click', (e) => {
-      console.log('Modal clicked, target:', e.target.tagName, e.target.id, e.target.classList.toString());
-      
       // Don't close if clicking on buttons, controls, or content
       if (e.target.tagName === 'BUTTON' || 
           e.target.classList.contains('preview-btn') ||
@@ -1510,12 +1494,10 @@
           e.target.classList.contains('preview-wrapper') ||
           e.target.id === 'previewImage' ||
           e.target.id === 'previewPdf') {
-        console.log('Click on interactive element, not closing modal');
         return;
       }
       
       if (e.target.id === 'previewModal' || e.target.classList.contains('preview-content')) {
-        console.log('Click on modal background, closing');
         closePreview();
       }
     });
