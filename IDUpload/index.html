@@ -774,28 +774,48 @@
     window.changeFile = function(targetId) {
       debugLog(`Changing file for ${targetId}`);
       
+      // Get the original input
+      const originalInput = document.getElementById(targetId);
+      if (!originalInput) {
+        debugLog(`Could not find input for ${targetId}`);
+        return;
+      }
+      
+      // Clear the current value to allow re-selection of the same file
+      originalInput.value = '';
+      
       // Create a temporary file input
       const tempInput = document.createElement('input');
       tempInput.type = 'file';
-      
-      // Get the original input to copy its attributes
-      const originalInput = document.getElementById(targetId);
-      if (originalInput) {
-        tempInput.accept = originalInput.accept;
-        tempInput.multiple = originalInput.multiple;
-      }
+      tempInput.accept = originalInput.accept || 'image/*,application/pdf';
+      tempInput.multiple = originalInput.multiple || false;
+      tempInput.style.display = 'none';
       
       tempInput.addEventListener('change', function() {
+        debugLog(`Temp input changed, ${this.files.length} files selected`);
         if (this.files && this.files.length > 0) {
-          // Replace the files in the original input
-          if (originalInput) {
-            originalInput.files = this.files;
-            originalInput.dispatchEvent(new Event('change', { bubbles: true }));
+          // Create a new DataTransfer to copy files
+          const dataTransfer = new DataTransfer();
+          for (let i = 0; i < this.files.length; i++) {
+            dataTransfer.items.add(this.files[i]);
           }
+          
+          // Set the files on the original input
+          originalInput.files = dataTransfer.files;
+          
+          // Trigger change event
+          const changeEvent = new Event('change', { bubbles: true });
+          originalInput.dispatchEvent(changeEvent);
+          
+          debugLog(`Files transferred to original input: ${originalInput.files.length} files`);
         }
+        
+        // Clean up temp input
+        document.body.removeChild(tempInput);
       });
       
-      // Trigger file selection
+      // Add to DOM temporarily and click
+      document.body.appendChild(tempInput);
       tempInput.click();
     };
 
