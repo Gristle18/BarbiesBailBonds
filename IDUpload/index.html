@@ -525,5 +525,13 @@
   </script>
   <script src="scripts/config.js"></script>
   <script src="scripts/upload.js"></script>
+  <script>
+    // Additional debugging
+    window.addEventListener('load', function() {
+      console.log('Page fully loaded');
+      console.log('Dropzones found:', document.querySelectorAll('.dropzone').length);
+      console.log('Upload forms found:', document.querySelectorAll('#uploadFormEn, #uploadFormEs').length);
+    });
+  </script>
 </body>
 </html>
