@@ -989,7 +989,7 @@
                 zone.style.overflow = 'hidden';
                 
                 zone.innerHTML = `
-                  <img id="${targetId}_preview" src="${url}" style="
+                  <img id="${targetId}_preview" src="${url}" data-target-id="${targetId}" style="
                     width: 100%; 
                     height: 100%; 
                     object-fit: cover; 
@@ -1043,6 +1043,10 @@
                 
                 // Add zoom and pan functionality
                 const previewImg = document.getElementById(targetId + '_preview');
+                
+                // Store the file data on the image element for later use
+                previewImg._fileData = file;
+                
                 let currentScale = 1;
                 let currentTranslateX = 0;
                 let currentTranslateY = 0;
@@ -1132,7 +1136,7 @@
               zone.style.position = 'relative';
               
               zone.innerHTML = `
-                <div style="
+                <div id="${targetId}_pdf_preview" style="
                   width: 100%; 
                   height: 100%; 
                   background: #dc3545; 
@@ -1179,6 +1183,12 @@
                   " title="Remove file">×</button>
                 </div>
               `;
+              
+              // Store the file data on the PDF element for later use
+              const pdfPreview = document.getElementById(targetId + '_pdf_preview');
+              if (pdfPreview) {
+                pdfPreview._fileData = file;
+              }
             }
             
             // Update the file list area below with file info
@@ -1335,10 +1345,28 @@
     let startX, startY, translateX = 0, translateY = 0;
 
     window.previewFile = function(targetId, fileIndex) {
-      const input = document.getElementById(targetId);
-      if (!input || !input.files || !input.files[fileIndex]) return;
+      // Try to get file from image preview element first
+      let file = null;
+      const imgPreview = document.getElementById(targetId + '_preview');
+      const pdfPreview = document.getElementById(targetId + '_pdf_preview');
       
-      const file = input.files[fileIndex];
+      if (imgPreview && imgPreview._fileData) {
+        file = imgPreview._fileData;
+      } else if (pdfPreview && pdfPreview._fileData) {
+        file = pdfPreview._fileData;
+      } else {
+        // Fallback to looking for input element (for backward compatibility)
+        const input = document.getElementById(targetId);
+        if (input && input.files && input.files[fileIndex]) {
+          file = input.files[fileIndex];
+        }
+      }
+      
+      if (!file) {
+        debugLog(`No file found for preview: ${targetId}[${fileIndex}]`);
+        return;
+      }
+      
       currentFile = file;
       
       const modal = document.getElementById('previewModal');
