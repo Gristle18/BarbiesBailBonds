@@ -935,8 +935,9 @@
                     transition: transform 0.3s ease;
                     transform-origin: center center;
                   " alt="Preview" />
+                  <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
                   <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
-                    <button onclick="changeFile('${targetId}')" style="
+                    <button onclick="event.stopPropagation(); event.preventDefault(); changeFile('${targetId}')" style="
                       background: rgba(0, 123, 255, 0.9); 
                       color: white; 
                       border: none; 
@@ -950,7 +951,7 @@
                       justify-content: center;
                       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
                     " title="Change file">📁</button>
-                    <button onclick="removeFile('${targetId}', 0)" style="
+                    <button onclick="event.stopPropagation(); event.preventDefault(); removeFile('${targetId}', 0)" style="
                       background: rgba(220, 53, 69, 0.9); 
                       color: white; 
                       border: none; 
@@ -984,6 +985,15 @@
                 
                 // Store the file data on the image element for later use
                 previewImg._fileData = file;
+                
+                // Re-attach change listener to the new input
+                const newInput = document.getElementById(targetId);
+                if (newInput) {
+                  newInput.addEventListener('change', () => {
+                    debugLog(`FILE INPUT CHANGED: ${targetId} - ${newInput.files.length} files`);
+                    updateList(newInput.files);
+                  });
+                }
                 
                 let currentScale = 1;
                 let currentTranslateX = 0;
@@ -1091,8 +1101,9 @@
                   <div style="font-size: 12px; opacity: 0.9;">${file.name}</div>
                   <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">${fileSize} MB</div>
                 </div>
+                <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
                 <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
-                  <button onclick="changeFile('${targetId}')" style="
+                  <button onclick="event.stopPropagation(); event.preventDefault(); changeFile('${targetId}')" style="
                     background: rgba(0, 123, 255, 0.9); 
                     color: white; 
                     border: none; 
@@ -1106,7 +1117,7 @@
                     justify-content: center;
                     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
                   " title="Change file">📁</button>
-                  <button onclick="removeFile('${targetId}', 0)" style="
+                  <button onclick="event.stopPropagation(); event.preventDefault(); removeFile('${targetId}', 0)" style="
                     background: rgba(220, 53, 69, 0.9); 
                     color: white; 
                     border: none; 
@@ -1127,6 +1138,15 @@
               const pdfPreview = document.getElementById(targetId + '_pdf_preview');
               if (pdfPreview) {
                 pdfPreview._fileData = file;
+              }
+              
+              // Re-attach change listener to the new input
+              const newInput = document.getElementById(targetId);
+              if (newInput) {
+                newInput.addEventListener('change', () => {
+                  debugLog(`FILE INPUT CHANGED: ${targetId} - ${newInput.files.length} files`);
+                  updateList(newInput.files);
+                });
               }
             }
             
