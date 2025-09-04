@@ -921,8 +921,11 @@
       // Insert before the add button
       container.insertBefore(section, addButton);
       
-      // Initialize dropzone functionality for the new section
-      initializeDropzone(inputId);
+      // Initialize dropzone functionality for the new section after a brief delay
+      // to ensure the DOM is fully updated
+      setTimeout(() => {
+        initializeDropzone(inputId);
+      }, 50);
       
       debugLog(`Document section added: ${sectionId}`);
     };
@@ -1001,8 +1004,27 @@
       debugLog(`Dropzone initialized for: ${targetId} - input overlay should handle clicks`);
     }
 
-    // Update file list display
-    function updateList(targetId, files) {
+    // Update file list display - supports both calling patterns
+    function updateList(targetIdOrFiles, filesParam) {
+      let targetId, files;
+      
+      // Handle both calling patterns: updateList(targetId, files) and updateList(files)
+      if (typeof targetIdOrFiles === 'string') {
+        targetId = targetIdOrFiles;
+        files = filesParam;
+      } else {
+        // This means it was called as updateList(files) - need to find the targetId
+        files = targetIdOrFiles;
+        // Find the targetId by looking at the currently active input
+        const activeInput = document.activeElement;
+        if (activeInput && activeInput.type === 'file') {
+          targetId = activeInput.id;
+        } else {
+          debugLog('ERROR: Could not determine targetId for updateList call');
+          return;
+        }
+      }
+      
       debugLog(`updateList called for ${targetId} with ${files ? files.length : 0} files`);
       
       const list = document.getElementById(targetId + 'List');
