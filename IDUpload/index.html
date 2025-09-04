@@ -1459,16 +1459,27 @@
         updateImageTransform();
       });
 
-      addButtonFeedback('resetZoom', () => {
+      addButtonFeedback('closePreview', () => {
+        // Reset zoom and position when closing
         currentZoom = 1;
         translateX = 0;
         translateY = 0;
-        updateImageTransform();
-      });
-
-      addButtonFeedback('closePreview', () => {
         closePreview();
       });
+      
+      // Setup image panning functionality for modal
+      const previewImage = document.getElementById('previewImage');
+      if (previewImage) {
+        previewImage.addEventListener('mousedown', (e) => {
+          if (currentZoom > 1) {
+            isDragging = true;
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+            previewImage.style.cursor = 'grabbing';
+            e.preventDefault();
+          }
+        });
+      }
     }
 
     function updateImageTransform() {
@@ -1514,18 +1525,7 @@
       }
     });
 
-    // Image dragging functionality
-    const previewImage = document.getElementById('previewImage');
-    
-    previewImage.addEventListener('mousedown', (e) => {
-      if (currentZoom > 1) {
-        isDragging = true;
-        startX = e.clientX - translateX;
-        startY = e.clientY - translateY;
-        previewImage.style.cursor = 'grabbing';
-      }
-    });
-
+    // Global mouse event listeners for panning (can be attached during page load)
     document.addEventListener('mousemove', (e) => {
       if (isDragging && currentZoom > 1) {
         translateX = e.clientX - startX;
@@ -1537,7 +1537,10 @@
     document.addEventListener('mouseup', () => {
       if (isDragging) {
         isDragging = false;
-        previewImage.style.cursor = 'grab';
+        const previewImage = document.getElementById('previewImage');
+        if (previewImage) {
+          previewImage.style.cursor = currentZoom > 1 ? 'grab' : 'pointer';
+        }
       }
     });
 
@@ -1547,6 +1550,10 @@
       if (modal.style.display === 'block') {
         switch(e.key) {
           case 'Escape':
+            // Reset zoom and position when closing via escape key
+            currentZoom = 1;
+            translateX = 0;
+            translateY = 0;
             closePreview();
             break;
           case '+':
@@ -1556,12 +1563,6 @@
             break;
           case '-':
             currentZoom = Math.max(currentZoom / 1.2, 0.1);
-            updateImageTransform();
-            break;
-          case '0':
-            currentZoom = 1;
-            translateX = 0;
-            translateY = 0;
             updateImageTransform();
             break;
         }
@@ -1589,7 +1590,6 @@
         <div class="preview-controls">
           <button class="preview-btn" id="zoomOut" title="Zoom Out">−</button>
           <button class="preview-btn" id="zoomIn" title="Zoom In">+</button>
-          <button class="preview-btn" id="resetZoom" title="Reset">⌂</button>
           <button class="preview-btn close-btn" id="closePreview" title="Close">×</button>
         </div>
       </div>
