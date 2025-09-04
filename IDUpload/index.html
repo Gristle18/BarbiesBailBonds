@@ -342,6 +342,122 @@
     .remove-file:hover {
       background: #c82333;
     }
+
+    /* Add Document Button Styles */
+    .add-doc-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      background: #f9f9f9;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .add-doc-button:hover {
+      border-color: #007bff;
+      background: #f0f8ff;
+    }
+
+    .plus-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #007bff;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .add-doc-button span {
+      font-weight: 500;
+      color: #333;
+    }
+
+    /* Document Type Dropdown */
+    .doc-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      display: none;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .doc-dropdown.show {
+      display: block;
+    }
+
+    .doc-option {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      transition: background 0.2s ease;
+    }
+
+    .doc-option:hover {
+      background: #f8f9fa;
+    }
+
+    .doc-option:last-child {
+      border-bottom: none;
+    }
+
+    /* Dynamic Document Section */
+    .dynamic-doc-section {
+      margin-bottom: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      background: #fafafa;
+      position: relative;
+    }
+
+    .doc-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .doc-section-title {
+      font-weight: 500;
+      color: #333;
+      flex-grow: 1;
+    }
+
+    .remove-doc-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: background 0.2s ease;
+      margin-left: 10px;
+    }
+
+    .remove-doc-btn:hover {
+      background: #c82333;
+    }
   </style>
 </head>
 <body>
@@ -417,14 +533,11 @@
           </div>
           <div class="file-list" id="idBackEnList"></div>
         </div>
-        <div class="full">
-          <label for="docsEn">Additional Documents (Court papers, etc.)</label>
-          <div class="dropzone" data-target="docsEn" style="position: relative;">
-            <div class="drop-hint">Drag & drop files here or click to select</div>
-            <input id="docsEn" name="docs" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+        <div class="full" id="additionalDocsContainerEn">
+          <div id="addDocButtonEn" class="add-doc-button" onclick="showDocumentDropdown('En')">
+            <div class="plus-icon">+</div>
+            <span>Add Document</span>
           </div>
-          <div class="file-list" id="docsEnList"></div>
-          <div class="note">Allowed types: JPG, PNG, HEIC, WEBP, PDF • Max 10MB per file.</div>
         </div>
       </div>
 
@@ -481,14 +594,11 @@
           </div>
           <div class="file-list" id="idBackEsList"></div>
         </div>
-        <div class="full">
-          <label for="docsEs">Documentos Adicionales (Papeles de la corte, etc.)</label>
-          <div class="dropzone" data-target="docsEs" style="position: relative;">
-            <div class="drop-hint">Arrastre y suelte archivos aquí o haga clic para seleccionar</div>
-            <input id="docsEs" name="docs" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+        <div class="full" id="additionalDocsContainerEs">
+          <div id="addDocButtonEs" class="add-doc-button" onclick="showDocumentDropdown('Es')">
+            <div class="plus-icon">+</div>
+            <span>Agregar Documento</span>
           </div>
-          <div class="file-list" id="docsEsList"></div>
-          <div class="note">Tipos permitidos: JPG, PNG, HEIC, WEBP, PDF • Máximo 10MB por archivo.</div>
         </div>
       </div>
 
@@ -697,6 +807,231 @@
         if (el) el.style.display = 'none';
       });
       debugLog('Language selection shown, forms reset, page language reset to English');
+    }
+
+    // Document types for dropdown
+    const documentTypes = {
+      'en': [
+        'Court Papers',
+        'Proof of Income',
+        'Property Documents',
+        'Bank Statements',
+        'Insurance Documents',
+        'Employment Documents',
+        'Tax Returns',
+        'Utility Bills',
+        'Other Documents'
+      ],
+      'es': [
+        'Documentos de la Corte',
+        'Comprobante de Ingresos',
+        'Documentos de Propiedad',
+        'Estados de Cuenta Bancarios',
+        'Documentos de Seguro',
+        'Documentos de Empleo',
+        'Declaraciones de Impuestos',
+        'Facturas de Servicios',
+        'Otros Documentos'
+      ]
+    };
+
+    // Global function to show document dropdown
+    window.showDocumentDropdown = function(suffix) {
+      debugLog(`showDocumentDropdown called for ${suffix}`);
+      
+      const container = document.getElementById(`additionalDocsContainer${suffix}`);
+      if (!container) {
+        debugLog(`Container not found: additionalDocsContainer${suffix}`);
+        return;
+      }
+
+      // Remove existing dropdown if any
+      const existingDropdown = container.querySelector('.doc-dropdown');
+      if (existingDropdown) {
+        existingDropdown.remove();
+      }
+
+      // Create dropdown
+      const dropdown = document.createElement('div');
+      dropdown.className = 'doc-dropdown show';
+      
+      const language = suffix === 'Es' ? 'es' : 'en';
+      const types = documentTypes[language];
+      
+      types.forEach(type => {
+        const option = document.createElement('div');
+        option.className = 'doc-option';
+        option.textContent = type;
+        option.onclick = (e) => {
+          e.stopPropagation();
+          addDocumentSection(suffix, type);
+          dropdown.remove();
+        };
+        dropdown.appendChild(option);
+      });
+
+      // Position dropdown relative to button
+      const button = document.getElementById(`addDocButton${suffix}`);
+      button.appendChild(dropdown);
+      
+      // Close dropdown when clicking outside
+      const closeDropdown = (e) => {
+        if (!button.contains(e.target)) {
+          dropdown.remove();
+          document.removeEventListener('click', closeDropdown);
+        }
+      };
+      
+      setTimeout(() => {
+        document.addEventListener('click', closeDropdown);
+      }, 10);
+    };
+
+    // Global function to add document section
+    window.addDocumentSection = function(suffix, documentType) {
+      debugLog(`addDocumentSection called: ${suffix}, ${documentType}`);
+      
+      const container = document.getElementById(`additionalDocsContainer${suffix}`);
+      const addButton = document.getElementById(`addDocButton${suffix}`);
+      
+      if (!container || !addButton) {
+        debugLog(`Container or button not found for ${suffix}`);
+        return;
+      }
+
+      // Generate unique ID for this section
+      const sectionId = `dynamicDoc${suffix}_${Date.now()}`;
+      const inputId = `${sectionId}_input`;
+      
+      // Create new document section
+      const section = document.createElement('div');
+      section.className = 'dynamic-doc-section';
+      section.innerHTML = `
+        <div class="doc-section-header">
+          <span class="doc-section-title">${documentType}</span>
+          <button type="button" class="remove-doc-btn" onclick="removeDocumentSection('${sectionId}')" title="Remove">−</button>
+        </div>
+        <div class="dropzone" data-target="${inputId}" style="position: relative;">
+          <div class="drop-hint">Drag & drop files here or click to select</div>
+          <input id="${inputId}" name="dynamic_docs[]" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+        </div>
+        <div class="file-list" id="${inputId}List"></div>
+      `;
+
+      // Insert before the add button
+      container.insertBefore(section, addButton);
+      
+      // Initialize dropzone functionality for the new section
+      initializeDropzone(inputId);
+      
+      debugLog(`Document section added: ${sectionId}`);
+    };
+
+    // Global function to remove document section
+    window.removeDocumentSection = function(sectionId) {
+      debugLog(`removeDocumentSection called: ${sectionId}`);
+      
+      const section = document.querySelector(`[class*="${sectionId}"]`)?.closest('.dynamic-doc-section');
+      if (section) {
+        section.remove();
+        debugLog(`Document section removed: ${sectionId}`);
+      } else {
+        debugLog(`Could not find section to remove: ${sectionId}`);
+      }
+    };
+
+    // Function to initialize dropzone for a specific input
+    function initializeDropzone(targetId) {
+      debugLog(`Initializing dropzone for: ${targetId}`);
+      
+      const zone = document.querySelector(`.dropzone[data-target="${targetId}"]`);
+      const input = document.getElementById(targetId);
+      const list = document.getElementById(targetId + 'List');
+      
+      if (!zone || !input || !list) {
+        debugLog(`Missing elements for ${targetId}: zone=${!!zone}, input=${!!input}, list=${!!list}`);
+        return;
+      }
+
+      // Click to upload
+      zone.addEventListener('click', (e) => {
+        debugLog(`Dropzone clicked for: ${targetId}`);
+        e.preventDefault();
+        e.stopPropagation();
+        input.click();
+      });
+
+      // Drag and drop
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('dragover');
+      });
+
+      zone.addEventListener('dragleave', (e) => {
+        if (!zone.contains(e.relatedTarget)) {
+          zone.classList.remove('dragover');
+        }
+      });
+
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        
+        debugLog(`Files dropped for: ${targetId}, Files: ${e.dataTransfer.files.length}`);
+        
+        if (input.multiple) {
+          input.files = e.dataTransfer.files;
+        } else {
+          const dt = new DataTransfer();
+          if (e.dataTransfer.files[0]) {
+            dt.items.add(e.dataTransfer.files[0]);
+          }
+          input.files = dt.files;
+        }
+        updateList(targetId, input.files);
+      });
+
+      // File input change
+      input.addEventListener('change', () => {
+        debugLog(`File input changed for: ${targetId}, Files: ${input.files.length}`);
+        updateList(targetId, input.files);
+      });
+    }
+
+    // Update file list display
+    function updateList(targetId, files) {
+      const list = document.getElementById(targetId + 'List');
+      if (!list) return;
+
+      if (!files || files.length === 0) {
+        list.innerHTML = '';
+        return;
+      }
+
+      // Create preview elements similar to existing functionality
+      const previews = Array.from(files).map((file, index) => {
+        let thumbnail = '';
+        if (file.type.startsWith('image/')) {
+          const url = URL.createObjectURL(file);
+          thumbnail = `<img src="${url}" class="file-thumbnail" alt="Preview">`;
+        } else if (file.type === 'application/pdf') {
+          thumbnail = `<div class="pdf-preview">
+            <div class="pdf-gradient"></div>
+            <div class="pdf-text">PDF</div>
+          </div>`;
+        }
+
+        return `<div class="file-preview">
+          ${thumbnail}
+          <div class="file-info">
+            <div class="file-name">${file.name}</div>
+            <div class="file-size">${(file.size/1024/1024).toFixed(2)} MB</div>
+          </div>
+          <button type="button" class="remove-file" onclick="removeFile('${targetId}', ${index})" title="Remove">×</button>
+        </div>`;
+      }).join('');
+
+      list.innerHTML = previews;
     }
 
     // Global function to remove files
