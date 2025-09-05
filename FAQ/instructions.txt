@@ -1,0 +1,26 @@
+FAQ Page – Editing Instructions
+===============================
+
+Add/Edit Questions
+------------------
+- To add a new question, duplicate an existing `.faq-item` block in `index.html` and update the question/answer text.
+- Keep questions concise and answers clear and direct.
+- If you add links:
+  - Internal links: open in the same tab (no `target` attribute)
+  - External links: add `target="_blank"`
+
+Phone Number Formatting
+-----------------------
+- Ensure phone number `561-247-0018` never wraps across lines.
+- Use inline style or a utility class, e.g. `<span style="white-space: nowrap;">561-247-0018</span>`.
+
+Styling & Behavior
+------------------
+- The page uses the same CSS variables and visual language as other pages.
+- Accordion behavior is handled by `scripts/faq.js` and uses simple show/hide with ARIA attributes for accessibility.
+
+Deployment Notes
+----------------
+- This page is static and does not require backend configuration.
+- If linked from other pages, follow the repo’s link behavior rules.
+
