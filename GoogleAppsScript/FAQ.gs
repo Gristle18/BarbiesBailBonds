@@ -16,6 +16,7 @@ function doGet(e) {
       const response = {
         query: query,
         results: results.map(item => ({
+          id: item.id,
           question: item.question,
           answer: item.answer,
           similarity: Math.round(item.similarity * 100) / 100
