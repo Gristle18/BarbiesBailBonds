@@ -6,12 +6,21 @@
 
   // Fetch FAQ data from Google Apps Script
   async function fetchFaqData() {
+    console.log('Fetching FAQ data from Google Apps Script...');
     try {
       const response = await fetch('https://script.google.com/macros/s/AKfycbxin16SHRhmORyggWCbFRloKZfnbsWL1Td7IKbAB9i1aejHHuNcmqldVEJTBfXCuXCc/exec?format=json');
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log('Successfully fetched FAQ data:', data);
       return data;
     } catch (error) {
       console.error('Error fetching FAQ data:', error);
+      console.log('Using fallback local data');
       // Fallback to local data if fetch fails
       return [
     { q: "How do bail bonds work?", a: "Bail bonds allow defendants to be released from custody pending trial, ensuring they appear in court when required." },
@@ -170,13 +179,19 @@
     const noResults = document.getElementById('noResults');
 
     // Fetch FAQ data
+    console.log('DOM loaded, starting FAQ initialization...');
     faqData = await fetchFaqData();
+    console.log('Final faqData length:', faqData.length);
     
     // Generate all FAQ items
     if (container) {
+      console.log('Generating FAQ items...');
       container.innerHTML = faqData.map((item, index) => 
         createFaqItem(item.q, item.a, index)
       ).join('');
+      console.log('FAQ items generated, container innerHTML length:', container.innerHTML.length);
+    } else {
+      console.error('FAQ container not found!');
     }
 
     const items = document.querySelectorAll('.faq-item');
