@@ -6,6 +6,70 @@
 function doGet(e) {
   const format = e.parameter.format;
   const callback = e.parameter.callback;
+  const action = e.parameter.action;
+  const query = e.parameter.query || e.parameter.q;
+  
+  // RAG Search endpoint
+  if (action === 'search' && query) {
+    try {
+      const results = semanticSearch(query, 5);
+      const response = {
+        query: query,
+        results: results.map(item => ({
+          question: item.question,
+          answer: item.answer,
+          similarity: Math.round(item.similarity * 100) / 100
+        }))
+      };
+      
+      if (format === 'jsonp' && callback) {
+        const jsonpResponse = callback + '(' + JSON.stringify(response) + ');';
+        return ContentService
+          .createTextOutput(jsonpResponse)
+          .setMimeType(ContentService.MimeType.JAVASCRIPT);
+      } else {
+        return ContentService
+          .createTextOutput(JSON.stringify(response))
+          .setMimeType(ContentService.MimeType.JSON)
+          .setHeader('Access-Control-Allow-Origin', '*');
+      }
+    } catch (error) {
+      const errorResponse = { error: error.toString(), query: query };
+      if (format === 'jsonp' && callback) {
+        const jsonpResponse = callback + '(' + JSON.stringify(errorResponse) + ');';
+        return ContentService.createTextOutput(jsonpResponse).setMimeType(ContentService.MimeType.JAVASCRIPT);
+      } else {
+        return ContentService.createTextOutput(JSON.stringify(errorResponse)).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+  }
+  
+  // RAG Chat endpoint
+  if (action === 'chat' && query) {
+    try {
+      const response = generateRAGResponse(query);
+      
+      if (format === 'jsonp' && callback) {
+        const jsonpResponse = callback + '(' + JSON.stringify(response) + ');';
+        return ContentService
+          .createTextOutput(jsonpResponse)
+          .setMimeType(ContentService.MimeType.JAVASCRIPT);
+      } else {
+        return ContentService
+          .createTextOutput(JSON.stringify(response))
+          .setMimeType(ContentService.MimeType.JSON)
+          .setHeader('Access-Control-Allow-Origin', '*');
+      }
+    } catch (error) {
+      const errorResponse = { error: error.toString(), query: query };
+      if (format === 'jsonp' && callback) {
+        const jsonpResponse = callback + '(' + JSON.stringify(errorResponse) + ');';
+        return ContentService.createTextOutput(jsonpResponse).setMimeType(ContentService.MimeType.JAVASCRIPT);
+      } else {
+        return ContentService.createTextOutput(JSON.stringify(errorResponse)).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+  }
   
   if (format === 'json') {
     // Return JSON data for API calls
