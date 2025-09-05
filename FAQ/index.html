@@ -197,7 +197,7 @@
           
           // Create script element
           const script = document.createElement('script');
-          script.src = `https://script.google.com/macros/s/AKfycbw9R2kuNUpv1_r3LD0CmsGAlA9K7UPcjYKyC3QE6vbh6miy0gIAhx8WZyEcDghoylxo/exec?format=jsonp&callback=${callbackName}`;
+          script.src = `https://script.google.com/macros/s/AKfycbxzjvann9agyueMAB0jIrmm6VwtoxQmpDn3yHQaZegeo6vvPst-lI3DJEr0FbZeOGYx/exec?format=jsonp&callback=${callbackName}`;
           
           // Set up callback
           window[callbackName] = function(data) {
@@ -362,7 +362,7 @@
           
           const callbackName = 'searchCallback_' + Date.now();
           const script = document.createElement('script');
-          script.src = `https://script.google.com/macros/s/AKfycbw9R2kuNUpv1_r3LD0CmsGAlA9K7UPcjYKyC3QE6vbh6miy0gIAhx8WZyEcDghoylxo/exec?action=search&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
+          script.src = `https://script.google.com/macros/s/AKfycbxzjvann9agyueMAB0jIrmm6VwtoxQmpDn3yHQaZegeo6vvPst-lI3DJEr0FbZeOGYx/exec?action=search&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
           
           window[callbackName] = function(results) {
             console.log('Semantic search results:', results);
