@@ -25,7 +25,8 @@ This RAG (Retrieval-Augmented Generation) system provides:
 1. In Google Apps Script, run the function: `generateFaqEmbeddings()`
 2. This will process all 128+ FAQ items and create vector embeddings
 3. Takes ~5-10 minutes due to API rate limits
-4. Embeddings are stored in Script Properties for fast access
+4. **NEW**: Embeddings are now stored in a Google Sheets spreadsheet for unlimited storage
+5. The script will automatically create a spreadsheet called "FAQ_Embeddings_Storage"
 
 ### 4. Deploy Updated Script
 1. Create a new deployment with the RAG-enabled code

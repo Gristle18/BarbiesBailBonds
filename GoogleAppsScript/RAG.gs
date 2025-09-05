@@ -8,15 +8,57 @@ const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY'; // Replace with your actual API ke
 const EMBEDDING_MODEL = 'models/embedding-001';
 const CHAT_MODEL = 'models/gemini-1.5-flash';
 
+// Storage configuration - using Google Sheets instead of PropertiesService
+const EMBEDDINGS_SPREADSHEET_NAME = 'FAQ_Embeddings_Storage';
+let embeddingsSheet = null;
+
+/**
+ * Get or create embeddings storage sheet
+ */
+function getEmbeddingsSheet() {
+  if (embeddingsSheet) return embeddingsSheet;
+  
+  // Try to find existing spreadsheet
+  const files = DriveApp.getFilesByName(EMBEDDINGS_SPREADSHEET_NAME);
+  let spreadsheet;
+  
+  if (files.hasNext()) {
+    spreadsheet = SpreadsheetApp.openById(files.next().getId());
+    console.log('Found existing embeddings spreadsheet');
+  } else {
+    // Create new spreadsheet
+    spreadsheet = SpreadsheetApp.create(EMBEDDINGS_SPREADSHEET_NAME);
+    console.log('Created new embeddings spreadsheet:', spreadsheet.getId());
+  }
+  
+  // Get or create the embeddings sheet
+  embeddingsSheet = spreadsheet.getSheetByName('Embeddings') || spreadsheet.insertSheet('Embeddings');
+  
+  // Set up headers if sheet is empty
+  if (embeddingsSheet.getLastRow() === 0) {
+    embeddingsSheet.appendRow(['ID', 'Question', 'Answer', 'Text', 'Embedding']);
+  }
+  
+  return embeddingsSheet;
+}
+
 /**
  * Generate embeddings for FAQ questions and answers
  * Run this once to create the knowledge base
  */
 function generateFaqEmbeddings() {
   const faqData = getFaqData();
-  const embeddings = [];
+  const sheet = getEmbeddingsSheet();
   
   console.log('Generating embeddings for', faqData.length, 'FAQ items...');
+  console.log('Using spreadsheet:', sheet.getParent().getName());
+  
+  // Clear existing data (keep headers)
+  if (sheet.getLastRow() > 1) {
+    sheet.deleteRows(2, sheet.getLastRow() - 1);
+  }
+  
+  const embeddings = [];
   
   for (let i = 0; i < faqData.length; i++) {
     const item = faqData[i];
@@ -24,18 +66,29 @@ function generateFaqEmbeddings() {
     
     try {
       const embedding = generateEmbedding(text);
-      embeddings.push({
+      const embeddingData = {
         id: i,
         question: item.q,
         answer: item.a,
         text: text,
         embedding: embedding
-      });
+      };
       
-      console.log(`Generated embedding ${i + 1}/${faqData.length}`);
+      embeddings.push(embeddingData);
+      
+      // Store in spreadsheet (convert embedding array to string for storage)
+      sheet.appendRow([
+        i,
+        item.q,
+        item.a,
+        text,
+        JSON.stringify(embedding)
+      ]);
+      
+      console.log('Generated embedding ' + (i + 1) + '/' + faqData.length);
       
       // Add delay to avoid rate limiting
-      if (i % 10 === 0) {
+      if (i % 10 === 0 && i > 0) {
         Utilities.sleep(1000);
       }
       
@@ -44,26 +97,8 @@ function generateFaqEmbeddings() {
     }
   }
   
-  // Store embeddings in chunks due to PropertiesService size limits
-  const properties = PropertiesService.getScriptProperties();
-  const chunkSize = 10; // Store 10 embeddings per chunk
-  const chunks = [];
-  
-  for (let i = 0; i < embeddings.length; i += chunkSize) {
-    const chunk = embeddings.slice(i, i + chunkSize);
-    const chunkIndex = Math.floor(i / chunkSize);
-    properties.setProperty(`faq_embeddings_${chunkIndex}`, JSON.stringify(chunk));
-    chunks.push(chunkIndex);
-  }
-  
-  // Store metadata about chunks
-  properties.setProperty('faq_embeddings_meta', JSON.stringify({
-    totalEmbeddings: embeddings.length,
-    chunkCount: chunks.length,
-    chunkSize: chunkSize
-  }));
-  
-  console.log('Successfully generated and stored', embeddings.length, 'embeddings in', chunks.length, 'chunks');
+  console.log('Successfully generated and stored', embeddings.length, 'embeddings in Google Sheets');
+  console.log('Spreadsheet ID:', sheet.getParent().getId());
   return embeddings;
 }
 
@@ -126,29 +161,47 @@ function semanticSearch(query, topK = 5) {
   // Generate embedding for the query
   const queryEmbedding = generateEmbedding(query);
   
-  // Get stored FAQ embeddings from chunks
-  const properties = PropertiesService.getScriptProperties();
-  const meta = properties.getProperty('faq_embeddings_meta');
+  // Get stored FAQ embeddings from Google Sheets
+  const sheet = getEmbeddingsSheet();
+  const dataRange = sheet.getDataRange();
+  const values = dataRange.getValues();
   
-  if (!meta) {
+  if (values.length <= 1) {
     throw new Error('FAQ embeddings not found. Run generateFaqEmbeddings() first.');
   }
   
-  const metadata = JSON.parse(meta);
   const faqEmbeddings = [];
   
-  // Load all chunks
-  for (let i = 0; i < metadata.chunkCount; i++) {
-    const chunkData = properties.getProperty(`faq_embeddings_${i}`);
-    if (chunkData) {
-      const chunk = JSON.parse(chunkData);
-      faqEmbeddings.push(...chunk);
+  // Skip header row (index 0), start from row 1
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+    const embeddingString = row[4]; // Embedding column
+    
+    if (embeddingString) {
+      try {
+        const embedding = JSON.parse(embeddingString);
+        faqEmbeddings.push({
+          id: row[0], // ID
+          question: row[1], // Question
+          answer: row[2], // Answer
+          text: row[3], // Text
+          embedding: embedding
+        });
+      } catch (error) {
+        console.error('Error parsing embedding for row', i, ':', error);
+      }
     }
   }
   
+  console.log('Loaded', faqEmbeddings.length, 'embeddings from Google Sheets');
+  
   // Calculate similarities
   const similarities = faqEmbeddings.map(item => ({
-    ...item,
+    id: item.id,
+    question: item.question,
+    answer: item.answer,
+    text: item.text,
+    embedding: item.embedding,
     similarity: cosineSimilarity(queryEmbedding, item.embedding)
   }));
   
