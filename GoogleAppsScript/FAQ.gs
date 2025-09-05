@@ -320,9 +320,9 @@ function getFaqHtml() {
     });
 
     function toggleFaq(index) {
-      const item = document.querySelector(\`.faq-item:nth-child(\${index + 1})\`);
-      const answer = document.getElementById(\`answer-\${index}\`);
-      const question = document.getElementById(\`question-\${index}\`);
+      const item = document.querySelector('.faq-item:nth-child(' + (index + 1) + ')');
+      const answer = document.getElementById('answer-' + index);
+      const question = document.getElementById('question-' + index);
       
       const isOpen = item.classList.contains('open');
       
@@ -380,7 +380,7 @@ function getFaqHtml() {
         element.setAttribute('data-original', originalText);
       }
       
-      const regex = new RegExp(\`(\${searchTerm.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')})\`, 'gi');
+      const regex = new RegExp('(' + searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
       const highlightedText = originalText.replace(regex, '<span class="highlight">$1</span>');
       element.innerHTML = highlightedText;
     }
@@ -397,13 +397,13 @@ function getFaqHtml() {
       const totalCount = allItems.length;
       
       if (searchTerm === '') {
-        searchInfo.textContent = \`Showing all \${totalCount} questions\`;
+        searchInfo.textContent = 'Showing all ' + totalCount + ' questions';
       } else if (visibleCount === 0) {
         searchInfo.textContent = 'No questions found';
       } else if (visibleCount === 1) {
         searchInfo.textContent = '1 question found';
       } else {
-        searchInfo.textContent = \`\${visibleCount} questions found\`;
+        searchInfo.textContent = visibleCount + ' questions found';
       }
     }
 
