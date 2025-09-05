@@ -188,32 +188,60 @@
       // FAQ Data will be fetched from Google Apps Script
       let faqData = [];
 
-      // Fetch FAQ data from Google Apps Script
-      async function fetchFaqData() {
-        console.log('Fetching FAQ data from Google Apps Script...');
-        try {
-          const response = await fetch('https://script.google.com/macros/s/AKfycbyW2Rdk25k3k3Ym0AWcEVGfSPgRjLf6m16UdHgNIgVhWn2c_U3xdwNJJGD2eWsfuh3q/exec?format=json');
-          console.log('Response status:', response.status);
+      // Fetch FAQ data from Google Apps Script using JSONP to bypass CORS
+      function fetchFaqData() {
+        console.log('Fetching FAQ data from Google Apps Script using JSONP...');
+        return new Promise((resolve) => {
+          // Create unique callback name
+          const callbackName = 'faqCallback_' + Date.now();
           
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
+          // Create script element
+          const script = document.createElement('script');
+          script.src = `https://script.google.com/macros/s/AKfycbyW2Rdk25k3k3Ym0AWcEVGfSPgRjLf6m16UdHgNIgVhWn2c_U3xdwNJJGD2eWsfuh3q/exec?format=jsonp&callback=${callbackName}`;
           
-          const data = await response.json();
-          console.log('Successfully fetched FAQ data:', data);
-          return data;
-        } catch (error) {
-          console.error('Error fetching FAQ data:', error);
-          console.log('Using fallback local data');
-          // Fallback to local data if fetch fails
-          return [
-            { q: "How do bail bonds work?", a: "Bail bonds allow defendants to be released from custody pending trial, ensuring they appear in court when required." },
-            { q: "What is the process for obtaining a bail bond?", a: "You contact a bail bondsman, pay a fee (typically 10% of the bond amount), and provide necessary information." },
-            { q: "What information do I need to provide to a bail bondsman?", a: "You'll need the defendant's full name, booking number, and the location of the jail." },
-            { q: "How much will I have to pay for a bond?", a: "Using a bondsman, you will typically pay 10% of the bond amount for state charges (15% for federal bonds). For example, if the bond is $5,000, you would pay $500. At the jail, you pay the full bond amount." },
-            { q: "Is the premium for the bond refundable?", a: "No, the premium paid to the bondsman is non-refundable once the case is closed or discharged." }
-          ];
-        }
+          // Set up callback
+          window[callbackName] = function(data) {
+            console.log('Successfully fetched FAQ data via JSONP:', data);
+            // Clean up
+            document.head.removeChild(script);
+            delete window[callbackName];
+            resolve(data);
+          };
+          
+          // Handle errors
+          script.onerror = function() {
+            console.error('JSONP request failed, using fallback local data');
+            // Clean up
+            document.head.removeChild(script);
+            delete window[callbackName];
+            resolve([
+              { q: "How do bail bonds work?", a: "Bail bonds allow defendants to be released from custody pending trial, ensuring they appear in court when required." },
+              { q: "What is the process for obtaining a bail bond?", a: "You contact a bail bondsman, pay a fee (typically 10% of the bond amount), and provide necessary information." },
+              { q: "What information do I need to provide to a bail bondsman?", a: "You'll need the defendant's full name, booking number, and the location of the jail." },
+              { q: "How much will I have to pay for a bond?", a: "Using a bondsman, you will typically pay 10% of the bond amount for state charges (15% for federal bonds). For example, if the bond is $5,000, you would pay $500. At the jail, you pay the full bond amount." },
+              { q: "Is the premium for the bond refundable?", a: "No, the premium paid to the bondsman is non-refundable once the case is closed or discharged." }
+            ]);
+          };
+          
+          // Add timeout
+          setTimeout(() => {
+            if (window[callbackName]) {
+              console.error('JSONP request timeout, using fallback local data');
+              document.head.removeChild(script);
+              delete window[callbackName];
+              resolve([
+                { q: "How do bail bonds work?", a: "Bail bonds allow defendants to be released from custody pending trial, ensuring they appear in court when required." },
+                { q: "What is the process for obtaining a bail bond?", a: "You contact a bail bondsman, pay a fee (typically 10% of the bond amount), and provide necessary information." },
+                { q: "What information do I need to provide to a bail bondsman?", a: "You'll need the defendant's full name, booking number, and the location of the jail." },
+                { q: "How much will I have to pay for a bond?", a: "Using a bondsman, you will typically pay 10% of the bond amount for state charges (15% for federal bonds). For example, if the bond is $5,000, you would pay $500. At the jail, you pay the full bond amount." },
+                { q: "Is the premium for the bond refundable?", a: "No, the premium paid to the bondsman is non-refundable once the case is closed or discharged." }
+              ]);
+            }
+          }, 10000);
+          
+          // Add script to head
+          document.head.appendChild(script);
+        });
       }
 
       // Function to create a single FAQ item

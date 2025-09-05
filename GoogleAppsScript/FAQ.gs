@@ -5,6 +5,7 @@
 
 function doGet(e) {
   const format = e.parameter.format;
+  const callback = e.parameter.callback;
   
   if (format === 'json') {
     // Return JSON data for API calls
@@ -12,6 +13,15 @@ function doGet(e) {
       .createTextOutput(JSON.stringify(getFaqData()))
       .setMimeType(ContentService.MimeType.JSON)
       .setHeader('Access-Control-Allow-Origin', '*');
+  }
+  
+  if (format === 'jsonp' && callback) {
+    // Return JSONP data for cross-origin requests
+    const jsonData = JSON.stringify(getFaqData());
+    const jsonpResponse = callback + '(' + jsonData + ');';
+    return ContentService
+      .createTextOutput(jsonpResponse)
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
   
   // Return HTML page by default
