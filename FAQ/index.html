@@ -366,6 +366,21 @@
           
           window[callbackName] = function(results) {
             console.log('Semantic search results:', results);
+            
+            // Check if we got an error response
+            if (results && results.error) {
+              console.error('Semantic search API error:', results.error);
+              performBasicSearch(query);
+              return;
+            }
+            
+            // Check if we got valid results
+            if (!results || !results.results || results.results.length === 0) {
+              console.log('No semantic results found, falling back to basic search');
+              performBasicSearch(query);
+              return;
+            }
+            
             displaySemanticResults(results, query);
             // Clean up
             document.head.removeChild(script);
@@ -399,8 +414,8 @@
           const relevantIds = new Set();
           
           // Get IDs of semantically relevant FAQs
-          if (results && results.length > 0) {
-            results.forEach(result => {
+          if (results && results.results && results.results.length > 0) {
+            results.results.forEach(result => {
               relevantIds.add(result.id);
             });
           }
@@ -409,7 +424,7 @@
           
           // Show/hide items based on semantic relevance
           items.forEach((item, index) => {
-            if (relevantIds.size === 0 || relevantIds.has(index)) {
+            if (relevantIds.size > 0 && relevantIds.has(index)) {
               item.classList.remove('hidden');
               visibleCount++;
               
@@ -427,7 +442,7 @@
           });
           
           noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-          updateSearchInfo(visibleCount, query, true, results ? results.length : 0);
+          updateSearchInfo(visibleCount, query, true, results && results.results ? results.results.length : 0);
         }
         
         function performBasicSearch(query) {
