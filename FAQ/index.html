@@ -181,7 +181,206 @@
     </div>
   </div>
 
-  <script src="scripts/faq.js"></script>
+  <script>
+    // FAQ Accordion and Search functionality with dynamic generation
+    (function () {
+      
+      // FAQ Data will be fetched from Google Apps Script
+      let faqData = [];
+
+      // Fetch FAQ data from Google Apps Script
+      async function fetchFaqData() {
+        console.log('Fetching FAQ data from Google Apps Script...');
+        try {
+          const response = await fetch('https://script.google.com/macros/s/AKfycbxin16SHRhmORyggWCbFRloKZfnbsWL1Td7IKbAB9i1aejHHuNcmqldVEJTBfXCuXCc/exec?format=json');
+          console.log('Response status:', response.status);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log('Successfully fetched FAQ data:', data);
+          return data;
+        } catch (error) {
+          console.error('Error fetching FAQ data:', error);
+          console.log('Using fallback local data');
+          // Fallback to local data if fetch fails
+          return [
+            { q: "How do bail bonds work?", a: "Bail bonds allow defendants to be released from custody pending trial, ensuring they appear in court when required." },
+            { q: "What is the process for obtaining a bail bond?", a: "You contact a bail bondsman, pay a fee (typically 10% of the bond amount), and provide necessary information." },
+            { q: "What information do I need to provide to a bail bondsman?", a: "You'll need the defendant's full name, booking number, and the location of the jail." },
+            { q: "How much will I have to pay for a bond?", a: "Using a bondsman, you will typically pay 10% of the bond amount for state charges (15% for federal bonds). For example, if the bond is $5,000, you would pay $500. At the jail, you pay the full bond amount." },
+            { q: "Is the premium for the bond refundable?", a: "No, the premium paid to the bondsman is non-refundable once the case is closed or discharged." }
+          ];
+        }
+      }
+
+      // Function to create a single FAQ item
+      function createFaqItem(question, answer, index) {
+        return `
+          <div class="faq-item" role="listitem">
+            <button class="faq-question" aria-expanded="false" aria-controls="faq-panel-${index}">
+              <span class="chevron">▶</span>
+              ${question}
+            </button>
+            <div class="faq-answer" id="faq-panel-${index}" role="region" aria-hidden="true">
+              <div class="answer-inner">
+                <p>${answer}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        const container = document.getElementById('faqContainer');
+        const searchInput = document.getElementById('faqSearch');
+        const searchInfo = document.getElementById('searchInfo');
+        const noResults = document.getElementById('noResults');
+
+        // Fetch FAQ data
+        console.log('DOM loaded, starting FAQ initialization...');
+        faqData = await fetchFaqData();
+        console.log('Final faqData length:', faqData.length);
+        
+        // Generate all FAQ items
+        if (container) {
+          console.log('Generating FAQ items...');
+          container.innerHTML = faqData.map((item, index) => 
+            createFaqItem(item.q, item.a, index)
+          ).join('');
+          console.log('FAQ items generated, container innerHTML length:', container.innerHTML.length);
+        } else {
+          console.error('FAQ container not found!');
+        }
+
+        const items = document.querySelectorAll('.faq-item');
+        
+        // Initialize accordion functionality
+        items.forEach((item, idx) => {
+          const btn = item.querySelector('.faq-question');
+          const panel = item.querySelector('.faq-answer');
+          if (!btn || !panel) return;
+
+          btn.addEventListener('click', () => {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            
+            // Close all others (optional: behave like accordion)
+            items.forEach(other => {
+              const otherBtn = other.querySelector('.faq-question');
+              const otherPanel = other.querySelector('.faq-answer');
+              if (otherBtn && otherPanel && otherBtn !== btn) {
+                otherBtn.setAttribute('aria-expanded', 'false');
+                otherPanel.setAttribute('aria-hidden', 'true');
+                other.classList.remove('open');
+                otherPanel.style.maxHeight = '0';
+              }
+            });
+            
+            // Toggle current item
+            if (expanded) {
+              btn.setAttribute('aria-expanded', 'false');
+              panel.setAttribute('aria-hidden', 'true');
+              item.classList.remove('open');
+              panel.style.maxHeight = '0';
+            } else {
+              btn.setAttribute('aria-expanded', 'true');
+              panel.setAttribute('aria-hidden', 'false');
+              item.classList.add('open');
+              setTimeout(() => {
+                panel.style.maxHeight = panel.scrollHeight + 'px';
+              }, 10);
+            }
+          });
+        });
+
+        // Search functionality
+        if (searchInput) {
+          searchInput.addEventListener('input', performSearch);
+        }
+        
+        updateSearchInfo();
+
+        function performSearch() {
+          const searchTerm = searchInput.value.toLowerCase().trim();
+          const items = document.querySelectorAll('.faq-item');
+          let visibleCount = 0;
+          
+          items.forEach(item => {
+            const question = item.querySelector('.faq-question span:last-child');
+            const answer = item.querySelector('.faq-answer p');
+            const questionText = question ? question.textContent.toLowerCase() : '';
+            const answerText = answer ? answer.textContent.toLowerCase() : '';
+            
+            if (searchTerm === '' || questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
+              item.classList.remove('hidden');
+              visibleCount++;
+              
+              if (searchTerm !== '') {
+                highlightText(question, searchTerm);
+                highlightText(answer, searchTerm);
+              } else {
+                removeHighlights(question);
+                removeHighlights(answer);
+              }
+            } else {
+              item.classList.add('hidden');
+              item.classList.remove('open');
+              const answerDiv = item.querySelector('.faq-answer');
+              if (answerDiv) answerDiv.style.maxHeight = '0';
+            }
+          });
+          
+          noResults.style.display = visibleCount === 0 && searchTerm !== '' ? 'block' : 'none';
+          updateSearchInfo(visibleCount, searchTerm);
+        }
+
+        function highlightText(element, searchTerm) {
+          if (!element) return;
+          const originalText = element.getAttribute('data-original') || element.innerHTML;
+          if (!element.getAttribute('data-original')) {
+            element.setAttribute('data-original', originalText);
+          }
+          
+          // Simple case-insensitive replacement without regex
+          var lowerOriginal = originalText.toLowerCase();
+          var lowerSearch = searchTerm.toLowerCase();
+          var startIndex = lowerOriginal.indexOf(lowerSearch);
+          
+          if (startIndex !== -1) {
+            var beforeMatch = originalText.substring(0, startIndex);
+            var match = originalText.substring(startIndex, startIndex + searchTerm.length);
+            var afterMatch = originalText.substring(startIndex + searchTerm.length);
+            element.innerHTML = beforeMatch + '<span class="highlight">' + match + '</span>' + afterMatch;
+          }
+        }
+
+        function removeHighlights(element) {
+          if (!element) return;
+          const originalText = element.getAttribute('data-original');
+          if (originalText) {
+            element.innerHTML = originalText;
+          }
+        }
+
+        function updateSearchInfo(visibleCount = null, searchTerm = '') {
+          if (!searchInfo) return;
+          const totalCount = faqData.length;
+          
+          if (searchTerm === '') {
+            searchInfo.textContent = 'Showing all ' + totalCount + ' questions';
+          } else if (visibleCount === 0) {
+            searchInfo.textContent = 'No questions found';
+          } else if (visibleCount === 1) {
+            searchInfo.textContent = '1 question found';
+          } else {
+            searchInfo.textContent = visibleCount + ' questions found';
+          }
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
 
