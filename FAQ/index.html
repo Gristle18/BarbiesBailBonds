@@ -323,9 +323,33 @@
           });
         });
 
-        // Search functionality
+        // Search functionality with 3-second debounce
+        let searchTimeout;
         if (searchInput) {
-          searchInput.addEventListener('input', performSearch);
+          searchInput.addEventListener('input', function() {
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+            
+            // If empty, search immediately to show all items
+            if (searchInput.value.trim() === '') {
+              performSearch();
+              return;
+            }
+            
+            // Set 3-second delay for non-empty searches
+            searchTimeout = setTimeout(() => {
+              performSearch();
+            }, 3000);
+          });
+          
+          // Also allow Enter key for immediate search
+          searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              clearTimeout(searchTimeout); // Cancel the timeout
+              performSearch();
+            }
+          });
         }
         
         updateSearchInfo();
