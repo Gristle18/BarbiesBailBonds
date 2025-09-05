@@ -568,8 +568,7 @@
       </div>
 
       <div class="actions">
-        <button type="button" class="btn btn-ghost" onclick="showLanguageSelection()">Back to Language</button>
-        <button type="button" class="btn btn-ghost" id="resetBtnEn">Reset</button>
+        <button type="button" class="btn btn-ghost" onclick="showUploadForm('es')">Switch to Español</button>
         <button type="submit" class="btn btn-primary" id="submitBtnEn">Submit</button>
       </div>
       <div class="note" style="text-align:center; margin-top:10px;">
@@ -629,8 +628,7 @@
       </div>
 
       <div class="actions">
-        <button type="button" class="btn btn-ghost" onclick="showLanguageSelection()">Volver al Idioma</button>
-        <button type="button" class="btn btn-ghost" id="resetBtnEs">Restablecer</button>
+        <button type="button" class="btn btn-ghost" onclick="showUploadForm('en')">Switch to English</button>
         <button type="submit" class="btn btn-primary" id="submitBtnEs">Enviar</button>
       </div>
       <div class="note" style="text-align:center; margin-top:10px;">
@@ -1938,7 +1936,6 @@
 
       function initializeForm(suffix) {
         const form = document.getElementById('uploadForm' + suffix);
-        const resetBtn = document.getElementById('resetBtn' + suffix);
         const submitBtn = document.getElementById('submitBtn' + suffix);
         const successMsg = document.getElementById('successMsg' + suffix);
         const errorMsg = document.getElementById('errorMsg' + suffix);
@@ -1959,13 +1956,6 @@
           });
         }
 
-        // Reset behavior
-        resetBtn?.addEventListener('click', () => {
-          form.reset();
-          form.querySelectorAll('.file-list').forEach(el => el.textContent = '');
-          successMsg.style.display = 'none';
-          errorMsg.style.display = 'none';
-        });
 
         // Submit handler - for now just show message that backend isn't configured
         form?.addEventListener('submit', async (e) => {
