@@ -517,11 +517,6 @@
       </div>
     </div>
 
-    <!-- DEBUG SECTION -->
-    <div style="background: rgba(0,0,0,0.9); color: #00ff00; font-family: monospace; font-size: 12px; padding: 10px; max-height: 150px; overflow-y: auto; border: 2px solid #00ff00; border-radius: 8px; margin: 20px 0;">
-      <div style="margin-bottom: 5px; font-weight: bold; color: #ffff00;">DEBUG OUTPUT:</div>
-      <div id="debugOutput">Ready for debugging...</div>
-    </div>
 
     <!-- English Upload Form -->
     <form id="uploadFormEn" class="upload-form card" style="display: none;" novalidate>
@@ -696,40 +691,9 @@
   </footer>
 
   <script>
-    // DEBUG FUNCTIONALITY
-    let debugOutput = null;
-    let debugCount = 0;
-    
-    function debugLog(message) {
-      if (!debugOutput) {
-        debugOutput = document.getElementById('debugOutput');
-      }
-      if (debugOutput) {
-        debugCount++;
-        const timestamp = new Date().toLocaleTimeString();
-        debugOutput.innerHTML += `<div>[${debugCount}] ${timestamp}: ${message}</div>`;
-        debugOutput.scrollTop = debugOutput.scrollHeight;
-      }
-      console.log(message);
-    }
-
-    // Global click listener to debug all clicks
-    document.addEventListener('click', function(e) {
-      debugLog(`CLICK: ${e.target.tagName} ${e.target.className ? '.' + e.target.className.replace(/\s+/g, '.') : ''} ${e.target.id ? '#' + e.target.id : ''}`);
-    }, true);
-
-    // Global change listener for form inputs
-    document.addEventListener('change', function(e) {
-      if (e.target.type === 'file') {
-        debugLog(`FILE CHANGE: ${e.target.id} - ${e.target.files.length} files selected`);
-      } else {
-        debugLog(`INPUT CHANGE: ${e.target.id} = "${e.target.value}"`);
-      }
-    });
 
     // Language selection functionality
     function showUploadForm(language) {
-      debugLog(`showUploadForm called with: ${language}`);
       // Hide language selection
       document.getElementById('languageSelection').style.display = 'none';
       
@@ -757,12 +721,6 @@
       document.querySelector('.subtitle').textContent = isSpanish ? 
         'Envíe de forma segura su ID gubernamental y documentos para acelerar la aprobación de su fianza.' : 
         'Securely send your government ID and paperwork to speed up your bond approval.';
-      
-      // Update debug panel title
-      const debugTitle = document.querySelector('#debugOutput').parentElement.querySelector('div');
-      if (debugTitle) {
-        debugTitle.textContent = isSpanish ? 'SALIDA DE DEPURACIÓN:' : 'DEBUG OUTPUT:';
-      }
       
       // Update How to Get to Us section
       const locationSection = document.querySelector('.location-content h2');
@@ -810,11 +768,9 @@
           'Copyright © 2024 Barbie\'s Bail Bonds | Bail Bond Services';
       }
       
-      debugLog(`Page language updated to: ${isSpanish ? 'Spanish' : 'English'}`);
     }
     
     function showLanguageSelection() {
-      debugLog('showLanguageSelection called');
       // Hide both forms
       document.getElementById('uploadFormEn').style.display = 'none';
       document.getElementById('uploadFormEs').style.display = 'none';
@@ -837,7 +793,6 @@
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
       });
-      debugLog('Language selection shown, forms reset, page language reset to English');
     }
 
     // Document types for dropdown
@@ -868,11 +823,9 @@
 
     // Global function to show document dropdown
     window.showDocumentDropdown = function(suffix) {
-      debugLog(`showDocumentDropdown called for ${suffix}`);
       
       const container = document.getElementById(`additionalDocsContainer${suffix}`);
       if (!container) {
-        debugLog(`Container not found: additionalDocsContainer${suffix}`);
         return;
       }
 
@@ -920,13 +873,11 @@
 
     // Global function to add document section
     window.addDocumentSection = function(suffix, documentType) {
-      debugLog(`addDocumentSection called: ${suffix}, ${documentType}`);
       
       const container = document.getElementById(`additionalDocsContainer${suffix}`);
       const addButton = document.getElementById(`addDocButton${suffix}`);
       
       if (!container || !addButton) {
-        debugLog(`Container or button not found for ${suffix}`);
         return;
       }
 
@@ -960,21 +911,17 @@
         const list = document.getElementById(inputId + 'List');
         
         if (zone && input && list) {
-          debugLog(`Using original system initialization for: ${inputId}`);
           
           // Call the original system's dropzone initialization logic
           initializeOriginalDropzone(inputId, zone, input, list);
         } else {
-          debugLog(`Failed to find elements for original system init: ${inputId}`);
         }
       }, 50);
       
-      debugLog(`Document section added: ${sectionId}`);
     };
 
     // Global function to remove document section
     window.removeDocumentSection = function(sectionId) {
-      debugLog(`removeDocumentSection called: ${sectionId}`);
       
       // Find by the input ID within the section since that contains our sectionId
       const input = document.getElementById(`${sectionId}_input`);
@@ -982,15 +929,12 @@
       
       if (section) {
         section.remove();
-        debugLog(`Document section removed: ${sectionId}`);
       } else {
-        debugLog(`Could not find section to remove: ${sectionId} (input found: ${!!input})`);
       }
     };
 
     // Initialize dropzone using the original system's exact logic
     function initializeOriginalDropzone(targetId, zone, input, list) {
-      debugLog(`Initializing original dropzone for: ${targetId}`);
       
       // This is the exact logic from the original initializeAllDropzones function
       const updateList = (files) => {
@@ -1019,7 +963,6 @@
           zone.style.position = 'relative';
           
           list.innerHTML = '';
-          debugLog(`${targetId} reset to original state`);
           return;
         }
 
@@ -1231,8 +1174,6 @@
           `;
         }
         
-        debugLog(`FILE INPUT CHANGED: ${targetId} - ${files.length} files`);
-        debugLog(`File preview updated for ${targetId}: ${file.name}`);
         
         // Re-attach event listeners to the new input
         const newInput = document.getElementById(targetId);
@@ -1277,7 +1218,6 @@
         updateList(input.files);
       });
       
-      debugLog(`Original system dropzone initialized for: ${targetId}`);
     }
 
     // Update file list display - supports both calling patterns
@@ -1296,26 +1236,21 @@
         if (activeInput && activeInput.type === 'file') {
           targetId = activeInput.id;
         } else {
-          debugLog('ERROR: Could not determine targetId for updateList call');
           return;
         }
       }
       
-      debugLog(`updateList called for ${targetId} with ${files ? files.length : 0} files`);
       
       const list = document.getElementById(targetId + 'List');
       if (!list) {
-        debugLog(`ERROR: Could not find list element: ${targetId}List`);
         return;
       }
 
       if (!files || files.length === 0) {
-        debugLog(`Clearing file list for ${targetId}`);
         list.innerHTML = '';
         return;
       }
 
-      debugLog(`Creating previews for ${files.length} files in ${targetId}`);
 
       // Create preview elements using the original system's CSS classes
       const previews = Array.from(files).map((file, index) => {
@@ -1341,19 +1276,16 @@
       }).join('');
 
       list.innerHTML = previews;
-      debugLog(`File previews updated for ${targetId}: ${files[0].name}`);
     }
 
     // Global function to remove files
     window.removeFile = function(targetId, fileIndex) {
-      debugLog(`Removing file ${fileIndex} from ${targetId}`);
       
       // Find the dropzone and list elements
       const zone = document.querySelector(`.dropzone[data-target="${targetId}"]`);
       const list = document.getElementById(targetId + 'List');
       
       if (!zone) {
-        debugLog(`Could not find dropzone for ${targetId}`);
         return;
       }
       
@@ -1518,7 +1450,6 @@
                 const finalInput = document.getElementById(targetId);
                 if (finalInput) {
                   finalInput.addEventListener('change', () => {
-                    debugLog(`FILE INPUT CHANGED: ${targetId} - ${finalInput.files.length} files`);
                     updateList(finalInput.files);
                   });
                 }
@@ -1559,7 +1490,6 @@
               const finalInput = document.getElementById(targetId);
               if (finalInput) {
                 finalInput.addEventListener('change', () => {
-                  debugLog(`FILE INPUT CHANGED: ${targetId} - ${finalInput.files.length} files`);
                   updateList(finalInput.files);
                 });
               }
@@ -1573,27 +1503,22 @@
               </div>
             `;
             
-            debugLog(`File preview updated for ${targetId}: ${file.name}`);
-          };
+              };
           
           // Attach the change listener
           newInput.addEventListener('change', () => {
-            debugLog(`FILE INPUT CHANGED: ${targetId} - ${newInput.files.length} files`);
             updateList(newInput.files);
           });
         }
       }
       
-      debugLog(`File removed from ${targetId}. Dropzone reset to original state.`);
     };
 
     window.changeFile = function(targetId) {
-      debugLog(`Changing file for ${targetId}`);
       
       // Get the original input
       const originalInput = document.getElementById(targetId);
       if (!originalInput) {
-        debugLog(`Could not find input for ${targetId}`);
         return;
       }
       
@@ -1608,7 +1533,6 @@
       tempInput.style.display = 'none';
       
       tempInput.addEventListener('change', function() {
-        debugLog(`Temp input changed, ${this.files.length} files selected`);
         if (this.files && this.files.length > 0) {
           // Create a new DataTransfer to copy files
           const dataTransfer = new DataTransfer();
@@ -1623,7 +1547,6 @@
           const changeEvent = new Event('change', { bubbles: true });
           originalInput.dispatchEvent(changeEvent);
           
-          debugLog(`Files transferred to original input: ${originalInput.files.length} files`);
         }
         
         // Clean up temp input
@@ -1639,7 +1562,6 @@
     (function () {
       // Initialize when DOM is loaded
       document.addEventListener('DOMContentLoaded', function() {
-        debugLog('DOM LOADED - Starting initialization');
         
         // Initialize dropzones for both forms
         initializeAllDropzones();
@@ -1648,23 +1570,19 @@
         initializeForm('En'); // English form
         initializeForm('Es'); // Spanish form
         
-        debugLog('Initialization complete');
       });
 
       function initializeAllDropzones() {
         // Find all dropzones in the document
         const dropzones = document.querySelectorAll('.dropzone');
-        debugLog(`Found ${dropzones.length} dropzones in document`);
         
         dropzones.forEach(zone => {
           const targetId = zone.getAttribute('data-target');
           const input = document.getElementById(targetId);
           const list = document.getElementById(targetId + 'List');
           
-          debugLog(`Initializing dropzone: ${targetId}, Input: ${!!input}, List: ${!!list}`);
           
           if (!input || !list) {
-            debugLog(`SKIPPING ${targetId} - missing input or list element`);
             return;
           }
 
@@ -1698,11 +1616,9 @@
               // Re-attach event listeners to the new input
               const newInput = document.getElementById(targetId);
               newInput.addEventListener('change', () => {
-                debugLog(`File input changed for: ${targetId}`, 'Files:', newInput.files.length);
                 updateList(newInput.files);
               });
               
-              debugLog(`File list cleared for ${targetId}`);
               return; 
             }
             
@@ -1806,8 +1722,7 @@
                 const newInput = document.getElementById(targetId);
                 if (newInput) {
                   newInput.addEventListener('change', () => {
-                    debugLog(`FILE INPUT CHANGED: ${targetId} - ${newInput.files.length} files`);
-                    updateList(newInput.files);
+                            updateList(newInput.files);
                   });
                 }
                 
@@ -1960,8 +1875,7 @@
               const newInput = document.getElementById(targetId);
               if (newInput) {
                 newInput.addEventListener('change', () => {
-                  debugLog(`FILE INPUT CHANGED: ${targetId} - ${newInput.files.length} files`);
-                  updateList(newInput.files);
+                        updateList(newInput.files);
                 });
               }
             }
@@ -1974,31 +1888,26 @@
               </div>
             `;
             
-            debugLog(`File preview updated for ${targetId}: ${file.name}`);
-          };
+              };
 
           // Simple click handler - no preview modal
           zone.addEventListener('click', (e) => {
             // No preview modal functionality - just log clicks
             if (e.target.classList.contains('preview-thumb') || e.target.id.includes('_preview')) {
-              debugLog(`PREVIEW IMAGE CLICKED: ${e.target.id} (no modal)`);
               return;
             }
-            debugLog(`DROPZONE CLICKED: ${targetId} (should be handled by file input overlay)`);
           });
 
           // Drag and drop
           zone.addEventListener('dragover', (e) => {
             e.preventDefault();
             zone.classList.add('dragover');
-            debugLog(`DRAGOVER: ${targetId}`);
           });
 
           zone.addEventListener('dragleave', (e) => {
             // Only remove dragover if we're really leaving the dropzone
             if (!zone.contains(e.relatedTarget)) {
               zone.classList.remove('dragover');
-              debugLog(`DRAGLEAVE: ${targetId}`);
             }
           });
 
@@ -2006,7 +1915,6 @@
             e.preventDefault();
             zone.classList.remove('dragover');
             
-            debugLog(`FILES DROPPED: ${targetId} - ${e.dataTransfer.files.length} files`);
             
             if (input.multiple) {
               input.files = e.dataTransfer.files;
@@ -2023,7 +1931,6 @@
 
           // File input change
           input.addEventListener('change', () => {
-            debugLog(`FILE INPUT CHANGED: ${targetId} - ${input.files.length} files`);
             updateList(input.files);
           });
         });
@@ -2037,11 +1944,9 @@
         const errorMsg = document.getElementById('errorMsg' + suffix);
 
         if (!form) {
-          debugLog(`FORM NOT FOUND: uploadForm${suffix}`);
           return;
         }
 
-        debugLog(`INITIALIZING FORM: uploadForm${suffix}`);
 
         // Simple phone formatting on blur (USA)
         const phone = document.getElementById('yourPhone' + suffix);
