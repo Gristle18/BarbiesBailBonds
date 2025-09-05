@@ -380,7 +380,7 @@ function getFaqHtml() {
         element.setAttribute('data-original', originalText);
       }
       
-      const regex = new RegExp('(' + searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+      const regex = new RegExp('(' + searchTerm.replace(/[.*+?^${}()|[\]\\\\]/g, '\\\\$&') + ')', 'gi');
       const highlightedText = originalText.replace(regex, '<span class="highlight">$1</span>');
       element.innerHTML = highlightedText;
     }
