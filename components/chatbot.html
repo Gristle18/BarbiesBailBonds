@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat Assistant • Barbie's Bail Bonds</title>
+  <style>
+    :root {
+      --brand: #F28C00;
+      --brand-dark: #D67700;
+      --dark: #111;
+      --muted: #666;
+      --light-gray: #eee;
+      --white: #fff;
+      --cream: #fff2d1;
+      --black: #000;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background: var(--light-gray);
+      padding: 20px;
+    }
+
+    .chatbot-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .chatbot-header {
+      background: var(--brand);
+      color: var(--white);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .chatbot-header h2 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .chatbot-header p {
+      opacity: 0.9;
+      font-size: 16px;
+    }
+
+    .chat-messages {
+      height: 400px;
+      overflow-y: auto;
+      padding: 20px;
+      background: #fafafa;
+    }
+
+    .message {
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .message.user {
+      flex-direction: row-reverse;
+    }
+
+    .message-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .message.assistant .message-avatar {
+      background: var(--brand);
+      color: var(--white);
+    }
+
+    .message.user .message-avatar {
+      background: var(--muted);
+      color: var(--white);
+    }
+
+    .message-content {
+      background: var(--white);
+      padding: 12px 16px;
+      border-radius: 12px;
+      max-width: 70%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .message.user .message-content {
+      background: var(--brand);
+      color: var(--white);
+    }
+
+    .message-content p {
+      margin-bottom: 8px;
+    }
+
+    .message-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-style: italic;
+      padding: 8px 0;
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      background: var(--muted);
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    .chat-input-container {
+      padding: 20px;
+      background: var(--white);
+      border-top: 1px solid var(--light-gray);
+    }
+
+    .chat-input-box {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid var(--light-gray);
+      border-radius: 12px;
+      font-size: 16px;
+      resize: none;
+      min-height: 44px;
+      max-height: 120px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .chat-input:focus {
+      border-color: var(--brand);
+    }
+
+    .send-button {
+      background: var(--brand);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      height: 44px;
+    }
+
+    .send-button:hover:not(:disabled) {
+      background: var(--brand-dark);
+    }
+
+    .send-button:disabled {
+      background: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .welcome-message {
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 20px;
+      font-size: 16px;
+    }
+
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin: 10px 0;
+      border: 1px solid #ffcdd2;
+    }
+  </style>
+</head>
+<body>
+  <div class="chatbot-container">
+    <div class="chatbot-header">
+      <h2>AI Chat Assistant</h2>
+      <p>Ask me anything about bail bonds and the release process</p>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="welcome-message">
+        👋 Hi! I'm your AI assistant for Barbie's Bail Bonds.<br>
+        Ask me anything about bail bonds, costs, processes, or requirements!
+      </div>
+    </div>
+
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="message-avatar">🤖</div>
+      <span>Assistant is typing</span>
+      <div class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <div class="chat-input-container">
+      <div class="chat-input-box">
+        <textarea 
+          id="chatInput" 
+          class="chat-input" 
+          placeholder="Ask a question about bail bonds..."
+          rows="1"
+        ></textarea>
+        <button id="sendButton" class="send-button">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Chat functionality
+    (function() {
+      const chatMessages = document.getElementById('chatMessages');
+      const chatInput = document.getElementById('chatInput');
+      const sendButton = document.getElementById('sendButton');
+      const typingIndicator = document.getElementById('typingIndicator');
+
+      // Google Apps Script endpoint
+      const API_URL = 'https://script.google.com/macros/s/AKfycbwIhKuXcceReUGCg7V5xcOi68MGzh1pBAcCpmvK8stOkmyzp5by-4LBWIhkYFh3hz3j/exec';
+
+      // Auto-resize textarea
+      chatInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+      });
+
+      // Send message on Enter (but allow Shift+Enter for new lines)
+      chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      // Send button click
+      sendButton.addEventListener('click', sendMessage);
+
+      function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message || sendButton.disabled) return;
+
+        // Add user message to chat
+        addMessage('user', message);
+        
+        // Clear input and disable send button
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+        sendButton.disabled = true;
+        
+        // Show typing indicator
+        showTyping();
+
+        // Send to AI
+        sendToAI(message);
+      }
+
+      function addMessage(sender, content) {
+        // Remove welcome message if it exists
+        const welcomeMessage = chatMessages.querySelector('.welcome-message');
+        if (welcomeMessage) {
+          welcomeMessage.remove();
+        }
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        avatar.textContent = sender === 'user' ? '👤' : '🤖';
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        
+        // Convert newlines to paragraphs
+        const paragraphs = content.split('\n').filter(p => p.trim());
+        if (paragraphs.length === 0) {
+          contentDiv.innerHTML = '<p>' + content + '</p>';
+        } else {
+          contentDiv.innerHTML = paragraphs.map(p => '<p>' + p.trim() + '</p>').join('');
+        }
+        
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(contentDiv);
+        
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+      }
+
+      function showTyping() {
+        typingIndicator.style.display = 'flex';
+        scrollToBottom();
+      }
+
+      function hideTyping() {
+        typingIndicator.style.display = 'none';
+        sendButton.disabled = false;
+      }
+
+      function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function sendToAI(query) {
+        const callbackName = 'chatCallback_' + Date.now();
+        const script = document.createElement('script');
+        script.src = `${API_URL}?action=chat&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
+
+        window[callbackName] = function(response) {
+          console.log('AI Chat response:', response);
+          hideTyping();
+          
+          if (response && response.answer) {
+            addMessage('assistant', response.answer);
+          } else if (response && response.error) {
+            addMessage('assistant', 'I apologize, but I encountered an error. Please try again or call us directly at 561-247-0018 for immediate assistance.');
+            console.error('Chat API error:', response.error);
+          } else {
+            addMessage('assistant', 'I apologize, but I couldn\'t generate a response. Please try again or call us at 561-247-0018 for help.');
+          }
+          
+          // Clean up
+          document.head.removeChild(script);
+          delete window[callbackName];
+        };
+
+        script.onerror = function() {
+          console.error('Chat request failed');
+          hideTyping();
+          addMessage('assistant', 'I apologize, but I\'m having trouble connecting right now. Please try again or call us directly at 561-247-0018 for immediate assistance.');
+          
+          // Clean up
+          document.head.removeChild(script);
+          delete window[callbackName];
+        };
+
+        // Add timeout
+        setTimeout(() => {
+          if (window[callbackName]) {
+            console.error('Chat request timeout');
+            hideTyping();
+            addMessage('assistant', 'I apologize for the delay. Please try again or call us at 561-247-0018 for immediate assistance.');
+            document.head.removeChild(script);
+            delete window[callbackName];
+          }
+        }, 15000); // 15 second timeout for chat
+
+        document.head.appendChild(script);
+      }
+
+      // Focus input on load
+      chatInput.focus();
+    })();
+  </script>
+</body>
+</html>
