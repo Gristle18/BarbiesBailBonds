@@ -162,7 +162,7 @@
 
     <div class="search-container">
       <div class="search-box">
-        <input type="text" class="search-input" id="faqSearch" placeholder="Search frequently asked questions..." autocomplete="off">
+        <input type="text" class="search-input" id="faqSearch" placeholder="Ask a question or search topics (powered by AI)..." autocomplete="off">
         <span class="search-icon">🔍</span>
       </div>
       <div class="search-results-info" id="searchInfo"></div>
@@ -331,7 +331,107 @@
         updateSearchInfo();
 
         function performSearch() {
-          const searchTerm = searchInput.value.toLowerCase().trim();
+          const searchTerm = searchInput.value.trim();
+          const items = document.querySelectorAll('.faq-item');
+          
+          // If empty search, show all items
+          if (searchTerm === '') {
+            items.forEach(item => {
+              item.classList.remove('hidden');
+              const question = item.querySelector('.faq-question span:last-child');
+              const answer = item.querySelector('.faq-answer p');
+              removeHighlights(question);
+              removeHighlights(answer);
+            });
+            noResults.style.display = 'none';
+            updateSearchInfo(items.length, '');
+            return;
+          }
+          
+          // Use RAG semantic search for non-empty queries
+          console.log('Performing semantic search for:', searchTerm);
+          performSemanticSearch(searchTerm);
+        }
+        
+        function performSemanticSearch(query) {
+          // Show loading state
+          const searchInfo = document.getElementById('searchInfo');
+          if (searchInfo) {
+            searchInfo.textContent = 'Searching...';
+          }
+          
+          const callbackName = 'searchCallback_' + Date.now();
+          const script = document.createElement('script');
+          script.src = `https://script.google.com/macros/s/AKfycbw9R2kuNUpv1_r3LD0CmsGAlA9K7UPcjYKyC3QE6vbh6miy0gIAhx8WZyEcDghoylxo/exec?action=search&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
+          
+          window[callbackName] = function(results) {
+            console.log('Semantic search results:', results);
+            displaySemanticResults(results, query);
+            // Clean up
+            document.head.removeChild(script);
+            delete window[callbackName];
+          };
+          
+          script.onerror = function() {
+            console.error('Semantic search failed, falling back to basic search');
+            // Clean up
+            document.head.removeChild(script);
+            delete window[callbackName];
+            // Fallback to basic text search
+            performBasicSearch(query);
+          };
+          
+          // Add timeout
+          setTimeout(() => {
+            if (window[callbackName]) {
+              console.error('Semantic search timeout, falling back to basic search');
+              document.head.removeChild(script);
+              delete window[callbackName];
+              performBasicSearch(query);
+            }
+          }, 10000);
+          
+          document.head.appendChild(script);
+        }
+        
+        function displaySemanticResults(results, query) {
+          const items = document.querySelectorAll('.faq-item');
+          const relevantIds = new Set();
+          
+          // Get IDs of semantically relevant FAQs
+          if (results && results.length > 0) {
+            results.forEach(result => {
+              relevantIds.add(result.id);
+            });
+          }
+          
+          let visibleCount = 0;
+          
+          // Show/hide items based on semantic relevance
+          items.forEach((item, index) => {
+            if (relevantIds.size === 0 || relevantIds.has(index)) {
+              item.classList.remove('hidden');
+              visibleCount++;
+              
+              // Highlight search terms
+              const question = item.querySelector('.faq-question span:last-child');
+              const answer = item.querySelector('.faq-answer p');
+              highlightText(question, query);
+              highlightText(answer, query);
+            } else {
+              item.classList.add('hidden');
+              item.classList.remove('open');
+              const answerDiv = item.querySelector('.faq-answer');
+              if (answerDiv) answerDiv.style.maxHeight = '0';
+            }
+          });
+          
+          noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+          updateSearchInfo(visibleCount, query, true, results ? results.length : 0);
+        }
+        
+        function performBasicSearch(query) {
+          const searchTerm = query.toLowerCase();
           const items = document.querySelectorAll('.faq-item');
           let visibleCount = 0;
           
@@ -341,17 +441,11 @@
             const questionText = question ? question.textContent.toLowerCase() : '';
             const answerText = answer ? answer.textContent.toLowerCase() : '';
             
-            if (searchTerm === '' || questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
+            if (questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
               item.classList.remove('hidden');
               visibleCount++;
-              
-              if (searchTerm !== '') {
-                highlightText(question, searchTerm);
-                highlightText(answer, searchTerm);
-              } else {
-                removeHighlights(question);
-                removeHighlights(answer);
-              }
+              highlightText(question, query);
+              highlightText(answer, query);
             } else {
               item.classList.add('hidden');
               item.classList.remove('open');
@@ -360,8 +454,8 @@
             }
           });
           
-          noResults.style.display = visibleCount === 0 && searchTerm !== '' ? 'block' : 'none';
-          updateSearchInfo(visibleCount, searchTerm);
+          noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+          updateSearchInfo(visibleCount, query, false);
         }
 
         function highlightText(element, searchTerm) {
@@ -392,7 +486,7 @@
           }
         }
 
-        function updateSearchInfo(visibleCount = null, searchTerm = '') {
+        function updateSearchInfo(visibleCount = null, searchTerm = '', isSemanticSearch = false, semanticResults = 0) {
           if (!searchInfo) return;
           const totalCount = faqData.length;
           
@@ -401,9 +495,16 @@
           } else if (visibleCount === 0) {
             searchInfo.textContent = 'No questions found';
           } else if (visibleCount === 1) {
-            searchInfo.textContent = '1 question found';
+            const prefix = isSemanticSearch ? 'Smart search found ' : '';
+            searchInfo.textContent = prefix + '1 question';
           } else {
-            searchInfo.textContent = visibleCount + ' questions found';
+            const prefix = isSemanticSearch ? 'Smart search found ' : '';
+            searchInfo.textContent = prefix + visibleCount + ' questions';
+          }
+          
+          // Add semantic search indicator
+          if (isSemanticSearch && visibleCount > 0) {
+            searchInfo.textContent += ' (ranked by relevance)';
           }
         }
       });
