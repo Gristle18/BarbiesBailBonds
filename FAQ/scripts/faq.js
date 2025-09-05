@@ -16,6 +16,7 @@
 
       btn.addEventListener('click', () => {
         const expanded = btn.getAttribute('aria-expanded') === 'true';
+        
         // close all others (optional: behave like accordion)
         items.forEach(other => {
           const oBtn = other.querySelector('.faq-question');
@@ -24,14 +25,18 @@
           oBtn.setAttribute('aria-expanded', 'false');
           oPanel.setAttribute('aria-hidden', 'true');
           other.classList.remove('open');
-          oPanel.style.maxHeight = null;
+          oPanel.style.maxHeight = '0px';
         });
 
         if (!expanded) {
           btn.setAttribute('aria-expanded', 'true');
           panel.setAttribute('aria-hidden', 'false');
           item.classList.add('open');
-          panel.style.maxHeight = panel.scrollHeight + 'px';
+          // Force a reflow to ensure maxHeight is calculated correctly
+          panel.style.maxHeight = '0px';
+          setTimeout(() => {
+            panel.style.maxHeight = panel.scrollHeight + 'px';
+          }, 10);
         }
       });
     });

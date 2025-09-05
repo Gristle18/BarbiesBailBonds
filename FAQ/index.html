@@ -67,6 +67,11 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .faq-question:hover {
+      background: #f0f0f0;
     }
     .faq-question .chevron { transition: transform .2s ease; }
     .faq-item.open .chevron { transform: rotate(90deg); }
@@ -77,7 +82,7 @@
       color: var(--dark);
       overflow: hidden;
       max-height: 0; /* animated expansion */
-      transition: max-height .2s ease;
+      transition: max-height 0.3s ease-in-out;
     }
     .faq-answer .answer-inner { padding: 14px 0 18px; }
     .faq-answer p { margin-bottom: 10px; }
@@ -92,9 +97,6 @@
       <div class="subtitle">Quick answers to common questions about bonds and the release process.</div>
     </div>
 
-    <div class="help-banner">
-      Need help now? Call <span class="phone"><a href="tel:+15612470018"><span style="white-space: nowrap;">561-247-0018</span></a></span>
-    </div>
 
     <div class="faq" role="list">
       <div class="faq-item" role="listitem">
