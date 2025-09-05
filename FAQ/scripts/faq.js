@@ -1,8 +1,19 @@
 // FAQ Accordion and Search functionality with dynamic generation
 (function () {
   
-  // FAQ Data - All questions and answers
-  const faqData = [
+  // FAQ Data will be fetched from Google Apps Script
+  let faqData = [];
+
+  // Fetch FAQ data from Google Apps Script
+  async function fetchFaqData() {
+    try {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbxin16SHRhmORyggWCbFRloKZfnbsWL1Td7IKbAB9i1aejHHuNcmqldVEJTBfXCuXCc/exec?format=json');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching FAQ data:', error);
+      // Fallback to local data if fetch fails
+      return [
     { q: "How do bail bonds work?", a: "Bail bonds allow defendants to be released from custody pending trial, ensuring they appear in court when required." },
     { q: "What is the process for obtaining a bail bond?", a: "You contact a bail bondsman, pay a fee (typically 10% of the bond amount), and provide necessary information." },
     { q: "What information do I need to provide to a bail bondsman?", a: "You'll need the defendant's full name, booking number, and the location of the jail." },
@@ -130,8 +141,10 @@
     { q: "Can you come to me instead of me going to your office?", a: "Yes, we can meet at your home, workplace, or the jail." },
     { q: "Do you have a physical office near the Palm Beach County Jail?", a: "Yes, we are located close to the Main Detention Center." },
     { q: "Do you charge the same as other bail bond companies?", a: "We charge the standard state-regulated rate." },
-    { q: "What should I do right now if I need to bail someone out?", a: "Call us immediately — we'll verify the arrest, explain your options, and start the process." }
-  ];
+        { q: "What should I do right now if I need to bail someone out?", a: "Call us immediately — we'll verify the arrest, explain your options, and start the process." }
+      ];
+    }
+  }
 
   // Function to create a single FAQ item
   function createFaqItem(question, answer, index) {
@@ -150,11 +163,14 @@
     `;
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     const container = document.getElementById('faqContainer');
     const searchInput = document.getElementById('faqSearch');
     const searchInfo = document.getElementById('searchInfo');
     const noResults = document.getElementById('noResults');
+
+    // Fetch FAQ data
+    faqData = await fetchFaqData();
     
     // Generate all FAQ items
     if (container) {
