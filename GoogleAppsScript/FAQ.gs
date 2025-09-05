@@ -380,9 +380,17 @@ function getFaqHtml() {
         element.setAttribute('data-original', originalText);
       }
       
-      const regex = new RegExp('(' + searchTerm.replace(/[.*+?^${}()|[\]\\\\]/g, '\\\\$&') + ')', 'gi');
-      const highlightedText = originalText.replace(regex, '<span class="highlight">$1</span>');
-      element.innerHTML = highlightedText;
+      // Simple case-insensitive replacement without regex
+      var lowerOriginal = originalText.toLowerCase();
+      var lowerSearch = searchTerm.toLowerCase();
+      var startIndex = lowerOriginal.indexOf(lowerSearch);
+      
+      if (startIndex !== -1) {
+        var beforeMatch = originalText.substring(0, startIndex);
+        var match = originalText.substring(startIndex, startIndex + searchTerm.length);
+        var afterMatch = originalText.substring(startIndex + searchTerm.length);
+        element.innerHTML = beforeMatch + '<span class="highlight">' + match + '</span>' + afterMatch;
+      }
     }
 
     function removeHighlights(element) {
