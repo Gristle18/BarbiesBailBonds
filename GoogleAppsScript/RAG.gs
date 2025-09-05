@@ -44,11 +44,26 @@ function generateFaqEmbeddings() {
     }
   }
   
-  // Store embeddings in PropertiesService
+  // Store embeddings in chunks due to PropertiesService size limits
   const properties = PropertiesService.getScriptProperties();
-  properties.setProperty('faq_embeddings', JSON.stringify(embeddings));
+  const chunkSize = 10; // Store 10 embeddings per chunk
+  const chunks = [];
   
-  console.log('Successfully generated and stored', embeddings.length, 'embeddings');
+  for (let i = 0; i < embeddings.length; i += chunkSize) {
+    const chunk = embeddings.slice(i, i + chunkSize);
+    const chunkIndex = Math.floor(i / chunkSize);
+    properties.setProperty(`faq_embeddings_${chunkIndex}`, JSON.stringify(chunk));
+    chunks.push(chunkIndex);
+  }
+  
+  // Store metadata about chunks
+  properties.setProperty('faq_embeddings_meta', JSON.stringify({
+    totalEmbeddings: embeddings.length,
+    chunkCount: chunks.length,
+    chunkSize: chunkSize
+  }));
+  
+  console.log('Successfully generated and stored', embeddings.length, 'embeddings in', chunks.length, 'chunks');
   return embeddings;
 }
 
@@ -111,15 +126,25 @@ function semanticSearch(query, topK = 5) {
   // Generate embedding for the query
   const queryEmbedding = generateEmbedding(query);
   
-  // Get stored FAQ embeddings
+  // Get stored FAQ embeddings from chunks
   const properties = PropertiesService.getScriptProperties();
-  const storedEmbeddings = properties.getProperty('faq_embeddings');
+  const meta = properties.getProperty('faq_embeddings_meta');
   
-  if (!storedEmbeddings) {
+  if (!meta) {
     throw new Error('FAQ embeddings not found. Run generateFaqEmbeddings() first.');
   }
   
-  const faqEmbeddings = JSON.parse(storedEmbeddings);
+  const metadata = JSON.parse(meta);
+  const faqEmbeddings = [];
+  
+  // Load all chunks
+  for (let i = 0; i < metadata.chunkCount; i++) {
+    const chunkData = properties.getProperty(`faq_embeddings_${i}`);
+    if (chunkData) {
+      const chunk = JSON.parse(chunkData);
+      faqEmbeddings.push(...chunk);
+    }
+  }
   
   // Calculate similarities
   const similarities = faqEmbeddings.map(item => ({
