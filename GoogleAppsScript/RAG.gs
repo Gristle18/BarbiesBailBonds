@@ -224,18 +224,23 @@ function generateRAGResponse(query) {
   ).join('\n\n');
   
   // Generate response using Gemini
-  const prompt = `You are a helpful bail bonds assistant for Barbie's Bail Bonds in Palm Beach County, Florida. 
+  const prompt = `You are an AI chatbot assistant for Barbie's Bail Bonds in Palm Beach County, Florida. 
 
-Based on the following FAQ information, please provide a helpful and accurate answer to the user's question. If the exact answer isn't in the FAQs, use the information to provide the best possible guidance.
+BE CONVERSATIONAL AND NATURAL. Only reference the FAQ context below if it's directly relevant to answering the user's question. Don't dump information they didn't ask for.
 
-CONTEXT (Relevant FAQs):
+Important guidelines:
+- If asked if you're an AI, be honest and say yes
+- For simple greetings or casual questions, respond naturally without forcing bail bonds information
+- Only mention the phone number (561-247-0018) if they're asking for contact info or have an urgent need
+- Keep responses concise and conversational
+- Don't regurgitate FAQ content unless specifically relevant
+
+AVAILABLE CONTEXT (use only if relevant):
 ${context}
 
-USER QUESTION: ${query}
+USER: ${query}
 
-Please provide a helpful, professional response. Include specific details from the FAQs when relevant. If you recommend contacting the company, mention they're available 24/7 at 561-247-0018.
-
-RESPONSE:`;
+Respond naturally and conversationally:`;
 
   const response = generateGeminiResponse(prompt);
   
@@ -261,7 +266,7 @@ function generateGeminiResponse(prompt) {
       parts: [{ text: prompt }]
     }],
     generationConfig: {
-      temperature: 0.7,
+      temperature: 0.8,
       topK: 40,
       topP: 0.95,
       maxOutputTokens: 1024
