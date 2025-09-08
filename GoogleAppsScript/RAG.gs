@@ -216,42 +216,58 @@ function semanticSearch(query, topK = 5) {
  */
 function generateRAGResponse(query) {
   // Get relevant FAQ items
-  const relevantItems = semanticSearch(query, 3);
+  const relevantItems = semanticSearch(query, 5); // Get top 5 candidates
   
-  // Create context from relevant FAQs
-  const context = relevantItems.map(item => 
-    `Q: ${item.question}\nA: ${item.answer}`
-  ).join('\n\n');
+  // Filter by relevance threshold (0.7 = 70% similarity)
+  const RELEVANCE_THRESHOLD = 0.7;
+  const highlyRelevantItems = relevantItems.filter(item => item.similarity >= RELEVANCE_THRESHOLD);
   
-  // Generate response using Gemini
-  const prompt = `You are an AI chatbot assistant for Barbie's Bail Bonds in Palm Beach County, Florida. 
+  // Check if we have relevant context
+  const hasRelevantContext = highlyRelevantItems.length > 0;
+  
+  // Create context only from highly relevant FAQs
+  const context = hasRelevantContext ? 
+    highlyRelevantItems.map(item => 
+      `Q: ${item.question}\nA: ${item.answer}`
+    ).join('\n\n') : '';
+  
+  // Use different prompts based on relevance
+  const prompt = hasRelevantContext ? 
+    `You are an AI chatbot assistant for Barbie's Bail Bonds in Palm Beach County, Florida.
 
-BE CONVERSATIONAL AND NATURAL. Only reference the FAQ context below if it's directly relevant to answering the user's question. Don't dump information they didn't ask for.
+The user has asked something relevant to our services. Use the FAQ information below to provide helpful, accurate information while maintaining a conversational tone.
 
-Important guidelines:
-- If asked if you're an AI, be honest and say yes
-- For simple greetings or casual questions, respond naturally without forcing bail bonds information
-- Only mention the phone number (561-247-0018) if they're asking for contact info or have an urgent need
-- Keep responses concise and conversational
-- Don't regurgitate FAQ content unless specifically relevant
-
-AVAILABLE CONTEXT (use only if relevant):
+RELEVANT INFORMATION:
 ${context}
 
 USER: ${query}
 
-Respond naturally and conversationally:`;
+Provide a helpful, conversational response using the information above. If they're dealing with an arrest situation, mention our 24/7 phone number: 561-247-0018.` 
+    :
+    `You are an AI chatbot assistant for Barbie's Bail Bonds in Palm Beach County, Florida.
 
+Be conversational and natural. This appears to be a general query or greeting.
+
+Guidelines:
+- If asked if you're an AI, be honest and say yes
+- For simple greetings, respond naturally and friendly
+- Keep responses brief unless they ask for details
+- Don't force bail bonds information into unrelated conversations
+
+USER: ${query}
+
+Respond naturally:`;
+  
   const response = generateGeminiResponse(prompt);
   
   return {
     answer: response,
-    relevantFaqs: relevantItems.map(item => ({
+    relevantFaqs: highlyRelevantItems.map(item => ({
       question: item.question,
       answer: item.answer,
       similarity: item.similarity
     })),
-    sources: relevantItems.length
+    sources: highlyRelevantItems.length
   };
 }
 
