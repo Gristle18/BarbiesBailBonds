@@ -214,7 +214,7 @@ function semanticSearch(query, topK = 5) {
 /**
  * Generate intelligent response using RAG
  */
-function generateRAGResponse(query) {
+function generateRAGResponse(query, conversationHistory = []) {
   // Get relevant FAQ items
   const relevantItems = semanticSearch(query, 5); // Get top 5 candidates
   
@@ -231,28 +231,38 @@ function generateRAGResponse(query) {
       `Q: ${item.question}\nA: ${item.answer}`
     ).join('\n\n') : '';
   
+  // Build conversation context
+  let conversationContext = '';
+  if (conversationHistory.length > 0) {
+    conversationContext = '\n\nPREVIOUS CONVERSATION:\n' + 
+      conversationHistory.map(h => `User: ${h.user}\nAssistant: ${h.assistant}`).join('\n');
+  }
+  
   // Use different prompts based on relevance
   const prompt = hasRelevantContext ? 
     `You are an AI chatbot assistant for Barbie's Bail Bonds in Palm Beach County, Florida.
 
 The user has asked something relevant to our services. Use the FAQ information below to provide helpful, accurate information while maintaining a conversational tone.
+${conversationContext}
 
 RELEVANT INFORMATION:
 ${context}
 
 USER: ${query}
 
-Provide a helpful, conversational response using the information above. If they're dealing with an arrest situation, mention our 24/7 phone number: 561-247-0018.` 
+Provide a helpful, conversational response using the information above. Remember the context of the conversation. If they're dealing with an arrest situation, mention our 24/7 phone number: 561-247-0018.` 
     :
     `You are an AI chatbot assistant for Barbie's Bail Bonds in Palm Beach County, Florida.
 
 Be conversational and natural. This appears to be a general query or greeting.
+${conversationContext}
 
 Guidelines:
 - If asked if you're an AI, be honest and say yes
 - For simple greetings, respond naturally and friendly
 - Keep responses brief unless they ask for details
 - Don't force bail bonds information into unrelated conversations
+- Remember the context of previous messages
 
 USER: ${query}
 

@@ -48,7 +48,8 @@ function doGet(e) {
   // RAG Chat endpoint
   if (action === 'chat' && query) {
     try {
-      const response = generateRAGResponse(query);
+      const history = e.parameter.history ? JSON.parse(e.parameter.history) : [];
+      const response = generateRAGResponse(query, history);
       
       if (format === 'jsonp' && callback) {
         const jsonpResponse = callback + '(' + JSON.stringify(response) + ');';

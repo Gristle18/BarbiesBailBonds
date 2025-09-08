@@ -1055,6 +1055,8 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbwPQaTilrv9FKzcGmUUOMiiDronNvMqrPrvqbjQtFmceaX7LzbHIz99oktIJ7cB-myF/exec';
   
   let isOpen = false;
+  let conversationHistory = [];
+  const MAX_HISTORY = 10; // Keep last 10 exchanges
 
   // Toggle chat interface
   function toggleChat() {
@@ -1098,18 +1100,33 @@
     // Send to AI backend
     const callbackName = 'chatCallback_' + Date.now();
     const script = document.createElement('script');
-    script.src = `${API_URL}?action=chat&query=${encodeURIComponent(message)}&format=jsonp&callback=${callbackName}`;
+    script.src = `${API_URL}?action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
 
     window[callbackName] = function(response) {
       hideTyping();
       
+      let assistantResponse = '';
       if (response && response.answer) {
-        addMessage('assistant', response.answer);
+        assistantResponse = response.answer;
+        addMessage('assistant', assistantResponse);
       } else if (response && response.error) {
-        addMessage('assistant', 'I apologize, but I encountered an error. Please try again or call us at 561-247-0018 for immediate assistance.');
+        assistantResponse = 'I apologize, but I encountered an error. Please try again or call us at 561-247-0018 for immediate assistance.';
+        addMessage('assistant', assistantResponse);
         console.error('Chat API error:', response.error);
       } else {
-        addMessage('assistant', 'I apologize, but I couldn\'t generate a response. Please try again or call us at 561-247-0018 for help.');
+        assistantResponse = 'I apologize, but I couldn\'t generate a response. Please try again or call us at 561-247-0018 for help.';
+        addMessage('assistant', assistantResponse);
+      }
+      
+      // Store conversation in history
+      conversationHistory.push({
+        user: message,
+        assistant: assistantResponse
+      });
+      
+      // Keep only last MAX_HISTORY exchanges
+      if (conversationHistory.length > MAX_HISTORY) {
+        conversationHistory = conversationHistory.slice(-MAX_HISTORY);
       }
       
       // Clean up
@@ -1119,7 +1136,19 @@
 
     script.onerror = function() {
       hideTyping();
-      addMessage('assistant', 'I\'m having trouble connecting right now. Please try again or call us directly at 561-247-0018 for assistance.');
+      const errorResponse = 'I\'m having trouble connecting right now. Please try again or call us directly at 561-247-0018 for assistance.';
+      addMessage('assistant', errorResponse);
+      
+      // Store error in conversation history too
+      conversationHistory.push({
+        user: message,
+        assistant: errorResponse
+      });
+      
+      if (conversationHistory.length > MAX_HISTORY) {
+        conversationHistory = conversationHistory.slice(-MAX_HISTORY);
+      }
+      
       document.head.removeChild(script);
       delete window[callbackName];
     };
@@ -1128,7 +1157,19 @@
     setTimeout(() => {
       if (window[callbackName]) {
         hideTyping();
-        addMessage('assistant', 'Request timed out. Please call us at 561-247-0018 for immediate assistance.');
+        const timeoutResponse = 'Request timed out. Please call us at 561-247-0018 for immediate assistance.';
+        addMessage('assistant', timeoutResponse);
+        
+        // Store timeout in conversation history too
+        conversationHistory.push({
+          user: message,
+          assistant: timeoutResponse
+        });
+        
+        if (conversationHistory.length > MAX_HISTORY) {
+          conversationHistory = conversationHistory.slice(-MAX_HISTORY);
+        }
+        
         document.head.removeChild(script);
         delete window[callbackName];
       }
