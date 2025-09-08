@@ -260,20 +260,19 @@ Instructions:
 Respond concisely and naturally:` 
     :
     `You are an AI chatbot assistant for Barbie's Bail Bonds in Palm Beach County, Florida.
-
-Be conversational and natural. This appears to be a general query or greeting.
 ${conversationContext}
 
+CURRENT USER MESSAGE: ${query}
+
+IMPORTANT: This may be a follow-up to the previous conversation. Look at the conversation history above and respond in context. If the user is asking about something mentioned earlier (like their son's arrest, bail costs, etc.), answer based on that context.
+
 Guidelines:
-- If asked if you're an AI, be honest and say yes
-- For simple greetings, respond naturally and friendly
-- Keep responses brief unless they ask for details
-- Don't force bail bonds information into unrelated conversations
-- Remember the context of previous messages
+- Always check if this relates to the previous conversation
+- If it's a follow-up question, answer in context
+- Keep responses brief and natural
+- If truly unrelated to previous messages, respond as a new topic
 
-USER: ${query}
-
-Respond naturally:`;
+Respond naturally based on the full conversation context:`;
   
   const response = generateGeminiResponse(prompt);
   
