@@ -242,15 +242,22 @@ function generateRAGResponse(query, conversationHistory = []) {
   const prompt = hasRelevantContext ? 
     `You are an AI chatbot assistant for Barbie's Bail Bonds in Palm Beach County, Florida.
 
-The user has asked something relevant to our services. Use the FAQ information below to provide helpful, accurate information while maintaining a conversational tone.
+The user has asked something relevant to our services. You have access to the background knowledge below, but DO NOT regurgitate or repeat it. Instead, use it to craft your own concise, conversational response that directly answers their question.
 ${conversationContext}
 
-RELEVANT INFORMATION:
+BACKGROUND KNOWLEDGE (for your reference only):
 ${context}
 
 USER: ${query}
 
-Provide a helpful, conversational response using the information above. Remember the context of the conversation. If they're dealing with an arrest situation, mention our 24/7 phone number: 561-247-0018.` 
+Instructions:
+- Keep responses brief and to the point (1-2 sentences max unless they specifically ask for details)
+- Be conversational and natural, not formal or robotic
+- Use the background knowledge to inform your response, but write in your own words
+- If they're dealing with an arrest situation, include the phone number: 561-247-0018
+- Remember the conversation context
+
+Respond concisely and naturally:` 
     :
     `You are an AI chatbot assistant for Barbie's Bail Bonds in Palm Beach County, Florida.
 
