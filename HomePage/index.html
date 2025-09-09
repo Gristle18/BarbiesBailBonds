@@ -1178,6 +1178,7 @@
   // Cursor/touch position tracking
   let lastCursorY = null;
   let cursorTrackingActive = false;
+  let pageScrollY = 0; // Track page scroll position
   
   function initializeCursorTracking() {
     console.log('Initializing cursor position tracking...');
@@ -1186,7 +1187,9 @@
     document.addEventListener('mousemove', (e) => {
       if (shouldIgnore(e.target)) return;
       
+      // Store cursor position relative to viewport
       lastCursorY = e.clientY;
+      pageScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
       cursorTrackingActive = true;
       updateIconPosition();
     }, { passive: true });
@@ -1195,7 +1198,9 @@
     document.addEventListener('touchmove', (e) => {
       if (shouldIgnore(e.target) || !e.touches[0]) return;
       
+      // Store touch position relative to viewport  
       lastCursorY = e.touches[0].clientY;
+      pageScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
       cursorTrackingActive = true;
       updateIconPosition();
     }, { passive: true });
@@ -1236,10 +1241,19 @@
     const btnRect = chatButton.getBoundingClientRect();
     const btnH = Math.max(1, Math.round(btnRect.height || 60));
     
-    // Position icon at same Y as cursor, but clamped to reasonable bounds
+    // Calculate current scroll position
+    const currentScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+    
+    // Calculate scroll difference since cursor was last moved
+    const scrollDiff = currentScrollY - pageScrollY;
+    
+    // Adjust cursor position for scroll changes
+    const adjustedCursorY = lastCursorY - scrollDiff;
+    
+    // Position icon at adjusted cursor position, clamped to reasonable bounds
     const maxTop = Math.max(0, vh - btnH - 20);
     const minTop = Math.max(0, base - 100);
-    const targetY = Math.max(minTop, Math.min(lastCursorY - (btnH / 2), maxTop));
+    const targetY = Math.max(minTop, Math.min(adjustedCursorY - (btnH / 2), maxTop));
     
     if (launcher) {
       launcher.style.setProperty('top', targetY + 'px', 'important');
