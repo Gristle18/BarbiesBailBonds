@@ -1114,7 +1114,8 @@
   
   function calculateScrollOffset() {
     const multiplier = getScrollMultiplier();
-    return totalScrollDistance * multiplier;
+    const offset = totalScrollDistance * multiplier;
+    return Math.max(0, offset); // Never go above starting position (negative offset)
   }
 
   function shouldIgnore(target) {
