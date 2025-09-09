@@ -1069,8 +1069,10 @@
   // Step 2: Adjust vertical offset based on wheel (scroll down) while remembering base offsets
   const launcher = document.querySelector('.chat-container');
   
-  // Intersection Observer scroll position tracking system
+  // Smooth animated positioning system
   let currentScrollPixels = 0; // current scroll position in pixels
+  let targetScrollPixels = 0; // target scroll position for smooth animation
+  let animationId = null; // current animation frame ID
 
   function getBaseTop() {
     const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
@@ -1123,8 +1125,47 @@
   
   function calculateScrollOffset() {
     const multiplier = getScrollMultiplier();
-    // Direct pixel-based calculation with multiplier
+    // Use animated currentScrollPixels for smooth movement
     return currentScrollPixels * multiplier;
+  }
+  
+  // Smooth animation between scroll positions
+  function animateToTarget() {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+    }
+    
+    function animate() {
+      const distance = Math.abs(targetScrollPixels - currentScrollPixels);
+      
+      if (distance < 1) {
+        // Close enough, snap to target
+        currentScrollPixels = targetScrollPixels;
+        applyLauncherTop();
+        return;
+      }
+      
+      // Calculate speed based on distance (faster when far, slower when close)
+      const baseSpeed = 2; // minimum pixels per frame
+      const speedMultiplier = Math.min(distance / 100, 5); // up to 5x speed for large distances
+      const speed = baseSpeed + (speedMultiplier * 3);
+      
+      // Move towards target
+      if (currentScrollPixels < targetScrollPixels) {
+        currentScrollPixels = Math.min(currentScrollPixels + speed, targetScrollPixels);
+      } else {
+        currentScrollPixels = Math.max(currentScrollPixels - speed, targetScrollPixels);
+      }
+      
+      applyLauncherTop();
+      
+      // Continue animation if not at target
+      if (Math.abs(targetScrollPixels - currentScrollPixels) > 1) {
+        animationId = requestAnimationFrame(animate);
+      }
+    }
+    
+    animationId = requestAnimationFrame(animate);
   }
 
   function shouldIgnore(target) {
@@ -1182,26 +1223,48 @@
     const markers = createScrollMarkers();
     
     const observer = new IntersectionObserver((entries) => {
-      // Find all currently intersecting markers
-      const visibleMarkers = entries
-        .filter(entry => entry.isIntersecting)
-        .map(entry => ({
-          element: entry.target,
-          pixels: parseInt(entry.target.dataset.pixels),
-          ratio: entry.intersectionRatio
-        }));
+      // Get all currently visible markers
+      const allVisibleMarkers = [];
       
-      if (visibleMarkers.length > 0) {
-        // Use the highest pixel position marker that's visible
-        const maxPixels = Math.max(...visibleMarkers.map(m => m.pixels));
-        currentScrollPixels = maxPixels;
+      // Update the visibility status of markers
+      entries.forEach(entry => {
+        const pixels = parseInt(entry.target.dataset.pixels);
+        if (entry.isIntersecting) {
+          allVisibleMarkers.push(pixels);
+        }
+      });
+      
+      // Get all markers that are currently intersecting (from all entries, not just changed ones)
+      const allCurrentMarkers = Array.from(document.querySelectorAll('.scroll-marker'))
+        .filter(marker => {
+          const rect = marker.getBoundingClientRect();
+          return rect.top < window.innerHeight && rect.bottom > 0;
+        })
+        .map(marker => parseInt(marker.dataset.pixels))
+        .sort((a, b) => a - b); // Sort ascending (lowest to highest)
+      
+      if (allCurrentMarkers.length >= 3) {
+        // Use the third-lowest visible marker
+        const thirdLowestPixels = allCurrentMarkers[2];
         
-        console.log(`Scroll position: ${currentScrollPixels}px (visible: ${visibleMarkers.map(m => m.pixels).join(', ')}px)`);
-        applyLauncherTop();
+        // Only animate if target changed significantly
+        if (Math.abs(targetScrollPixels - thirdLowestPixels) > 25) {
+          targetScrollPixels = thirdLowestPixels;
+          console.log(`New target: ${targetScrollPixels}px (3rd of ${allCurrentMarkers.length} visible: [${allCurrentMarkers.slice(0, 5).join(', ')}...])`);
+          animateToTarget();
+        }
+      } else if (allCurrentMarkers.length > 0) {
+        // Fallback: use the highest visible marker if less than 3 markers
+        const fallbackPixels = Math.max(...allCurrentMarkers);
+        if (Math.abs(targetScrollPixels - fallbackPixels) > 25) {
+          targetScrollPixels = fallbackPixels;
+          console.log(`Fallback target: ${targetScrollPixels}px (only ${allCurrentMarkers.length} visible)`);
+          animateToTarget();
+        }
       }
     }, {
-      // Trigger when any part of the marker enters the viewport
-      threshold: [0, 0.5, 1.0],
+      // Trigger when markers enter/leave viewport
+      threshold: [0, 1.0],
       root: null,
       rootMargin: '0px'
     });
