@@ -32,6 +32,15 @@
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
+            /* Hide scrollbar but keep scrolling functionality */
+            overflow: -moz-scrollbars-none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+
+        /* Hide webkit scrollbar */
+        body::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
         }
 
         /* Remove focus outline and prevent text editing cursor */
