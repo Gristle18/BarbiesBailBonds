@@ -1178,7 +1178,7 @@
   // Cursor/touch position tracking
   let lastCursorY = null;
   let cursorTrackingActive = false;
-  let pageScrollY = 0; // Track page scroll position
+  let accumulatedScroll = 0; // Track accumulated scroll from wheel events
   
   function initializeCursorTracking() {
     console.log('Initializing cursor position tracking...');
@@ -1187,9 +1187,9 @@
     document.addEventListener('mousemove', (e) => {
       if (shouldIgnore(e.target)) return;
       
-      // Store cursor position relative to viewport
+      // Store cursor position and reset scroll accumulation
       lastCursorY = e.clientY;
-      pageScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+      accumulatedScroll = 0; // Reset since cursor moved
       cursorTrackingActive = true;
       updateIconPosition();
     }, { passive: true });
@@ -1198,29 +1198,21 @@
     document.addEventListener('touchmove', (e) => {
       if (shouldIgnore(e.target) || !e.touches[0]) return;
       
-      // Store touch position relative to viewport  
+      // Store touch position and reset scroll accumulation
       lastCursorY = e.touches[0].clientY;
-      pageScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+      accumulatedScroll = 0; // Reset since cursor moved
       cursorTrackingActive = true;
       updateIconPosition();
     }, { passive: true });
     
-    // Track scroll events to update position even when cursor doesn't move
+    // Track scroll events using wheel detection (same method as before)
     document.addEventListener('wheel', (e) => {
       if (shouldIgnore(e.target)) return;
       
-      // If we have a cursor position, keep updating icon position during scroll
+      // If we have a cursor position, accumulate scroll and update
       if (cursorTrackingActive && lastCursorY !== null) {
-        // Small delay to let scroll settle, then update position
-        setTimeout(() => {
-          updateIconPosition();
-        }, 16); // ~1 frame delay
-      }
-    }, { passive: true });
-    
-    // Also track scroll events (for when user scrolls via scrollbar)
-    document.addEventListener('scroll', () => {
-      if (cursorTrackingActive && lastCursorY !== null) {
+        const deltaY = normalizeWheelDeltaY(e);
+        accumulatedScroll += deltaY * 0.3; // Same multiplier as before
         updateIconPosition();
       }
     }, { passive: true });
@@ -1241,14 +1233,8 @@
     const btnRect = chatButton.getBoundingClientRect();
     const btnH = Math.max(1, Math.round(btnRect.height || 60));
     
-    // Calculate current scroll position
-    const currentScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
-    
-    // Calculate scroll difference since cursor was last moved
-    const scrollDiff = currentScrollY - pageScrollY;
-    
-    // Adjust cursor position for scroll changes
-    const adjustedCursorY = lastCursorY - scrollDiff;
+    // Adjust cursor position based on accumulated scroll (scroll down = cursor moves up relatively)
+    const adjustedCursorY = lastCursorY - accumulatedScroll;
     
     // Position icon at adjusted cursor position, clamped to reasonable bounds
     const maxTop = Math.max(0, vh - btnH - 20);
