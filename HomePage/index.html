@@ -1129,7 +1129,11 @@
     if (shouldIgnore(e.target)) return;
     const deltaY = normalizeWheelDeltaY(e);
     
+    // Skip if deltaY is too small (could be causing freezing)
+    if (Math.abs(deltaY) < 1) return;
+    
     const currentDirection = deltaY > 0 ? 1 : -1;
+    const previousScroll = totalDownwardScroll;
     
     if (deltaY > 0) {
       // Scrolling down - add to downward scroll
@@ -1145,7 +1149,10 @@
     const maxScrollDistance = 2000; // pixels
     totalDownwardScroll = Math.min(totalDownwardScroll, maxScrollDistance);
     
-    applyLauncherTop();
+    // Only apply if something actually changed
+    if (Math.abs(totalDownwardScroll - previousScroll) > 0.1) {
+      applyLauncherTop();
+    }
   }, { passive: true });
 
   window.addEventListener('resize', applyLauncherTop, { passive: true });
