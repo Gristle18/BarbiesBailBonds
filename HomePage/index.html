@@ -480,21 +480,32 @@
 
         /* Chatbot Widget Styles */
         .chat-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+            position: fixed !important;
+            top: 550px !important;
+            right: clamp(12px, 3vw, 28px) !important;
+            bottom: auto !important;
+            left: auto !important;
+            transform: none !important;
             z-index: 1000;
             font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
         }
 
+        /* Adjust launcher vertical offset for tablet and phone */
+        @media (max-width: 1024px) {
+            .chat-container { top: 525px !important; }
+        }
+        @media (max-width: 600px) {
+            .chat-container { top: 500px !important; }
+        }
+
         .chat-button {
-            width: 60px;
-            height: 60px;
+            width: clamp(60px, 9vw, 84px);
+            height: clamp(60px, 9vw, 84px);
             background: linear-gradient(135deg, #F28C00, #D67700);
             border: none;
             border-radius: 50%;
             color: white;
-            font-size: 24px;
+            font-size: clamp(22px, 4vw, 30px);
             cursor: pointer;
             display: flex;
             justify-content: center;
@@ -1051,6 +1062,84 @@
   const chatInput = document.getElementById('chatInput');
   const chatSend = document.getElementById('chatSend');
   const typingIndicator = document.getElementById('typingIndicator');
+
+  // (Step 1) Use CSS clamp() on right to adapt to viewport width.
+  // No JS-based positioning needed here.
+
+  // Step 2: Adjust vertical offset based on wheel (scroll down) while remembering base offsets
+  const launcher = document.querySelector('.chat-container');
+  let scrollOffset = 0; // accumulative additional padding from the top
+  // No smoothing: use fixed per-event step adjustments
+
+  function getBaseTop() {
+    const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    if (w <= 600) return 500;     // phone baseline
+    if (w <= 1024) return 525;    // tablet baseline
+    return 550;                   // desktop baseline
+  }
+
+  function applyLauncherTop() {
+    if (!launcher) return;
+    const base = getBaseTop();
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    const btnRect = chatButton.getBoundingClientRect();
+    const btnH = Math.max(1, Math.round(btnRect.height || 60));
+    const maxTop = Math.max(0, vh - btnH - 12); // keep inside viewport (bottom bound)
+    const minTop = 12; // allow moving above baseline but not off-screen (top bound)
+    const target = Math.max(minTop, Math.min(base + scrollOffset, maxTop));
+    launcher.style.setProperty('top', target + 'px', 'important');
+  }
+
+  function normalizeWheelDeltaY(e) {
+    const mode = e.deltaMode; // 0: pixel, 1: line, 2: page
+    let factor = 1;
+    if (mode === 1) factor = 16; // approx line height
+    else if (mode === 2) factor = Math.max(window.innerHeight || 0, 600);
+    return e.deltaY * factor; // positive = scrolling down
+  }
+
+  function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+
+  // Compute per-event step as a percentage of viewport height,
+  // chosen based on viewport width (phone/tablet/desktop breakpoints).
+  function getScrollStep() {
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    const pct = vw <= 600 ? 0.10   // phone: 10% of viewport height
+               : vw <= 1024 ? 0.08 // tablet: 8%
+               : 0.06;            // desktop: 6%
+    const px = Math.round(vh * pct);
+    return clamp(px, 32, 240); // keep steps reasonable
+  }
+
+  function shouldIgnore(target) {
+    if (!target) return false;
+    if (target.closest && target.closest('.chat-interface')) return true;
+    const tag = target.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON';
+  }
+
+  // Increase launcher top padding when scrolling down inside the embed
+  document.addEventListener('wheel', function(e) {
+    if (shouldIgnore(e.target)) return;
+    const deltaY = normalizeWheelDeltaY(e);
+    const STEP = getScrollStep(); // step based on viewport size/percentages
+    if (deltaY > 0) {
+      scrollOffset += STEP;
+      applyLauncherTop();
+    } else if (deltaY < 0) {
+      scrollOffset -= STEP; // allow moving above baseline; top will be clamped to minTop in apply
+      applyLauncherTop();
+    }
+  }, { passive: true });
+
+  window.addEventListener('resize', applyLauncherTop, { passive: true });
+  window.addEventListener('orientationchange', applyLauncherTop, { passive: true });
+  window.addEventListener('load', () => setTimeout(applyLauncherTop, 0));
+  applyLauncherTop();
+
+  // Detect if this page is running inside an embed (e.g., Google Sites)
+  
 
   const API_URL = 'https://script.google.com/macros/s/AKfycbwvJ8utZ62xKjZt2nz8wZnBJb5vbOsCD38RJnDZ0yFZGppsfWnmv7_YIuz5yV9lZz7z/exec';
   
