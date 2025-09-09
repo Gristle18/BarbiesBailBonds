@@ -1175,41 +1175,29 @@
     return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON';
   }
 
-  // Cursor/touch position tracking
+  // Cursor/touch position tracking with smooth animation
   let lastCursorY = null;
   let cursorTrackingActive = false;
+  let currentIconY = 0;
+  let targetIconY = 0;
+  let trackingInterval = null;
+  let animationId = null;
   
   function initializeCursorTracking() {
     console.log('Initializing cursor position tracking...');
     
-    // Mouse move tracking
+    // Mouse move tracking - just store position
     document.addEventListener('mousemove', (e) => {
       if (shouldIgnore(e.target)) return;
-      
-      // Store cursor position
       lastCursorY = e.clientY;
       cursorTrackingActive = true;
-      updateIconPosition();
     }, { passive: true });
     
-    // Touch tracking for mobile
+    // Touch tracking for mobile - just store position
     document.addEventListener('touchmove', (e) => {
       if (shouldIgnore(e.target) || !e.touches[0]) return;
-      
-      // Store touch position
       lastCursorY = e.touches[0].clientY;
       cursorTrackingActive = true;
-      updateIconPosition();
-    }, { passive: true });
-    
-    // When wheel event detected, just position icon at current cursor location
-    document.addEventListener('wheel', (e) => {
-      if (shouldIgnore(e.target)) return;
-      
-      // If we have a cursor position, just update icon to current cursor location
-      if (cursorTrackingActive && lastCursorY !== null) {
-        updateIconPosition();
-      }
     }, { passive: true });
     
     // Hide cursor tracking when mouse leaves
@@ -1217,33 +1205,93 @@
       cursorTrackingActive = false;
     }, { passive: true });
     
-    console.log('Cursor tracking initialized');
+    // Start interval to update icon position every 100ms
+    trackingInterval = setInterval(() => {
+      if (cursorTrackingActive && lastCursorY !== null) {
+        updateTargetPosition();
+      }
+    }, 100);
+    
+    console.log('Cursor tracking initialized with 100ms interval');
   }
   
-  function updateIconPosition() {
-    if (!cursorTrackingActive || lastCursorY === null) return;
-    
+  function updateTargetPosition() {
     const base = getBaseTop();
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
     const btnRect = chatButton.getBoundingClientRect();
     const btnH = Math.max(1, Math.round(btnRect.height || 60));
     
-    // Position icon at cursor position, clamped to reasonable bounds
+    // Calculate target position based on cursor
     const maxTop = Math.max(0, vh - btnH - 20);
     const minTop = Math.max(0, base - 100);
-    const targetY = Math.max(minTop, Math.min(lastCursorY - (btnH / 2), maxTop));
+    const newTarget = Math.max(minTop, Math.min(lastCursorY - (btnH / 2), maxTop));
     
+    // Only start animation if target changed significantly
+    if (Math.abs(newTarget - targetIconY) > 2) {
+      targetIconY = newTarget;
+      animateToTarget();
+    }
+  }
+  
+  function animateToTarget() {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+    }
+    
+    function animate() {
+      const distance = Math.abs(targetIconY - currentIconY);
+      
+      if (distance < 1) {
+        // Close enough, snap to target
+        currentIconY = targetIconY;
+        applyIconPosition();
+        return;
+      }
+      
+      // Smooth movement - move 20% of distance each frame
+      const speed = distance * 0.2;
+      if (currentIconY < targetIconY) {
+        currentIconY = Math.min(currentIconY + speed, targetIconY);
+      } else {
+        currentIconY = Math.max(currentIconY - speed, targetIconY);
+      }
+      
+      applyIconPosition();
+      
+      // Continue animation
+      if (Math.abs(targetIconY - currentIconY) > 1) {
+        animationId = requestAnimationFrame(animate);
+      }
+    }
+    
+    animationId = requestAnimationFrame(animate);
+  }
+  
+  function applyIconPosition() {
     if (launcher) {
-      launcher.style.setProperty('top', targetY + 'px', 'important');
+      launcher.style.setProperty('top', currentIconY + 'px', 'important');
     }
   }
 
   // Initialize the cursor tracking system
-  window.addEventListener('resize', applyLauncherTop, { passive: true });
-  window.addEventListener('orientationchange', applyLauncherTop, { passive: true });
+  window.addEventListener('resize', () => {
+    // Update current position on resize
+    currentIconY = getBaseTop();
+    applyIconPosition();
+  }, { passive: true });
+  
+  window.addEventListener('orientationchange', () => {
+    // Update current position on orientation change
+    currentIconY = getBaseTop();
+    applyIconPosition();
+  }, { passive: true });
+  
   window.addEventListener('load', () => {
     setTimeout(() => {
-      applyLauncherTop();
+      // Initialize current position
+      currentIconY = getBaseTop();
+      targetIconY = currentIconY;
+      applyIconPosition();
       initializeCursorTracking();
     }, 100);
   });
@@ -1252,14 +1300,20 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       console.log('DOM loaded, initializing cursor tracking...');
+      currentIconY = getBaseTop();
+      targetIconY = currentIconY;
+      applyIconPosition();
       initializeCursorTracking();
     });
   } else {
     console.log('DOM already ready, initializing cursor tracking...');
-    setTimeout(initializeCursorTracking, 100);
+    setTimeout(() => {
+      currentIconY = getBaseTop();
+      targetIconY = currentIconY;
+      applyIconPosition();
+      initializeCursorTracking();
+    }, 100);
   }
-  
-  applyLauncherTop();
 
   // Detect if this page is running inside an embed (e.g., Google Sites)
   
