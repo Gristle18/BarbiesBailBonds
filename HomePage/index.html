@@ -1106,27 +1106,27 @@
     return Math.abs(e.deltaY) < 50 && e.deltaMode === 0;
   }
 
-  // Compute per-event step as a percentage of viewport height,
-  // chosen based on viewport width (phone/tablet/desktop breakpoints) and input type.
+  // Compute per-event step based on viewport width percentage multiplied by base step size
+  // Narrower viewports (mobile) need larger steps since content is taller
   function getScrollStep(isTrackpad = false) {
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
     
-    let pct;
+    // Calculate viewport width as percentage of desktop baseline (1200px)
+    const vwPercent = Math.min(1.0, 1200 / Math.max(vw, 320)); // clamp between 320px-1200px
+    
+    let baseStep;
     if (isTrackpad) {
-      // Much smaller steps for trackpad (more sensitive)
-      pct = vw <= 600 ? 0.015   // phone: 1.5% of viewport height
-            : vw <= 1024 ? 0.012 // tablet: 1.2%
-            : 0.008;            // desktop: 0.8%
+      // Smaller base steps for trackpad
+      baseStep = 8; // base pixels per trackpad scroll
     } else {
-      // Larger steps for mouse wheel (original values)
-      pct = vw <= 600 ? 0.10   // phone: 10% of viewport height
-            : vw <= 1024 ? 0.08 // tablet: 8%
-            : 0.06;            // desktop: 6%
+      // Larger base steps for mouse wheel  
+      baseStep = 60; // base pixels per wheel click
     }
     
-    const px = Math.round(vh * pct);
-    return isTrackpad ? clamp(px, 4, 32) : clamp(px, 32, 240); // smaller clamp for trackpad
+    // Multiply base step by viewport width percentage
+    // Narrower screens get larger steps (more movement per scroll)
+    const px = Math.round(baseStep * vwPercent);
+    return isTrackpad ? clamp(px, 2, 24) : clamp(px, 20, 120);
   }
 
   function shouldIgnore(target) {
