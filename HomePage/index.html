@@ -1068,8 +1068,10 @@
 
   // Step 2: Adjust vertical offset based on wheel (scroll down) while remembering base offsets
   const launcher = document.querySelector('.chat-container');
-  let scrollOffset = 0; // accumulative additional padding from the top
-  // No smoothing: use fixed per-event step adjustments
+  
+  // Proportional scroll tracking system
+  let totalScrollDistance = 0; // cumulative scroll distance from page start
+  let lastScrollDirection = 0; // 1 = down, -1 = up, 0 = none
 
   function getBaseTop() {
     const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
@@ -1086,6 +1088,7 @@
     const btnH = Math.max(1, Math.round(btnRect.height || 60));
     const maxTop = Math.max(0, vh - btnH - 12); // keep inside viewport (bottom bound)
     const minTop = 12; // allow moving above baseline but not off-screen (top bound)
+    const scrollOffset = calculateScrollOffset();
     const target = Math.max(minTop, Math.min(base + scrollOffset, maxTop));
     launcher.style.setProperty('top', target + 'px', 'important');
   }
@@ -1100,33 +1103,18 @@
 
   function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
 
-  // Detect if input is from trackpad (small continuous deltas) vs mouse wheel (larger discrete deltas)
-  function isTrackpadScroll(e) {
-    // Trackpad typically sends smaller, more frequent deltaY values
-    return Math.abs(e.deltaY) < 50 && e.deltaMode === 0;
-  }
-
-  // Compute per-event step based on viewport width percentage multiplied by base step size
-  // Narrower viewports (mobile) need larger steps since content is taller
-  function getScrollStep(isTrackpad = false) {
+  // Calculate icon offset based on total scroll distance
+  function getScrollMultiplier() {
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-    
-    // Calculate viewport width as percentage of desktop baseline (1200px)
-    const vwPercent = Math.min(1.0, 1200 / Math.max(vw, 320)); // clamp between 320px-1200px
-    
-    let baseStep;
-    if (isTrackpad) {
-      // Smaller base steps for trackpad
-      baseStep = 8; // base pixels per trackpad scroll
-    } else {
-      // Larger base steps for mouse wheel  
-      baseStep = 60; // base pixels per wheel click
-    }
-    
-    // Multiply base step by viewport width percentage
-    // Narrower screens get larger steps (more movement per scroll)
-    const px = Math.round(baseStep * vwPercent);
-    return isTrackpad ? clamp(px, 2, 24) : clamp(px, 20, 120);
+    // Narrower viewports get higher multipliers since content is taller
+    if (vw <= 600) return 0.15;      // phone: 15% of scroll distance
+    if (vw <= 1024) return 0.12;     // tablet: 12% of scroll distance  
+    return 0.08;                     // desktop: 8% of scroll distance
+  }
+  
+  function calculateScrollOffset() {
+    const multiplier = getScrollMultiplier();
+    return totalScrollDistance * multiplier;
   }
 
   function shouldIgnore(target) {
@@ -1136,19 +1124,27 @@
     return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON';
   }
 
-  // Increase launcher top padding when scrolling down inside the embed
+  // Track total scroll distance for proportional icon movement
   document.addEventListener('wheel', function(e) {
     if (shouldIgnore(e.target)) return;
     const deltaY = normalizeWheelDeltaY(e);
-    const isTrackpad = isTrackpadScroll(e);
-    const STEP = getScrollStep(isTrackpad); // step based on viewport size/percentages and input type
-    if (deltaY > 0) {
-      scrollOffset += STEP;
-      applyLauncherTop();
-    } else if (deltaY < 0) {
-      scrollOffset -= STEP; // allow moving above baseline; top will be clamped to minTop in apply
-      applyLauncherTop();
+    
+    // Detect direction change and reset if needed to prevent drift
+    const currentDirection = deltaY > 0 ? 1 : -1;
+    if (lastScrollDirection !== 0 && currentDirection !== lastScrollDirection) {
+      // Direction changed - apply some dampening to prevent immediate reversal
+      totalScrollDistance *= 0.8;
     }
+    lastScrollDirection = currentDirection;
+    
+    // Add to total scroll distance (can go negative for upward scrolls)
+    totalScrollDistance += deltaY;
+    
+    // Apply reasonable bounds to prevent extreme icon positions
+    const maxScrollDistance = 2000; // pixels
+    totalScrollDistance = clamp(totalScrollDistance, -maxScrollDistance, maxScrollDistance);
+    
+    applyLauncherTop();
   }, { passive: true });
 
   window.addEventListener('resize', applyLauncherTop, { passive: true });
