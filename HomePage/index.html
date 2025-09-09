@@ -1069,103 +1069,11 @@
   // Step 2: Adjust vertical offset based on wheel (scroll down) while remembering base offsets
   const launcher = document.querySelector('.chat-container');
   
-  // Smooth animated positioning system
-  let currentScrollPixels = 0; // current scroll position in pixels
-  let targetScrollPixels = 0; // target scroll position for smooth animation
-  let animationId = null; // current animation frame ID
-
   function getBaseTop() {
     const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
     if (w <= 600) return 500;     // phone baseline
     if (w <= 1024) return 525;    // tablet baseline
     return 550;                   // desktop baseline
-  }
-
-  function applyLauncherTop() {
-    if (!launcher) return;
-    const base = getBaseTop();
-    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-    const btnRect = chatButton.getBoundingClientRect();
-    const btnH = Math.max(1, Math.round(btnRect.height || 60));
-    
-    // More generous bounds to prevent getting stuck
-    const maxTop = Math.max(0, vh - btnH - 20); // bottom bound with more margin
-    const minTop = Math.max(0, base - 100); // can go 100px above baseline
-    
-    const scrollOffset = calculateScrollOffset();
-    const unclamped = base + scrollOffset;
-    const target = Math.max(minTop, Math.min(unclamped, maxTop));
-    
-    // Debug: log when we're hitting bounds
-    if (unclamped !== target) {
-      console.log(`Chatbot clamped: unclamped=${unclamped}, target=${target}, bounds=[${minTop}, ${maxTop}]`);
-    }
-    
-    launcher.style.setProperty('top', target + 'px', 'important');
-  }
-
-  function normalizeWheelDeltaY(e) {
-    const mode = e.deltaMode; // 0: pixel, 1: line, 2: page
-    let factor = 1;
-    if (mode === 1) factor = 16; // approx line height
-    else if (mode === 2) factor = Math.max(window.innerHeight || 0, 600);
-    return e.deltaY * factor; // positive = scrolling down
-  }
-
-  function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
-
-  // Calculate icon offset based on total scroll distance
-  function getScrollMultiplier() {
-    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-    // Narrower viewports get higher multipliers since content is taller
-    if (vw <= 600) return 1.2;       // phone: 120% of scroll distance
-    if (vw <= 1024) return 1.0;      // tablet: 100% of scroll distance  
-    return 0.8;                      // desktop: 80% of scroll distance
-  }
-  
-  function calculateScrollOffset() {
-    const multiplier = getScrollMultiplier();
-    // Use animated currentScrollPixels for smooth movement
-    return currentScrollPixels * multiplier;
-  }
-  
-  // Smooth animation between scroll positions
-  function animateToTarget() {
-    if (animationId) {
-      cancelAnimationFrame(animationId);
-    }
-    
-    function animate() {
-      const distance = Math.abs(targetScrollPixels - currentScrollPixels);
-      
-      if (distance < 1) {
-        // Close enough, snap to target
-        currentScrollPixels = targetScrollPixels;
-        applyLauncherTop();
-        return;
-      }
-      
-      // Calculate speed based on distance (faster when far, slower when close)
-      const baseSpeed = 2; // minimum pixels per frame
-      const speedMultiplier = Math.min(distance / 100, 5); // up to 5x speed for large distances
-      const speed = baseSpeed + (speedMultiplier * 3);
-      
-      // Move towards target
-      if (currentScrollPixels < targetScrollPixels) {
-        currentScrollPixels = Math.min(currentScrollPixels + speed, targetScrollPixels);
-      } else {
-        currentScrollPixels = Math.max(currentScrollPixels - speed, targetScrollPixels);
-      }
-      
-      applyLauncherTop();
-      
-      // Continue animation if not at target
-      if (Math.abs(targetScrollPixels - currentScrollPixels) > 1) {
-        animationId = requestAnimationFrame(animate);
-      }
-    }
-    
-    animationId = requestAnimationFrame(animate);
   }
 
   function shouldIgnore(target) {
@@ -1216,6 +1124,11 @@
   }
   
   function updateTargetPosition() {
+    if (!chatButton || !launcher) {
+      console.log('Missing elements:', { chatButton: !!chatButton, launcher: !!launcher });
+      return;
+    }
+    
     const base = getBaseTop();
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
     const btnRect = chatButton.getBoundingClientRect();
@@ -1225,6 +1138,8 @@
     const maxTop = Math.max(0, vh - btnH - 20);
     const minTop = Math.max(0, base - 100);
     const newTarget = Math.max(minTop, Math.min(lastCursorY - (btnH / 2), maxTop));
+    
+    console.log(`Cursor: ${lastCursorY}, Target: ${newTarget}, Current: ${currentIconY}`);
     
     // Only start animation if target changed significantly
     if (Math.abs(newTarget - targetIconY) > 2) {
