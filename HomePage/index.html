@@ -1188,11 +1188,12 @@
     
     console.log(`Document height: ${documentHeight}px`);
     
-    // Create markers every 50px
+    // Create markers every 50px, but stop before the very bottom
     const markerSpacing = 50;
     const markerCount = Math.ceil(documentHeight / markerSpacing);
+    const maxMarkers = Math.max(0, markerCount - 1); // Don't create the bottom-most marker
     
-    for (let i = 0; i <= markerCount; i++) {
+    for (let i = 0; i <= maxMarkers; i++) {
       const pixelPosition = i * markerSpacing;
       const marker = document.createElement('div');
       marker.className = 'scroll-marker';
@@ -1210,7 +1211,7 @@
       document.body.appendChild(marker);
     }
     
-    console.log(`Created ${markerCount + 1} scroll markers (0px to ${markerCount * markerSpacing}px)`);
+    console.log(`Created ${maxMarkers + 1} scroll markers (0px to ${maxMarkers * markerSpacing}px, bottom excluded)`);
     return document.querySelectorAll('.scroll-marker');
   }
   
