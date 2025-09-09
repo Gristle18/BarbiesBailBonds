@@ -1107,9 +1107,9 @@
   function getScrollMultiplier() {
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
     // Narrower viewports get higher multipliers since content is taller
-    if (vw <= 600) return 0.15;      // phone: 15% of scroll distance
-    if (vw <= 1024) return 0.12;     // tablet: 12% of scroll distance  
-    return 0.08;                     // desktop: 8% of scroll distance
+    if (vw <= 600) return 0.35;      // phone: 35% of scroll distance
+    if (vw <= 1024) return 0.28;     // tablet: 28% of scroll distance  
+    return 0.20;                     // desktop: 20% of scroll distance
   }
   
   function calculateScrollOffset() {
