@@ -1175,95 +1175,30 @@
     return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON';
   }
 
-  // Create scroll markers dynamically in viewport increments
-  function createScrollMarkers() {
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-    console.log(`Viewport height: ${viewportHeight}px`);
-    
-    // Create markers every 10% of viewport height within the viewport
-    const markers = [];
-    for (let i = 0; i <= 10; i++) {
-      const vhPercent = i * 10; // 0%, 10%, 20%, ... 100%
-      const marker = document.createElement('div');
-      marker.className = 'scroll-marker';
-      marker.dataset.pixels = (vhPercent * viewportHeight / 100).toString(); // Convert to pixel equivalent
-      marker.style.cssText = `
-        position: fixed;
-        top: ${vhPercent}vh;
-        left: 0;
-        height: 1px;
-        width: 1px;
-        opacity: 0;
-        pointer-events: none;
-        z-index: -1;
-      `;
-      document.body.appendChild(marker);
-      markers.push(marker);
-    }
-    
-    console.log(`Created ${markers.length} viewport-based scroll markers (0vh to 100vh)`);
-    return markers;
-  }
-  
-  // Intersection Observer for scroll position tracking
+  // Simple wheel event tracking - no IntersectionObserver
   function initializeScrollTracking() {
-    // Remove any existing markers first
-    document.querySelectorAll('.scroll-marker').forEach(marker => marker.remove());
+    console.log('Initializing simple wheel event tracking...');
     
-    // Create new markers every 50px
-    const markers = createScrollMarkers();
-    
-    const observer = new IntersectionObserver((entries) => {
-      console.log(`IntersectionObserver triggered with ${entries.length} entries`);
+    // Simple wheel event listener
+    document.addEventListener('wheel', (e) => {
+      if (shouldIgnore(e.target)) return;
       
-      // Get all markers that are currently intersecting
-      const allCurrentMarkers = Array.from(document.querySelectorAll('.scroll-marker'))
-        .filter(marker => {
-          const rect = marker.getBoundingClientRect();
-          const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
-          return isVisible;
-        })
-        .map(marker => parseInt(marker.dataset.pixels))
-        .sort((a, b) => a - b); // Sort ascending (lowest to highest)
+      const deltaY = normalizeWheelDeltaY(e);
+      if (Math.abs(deltaY) < 1) return;
       
-      console.log(`Found ${allCurrentMarkers.length} visible markers: [${allCurrentMarkers.slice(0, 10).join(', ')}${allCurrentMarkers.length > 10 ? '...' : ''}]`);
+      // Calculate new target based on current + delta
+      const scrollStep = deltaY * 0.3; // Much smaller, more controlled steps
+      const newTarget = Math.max(0, currentScrollPixels + scrollStep);
       
-      if (allCurrentMarkers.length >= 3) {
-        // Use the third-lowest visible marker
-        const thirdLowestPixels = allCurrentMarkers[2];
-        
-        console.log(`Targeting 3rd lowest: ${thirdLowestPixels}px (current target: ${targetScrollPixels}px, diff: ${Math.abs(targetScrollPixels - thirdLowestPixels)}px)`);
-        
-        // Only animate if target changed significantly
-        if (Math.abs(targetScrollPixels - thirdLowestPixels) > 25) {
-          targetScrollPixels = thirdLowestPixels;
-          console.log(`🎯 NEW TARGET: ${targetScrollPixels}px (3rd of ${allCurrentMarkers.length} visible)`);
-          animateToTarget();
-        }
-      } else if (allCurrentMarkers.length > 0) {
-        // Fallback: use the highest visible marker if less than 3 markers
-        const fallbackPixels = Math.max(...allCurrentMarkers);
-        console.log(`Using fallback (highest): ${fallbackPixels}px (current target: ${targetScrollPixels}px)`);
-        
-        if (Math.abs(targetScrollPixels - fallbackPixels) > 25) {
-          targetScrollPixels = fallbackPixels;
-          console.log(`🎯 FALLBACK TARGET: ${targetScrollPixels}px (only ${allCurrentMarkers.length} visible)`);
-          animateToTarget();
-        }
-      } else {
-        console.log('❌ No visible markers found');
+      // Only animate if the change is significant enough
+      if (Math.abs(newTarget - targetScrollPixels) > 5) {
+        targetScrollPixels = newTarget;
+        console.log(`🎯 Wheel target: ${targetScrollPixels.toFixed(1)}px (delta: ${deltaY.toFixed(1)}, step: ${scrollStep.toFixed(1)})`);
+        animateToTarget();
       }
-    }, {
-      // Trigger when markers enter/leave viewport
-      threshold: [0, 1.0],
-      root: null,
-      rootMargin: '0px'
-    });
+    }, { passive: true });
     
-    // Observe all scroll markers
-    markers.forEach(marker => observer.observe(marker));
-    
-    console.log(`Initialized scroll tracking with ${markers.length} markers every 50px`);
+    console.log('Simple wheel tracking initialized');
   }
 
   // Initialize the scroll tracking system
