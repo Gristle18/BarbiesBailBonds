@@ -1224,44 +1224,44 @@
     const markers = createScrollMarkers();
     
     const observer = new IntersectionObserver((entries) => {
-      // Get all currently visible markers
-      const allVisibleMarkers = [];
+      console.log(`IntersectionObserver triggered with ${entries.length} entries`);
       
-      // Update the visibility status of markers
-      entries.forEach(entry => {
-        const pixels = parseInt(entry.target.dataset.pixels);
-        if (entry.isIntersecting) {
-          allVisibleMarkers.push(pixels);
-        }
-      });
-      
-      // Get all markers that are currently intersecting (from all entries, not just changed ones)
+      // Get all markers that are currently intersecting
       const allCurrentMarkers = Array.from(document.querySelectorAll('.scroll-marker'))
         .filter(marker => {
           const rect = marker.getBoundingClientRect();
-          return rect.top < window.innerHeight && rect.bottom > 0;
+          const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+          return isVisible;
         })
         .map(marker => parseInt(marker.dataset.pixels))
         .sort((a, b) => a - b); // Sort ascending (lowest to highest)
+      
+      console.log(`Found ${allCurrentMarkers.length} visible markers: [${allCurrentMarkers.slice(0, 10).join(', ')}${allCurrentMarkers.length > 10 ? '...' : ''}]`);
       
       if (allCurrentMarkers.length >= 3) {
         // Use the third-lowest visible marker
         const thirdLowestPixels = allCurrentMarkers[2];
         
+        console.log(`Targeting 3rd lowest: ${thirdLowestPixels}px (current target: ${targetScrollPixels}px, diff: ${Math.abs(targetScrollPixels - thirdLowestPixels)}px)`);
+        
         // Only animate if target changed significantly
         if (Math.abs(targetScrollPixels - thirdLowestPixels) > 25) {
           targetScrollPixels = thirdLowestPixels;
-          console.log(`New target: ${targetScrollPixels}px (3rd of ${allCurrentMarkers.length} visible: [${allCurrentMarkers.slice(0, 5).join(', ')}...])`);
+          console.log(`🎯 NEW TARGET: ${targetScrollPixels}px (3rd of ${allCurrentMarkers.length} visible)`);
           animateToTarget();
         }
       } else if (allCurrentMarkers.length > 0) {
         // Fallback: use the highest visible marker if less than 3 markers
         const fallbackPixels = Math.max(...allCurrentMarkers);
+        console.log(`Using fallback (highest): ${fallbackPixels}px (current target: ${targetScrollPixels}px)`);
+        
         if (Math.abs(targetScrollPixels - fallbackPixels) > 25) {
           targetScrollPixels = fallbackPixels;
-          console.log(`Fallback target: ${targetScrollPixels}px (only ${allCurrentMarkers.length} visible)`);
+          console.log(`🎯 FALLBACK TARGET: ${targetScrollPixels}px (only ${allCurrentMarkers.length} visible)`);
           animateToTarget();
         }
+      } else {
+        console.log('❌ No visible markers found');
       }
     }, {
       // Trigger when markers enter/leave viewport
@@ -1286,10 +1286,14 @@
     }, 100);
   });
   
-  // Initialize immediately if DOM is already ready
+  // Initialize immediately if DOM is already ready  
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeScrollTracking);
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, initializing scroll tracking...');
+      initializeScrollTracking();
+    });
   } else {
+    console.log('DOM already ready, initializing scroll tracking...');
     setTimeout(initializeScrollTracking, 100);
   }
   
