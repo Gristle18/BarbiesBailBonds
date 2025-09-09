@@ -35,6 +35,14 @@
             width: 0px;
             background: transparent;
         }
+        
+        /* Invisible spacer to double page height */
+        .invisible-spacer {
+            height: 200vh; /* Double the viewport height */
+            width: 100%;
+            visibility: hidden;
+            pointer-events: none;
+        }
 
         /* Remove focus outline and prevent text editing cursor */
         * {
@@ -1281,6 +1289,9 @@
   
 })();
 </script>
+
+<!-- Invisible spacer section to double page height -->
+<div class="invisible-spacer"></div>
 
 </body>
 </html>
