@@ -773,8 +773,12 @@
 </head>
 <body>
 
+<!-- Invisible scroll position markers -->
+<div class="scroll-marker" data-position="0" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
+
 <!-- Hero Video Banner Section -->
 <section id="bbb-hero" aria-label="Palm Beach video banner">
+    <div class="scroll-marker" data-position="10" style="position: absolute; top: 10%; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <div class="bg" aria-hidden="true">
         <video id="pbVideo" autoplay muted loop playsinline preload="auto"
             poster="https://via.placeholder.com/1600x900/111111/ffffff?text=Palm+Beach">
@@ -807,6 +811,7 @@
 
 <!-- Reviews Section -->
 <div class="bbb-reviews">
+    <div class="scroll-marker" data-position="50" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <h2 class="bbb-title">What Our Clients Say</h2>
     <div class="bbb-marquee" aria-label="Client reviews scrolling">
         <div class="bbb-track" id="bbb-track">
@@ -871,6 +876,7 @@
 
 <!-- Service Boxes Section -->
 <section class="services-section">
+    <div class="scroll-marker" data-position="30" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <div class="services-container">
         <div class="services-grid">
             
@@ -910,6 +916,7 @@
 
 <!-- How to Get to Us Section -->
 <section class="location-section">
+    <div class="scroll-marker" data-position="70" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <div class="location-container">
         <div class="location-content">
             <h2>How to Get to Us</h2>
@@ -938,6 +945,7 @@
 
 <!-- Footer Section -->
 <footer class="footer">
+    <div class="scroll-marker" data-position="90" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <div class="footer-container">
         <div class="footer-content">
             <p>Since 1993, Jerry & Barbie's Bail Bonds has been a trusted, family-owned agency committed to those in need of a bail bondsman in South Florida. We specialize in a wide range of Bail Bonds and in handling Warrants through our Walkthrough Bonds Service. Our service is 100% confidential and you will be dealing with experienced bail bonds agents the entire time.</p>
@@ -951,6 +959,7 @@
 
 <!-- Copyright Footer -->
 <footer class="copyright-footer">
+    <div class="scroll-marker" data-position="100" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <div class="copyright-content">
         <p>Copyright © 2024 Barbie's Bail Bonds | Bail Bond Services</p>
     </div>
@@ -1069,11 +1078,8 @@
   // Step 2: Adjust vertical offset based on wheel (scroll down) while remembering base offsets
   const launcher = document.querySelector('.chat-container');
   
-  // Enhanced scroll tracking system with better trackpad detection
-  let scrollPosition = 0; // current scroll position (can go negative)
-  let lastUpdate = Date.now();
-  let eventCount = 0;
-  let eventTimestamp = Date.now();
+  // Intersection Observer scroll position tracking system
+  let currentScrollPosition = 0; // 0-100 representing page position percentage
 
   function getBaseTop() {
     const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
@@ -1126,8 +1132,9 @@
   
   function calculateScrollOffset() {
     const multiplier = getScrollMultiplier();
-    const offset = scrollPosition * multiplier;
-    return Math.max(0, offset); // Never go above baseline
+    // Convert percentage (0-100) to pixel offset with multiplier
+    const pixelDistance = (currentScrollPosition / 100) * 800; // 800px max travel
+    return pixelDistance * multiplier;
   }
 
   function shouldIgnore(target) {
@@ -1137,80 +1144,64 @@
     return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON';
   }
 
-  // Enhanced trackpad detection using multiple methods
-  function detectTrackpad(e) {
-    // Method 1: Check delta ratio (works in many browsers)
-    if (e.wheelDeltaY && e.deltaY) {
-      if (Math.abs(e.wheelDeltaY + (e.deltaY * 3)) < 1) {
-        return true;
-      }
+  // Intersection Observer for scroll position tracking
+  function initializeScrollTracking() {
+    const markers = document.querySelectorAll('.scroll-marker');
+    
+    if (markers.length === 0) {
+      console.warn('No scroll markers found');
+      return;
     }
     
-    // Method 2: Event frequency detection
-    const now = Date.now();
-    if (now - eventTimestamp < 50) {
-      eventCount++;
-    } else {
-      eventCount = 1;
-      eventTimestamp = now;
-    }
-    
-    // More than 5 events in 50ms = likely trackpad
-    if (eventCount > 5) return true;
-    
-    // Method 3: Small delta values + deltaMode check
-    const isSmallDelta = Math.abs(e.deltaY) < 50;
-    const isPixelMode = e.deltaMode === 0;
-    
-    return isSmallDelta && isPixelMode;
-  }
-  
-  // Enhanced scroll tracking with velocity-based sensitivity
-  document.addEventListener('wheel', function(e) {
-    if (shouldIgnore(e.target)) return;
-    const deltaY = normalizeWheelDeltaY(e);
-    
-    // Skip tiny movements
-    if (Math.abs(deltaY) < 1) return;
-    
-    const now = Date.now();
-    const timeDiff = now - lastUpdate;
-    
-    // Don't throttle too aggressively - allow more updates for trackpad
-    if (timeDiff < 5) return; // max 200 updates per second
-    
-    const isTrackpad = detectTrackpad(e);
-    
-    // Calculate velocity-based multiplier
-    let velocityMultiplier = 1;
-    if (timeDiff > 0) {
-      const velocity = Math.abs(deltaY) / timeDiff; // pixels per ms
+    const observer = new IntersectionObserver((entries) => {
+      // Find all currently intersecting markers
+      const visibleMarkers = entries
+        .filter(entry => entry.isIntersecting)
+        .map(entry => ({
+          element: entry.target,
+          position: parseInt(entry.target.dataset.position),
+          ratio: entry.intersectionRatio
+        }));
       
-      if (isTrackpad) {
-        // For trackpad: increase multiplier for fast scrolling
-        velocityMultiplier = velocity > 1 ? Math.min(3, 1 + (velocity * 0.5)) : 1;
-      } else {
-        // For mouse wheel: standard behavior
-        velocityMultiplier = 1;
+      if (visibleMarkers.length > 0) {
+        // Use the highest position marker that's visible
+        const maxPosition = Math.max(...visibleMarkers.map(m => m.position));
+        currentScrollPosition = maxPosition;
+        
+        console.log(`Scroll position: ${currentScrollPosition}% (visible markers: ${visibleMarkers.map(m => m.position).join(', ')})`);
+        applyLauncherTop();
       }
-    }
+    }, {
+      // Trigger when any part of the marker enters the viewport
+      threshold: [0, 0.1, 1.0],
+      // Use the viewport as root (default)
+      root: null,
+      rootMargin: '0px'
+    });
     
-    lastUpdate = now;
+    // Observe all scroll markers
+    markers.forEach(marker => observer.observe(marker));
     
-    // Apply velocity-adjusted delta
-    const adjustedDelta = deltaY * velocityMultiplier;
-    scrollPosition += adjustedDelta;
-    
-    // Clamp to reasonable bounds
-    scrollPosition = clamp(scrollPosition, -500, 2000);
-    
-    console.log(`Scroll: ${isTrackpad ? 'trackpad' : 'mouse'}, deltaY=${deltaY}, velocity=${velocityMultiplier.toFixed(2)}, adjusted=${adjustedDelta.toFixed(1)}, position=${scrollPosition.toFixed(1)}`);
-    applyLauncherTop();
-  }, { passive: true });
+    console.log(`Initialized scroll tracking with ${markers.length} markers`);
+  }
 
+  // Initialize the scroll tracking system
   window.addEventListener('resize', applyLauncherTop, { passive: true });
   window.addEventListener('orientationchange', applyLauncherTop, { passive: true });
-  window.addEventListener('load', () => setTimeout(applyLauncherTop, 0));
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      applyLauncherTop();
+      initializeScrollTracking();
+    }, 100);
+  });
+  
+  // Initialize immediately if DOM is already ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeScrollTracking);
+  } else {
+    setTimeout(initializeScrollTracking, 100);
+  }
+  
   applyLauncherTop();
 
   // Detect if this page is running inside an embed (e.g., Google Sites)
