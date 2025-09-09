@@ -1084,7 +1084,7 @@
   }
 
   // Cursor/touch position tracking with smooth animation
-  let lastCursorY = null;
+  let currentCursorY = null; // Real-time cursor position
   let cursorTrackingActive = false;
   let currentIconY = 0;
   let targetIconY = 0;
@@ -1094,17 +1094,25 @@
   function initializeCursorTracking() {
     console.log('Initializing cursor position tracking...');
     
-    // Mouse move tracking - just store position
+    // Global mouse position tracker - store current viewport position
     document.addEventListener('mousemove', (e) => {
-      if (shouldIgnore(e.target)) return;
-      lastCursorY = e.clientY;
+      currentCursorY = e.clientY;
       cursorTrackingActive = true;
     }, { passive: true });
     
-    // Touch tracking for mobile - just store position
+    // Track when user scrolls to trigger icon updates
+    document.addEventListener('wheel', (e) => {
+      // When scrolling, the cursor effectively "moves" relative to content
+      // So we should update the icon position immediately
+      if (cursorTrackingActive && currentCursorY !== null) {
+        updateTargetPosition();
+      }
+    }, { passive: true });
+    
+    // Touch tracking for mobile
     document.addEventListener('touchmove', (e) => {
-      if (shouldIgnore(e.target) || !e.touches[0]) return;
-      lastCursorY = e.touches[0].clientY;
+      if (!e.touches[0]) return;
+      currentCursorY = e.touches[0].clientY;
       cursorTrackingActive = true;
     }, { passive: true });
     
@@ -1113,9 +1121,9 @@
       cursorTrackingActive = false;
     }, { passive: true });
     
-    // Start interval to update icon position every 100ms
+    // Start interval to update icon position every 100ms using current cursor position
     trackingInterval = setInterval(() => {
-      if (cursorTrackingActive && lastCursorY !== null) {
+      if (cursorTrackingActive && currentCursorY !== null) {
         updateTargetPosition();
       }
     }, 100);
@@ -1134,12 +1142,12 @@
     const btnRect = chatButton.getBoundingClientRect();
     const btnH = Math.max(1, Math.round(btnRect.height || 60));
     
-    // Calculate target position based on cursor
+    // Calculate target position based on current cursor position
     const maxTop = Math.max(0, vh - btnH - 20);
     const minTop = Math.max(0, base - 100);
-    const newTarget = Math.max(minTop, Math.min(lastCursorY - (btnH / 2), maxTop));
+    const newTarget = Math.max(minTop, Math.min(currentCursorY - (btnH / 2), maxTop));
     
-    console.log(`Cursor: ${lastCursorY}, Target: ${newTarget}, Current: ${currentIconY}`);
+    console.log(`Cursor: ${currentCursorY}, Target: ${newTarget}, Current: ${currentIconY}`);
     
     // Only start animation if target changed significantly
     if (Math.abs(newTarget - targetIconY) > 2) {
