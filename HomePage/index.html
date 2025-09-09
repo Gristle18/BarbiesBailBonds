@@ -1178,7 +1178,6 @@
   // Cursor/touch position tracking
   let lastCursorY = null;
   let cursorTrackingActive = false;
-  let accumulatedScroll = 0; // Track accumulated scroll from wheel events
   
   function initializeCursorTracking() {
     console.log('Initializing cursor position tracking...');
@@ -1187,9 +1186,8 @@
     document.addEventListener('mousemove', (e) => {
       if (shouldIgnore(e.target)) return;
       
-      // Store cursor position and reset scroll accumulation
+      // Store cursor position
       lastCursorY = e.clientY;
-      accumulatedScroll = 0; // Reset since cursor moved
       cursorTrackingActive = true;
       updateIconPosition();
     }, { passive: true });
@@ -1198,21 +1196,18 @@
     document.addEventListener('touchmove', (e) => {
       if (shouldIgnore(e.target) || !e.touches[0]) return;
       
-      // Store touch position and reset scroll accumulation
+      // Store touch position
       lastCursorY = e.touches[0].clientY;
-      accumulatedScroll = 0; // Reset since cursor moved
       cursorTrackingActive = true;
       updateIconPosition();
     }, { passive: true });
     
-    // Track scroll events using wheel detection (same method as before)
+    // When wheel event detected, just position icon at current cursor location
     document.addEventListener('wheel', (e) => {
       if (shouldIgnore(e.target)) return;
       
-      // If we have a cursor position, accumulate scroll and update
+      // If we have a cursor position, just update icon to current cursor location
       if (cursorTrackingActive && lastCursorY !== null) {
-        const deltaY = normalizeWheelDeltaY(e);
-        accumulatedScroll += deltaY * 0.3; // Same multiplier as before
         updateIconPosition();
       }
     }, { passive: true });
@@ -1233,13 +1228,10 @@
     const btnRect = chatButton.getBoundingClientRect();
     const btnH = Math.max(1, Math.round(btnRect.height || 60));
     
-    // Adjust cursor position based on accumulated scroll (scroll down = cursor moves up relatively)
-    const adjustedCursorY = lastCursorY - accumulatedScroll;
-    
-    // Position icon at adjusted cursor position, clamped to reasonable bounds
+    // Position icon at cursor position, clamped to reasonable bounds
     const maxTop = Math.max(0, vh - btnH - 20);
     const minTop = Math.max(0, base - 100);
-    const targetY = Math.max(minTop, Math.min(adjustedCursorY - (btnH / 2), maxTop));
+    const targetY = Math.max(minTop, Math.min(lastCursorY - (btnH / 2), maxTop));
     
     if (launcher) {
       launcher.style.setProperty('top', targetY + 'px', 'important');
