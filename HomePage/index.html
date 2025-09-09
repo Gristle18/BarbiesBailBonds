@@ -1086,10 +1086,20 @@
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
     const btnRect = chatButton.getBoundingClientRect();
     const btnH = Math.max(1, Math.round(btnRect.height || 60));
-    const maxTop = Math.max(0, vh - btnH - 12); // keep inside viewport (bottom bound)
-    const minTop = 12; // allow moving above baseline but not off-screen (top bound)
+    
+    // More generous bounds to prevent getting stuck
+    const maxTop = Math.max(0, vh - btnH - 20); // bottom bound with more margin
+    const minTop = Math.max(0, base - 100); // can go 100px above baseline
+    
     const scrollOffset = calculateScrollOffset();
-    const target = Math.max(minTop, Math.min(base + scrollOffset, maxTop));
+    const unclamped = base + scrollOffset;
+    const target = Math.max(minTop, Math.min(unclamped, maxTop));
+    
+    // Debug: log when we're hitting bounds
+    if (unclamped !== target) {
+      console.log(`Chatbot clamped: unclamped=${unclamped}, target=${target}, bounds=[${minTop}, ${maxTop}]`);
+    }
+    
     launcher.style.setProperty('top', target + 'px', 'important');
   }
 
