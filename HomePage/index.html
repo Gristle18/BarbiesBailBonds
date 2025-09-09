@@ -1070,7 +1070,7 @@
   const launcher = document.querySelector('.chat-container');
   
   // Proportional scroll tracking system
-  let totalScrollDistance = 0; // cumulative scroll distance from page start
+  let totalDownwardScroll = 0; // cumulative downward scroll distance only
   let lastScrollDirection = 0; // 1 = down, -1 = up, 0 = none
 
   function getBaseTop() {
@@ -1114,8 +1114,7 @@
   
   function calculateScrollOffset() {
     const multiplier = getScrollMultiplier();
-    const offset = totalScrollDistance * multiplier;
-    return Math.max(0, offset); // Never go above starting position (negative offset)
+    return totalDownwardScroll * multiplier;
   }
 
   function shouldIgnore(target) {
@@ -1125,25 +1124,26 @@
     return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON';
   }
 
-  // Track total scroll distance for proportional icon movement
+  // Track downward scroll distance for proportional icon movement
   document.addEventListener('wheel', function(e) {
     if (shouldIgnore(e.target)) return;
     const deltaY = normalizeWheelDeltaY(e);
     
-    // Detect direction change and reset if needed to prevent drift
     const currentDirection = deltaY > 0 ? 1 : -1;
-    if (lastScrollDirection !== 0 && currentDirection !== lastScrollDirection) {
-      // Direction changed - apply some dampening to prevent immediate reversal
-      totalScrollDistance *= 0.8;
-    }
-    lastScrollDirection = currentDirection;
     
-    // Add to total scroll distance (can go negative for upward scrolls)
-    totalScrollDistance += deltaY;
+    if (deltaY > 0) {
+      // Scrolling down - add to downward scroll
+      totalDownwardScroll += deltaY;
+    } else {
+      // Scrolling up - reduce downward scroll (but don't go below 0)
+      totalDownwardScroll = Math.max(0, totalDownwardScroll + deltaY);
+    }
+    
+    lastScrollDirection = currentDirection;
     
     // Apply reasonable bounds to prevent extreme icon positions
     const maxScrollDistance = 2000; // pixels
-    totalScrollDistance = clamp(totalScrollDistance, -maxScrollDistance, maxScrollDistance);
+    totalDownwardScroll = Math.min(totalDownwardScroll, maxScrollDistance);
     
     applyLauncherTop();
   }, { passive: true });
