@@ -773,12 +773,8 @@
 </head>
 <body>
 
-<!-- Invisible scroll position markers -->
-<div class="scroll-marker" data-position="0" style="position: absolute; top: 0; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
-
 <!-- Hero Video Banner Section -->
 <section id="bbb-hero" aria-label="Palm Beach video banner">
-    <div class="scroll-marker" data-position="10" style="position: absolute; top: 10%; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <div class="bg" aria-hidden="true">
         <video id="pbVideo" autoplay muted loop playsinline preload="auto"
             poster="https://via.placeholder.com/1600x900/111111/ffffff?text=Palm+Beach">
@@ -811,7 +807,6 @@
 
 <!-- Reviews Section -->
 <div class="bbb-reviews">
-    <div class="scroll-marker" data-position="50" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <h2 class="bbb-title">What Our Clients Say</h2>
     <div class="bbb-marquee" aria-label="Client reviews scrolling">
         <div class="bbb-track" id="bbb-track">
@@ -876,7 +871,6 @@
 
 <!-- Service Boxes Section -->
 <section class="services-section">
-    <div class="scroll-marker" data-position="30" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <div class="services-container">
         <div class="services-grid">
             
@@ -916,7 +910,6 @@
 
 <!-- How to Get to Us Section -->
 <section class="location-section">
-    <div class="scroll-marker" data-position="70" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <div class="location-container">
         <div class="location-content">
             <h2>How to Get to Us</h2>
@@ -945,7 +938,6 @@
 
 <!-- Footer Section -->
 <footer class="footer">
-    <div class="scroll-marker" data-position="90" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <div class="footer-container">
         <div class="footer-content">
             <p>Since 1993, Jerry & Barbie's Bail Bonds has been a trusted, family-owned agency committed to those in need of a bail bondsman in South Florida. We specialize in a wide range of Bail Bonds and in handling Warrants through our Walkthrough Bonds Service. Our service is 100% confidential and you will be dealing with experienced bail bonds agents the entire time.</p>
@@ -959,7 +951,6 @@
 
 <!-- Copyright Footer -->
 <footer class="copyright-footer">
-    <div class="scroll-marker" data-position="100" style="position: absolute; height: 1px; width: 1px; opacity: 0; pointer-events: none;"></div>
     <div class="copyright-content">
         <p>Copyright © 2024 Barbie's Bail Bonds | Bail Bond Services</p>
     </div>
@@ -1079,7 +1070,7 @@
   const launcher = document.querySelector('.chat-container');
   
   // Intersection Observer scroll position tracking system
-  let currentScrollPosition = 0; // 0-100 representing page position percentage
+  let currentScrollPixels = 0; // current scroll position in pixels
 
   function getBaseTop() {
     const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
@@ -1132,9 +1123,8 @@
   
   function calculateScrollOffset() {
     const multiplier = getScrollMultiplier();
-    // Convert percentage (0-100) to pixel offset with multiplier
-    const pixelDistance = (currentScrollPosition / 100) * 800; // 800px max travel
-    return pixelDistance * multiplier;
+    // Direct pixel-based calculation with multiplier
+    return currentScrollPixels * multiplier;
   }
 
   function shouldIgnore(target) {
@@ -1144,14 +1134,52 @@
     return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON';
   }
 
+  // Create scroll markers dynamically every 50px
+  function createScrollMarkers() {
+    // Get the total document height
+    const documentHeight = Math.max(
+      document.body.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.clientHeight,
+      document.documentElement.scrollHeight,
+      document.documentElement.offsetHeight
+    );
+    
+    console.log(`Document height: ${documentHeight}px`);
+    
+    // Create markers every 50px
+    const markerSpacing = 50;
+    const markerCount = Math.ceil(documentHeight / markerSpacing);
+    
+    for (let i = 0; i <= markerCount; i++) {
+      const pixelPosition = i * markerSpacing;
+      const marker = document.createElement('div');
+      marker.className = 'scroll-marker';
+      marker.dataset.pixels = pixelPosition.toString();
+      marker.style.cssText = `
+        position: absolute;
+        top: ${pixelPosition}px;
+        left: 0;
+        height: 1px;
+        width: 1px;
+        opacity: 0;
+        pointer-events: none;
+        z-index: -1;
+      `;
+      document.body.appendChild(marker);
+    }
+    
+    console.log(`Created ${markerCount + 1} scroll markers (0px to ${markerCount * markerSpacing}px)`);
+    return document.querySelectorAll('.scroll-marker');
+  }
+  
   // Intersection Observer for scroll position tracking
   function initializeScrollTracking() {
-    const markers = document.querySelectorAll('.scroll-marker');
+    // Remove any existing markers first
+    document.querySelectorAll('.scroll-marker').forEach(marker => marker.remove());
     
-    if (markers.length === 0) {
-      console.warn('No scroll markers found');
-      return;
-    }
+    // Create new markers every 50px
+    const markers = createScrollMarkers();
     
     const observer = new IntersectionObserver((entries) => {
       // Find all currently intersecting markers
@@ -1159,22 +1187,21 @@
         .filter(entry => entry.isIntersecting)
         .map(entry => ({
           element: entry.target,
-          position: parseInt(entry.target.dataset.position),
+          pixels: parseInt(entry.target.dataset.pixels),
           ratio: entry.intersectionRatio
         }));
       
       if (visibleMarkers.length > 0) {
-        // Use the highest position marker that's visible
-        const maxPosition = Math.max(...visibleMarkers.map(m => m.position));
-        currentScrollPosition = maxPosition;
+        // Use the highest pixel position marker that's visible
+        const maxPixels = Math.max(...visibleMarkers.map(m => m.pixels));
+        currentScrollPixels = maxPixels;
         
-        console.log(`Scroll position: ${currentScrollPosition}% (visible markers: ${visibleMarkers.map(m => m.position).join(', ')})`);
+        console.log(`Scroll position: ${currentScrollPixels}px (visible: ${visibleMarkers.map(m => m.pixels).join(', ')}px)`);
         applyLauncherTop();
       }
     }, {
       // Trigger when any part of the marker enters the viewport
-      threshold: [0, 0.1, 1.0],
-      // Use the viewport as root (default)
+      threshold: [0, 0.5, 1.0],
       root: null,
       rootMargin: '0px'
     });
@@ -1182,7 +1209,7 @@
     // Observe all scroll markers
     markers.forEach(marker => observer.observe(marker));
     
-    console.log(`Initialized scroll tracking with ${markers.length} markers`);
+    console.log(`Initialized scroll tracking with ${markers.length} markers every 50px`);
   }
 
   // Initialize the scroll tracking system
