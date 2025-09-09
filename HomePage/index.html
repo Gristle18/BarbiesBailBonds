@@ -1200,6 +1200,26 @@
       updateIconPosition();
     }, { passive: true });
     
+    // Track scroll events to update position even when cursor doesn't move
+    document.addEventListener('wheel', (e) => {
+      if (shouldIgnore(e.target)) return;
+      
+      // If we have a cursor position, keep updating icon position during scroll
+      if (cursorTrackingActive && lastCursorY !== null) {
+        // Small delay to let scroll settle, then update position
+        setTimeout(() => {
+          updateIconPosition();
+        }, 16); // ~1 frame delay
+      }
+    }, { passive: true });
+    
+    // Also track scroll events (for when user scrolls via scrollbar)
+    document.addEventListener('scroll', () => {
+      if (cursorTrackingActive && lastCursorY !== null) {
+        updateIconPosition();
+      }
+    }, { passive: true });
+    
     // Hide cursor tracking when mouse leaves
     document.addEventListener('mouseleave', () => {
       cursorTrackingActive = false;
