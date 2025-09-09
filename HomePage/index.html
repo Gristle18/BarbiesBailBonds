@@ -1069,9 +1069,11 @@
   // Step 2: Adjust vertical offset based on wheel (scroll down) while remembering base offsets
   const launcher = document.querySelector('.chat-container');
   
-  // Simplified scroll tracking system
+  // Enhanced scroll tracking system with better trackpad detection
   let scrollPosition = 0; // current scroll position (can go negative)
   let lastUpdate = Date.now();
+  let eventCount = 0;
+  let eventTimestamp = Date.now();
 
   function getBaseTop() {
     const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
@@ -1135,7 +1137,35 @@
     return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON';
   }
 
-  // Simple scroll tracking - just add all scroll deltas
+  // Enhanced trackpad detection using multiple methods
+  function detectTrackpad(e) {
+    // Method 1: Check delta ratio (works in many browsers)
+    if (e.wheelDeltaY && e.deltaY) {
+      if (Math.abs(e.wheelDeltaY + (e.deltaY * 3)) < 1) {
+        return true;
+      }
+    }
+    
+    // Method 2: Event frequency detection
+    const now = Date.now();
+    if (now - eventTimestamp < 50) {
+      eventCount++;
+    } else {
+      eventCount = 1;
+      eventTimestamp = now;
+    }
+    
+    // More than 5 events in 50ms = likely trackpad
+    if (eventCount > 5) return true;
+    
+    // Method 3: Small delta values + deltaMode check
+    const isSmallDelta = Math.abs(e.deltaY) < 50;
+    const isPixelMode = e.deltaMode === 0;
+    
+    return isSmallDelta && isPixelMode;
+  }
+  
+  // Enhanced scroll tracking with velocity-based sensitivity
   document.addEventListener('wheel', function(e) {
     if (shouldIgnore(e.target)) return;
     const deltaY = normalizeWheelDeltaY(e);
@@ -1143,18 +1173,38 @@
     // Skip tiny movements
     if (Math.abs(deltaY) < 1) return;
     
-    // Throttle updates to prevent excessive calls
     const now = Date.now();
-    if (now - lastUpdate < 10) return; // max 100 updates per second
+    const timeDiff = now - lastUpdate;
+    
+    // Don't throttle too aggressively - allow more updates for trackpad
+    if (timeDiff < 5) return; // max 200 updates per second
+    
+    const isTrackpad = detectTrackpad(e);
+    
+    // Calculate velocity-based multiplier
+    let velocityMultiplier = 1;
+    if (timeDiff > 0) {
+      const velocity = Math.abs(deltaY) / timeDiff; // pixels per ms
+      
+      if (isTrackpad) {
+        // For trackpad: increase multiplier for fast scrolling
+        velocityMultiplier = velocity > 1 ? Math.min(3, 1 + (velocity * 0.5)) : 1;
+      } else {
+        // For mouse wheel: standard behavior
+        velocityMultiplier = 1;
+      }
+    }
+    
     lastUpdate = now;
     
-    // Simple accumulation - scroll position can go negative or positive
-    scrollPosition += deltaY;
+    // Apply velocity-adjusted delta
+    const adjustedDelta = deltaY * velocityMultiplier;
+    scrollPosition += adjustedDelta;
     
     // Clamp to reasonable bounds
     scrollPosition = clamp(scrollPosition, -500, 2000);
     
-    console.log(`Scroll: deltaY=${deltaY}, position=${scrollPosition}, offset=${calculateScrollOffset()}`);
+    console.log(`Scroll: ${isTrackpad ? 'trackpad' : 'mouse'}, deltaY=${deltaY}, velocity=${velocityMultiplier.toFixed(2)}, adjusted=${adjustedDelta.toFixed(1)}, position=${scrollPosition.toFixed(1)}`);
     applyLauncherTop();
   }, { passive: true });
 
