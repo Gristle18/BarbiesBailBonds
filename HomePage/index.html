@@ -1069,9 +1069,9 @@
   // Step 2: Adjust vertical offset based on wheel (scroll down) while remembering base offsets
   const launcher = document.querySelector('.chat-container');
   
-  // Proportional scroll tracking system
-  let totalDownwardScroll = 0; // cumulative downward scroll distance only
-  let lastScrollDirection = 0; // 1 = down, -1 = up, 0 = none
+  // Simplified scroll tracking system
+  let scrollPosition = 0; // current scroll position (can go negative)
+  let lastUpdate = Date.now();
 
   function getBaseTop() {
     const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
@@ -1124,7 +1124,8 @@
   
   function calculateScrollOffset() {
     const multiplier = getScrollMultiplier();
-    return totalDownwardScroll * multiplier;
+    const offset = scrollPosition * multiplier;
+    return Math.max(0, offset); // Never go above baseline
   }
 
   function shouldIgnore(target) {
@@ -1134,35 +1135,27 @@
     return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON';
   }
 
-  // Track downward scroll distance for proportional icon movement
+  // Simple scroll tracking - just add all scroll deltas
   document.addEventListener('wheel', function(e) {
     if (shouldIgnore(e.target)) return;
     const deltaY = normalizeWheelDeltaY(e);
     
-    // Skip if deltaY is too small (could be causing freezing)
+    // Skip tiny movements
     if (Math.abs(deltaY) < 1) return;
     
-    const currentDirection = deltaY > 0 ? 1 : -1;
-    const previousScroll = totalDownwardScroll;
+    // Throttle updates to prevent excessive calls
+    const now = Date.now();
+    if (now - lastUpdate < 10) return; // max 100 updates per second
+    lastUpdate = now;
     
-    if (deltaY > 0) {
-      // Scrolling down - add to downward scroll
-      totalDownwardScroll += deltaY;
-    } else {
-      // Scrolling up - reduce downward scroll by same amount (but don't go below 0)
-      totalDownwardScroll = Math.max(0, totalDownwardScroll + deltaY);
-    }
+    // Simple accumulation - scroll position can go negative or positive
+    scrollPosition += deltaY;
     
-    lastScrollDirection = currentDirection;
+    // Clamp to reasonable bounds
+    scrollPosition = clamp(scrollPosition, -500, 2000);
     
-    // Apply reasonable bounds to prevent extreme icon positions
-    const maxScrollDistance = 2000; // pixels
-    totalDownwardScroll = Math.min(totalDownwardScroll, maxScrollDistance);
-    
-    // Only apply if something actually changed
-    if (Math.abs(totalDownwardScroll - previousScroll) > 0.1) {
-      applyLauncherTop();
-    }
+    console.log(`Scroll: deltaY=${deltaY}, position=${scrollPosition}, offset=${calculateScrollOffset()}`);
+    applyLauncherTop();
   }, { passive: true });
 
   window.addEventListener('resize', applyLauncherTop, { passive: true });
