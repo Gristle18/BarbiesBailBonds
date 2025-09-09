@@ -1175,32 +1175,21 @@
     return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON';
   }
 
-  // Create scroll markers dynamically every 50px
+  // Create scroll markers dynamically in viewport increments
   function createScrollMarkers() {
-    // Get the total document height
-    const documentHeight = Math.max(
-      document.body.scrollHeight,
-      document.body.offsetHeight,
-      document.documentElement.clientHeight,
-      document.documentElement.scrollHeight,
-      document.documentElement.offsetHeight
-    );
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    console.log(`Viewport height: ${viewportHeight}px`);
     
-    console.log(`Document height: ${documentHeight}px`);
-    
-    // Create markers every 50px, but stop before the very bottom
-    const markerSpacing = 50;
-    const markerCount = Math.ceil(documentHeight / markerSpacing);
-    const maxMarkers = Math.max(0, markerCount - 1); // Don't create the bottom-most marker
-    
-    for (let i = 0; i <= maxMarkers; i++) {
-      const pixelPosition = i * markerSpacing;
+    // Create markers every 10% of viewport height within the viewport
+    const markers = [];
+    for (let i = 0; i <= 10; i++) {
+      const vhPercent = i * 10; // 0%, 10%, 20%, ... 100%
       const marker = document.createElement('div');
       marker.className = 'scroll-marker';
-      marker.dataset.pixels = pixelPosition.toString();
+      marker.dataset.pixels = (vhPercent * viewportHeight / 100).toString(); // Convert to pixel equivalent
       marker.style.cssText = `
-        position: absolute;
-        top: ${pixelPosition}px;
+        position: fixed;
+        top: ${vhPercent}vh;
         left: 0;
         height: 1px;
         width: 1px;
@@ -1209,10 +1198,11 @@
         z-index: -1;
       `;
       document.body.appendChild(marker);
+      markers.push(marker);
     }
     
-    console.log(`Created ${maxMarkers + 1} scroll markers (0px to ${maxMarkers * markerSpacing}px, bottom excluded)`);
-    return document.querySelectorAll('.scroll-marker');
+    console.log(`Created ${markers.length} viewport-based scroll markers (0vh to 100vh)`);
+    return markers;
   }
   
   // Intersection Observer for scroll position tracking
