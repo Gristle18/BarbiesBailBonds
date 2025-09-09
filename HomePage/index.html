@@ -1100,16 +1100,33 @@
 
   function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
 
+  // Detect if input is from trackpad (small continuous deltas) vs mouse wheel (larger discrete deltas)
+  function isTrackpadScroll(e) {
+    // Trackpad typically sends smaller, more frequent deltaY values
+    return Math.abs(e.deltaY) < 50 && e.deltaMode === 0;
+  }
+
   // Compute per-event step as a percentage of viewport height,
-  // chosen based on viewport width (phone/tablet/desktop breakpoints).
-  function getScrollStep() {
+  // chosen based on viewport width (phone/tablet/desktop breakpoints) and input type.
+  function getScrollStep(isTrackpad = false) {
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
     const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-    const pct = vw <= 600 ? 0.10   // phone: 10% of viewport height
-               : vw <= 1024 ? 0.08 // tablet: 8%
-               : 0.06;            // desktop: 6%
+    
+    let pct;
+    if (isTrackpad) {
+      // Much smaller steps for trackpad (more sensitive)
+      pct = vw <= 600 ? 0.015   // phone: 1.5% of viewport height
+            : vw <= 1024 ? 0.012 // tablet: 1.2%
+            : 0.008;            // desktop: 0.8%
+    } else {
+      // Larger steps for mouse wheel (original values)
+      pct = vw <= 600 ? 0.10   // phone: 10% of viewport height
+            : vw <= 1024 ? 0.08 // tablet: 8%
+            : 0.06;            // desktop: 6%
+    }
+    
     const px = Math.round(vh * pct);
-    return clamp(px, 32, 240); // keep steps reasonable
+    return isTrackpad ? clamp(px, 4, 32) : clamp(px, 32, 240); // smaller clamp for trackpad
   }
 
   function shouldIgnore(target) {
@@ -1123,7 +1140,8 @@
   document.addEventListener('wheel', function(e) {
     if (shouldIgnore(e.target)) return;
     const deltaY = normalizeWheelDeltaY(e);
-    const STEP = getScrollStep(); // step based on viewport size/percentages
+    const isTrackpad = isTrackpadScroll(e);
+    const STEP = getScrollStep(isTrackpad); // step based on viewport size/percentages and input type
     if (deltaY > 0) {
       scrollOffset += STEP;
       applyLauncherTop();
