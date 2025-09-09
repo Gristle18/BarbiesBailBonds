@@ -1135,8 +1135,8 @@
       // Scrolling down - add to downward scroll
       totalDownwardScroll += deltaY;
     } else {
-      // Scrolling up - reduce downward scroll more gradually (but don't go below 0)
-      totalDownwardScroll = Math.max(0, totalDownwardScroll + (deltaY * 0.7));
+      // Scrolling up - reduce downward scroll by same amount (but don't go below 0)
+      totalDownwardScroll = Math.max(0, totalDownwardScroll + deltaY);
     }
     
     lastScrollDirection = currentDirection;
