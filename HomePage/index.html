@@ -1175,51 +1175,76 @@
     return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON';
   }
 
-  // Simple wheel event tracking - no IntersectionObserver
-  function initializeScrollTracking() {
-    console.log('Initializing simple wheel event tracking...');
+  // Cursor/touch position tracking
+  let lastCursorY = null;
+  let cursorTrackingActive = false;
+  
+  function initializeCursorTracking() {
+    console.log('Initializing cursor position tracking...');
     
-    // Simple wheel event listener
-    document.addEventListener('wheel', (e) => {
+    // Mouse move tracking
+    document.addEventListener('mousemove', (e) => {
       if (shouldIgnore(e.target)) return;
       
-      const deltaY = normalizeWheelDeltaY(e);
-      if (Math.abs(deltaY) < 1) return;
-      
-      // Calculate new target based on current + delta
-      const scrollStep = deltaY * 0.3; // Much smaller, more controlled steps
-      const newTarget = Math.max(0, currentScrollPixels + scrollStep);
-      
-      // Only animate if the change is significant enough
-      if (Math.abs(newTarget - targetScrollPixels) > 5) {
-        targetScrollPixels = newTarget;
-        console.log(`🎯 Wheel target: ${targetScrollPixels.toFixed(1)}px (delta: ${deltaY.toFixed(1)}, step: ${scrollStep.toFixed(1)})`);
-        animateToTarget();
-      }
+      lastCursorY = e.clientY;
+      cursorTrackingActive = true;
+      updateIconPosition();
     }, { passive: true });
     
-    console.log('Simple wheel tracking initialized');
+    // Touch tracking for mobile
+    document.addEventListener('touchmove', (e) => {
+      if (shouldIgnore(e.target) || !e.touches[0]) return;
+      
+      lastCursorY = e.touches[0].clientY;
+      cursorTrackingActive = true;
+      updateIconPosition();
+    }, { passive: true });
+    
+    // Hide cursor tracking when mouse leaves
+    document.addEventListener('mouseleave', () => {
+      cursorTrackingActive = false;
+    }, { passive: true });
+    
+    console.log('Cursor tracking initialized');
+  }
+  
+  function updateIconPosition() {
+    if (!cursorTrackingActive || lastCursorY === null) return;
+    
+    const base = getBaseTop();
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    const btnRect = chatButton.getBoundingClientRect();
+    const btnH = Math.max(1, Math.round(btnRect.height || 60));
+    
+    // Position icon at same Y as cursor, but clamped to reasonable bounds
+    const maxTop = Math.max(0, vh - btnH - 20);
+    const minTop = Math.max(0, base - 100);
+    const targetY = Math.max(minTop, Math.min(lastCursorY - (btnH / 2), maxTop));
+    
+    if (launcher) {
+      launcher.style.setProperty('top', targetY + 'px', 'important');
+    }
   }
 
-  // Initialize the scroll tracking system
+  // Initialize the cursor tracking system
   window.addEventListener('resize', applyLauncherTop, { passive: true });
   window.addEventListener('orientationchange', applyLauncherTop, { passive: true });
   window.addEventListener('load', () => {
     setTimeout(() => {
       applyLauncherTop();
-      initializeScrollTracking();
+      initializeCursorTracking();
     }, 100);
   });
   
   // Initialize immediately if DOM is already ready  
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM loaded, initializing scroll tracking...');
-      initializeScrollTracking();
+      console.log('DOM loaded, initializing cursor tracking...');
+      initializeCursorTracking();
     });
   } else {
-    console.log('DOM already ready, initializing scroll tracking...');
-    setTimeout(initializeScrollTracking, 100);
+    console.log('DOM already ready, initializing cursor tracking...');
+    setTimeout(initializeCursorTracking, 100);
   }
   
   applyLauncherTop();
