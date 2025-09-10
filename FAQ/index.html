@@ -735,13 +735,14 @@
           isSearchActive = false;
           document.getElementById('staticFaqContainer').style.display = 'block';
           document.getElementById('dynamicSearchResults').style.display = 'none';
-          searchInfo.textContent = `Showing ${staticFaqData.length} questions`;
+          searchInfo.style.display = 'none'; // Hide search info when showing all FAQs
         }
         
         function hideStaticFAQs() {
           isSearchActive = true;
           document.getElementById('staticFaqContainer').style.display = 'none';
           document.getElementById('dynamicSearchResults').style.display = 'block';
+          searchInfo.style.display = 'block'; // Show search info when searching
           searchInfo.textContent = 'Searching...';
         }
         
@@ -763,7 +764,8 @@
           searchIcon.style.cursor = 'pointer';
         }
         
-        updateSearchInfo();
+        // Initially hide search info - it will only show after first search
+        searchInfo.style.display = 'none';
 
         function performSearch() {
           const searchTerm = searchInput.value.trim();
@@ -890,6 +892,7 @@
           }
           
           // Update search info
+          searchInfo.style.display = 'block';
           searchInfo.textContent = `Found ${visibleCount} result${visibleCount !== 1 ? 's' : ''} for "${query}"`;
           noResults.style.display = visibleCount === 0 ? 'block' : 'none';
         }
@@ -945,6 +948,7 @@
             dynamicContainer.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">No results found for your search.</p>';
           }
           
+          searchInfo.style.display = 'block';
           searchInfo.textContent = `Found ${visibleCount} result${visibleCount !== 1 ? 's' : ''} for "${query}" (basic search)`;
           noResults.style.display = visibleCount === 0 ? 'block' : 'none';
         }
