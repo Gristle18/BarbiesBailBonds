@@ -468,6 +468,9 @@
       }
     }
   </style>
+  
+  <!-- Load static FAQ data (no API calls!) -->
+  <script src="faq-data.js"></script>
 </head>
 <body>
   <div class="container">
@@ -488,8 +491,14 @@
       <p>No questions found matching your search. Try different keywords or browse all questions below.</p>
     </div>
 
-    <div class="faq" role="list" id="faqContainer">
-      <!-- FAQ items will be dynamically generated here -->
+    <!-- Static FAQ container (no API calls needed) -->
+    <div class="faq" role="list" id="staticFaqContainer">
+      <!-- Static FAQ items will be generated here -->
+    </div>
+    
+    <!-- Dynamic search results container (API calls only when searching) -->
+    <div class="faq" role="list" id="dynamicSearchResults" style="display: none;">
+      <!-- Dynamic search results will be shown here -->
     </div>
 
     <div class="footer">
@@ -577,26 +586,24 @@
         `;
       }
 
+      // Static FAQ data is loaded from external file (no API calls!)
+
       document.addEventListener('DOMContentLoaded', async () => {
-        const container = document.getElementById('faqContainer');
+        const staticContainer = document.getElementById('staticFaqContainer');
+        const dynamicContainer = document.getElementById('dynamicSearchResults');
         const searchInput = document.getElementById('faqSearch');
         const searchInfo = document.getElementById('searchInfo');
         const noResults = document.getElementById('noResults');
 
-        // Fetch FAQ data
-        console.log('DOM loaded, starting FAQ initialization...');
-        faqData = await fetchFaqData();
-        console.log('Final faqData length:', faqData.length);
-        
-        // Generate all FAQ items
-        if (container) {
-          console.log('Generating FAQ items...');
-          container.innerHTML = faqData.map((item, index) => 
+        // Generate static FAQ items (no API call!)
+        if (staticContainer) {
+          console.log('Generating static FAQ items...');
+          staticContainer.innerHTML = staticFaqData.map((item, index) => 
             createFaqItem(item.q, item.a, index)
           ).join('');
-          console.log('FAQ items generated, container innerHTML length:', container.innerHTML.length);
+          console.log('Static FAQ items generated:', staticFaqData.length);
         } else {
-          console.error('FAQ container not found!');
+          console.error('Static FAQ container not found!');
         }
 
         const items = document.querySelectorAll('.faq-item');
@@ -639,33 +646,53 @@
           });
         });
 
-        // Search functionality with 3-second debounce
-        let searchTimeout;
-        if (searchInput) {
-          searchInput.addEventListener('input', function() {
-            // Clear previous timeout
-            clearTimeout(searchTimeout);
-            
-            // If empty, search immediately to show all items
-            if (searchInput.value.trim() === '') {
-              performSearch();
-              return;
-            }
-            
-            // Set 3-second delay for non-empty searches
-            searchTimeout = setTimeout(() => {
-              performSearch();
-            }, 3000);
-          });
+        // Search functionality - ONLY on Enter key or search icon click (no auto-search!)
+        const searchIcon = document.querySelector('.search-icon');
+        let isSearchActive = false;
+        
+        function triggerSearch() {
+          const query = searchInput.value.trim();
+          if (query === '') {
+            // Show all static FAQ items
+            showStaticFAQs();
+            return;
+          }
           
-          // Also allow Enter key for immediate search
+          // Hide static FAQs and show dynamic search results
+          hideStaticFAQs();
+          performSemanticSearch(query);
+        }
+        
+        function showStaticFAQs() {
+          isSearchActive = false;
+          document.getElementById('staticFaqContainer').style.display = 'block';
+          document.getElementById('dynamicSearchResults').style.display = 'none';
+          searchInfo.textContent = `Showing ${staticFaqData.length} questions`;
+        }
+        
+        function hideStaticFAQs() {
+          isSearchActive = true;
+          document.getElementById('staticFaqContainer').style.display = 'none';
+          document.getElementById('dynamicSearchResults').style.display = 'block';
+          searchInfo.textContent = 'Searching...';
+        }
+        
+        if (searchInput) {
+          // Enter key triggers search
           searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
               e.preventDefault();
-              clearTimeout(searchTimeout); // Cancel the timeout
-              performSearch();
+              triggerSearch();
             }
           });
+        }
+        
+        if (searchIcon) {
+          // Clicking search icon triggers search
+          searchIcon.addEventListener('click', function() {
+            triggerSearch();
+          });
+          searchIcon.style.cursor = 'pointer';
         }
         
         updateSearchInfo();
@@ -750,67 +777,108 @@
         }
         
         function displaySemanticResults(results, query) {
-          const items = document.querySelectorAll('.faq-item');
-          const relevantIds = new Set();
-          
-          // Get IDs of semantically relevant FAQs
-          if (results && results.results && results.results.length > 0) {
-            results.results.forEach(result => {
-              relevantIds.add(result.id);
-            });
-          }
+          const dynamicContainer = document.getElementById('dynamicSearchResults');
+          const searchInfo = document.getElementById('searchInfo');
           
           let visibleCount = 0;
           
-          // Show/hide items based on semantic relevance
-          items.forEach((item, index) => {
-            if (relevantIds.size > 0 && relevantIds.has(index)) {
-              item.classList.remove('hidden');
+          if (results && results.results && results.results.length > 0) {
+            // Create new HTML content for search results
+            const searchResultsHTML = results.results.map((result, index) => {
               visibleCount++;
+              return createFaqItem(result.question, result.answer, index);
+            }).join('');
+            
+            dynamicContainer.innerHTML = searchResultsHTML;
+            
+            // Initialize accordion functionality for dynamic results
+            const newItems = dynamicContainer.querySelectorAll('.faq-item');
+            newItems.forEach(item => {
+              const question = item.querySelector('.faq-question');
+              const answer = item.querySelector('.faq-answer');
+              const panel = answer.querySelector('p');
               
               // Highlight search terms
-              const question = item.querySelector('.faq-question span:last-child');
-              const answer = item.querySelector('.faq-answer p');
-              highlightText(question, query);
-              highlightText(answer, query);
-            } else {
-              item.classList.add('hidden');
-              item.classList.remove('open');
-              const answerDiv = item.querySelector('.faq-answer');
-              if (answerDiv) answerDiv.style.maxHeight = '0';
-            }
-          });
+              highlightText(question.querySelector('span:last-child'), query);
+              highlightText(panel, query);
+              
+              question.addEventListener('click', () => {
+                const isOpen = item.classList.contains('open');
+                if (isOpen) {
+                  item.classList.remove('open');
+                  panel.style.maxHeight = null;
+                } else {
+                  panel.setAttribute('aria-hidden', 'false');
+                  item.classList.add('open');
+                  setTimeout(() => {
+                    panel.style.maxHeight = panel.scrollHeight + 'px';
+                  }, 10);
+                }
+              });
+            });
+          } else {
+            dynamicContainer.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">No results found for your search.</p>';
+            visibleCount = 0;
+          }
           
+          // Update search info
+          searchInfo.textContent = `Found ${visibleCount} result${visibleCount !== 1 ? 's' : ''} for "${query}"`;
           noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-          updateSearchInfo(visibleCount, query, true, results && results.results ? results.results.length : 0);
         }
         
         function performBasicSearch(query) {
           const searchTerm = query.toLowerCase();
-          const items = document.querySelectorAll('.faq-item');
-          let visibleCount = 0;
+          const dynamicContainer = document.getElementById('dynamicSearchResults');
+          const searchInfo = document.getElementById('searchInfo');
           
-          items.forEach(item => {
-            const question = item.querySelector('.faq-question span:last-child');
-            const answer = item.querySelector('.faq-answer p');
-            const questionText = question ? question.textContent.toLowerCase() : '';
-            const answerText = answer ? answer.textContent.toLowerCase() : '';
-            
-            if (questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
-              item.classList.remove('hidden');
-              visibleCount++;
-              highlightText(question, query);
-              highlightText(answer, query);
-            } else {
-              item.classList.add('hidden');
-              item.classList.remove('open');
-              const answerDiv = item.querySelector('.faq-answer');
-              if (answerDiv) answerDiv.style.maxHeight = '0';
-            }
+          // Search through static FAQ data
+          const matchingItems = staticFaqData.filter(item => {
+            const questionText = item.q.toLowerCase();
+            const answerText = item.a.toLowerCase();
+            return questionText.includes(searchTerm) || answerText.includes(searchTerm);
           });
           
+          let visibleCount = matchingItems.length;
+          
+          if (matchingItems.length > 0) {
+            // Create HTML for matching items
+            const searchResultsHTML = matchingItems.map((item, index) => 
+              createFaqItem(item.q, item.a, index)
+            ).join('');
+            
+            dynamicContainer.innerHTML = searchResultsHTML;
+            
+            // Initialize accordion functionality and highlighting
+            const newItems = dynamicContainer.querySelectorAll('.faq-item');
+            newItems.forEach(item => {
+              const question = item.querySelector('.faq-question');
+              const answer = item.querySelector('.faq-answer');
+              const panel = answer.querySelector('p');
+              
+              // Highlight search terms
+              highlightText(question.querySelector('span:last-child'), query);
+              highlightText(panel, query);
+              
+              question.addEventListener('click', () => {
+                const isOpen = item.classList.contains('open');
+                if (isOpen) {
+                  item.classList.remove('open');
+                  panel.style.maxHeight = null;
+                } else {
+                  panel.setAttribute('aria-hidden', 'false');
+                  item.classList.add('open');
+                  setTimeout(() => {
+                    panel.style.maxHeight = panel.scrollHeight + 'px';
+                  }, 10);
+                }
+              });
+            });
+          } else {
+            dynamicContainer.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">No results found for your search.</p>';
+          }
+          
+          searchInfo.textContent = `Found ${visibleCount} result${visibleCount !== 1 ? 's' : ''} for "${query}" (basic search)`;
           noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-          updateSearchInfo(visibleCount, query, false);
         }
 
         function highlightText(element, searchTerm) {
