@@ -583,14 +583,61 @@
         const searchInfo = document.getElementById('searchInfo');
         const noResults = document.getElementById('noResults');
 
-        // Show initial message instead of fetching data
+        // Fetch FAQ data
+        console.log('DOM loaded, starting FAQ initialization...');
+        faqData = await fetchFaqData();
+        console.log('Final faqData length:', faqData.length);
+        
+        // Generate all FAQ items
         if (container) {
-          container.innerHTML = '<p style="text-align: center; padding: 40px; color: #666;">Start typing to search our frequently asked questions...</p>';
+          console.log('Generating FAQ items...');
+          container.innerHTML = faqData.map((item, index) => 
+            createFaqItem(item.q, item.a, index)
+          ).join('');
+          console.log('FAQ items generated, container innerHTML length:', container.innerHTML.length);
         } else {
           console.error('FAQ container not found!');
         }
 
-        // FAQ items will be loaded and initialized when user searches
+        const items = document.querySelectorAll('.faq-item');
+        
+        // Initialize accordion functionality
+        items.forEach((item, idx) => {
+          const btn = item.querySelector('.faq-question');
+          const panel = item.querySelector('.faq-answer');
+          if (!btn || !panel) return;
+
+          btn.addEventListener('click', () => {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            
+            // Close all others (optional: behave like accordion)
+            items.forEach(other => {
+              const otherBtn = other.querySelector('.faq-question');
+              const otherPanel = other.querySelector('.faq-answer');
+              if (otherBtn && otherPanel && otherBtn !== btn) {
+                otherBtn.setAttribute('aria-expanded', 'false');
+                otherPanel.setAttribute('aria-hidden', 'true');
+                other.classList.remove('open');
+                otherPanel.style.maxHeight = '0';
+              }
+            });
+            
+            // Toggle current item
+            if (expanded) {
+              btn.setAttribute('aria-expanded', 'false');
+              panel.setAttribute('aria-hidden', 'true');
+              item.classList.remove('open');
+              panel.style.maxHeight = '0';
+            } else {
+              btn.setAttribute('aria-expanded', 'true');
+              panel.setAttribute('aria-hidden', 'false');
+              item.classList.add('open');
+              setTimeout(() => {
+                panel.style.maxHeight = panel.scrollHeight + 'px';
+              }, 10);
+            }
+          });
+        });
 
         // Search functionality with 3-second debounce
         let searchTimeout;
@@ -623,49 +670,8 @@
         
         updateSearchInfo();
 
-        async function performSearch() {
+        function performSearch() {
           const searchTerm = searchInput.value.trim();
-          
-          // Fetch FAQ data if not already loaded
-          if (!faqData || faqData.length === 0) {
-            console.log('FAQ data not loaded, fetching now...');
-            faqData = await fetchFaqData();
-            console.log('FAQ data loaded:', faqData.length);
-            
-            // Generate all FAQ items now that we have data
-            if (container) {
-              container.innerHTML = faqData.map((item, index) => 
-                createFaqItem(item.q, item.a, index)
-              ).join('');
-            }
-            
-            // Initialize accordion functionality for newly created items
-            const items = document.querySelectorAll('.faq-item');
-            items.forEach(item => {
-              const question = item.querySelector('.faq-question');
-              const answer = item.querySelector('.faq-answer');
-              const panel = answer.querySelector('p');
-              
-              question.addEventListener('click', () => {
-                const isOpen = item.classList.contains('open');
-                
-                if (isOpen) {
-                  item.classList.remove('open');
-                  panel.style.maxHeight = null;
-                  question.setAttribute('aria-expanded', 'false');
-                  answer.setAttribute('aria-hidden', 'true');
-                } else {
-                  panel.style.maxHeight = null;
-                  panel.setAttribute('aria-hidden', 'false');
-                  item.classList.add('open');
-                  setTimeout(() => {
-                    panel.style.maxHeight = panel.scrollHeight + 'px';
-                  }, 10);
-                }
-              });
-            });
-          }
-          
           const items = document.querySelectorAll('.faq-item');
           
           // If empty search, show all items
