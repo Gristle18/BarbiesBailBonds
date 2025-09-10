@@ -236,51 +236,64 @@
             background: var(--brand-dark);
         }
 
-        /* Testimonials Section */
-        .testimonials-section {
-            background: #f8f9fa;
-            padding: 60px 20px;
+        /* Reviews Section */
+        .bbb-reviews {
+            margin: 60px 0;
+            padding: 0 20px;
+            background: var(--white);
         }
-
-        .testimonials-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .testimonials-title {
-            text-align: center;
-            font-size: 36px;
+        
+        .bbb-title {
             font-weight: 700;
-            margin-bottom: 50px;
+            margin: 20px 0 40px;
+            font-size: 36px;
+            text-align: center;
             color: var(--dark);
         }
 
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+        .bbb-marquee {
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .bbb-track {
+            display: flex;
+            gap: 12px;
+            width: max-content;
+            will-change: transform;
         }
 
-        .testimonial-card {
+        .bbb-card {
+            border: 1px solid var(--light-gray);
+            border-radius: 16px;
+            box-shadow: 0 4px 14px rgba(0,0,0,.06);
+            padding: 16px;
             background: var(--white);
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            flex: 0 0 clamp(260px, 60vw, 360px);
             border-left: 4px solid var(--brand);
         }
-
-        .testimonial-text {
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 20px;
+        
+        .bbb-stars {
+            color: var(--brand);
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+        
+        .bbb-text {
+            margin: 8px 0 10px;
+            line-height: 1.45;
             font-style: italic;
-            color: var(--dark);
+        }
+        
+        .bbb-meta {
+            font-size: 13px;
+            color: var(--muted);
         }
 
-        .testimonial-author {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--brand);
+        @media (prefers-reduced-motion: reduce) {
+            .bbb-marquee {
+                overflow: auto;
+            }
         }
 
         /* Process Steps Section */
@@ -688,48 +701,58 @@
         </div>
     </div>
 
-    <!-- Testimonials Carousel Section -->
-    <div class="testimonials-section">
-        <div class="testimonials-container">
-            <h2 class="testimonials-title">What Our Clients Are Saying</h2>
-            <div class="carousel-container">
-                <div class="testimonials-carousel" id="testimonialsCarousel">
-                    <div class="testimonial-slide">
-                        <p class="testimonial-text">
-                            "Professional and fast service. They helped us through a very difficult time with compassion and efficiency. Highly recommended!"
-                        </p>
-                        <p class="testimonial-author">- Maria S., West Palm Beach</p>
-                    </div>
-                    <div class="testimonial-slide">
-                        <p class="testimonial-text">
-                            "Available 24/7 when we needed them most. The bilingual service was crucial for our family. Thank you Barbie's Bail Bonds!"
-                        </p>
-                        <p class="testimonial-author">- Carlos R., Lake Worth</p>
-                    </div>
-                    <div class="testimonial-slide">
-                        <p class="testimonial-text">
-                            "30+ years of experience shows. They handled everything professionally and got our son released quickly. Grateful for their service."
-                        </p>
-                        <p class="testimonial-author">- Jennifer L., Boynton Beach</p>
-                    </div>
-                    <div class="testimonial-slide">
-                        <p class="testimonial-text">
-                            "They made the whole process so easy and stress-free. Quick response time and very professional staff. Would definitely recommend!"
-                        </p>
-                        <p class="testimonial-author">- Robert T., Delray Beach</p>
-                    </div>
-                    <div class="testimonial-slide">
-                        <p class="testimonial-text">
-                            "Excellent customer service and they walked us through every step. Their Spanish-speaking agent was incredibly helpful for our family."
-                        </p>
-                        <p class="testimonial-author">- Elena M., Boca Raton</p>
+    <!-- Reviews Section -->
+    <div class="bbb-reviews">
+        <h2 class="bbb-title">What Our Clients Are Saying</h2>
+        <div class="bbb-marquee" aria-label="Client reviews scrolling">
+            <div class="bbb-track" id="bbb-track">
+                <div class="bbb-card">
+                    <div class="bbb-content">
+                        <div class="bbb-stars">★★★★★</div>
+                        <div class="bbb-text">"Professional and fast service. They helped us through a very difficult time with compassion and efficiency. Highly recommended!"</div>
+                        <div class="bbb-meta">— Maria S. • West Palm Beach</div>
                     </div>
                 </div>
-            </div>
-            <div class="carousel-nav">
-                <button class="carousel-btn" id="prevBtn">‹</button>
-                <div class="carousel-dots" id="carouselDots"></div>
-                <button class="carousel-btn" id="nextBtn">›</button>
+
+                <div class="bbb-card">
+                    <div class="bbb-content">
+                        <div class="bbb-stars">★★★★★</div>
+                        <div class="bbb-text">"Available 24/7 when we needed them most. The bilingual service was crucial for our family. Thank you Barbie's Bail Bonds!"</div>
+                        <div class="bbb-meta">— Carlos R. • Lake Worth</div>
+                    </div>
+                </div>
+
+                <div class="bbb-card">
+                    <div class="bbb-content">
+                        <div class="bbb-stars">★★★★★</div>
+                        <div class="bbb-text">"30+ years of experience shows. They handled everything professionally and got our son released quickly. Grateful for their service."</div>
+                        <div class="bbb-meta">— Jennifer L. • Boynton Beach</div>
+                    </div>
+                </div>
+
+                <div class="bbb-card">
+                    <div class="bbb-content">
+                        <div class="bbb-stars">★★★★★</div>
+                        <div class="bbb-text">"They made the whole process so easy and stress-free. Quick response time and very professional staff. Would definitely recommend!"</div>
+                        <div class="bbb-meta">— Robert T. • Delray Beach</div>
+                    </div>
+                </div>
+
+                <div class="bbb-card">
+                    <div class="bbb-content">
+                        <div class="bbb-stars">★★★★★</div>
+                        <div class="bbb-text">"Excellent customer service and they walked us through every step. Their Spanish-speaking agent was incredibly helpful for our family."</div>
+                        <div class="bbb-meta">— Elena M. • Boca Raton</div>
+                    </div>
+                </div>
+
+                <div class="bbb-card">
+                    <div class="bbb-content">
+                        <div class="bbb-stars">★★★★★</div>
+                        <div class="bbb-text">"Fast response and very knowledgeable staff. They made a stressful situation much easier to handle. Thank you for everything!"</div>
+                        <div class="bbb-meta">— Michael D. • Palm Beach Gardens</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -976,73 +999,43 @@
             this.style.height = (this.scrollHeight) + 'px';
         });
 
-        // Testimonials Carousel Functionality
-        const carousel = document.getElementById('testimonialsCarousel');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const dotsContainer = document.getElementById('carouselDots');
-        
-        let currentSlide = 0;
-        const totalSlides = carousel.children.length;
-        
-        // Create dots
-        for (let i = 0; i < totalSlides; i++) {
-            const dot = document.createElement('div');
-            dot.classList.add('dot');
-            if (i === 0) dot.classList.add('active');
-            dot.addEventListener('click', () => goToSlide(i));
-            dotsContainer.appendChild(dot);
-        }
-        
-        function updateCarousel() {
-            const offset = -currentSlide * 100;
-            carousel.style.transform = `translateX(${offset}%)`;
-            
-            // Update dots
-            dotsContainer.querySelectorAll('.dot').forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentSlide);
-            });
-            
-            // Update button states
-            prevBtn.disabled = currentSlide === 0;
-            nextBtn.disabled = currentSlide === totalSlides - 1;
-        }
-        
-        function goToSlide(slideIndex) {
-            currentSlide = slideIndex;
-            updateCarousel();
-        }
-        
-        function nextSlide() {
-            if (currentSlide < totalSlides - 1) {
-                currentSlide++;
-                updateCarousel();
+        // Reviews marquee animation
+        (function(){
+            const SPEED = 20; 
+            const marquee = document.querySelector('.bbb-marquee');
+            const track = document.getElementById('bbb-track');
+            if (!marquee || !track) return;
+
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            const originals = Array.from(track.children);
+            function totalWidth(){ return track.scrollWidth; }
+            function needMore(){ return totalWidth() < marquee.clientWidth * 2; }
+            while (needMore()) {
+                for (const el of originals) track.appendChild(el.cloneNode(true));
             }
-        }
-        
-        function prevSlide() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                updateCarousel();
+
+            let x = 0;
+            let last = performance.now();
+            let paused = false;
+            const gap = parseFloat(getComputedStyle(track).gap || '0');
+
+            marquee.addEventListener('mouseenter', () => paused = true);
+            marquee.addEventListener('mouseleave', () => paused = false);
+
+            function step(t){
+                const dt = (t - last) / 1000; 
+                last = t;
+                if (!paused) {
+                    x += SPEED * dt;
+                    const cardWidth = track.children[0].offsetWidth + gap;
+                    if (x >= cardWidth) x -= cardWidth;
+                }
+                track.style.transform = `translateX(-${x}px)`;
+                requestAnimationFrame(step);
             }
-        }
-        
-        // Event listeners
-        nextBtn.addEventListener('click', nextSlide);
-        prevBtn.addEventListener('click', prevSlide);
-        
-        // Auto-advance carousel every 5 seconds
-        setInterval(() => {
-            if (currentSlide === totalSlides - 1) {
-                currentSlide = 0;
-            } else {
-                currentSlide++;
-            }
-            updateCarousel();
-        }, 5000);
-        
-        // Initialize carousel
-        updateCarousel();
+            requestAnimationFrame(step);
+        })();
     </script>
 </body>
 </html>
