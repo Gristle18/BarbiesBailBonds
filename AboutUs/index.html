@@ -40,9 +40,9 @@
         
         /* Invisible spacer to double page height */
         .invisible-spacer {
-            height: 200vh; /* Double the viewport height */
+            height: 200vh;
             width: 100%;
-            background: #000000; /* Pure black */
+            background: #000000;
             visibility: visible;
             pointer-events: none;
         }
@@ -54,125 +54,102 @@
         }
 
         /* Restore pointer cursor for interactive elements */
-        a, button, .service-item {
+        a, button {
             cursor: pointer;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
+        /* Hero Section - Dark Background with Overlay */
+        .hero-section {
+            background: linear-gradient(135deg, var(--dark) 0%, #000 100%);
+            color: var(--white);
+            padding: 80px 20px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Header Section */
-        .hero-section {
-            text-align: center;
-            margin-bottom: 60px;
-            padding: 60px 0;
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .main-title {
             font-size: 48px;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 20px;
-            color: var(--dark);
+            color: var(--white);
         }
 
-        .subtitle {
-            font-size: 24px;
-            color: var(--brand);
-            font-weight: 600;
+        .hero-subtitle {
+            font-size: 20px;
+            line-height: 1.6;
             margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
         }
 
-        .phone-highlight {
-            font-size: 32px;
-            color: var(--brand);
-            font-weight: 700;
-            white-space: nowrap;
-            display: inline-block;
-            margin-top: 10px;
-        }
-
-        /* About Content Section */
-        .about-content {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 40px;
-            margin-bottom: 60px;
-        }
-
-        .story-section {
-            padding: 0;
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 25px;
-        }
-
-        .story-text {
+        .hero-cta {
+            background: var(--brand);
+            color: var(--white);
+            padding: 15px 30px;
             font-size: 18px;
-            line-height: 1.7;
-            color: var(--dark);
-            margin-bottom: 20px;
-        }
-
-        .highlight-text {
-            color: var(--brand);
             font-weight: 600;
+            text-decoration: none;
+            border-radius: 6px;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
         }
 
-        /* Services Section */
-        .services-section {
-            margin-bottom: 40px;
-            padding: 0;
+        .hero-cta:hover {
+            background: var(--brand-dark);
         }
 
-        .services-title {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--dark);
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .service-item {
-            padding: 15px 0;
-        }
-
-        .service-icon {
-            font-size: 24px;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .service-text {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        /* Why Choose Us Section */
+        /* Feature Cards Section */
         .features-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
+            background: var(--white);
+            padding: 60px 20px;
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 700;
             margin-bottom: 50px;
+            color: var(--dark);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
         }
 
         .feature-card {
+            background: var(--brand);
+            color: var(--white);
+            padding: 40px 30px;
             text-align: center;
-            padding: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(242, 140, 0, 0.3);
         }
 
         .feature-icon {
@@ -183,96 +160,214 @@
 
         .feature-title {
             font-size: 20px;
-            font-weight: 700;
-            color: var(--dark);
+            font-weight: 600;
             margin-bottom: 15px;
         }
 
         .feature-text {
             font-size: 16px;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        /* Call to Action */
-        .cta-section {
-            background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-            color: white;
-            padding: 50px;
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .cta-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .cta-text {
-            font-size: 18px;
-            margin-bottom: 30px;
+            line-height: 1.5;
             opacity: 0.95;
         }
 
-        .cta-button {
-            display: inline-block;
+        /* Main Content Area - Two Column */
+        .main-content {
             background: var(--white);
-            color: var(--brand);
-            padding: 18px 40px;
-            font-size: 20px;
+            padding: 60px 20px;
+        }
+
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 50px;
+        }
+
+        .content-main {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--dark);
+        }
+
+        .content-main p {
+            margin-bottom: 20px;
+        }
+
+        .content-sidebar {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            height: fit-content;
+        }
+
+        .sidebar-title {
+            font-size: 24px;
             font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .sidebar-info {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--dark);
+        }
+
+        .sidebar-info p {
+            margin-bottom: 15px;
+        }
+
+        .sidebar-phone {
+            background: var(--brand);
+            color: var(--white);
+            padding: 15px 20px;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 20px 0;
             text-decoration: none;
-            transition: all 0.3s ease;
+            display: block;
             white-space: nowrap;
         }
 
-        .cta-button:hover {
-            background: var(--cream);
+        .sidebar-phone:hover {
+            background: var(--brand-dark);
         }
 
-        /* Mobile Responsive */
+        /* Testimonials Section */
+        .testimonials-section {
+            background: #f8f9fa;
+            padding: 60px 20px;
+        }
+
+        .testimonials-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonials-title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 50px;
+            color: var(--dark);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--brand);
+        }
+
+        .testimonial-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: var(--dark);
+        }
+
+        .testimonial-author {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--brand);
+        }
+
+        /* Process Steps Section */
+        .process-section {
+            background: var(--white);
+            padding: 60px 20px;
+        }
+
+        .process-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .process-title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 50px;
+            color: var(--dark);
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .process-step {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .step-number {
+            background: var(--brand);
+            color: var(--white);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 auto 20px;
+        }
+
+        .step-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .step-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--muted);
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
             .main-title {
                 font-size: 36px;
             }
-            
-            .phone-highlight {
-                font-size: 24px;
+
+            .hero-subtitle {
+                font-size: 18px;
             }
-            
-            .services-section, .cta-section {
-                padding: 30px 0;
-            }
-            
-            .services-grid {
+
+            .content-container {
                 grid-template-columns: 1fr;
+                gap: 30px;
             }
-            
-            .features-section {
+
+            .features-grid,
+            .testimonials-grid,
+            .process-steps {
                 grid-template-columns: 1fr;
-                gap: 20px;
             }
         }
 
-        /* Chatbot Widget Styles */
+        /* Chatbot Styles */
         .chat-container {
-            position: fixed !important;
-            top: 550px !important;
-            right: clamp(12px, 3vw, 28px) !important;
-            bottom: auto !important;
-            left: auto !important;
-            transform: none !important;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             z-index: 1000;
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-        }
-
-        /* Adjust launcher vertical offset for tablet and phone */
-        @media (max-width: 1024px) {
-            .chat-container { top: 525px !important; }
-        }
-        @media (max-width: 600px) {
-            .chat-container { top: 500px !important; }
         }
 
         .chat-button {
@@ -303,50 +398,45 @@
         }
 
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 4px 15px rgba(242, 140, 0, 0.4); }
-            50% { box-shadow: 0 4px 15px rgba(242, 140, 0, 0.8), 0 0 0 10px rgba(242, 140, 0, 0.1); }
+            0% { box-shadow: 0 4px 15px rgba(242, 140, 0, 0.4); }
+            50% { box-shadow: 0 4px 15px rgba(242, 140, 0, 0.7); }
+            100% { box-shadow: 0 4px 15px rgba(242, 140, 0, 0.4); }
         }
 
         .chat-interface {
-            display: none;
-            position: absolute;
-            bottom: 80px;
-            right: 0;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             width: 350px;
             height: 500px;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            transform: scale(0.8);
             opacity: 0;
-            transform: translateY(20px) scale(0.9);
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 999;
         }
 
         .chat-interface.open {
-            display: flex;
-            flex-direction: column;
+            transform: scale(1);
             opacity: 1;
-            transform: translateY(0) scale(1);
         }
 
         .chat-header {
             background: linear-gradient(135deg, #F28C00, #D67700);
             color: white;
-            padding: 16px 20px;
+            padding: 20px;
+            border-radius: 16px 16px 0 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .chat-title-area {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
         .chat-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             margin: 0;
         }
@@ -453,52 +543,9 @@
             padding: 16px;
             border-top: none;
             background: transparent;
-            font-size: 14px;
-            color: #666;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-
-        .typing-dots span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #F28C00;
-            animation: typing 1.4s infinite ease-in-out;
-        }
-
-        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes typing {
-            0%, 80%, 100% {
-                transform: scale(0.8);
-                opacity: 0.5;
-            }
-            40% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .chat-input-container {
+        .chat-input-area {
             padding: 16px;
             border-top: 1px solid #eee;
             display: flex;
@@ -507,35 +554,28 @@
 
         .chat-input {
             flex: 1;
-            padding: 12px 16px;
             border: 1px solid #ddd;
             border-radius: 20px;
+            padding: 8px 16px;
             font-size: 14px;
             outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .chat-input:focus {
-            border-color: #F28C00;
-        }
-
-        .chat-input::placeholder {
-            color: #999;
+            resize: none;
+            max-height: 100px;
         }
 
         .chat-send {
             background: #F28C00;
             border: none;
             color: white;
-            width: 40px;
-            height: 40px;
             border-radius: 50%;
+            width: 36px;
+            height: 36px;
             cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
         }
 
         .chat-send:hover:not(:disabled) {
@@ -548,42 +588,154 @@
             cursor: not-allowed;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @media (max-width: 600px) {
             .chat-interface {
-                height: 400px !important; /* 100px shorter on mobile */
+                height: 400px !important;
+            }
+
+            .chat-container {
+                bottom: 20px;
+                right: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Hero Section -->
-        <div class="hero-section">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content">
             <h1 class="main-title">About Barbie's Bail Bonds</h1>
-            <p class="subtitle">Serving Florida Families Since 1993</p>
-            <div class="phone-highlight">561-247-0018</div>
+            <p class="hero-subtitle">
+                Licensed Palm Beach bail bonds agency providing fast, reliable service in Palm Beach County Florida and throughout most counties in the state. Since 1993, our family agency has been helping families bond out their loved ones with 24-hour emergency service.
+            </p>
+            <a href="tel:561-247-0018" class="hero-cta">Call 561-247-0018</a>
         </div>
+    </div>
 
-        <!-- About Content -->
-        <div class="about-content">
-            <p class="story-text">
-                Barbie's Bail Bonds is a licensed Palm Beach bail bonds agency providing fast, reliable service in Palm Beach County Florida and throughout most counties in the state. Since 1993 our family agency has been helping families bond out their loved ones.
-            </p>
-            <p class="story-text">
-                Whether it be from Palm Beach County's Gun Club Jail or any other detention facility in Florida where we have 24 hour emergency service. Our licensed agents speak English and Spanish to help with any questions.
-            </p>
-            <p class="story-text">
-                At Barbie's Bail Bonds you will never have to worry about posting bail because we take care of everything.
-            </p>
-            <p class="story-text">
-                Our comprehensive services include Bail Bonds in Palm Beach Jail and most other Florida counties, allowing you to complete the ENTIRE Bail Bonds Process from home. We handle both Felony and Misdemeanor Bail Bonds, as well as Walkthrough Bail Bonds (No Arrest). You can use our Online Bail Bond application for immediate service. We accept Cash, Zelle, Credit Cards, and even Bitcoin with guaranteed confidentiality and a 100% Money-Back Guarantee.
-            </p>
-            <p class="story-text">
-                With over 30 years of experience serving Florida families since 1993, we provide trusted, reliable bail bond services. We're available around the clock for immediate assistance when you need us most. As a trusted family business committed to helping other families in their time of need, our licensed agents speak both English and Spanish to better serve our community.
-            </p>
-            <p class="story-text">
-                Don't let your loved one stay in jail longer than necessary. Our experienced team is ready to help you through the bail process quickly and efficiently. Call us at <strong style="color: var(--brand); white-space: nowrap;">561-247-0018</strong> for immediate assistance.
-            </p>
+    <!-- Features Section -->
+    <div class="features-section">
+        <div class="features-container">
+            <h2 class="features-title">Why Clients Trust Barbie's Bail Bonds</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🏆</span>
+                    <h3 class="feature-title">30+ Years Experience</h3>
+                    <p class="feature-text">Serving Florida families since 1993 with trusted, reliable bail bond services.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🕒</span>
+                    <h3 class="feature-title">24/7 Emergency Service</h3>
+                    <p class="feature-text">Available around the clock for immediate assistance when you need us most.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🌐</span>
+                    <h3 class="feature-title">Bilingual Service</h3>
+                    <p class="feature-text">Our licensed agents speak both English and Spanish to better serve our community.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">👨‍👩‍👧‍👦</span>
+                    <h3 class="feature-title">Local Palm Beach Experts</h3>
+                    <p class="feature-text">A trusted family business committed to helping other families in their time of need.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <div class="content-container">
+            <div class="content-main">
+                <p>
+                    Barbie's Bail Bonds is a licensed Palm Beach bail bonds agency providing fast, reliable service in Palm Beach County Florida and throughout most counties in the state. Since 1993 our family agency has been helping families bond out their loved ones.
+                </p>
+                <p>
+                    Whether it be from Palm Beach County's Gun Club Jail or any other detention facility in Florida where we have 24 hour emergency service. Our licensed agents speak English and Spanish to help with any questions.
+                </p>
+                <p>
+                    At Barbie's Bail Bonds you will never have to worry about posting bail because we take care of everything. Our comprehensive services include Bail Bonds in Palm Beach Jail and most other Florida counties, allowing you to complete the ENTIRE Bail Bonds Process from home.
+                </p>
+                <p>
+                    We handle both Felony and Misdemeanor Bail Bonds, as well as Walkthrough Bail Bonds (No Arrest). You can use our Online Bail Bond application for immediate service. We accept Cash, Zelle, Credit Cards, and even Bitcoin with guaranteed confidentiality and a 100% Money-Back Guarantee.
+                </p>
+                <p>
+                    With over 30 years of experience serving Florida families since 1993, we provide trusted, reliable bail bond services. We're available around the clock for immediate assistance when you need us most. As a trusted family business committed to helping other families in their time of need, our licensed agents speak both English and Spanish to better serve our community.
+                </p>
+                <p>
+                    Don't let your loved one stay in jail longer than necessary. Our experienced team is ready to help you through the bail process quickly and efficiently.
+                </p>
+            </div>
+            <div class="content-sidebar">
+                <h3 class="sidebar-title">Quick Contact</h3>
+                <div class="sidebar-info">
+                    <p><strong>24/7 Emergency Service</strong></p>
+                    <p>Available around the clock for immediate assistance</p>
+                    <a href="tel:561-247-0018" class="sidebar-phone">561-247-0018</a>
+                    <p><strong>Service Areas:</strong></p>
+                    <p>Palm Beach County, Florida and most counties statewide</p>
+                    <p><strong>Languages:</strong></p>
+                    <p>English and Spanish</p>
+                    <p><strong>Payment Methods:</strong></p>
+                    <p>Cash, Zelle, Credit Cards, Bitcoin</p>
+                    <p><strong>Guarantee:</strong></p>
+                    <p>100% Money-Back Guarantee with guaranteed confidentiality</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials Section -->
+    <div class="testimonials-section">
+        <div class="testimonials-container">
+            <h2 class="testimonials-title">What Our Clients Are Saying</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">
+                        "Professional and fast service. They helped us through a very difficult time with compassion and efficiency. Highly recommended!"
+                    </p>
+                    <p class="testimonial-author">- Maria S., West Palm Beach</p>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">
+                        "Available 24/7 when we needed them most. The bilingual service was crucial for our family. Thank you Barbie's Bail Bonds!"
+                    </p>
+                    <p class="testimonial-author">- Carlos R., Lake Worth</p>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">
+                        "30+ years of experience shows. They handled everything professionally and got our son released quickly. Grateful for their service."
+                    </p>
+                    <p class="testimonial-author">- Jennifer L., Boynton Beach</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Process Steps Section -->
+    <div class="process-section">
+        <div class="process-container">
+            <h2 class="process-title">Our Simple 3-Step Process</h2>
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Call Us</h3>
+                    <p class="step-description">Contact us at 561-247-0018 immediately. We're available 24/7 for emergency bail bond services.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">We Handle Everything</h3>
+                    <p class="step-description">Our experienced agents handle all the paperwork and legal requirements. You can complete the entire process from home.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Your Loved One Gets Released</h3>
+                    <p class="step-description">We work quickly to secure release from Palm Beach County Jail or any detention facility in Florida.</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -607,67 +759,50 @@
             <div class="chat-messages" id="chatMessages">
                 <div class="welcome-message">
                     👋 Hi! I'm your AI assistant for <strong>Barbie's Bail Bonds</strong>.<br><br>
-                    Ask me anything about:<br>
-                    • Bail costs & processes<br>
-                    • Court requirements<br>
-                    • Payment options<br>
-                    • Release procedures
+                    I can help you with questions about:
+                    <br>• Bail bond process
+                    <br>• Pricing and payment options  
+                    <br>• Required paperwork
+                    <br>• Service areas
+                    <br>• Emergency services<br><br>
+                    How can I assist you today?
                 </div>
             </div>
             
             <div class="typing-indicator" id="typingIndicator">
-                🤖 Assistant is typing
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
+                <span>AI is typing...</span>
             </div>
             
-            <div class="chat-input-container">
-                <input 
-                    type="text" 
-                    class="chat-input" 
-                    id="chatInput" 
-                    placeholder="Type your message..."
-                    maxlength="500"
-                >
-                <button class="chat-send" id="chatSend">▶</button>
+            <div class="chat-input-area">
+                <textarea class="chat-input" id="chatInput" placeholder="Type your question here..." rows="1"></textarea>
+                <button class="chat-send" id="chatSend">➤</button>
             </div>
         </div>
     </div>
 
-    <!-- Invisible spacer section to double page height -->
+    <!-- Invisible spacer -->
     <div class="invisible-spacer"></div>
 
     <script>
-    (function() {
-        // Get DOM elements
+        // Chatbot functionality
         const chatButton = document.getElementById('chatButton');
         const chatInterface = document.getElementById('chatInterface');
         const chatClose = document.getElementById('chatClose');
-        const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const chatSend = document.getElementById('chatSend');
+        const chatMessages = document.getElementById('chatMessages');
         const typingIndicator = document.getElementById('typingIndicator');
 
-        // Chatbot positioning now handled by CSS position:fixed - no JavaScript needed!
-
-        // Detect if this page is running inside an embed (e.g., Google Sites)
-        
         const API_URL = 'https://script.google.com/macros/s/AKfycbwvJ8utZ62xKjZt2nz8wZnBJb5vbOsCD38RJnDZ0yFZGppsfWnmv7_YIuz5yV9lZz7z/exec';
         
         let isOpen = false;
         let conversationHistory = [];
-        const MAX_HISTORY = 10; // Keep last 10 exchanges
 
         // Toggle chat interface
         function toggleChat() {
             isOpen = !isOpen;
-            
             if (isOpen) {
                 chatInterface.style.display = 'flex';
-                // Trigger animation after display change
                 setTimeout(() => {
                     chatInterface.classList.add('open');
                 }, 10);
@@ -678,14 +813,12 @@
                 chatInterface.classList.remove('open');
                 chatButton.classList.remove('active');
                 chatButton.innerHTML = '<span class="chat-icon">💬</span>';
-                // Hide after animation completes
                 setTimeout(() => {
                     if (!isOpen) chatInterface.style.display = 'none';
                 }, 300);
             }
         }
 
-        // Event listeners
         chatButton.addEventListener('click', toggleChat);
         chatClose.addEventListener('click', toggleChat);
 
@@ -702,12 +835,8 @@
                 role: 'user',
                 content: message
             });
-            
-            // Keep only last MAX_HISTORY exchanges (user + assistant pairs)
-            if (conversationHistory.length > MAX_HISTORY * 2) {
-                conversationHistory = conversationHistory.slice(-MAX_HISTORY * 2);
-            }
-            
+
+            // Clear input and disable send button
             chatInput.value = '';
             chatSend.disabled = true;
             
@@ -719,26 +848,6 @@
             callChatAPI(message);
         }
 
-        // Add message to chat interface
-        function addMessage(content, role) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role}`;
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.textContent = role === 'user' ? '👤' : '🤖';
-            
-            const messageContent = document.createElement('div');
-            messageContent.className = 'message-content';
-            messageContent.textContent = content;
-            
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(messageContent);
-            chatMessages.appendChild(messageDiv);
-            
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
         // Call chat API using JSONP
         function callChatAPI(message) {
             const timeout = setTimeout(() => {
@@ -746,7 +855,10 @@
             }, 30000); // 30 second timeout
 
             const callbackName = 'chatCallback_' + Date.now();
+            const script = document.createElement('script');
             
+            script.src = `${API_URL}?source=AboutUs_chatbot&action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
+
             window[callbackName] = function(response) {
                 clearTimeout(timeout);
                 
@@ -755,63 +867,95 @@
                     document.head.removeChild(script);
                     delete window[callbackName];
                     
-                    if (response && response.reply) {
-                        // Add assistant response
-                        addMessage(response.reply, 'assistant');
+                    // Hide typing indicator
+                    typingIndicator.style.display = 'none';
+                    
+                    // Handle response
+                    if (response && response.answer) {
+                        const assistantResponse = response.answer;
+                        addMessage(assistantResponse, 'assistant');
                         
                         // Add to conversation history
                         conversationHistory.push({
                             role: 'assistant',
-                            content: response.reply
+                            content: assistantResponse
                         });
+                        
+                        // Keep conversation history manageable
+                        if (conversationHistory.length > 10) {
+                            conversationHistory = conversationHistory.slice(-8);
+                        }
                     } else {
-                        handleAPIError('Sorry, I had trouble processing that. Please try again or call 561-247-0018 for immediate help.');
+                        handleAPIError('I apologize, but I encountered an issue processing your request. Please call us at 561-247-0018 for immediate assistance.');
                     }
                 } catch (error) {
-                    handleAPIError('Connection error. Please try again or call 561-247-0018 for assistance.');
-                } finally {
-                    // Hide typing indicator and re-enable send button
-                    typingIndicator.style.display = 'none';
-                    chatSend.disabled = false;
+                    console.error('Chat API Error:', error);
+                    handleAPIError('I apologize, but I encountered an issue. Please call us at 561-247-0018 for immediate assistance.');
                 }
+                
+                // Re-enable send button
+                chatSend.disabled = false;
             };
 
-            // Create script tag for JSONP request
-            const script = document.createElement('script');
-            script.src = `${API_URL}?source=AboutUs_chatbot&action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
-            
             script.onerror = function() {
                 clearTimeout(timeout);
-                handleAPIError('Unable to reach our AI assistant. Please try again or call 561-247-0018 for immediate help.');
+                handleAPIError('Connection error. Please call us at 561-247-0018 for immediate assistance.');
             };
-            
+
             document.head.appendChild(script);
         }
 
-        // Handle API errors
-        function handleAPIError(errorMessage) {
-            addMessage(errorMessage, 'assistant');
+        function handleAPIError(message) {
             typingIndicator.style.display = 'none';
+            addMessage(message, 'assistant');
             chatSend.disabled = false;
+            
+            // Clean up any lingering scripts
+            try {
+                const scripts = document.querySelectorAll('script[src*="' + API_URL.split('/')[5] + '"]');
+                scripts.forEach(script => {
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                });
+            } catch (e) {
+                console.log('Script cleanup completed');
+            }
         }
 
-        // Event listeners for sending messages
+        // Add message to chat
+        function addMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            
+            const avatar = document.createElement('div');
+            avatar.classList.add('message-avatar');
+            avatar.textContent = sender === 'user' ? 'You' : 'AI';
+            
+            const content = document.createElement('div');
+            content.classList.add('message-content');
+            content.innerHTML = message.replace(/\n/g, '<br>');
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Event listeners
         chatSend.addEventListener('click', sendMessage);
         chatInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
                 sendMessage();
             }
         });
 
-        // Close chat when clicking outside (optional)
-        document.addEventListener('click', function(e) {
-            if (isOpen && !chatInterface.contains(e.target) && !chatButton.contains(e.target)) {
-                // Uncomment the next line if you want to close chat when clicking outside
-                // toggleChat();
-            }
+        // Auto-resize textarea
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
         });
-        
-    })();
     </script>
 </body>
 </html>
