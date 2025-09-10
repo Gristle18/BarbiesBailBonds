@@ -811,7 +811,7 @@
     // Send to AI backend
     const callbackName = 'chatCallback_' + Date.now();
     const script = document.createElement('script');
-    script.src = `${API_URL}?action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
+    script.src = `${API_URL}?source=OnlineApplication_Spanish_chatbot&action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
 
     window[callbackName] = function(response) {
       hideTyping();

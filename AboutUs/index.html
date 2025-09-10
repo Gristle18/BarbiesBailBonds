@@ -848,7 +848,7 @@
 
             // Create script tag for JSONP request
             const script = document.createElement('script');
-            script.src = `${API_URL}?action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
+            script.src = `${API_URL}?source=AboutUs_chatbot&action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
             
             script.onerror = function() {
                 clearTimeout(timeout);

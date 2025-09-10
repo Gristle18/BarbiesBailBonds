@@ -513,7 +513,7 @@
           
           // Create script element
           const script = document.createElement('script');
-          script.src = `https://script.google.com/macros/s/AKfycbwIhKuXcceReUGCg7V5xcOi68MGzh1pBAcCpmvK8stOkmyzp5by-4LBWIhkYFh3hz3j/exec?format=jsonp&callback=${callbackName}`;
+          script.src = `https://script.google.com/macros/s/AKfycbwIhKuXcceReUGCg7V5xcOi68MGzh1pBAcCpmvK8stOkmyzp5by-4LBWIhkYFh3hz3j/exec?source=FAQ_autoload&format=jsonp&callback=${callbackName}`;
           
           // Set up callback
           window[callbackName] = function(data) {
@@ -702,7 +702,7 @@
           
           const callbackName = 'searchCallback_' + Date.now();
           const script = document.createElement('script');
-          script.src = `https://script.google.com/macros/s/AKfycbwIhKuXcceReUGCg7V5xcOi68MGzh1pBAcCpmvK8stOkmyzp5by-4LBWIhkYFh3hz3j/exec?action=search&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
+          script.src = `https://script.google.com/macros/s/AKfycbwIhKuXcceReUGCg7V5xcOi68MGzh1pBAcCpmvK8stOkmyzp5by-4LBWIhkYFh3hz3j/exec?source=FAQ_search&action=search&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
           
           window[callbackName] = function(results) {
             console.log('Semantic search results:', results);
@@ -983,7 +983,7 @@
     // Send to AI backend
     const callbackName = 'chatCallback_' + Date.now();
     const script = document.createElement('script');
-    script.src = `${API_URL}?action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
+    script.src = `${API_URL}?source=FAQ_chatbot&action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
 
     window[callbackName] = function(response) {
       hideTyping();
