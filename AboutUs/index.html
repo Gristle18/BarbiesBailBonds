@@ -688,29 +688,48 @@
         </div>
     </div>
 
-    <!-- Testimonials Section -->
+    <!-- Testimonials Carousel Section -->
     <div class="testimonials-section">
         <div class="testimonials-container">
             <h2 class="testimonials-title">What Our Clients Are Saying</h2>
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <p class="testimonial-text">
-                        "Professional and fast service. They helped us through a very difficult time with compassion and efficiency. Highly recommended!"
-                    </p>
-                    <p class="testimonial-author">- Maria S., West Palm Beach</p>
+            <div class="carousel-container">
+                <div class="testimonials-carousel" id="testimonialsCarousel">
+                    <div class="testimonial-slide">
+                        <p class="testimonial-text">
+                            "Professional and fast service. They helped us through a very difficult time with compassion and efficiency. Highly recommended!"
+                        </p>
+                        <p class="testimonial-author">- Maria S., West Palm Beach</p>
+                    </div>
+                    <div class="testimonial-slide">
+                        <p class="testimonial-text">
+                            "Available 24/7 when we needed them most. The bilingual service was crucial for our family. Thank you Barbie's Bail Bonds!"
+                        </p>
+                        <p class="testimonial-author">- Carlos R., Lake Worth</p>
+                    </div>
+                    <div class="testimonial-slide">
+                        <p class="testimonial-text">
+                            "30+ years of experience shows. They handled everything professionally and got our son released quickly. Grateful for their service."
+                        </p>
+                        <p class="testimonial-author">- Jennifer L., Boynton Beach</p>
+                    </div>
+                    <div class="testimonial-slide">
+                        <p class="testimonial-text">
+                            "They made the whole process so easy and stress-free. Quick response time and very professional staff. Would definitely recommend!"
+                        </p>
+                        <p class="testimonial-author">- Robert T., Delray Beach</p>
+                    </div>
+                    <div class="testimonial-slide">
+                        <p class="testimonial-text">
+                            "Excellent customer service and they walked us through every step. Their Spanish-speaking agent was incredibly helpful for our family."
+                        </p>
+                        <p class="testimonial-author">- Elena M., Boca Raton</p>
+                    </div>
                 </div>
-                <div class="testimonial-card">
-                    <p class="testimonial-text">
-                        "Available 24/7 when we needed them most. The bilingual service was crucial for our family. Thank you Barbie's Bail Bonds!"
-                    </p>
-                    <p class="testimonial-author">- Carlos R., Lake Worth</p>
-                </div>
-                <div class="testimonial-card">
-                    <p class="testimonial-text">
-                        "30+ years of experience shows. They handled everything professionally and got our son released quickly. Grateful for their service."
-                    </p>
-                    <p class="testimonial-author">- Jennifer L., Boynton Beach</p>
-                </div>
+            </div>
+            <div class="carousel-nav">
+                <button class="carousel-btn" id="prevBtn">‹</button>
+                <div class="carousel-dots" id="carouselDots"></div>
+                <button class="carousel-btn" id="nextBtn">›</button>
             </div>
         </div>
     </div>
@@ -956,6 +975,74 @@
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
         });
+
+        // Testimonials Carousel Functionality
+        const carousel = document.getElementById('testimonialsCarousel');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dotsContainer = document.getElementById('carouselDots');
+        
+        let currentSlide = 0;
+        const totalSlides = carousel.children.length;
+        
+        // Create dots
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(i));
+            dotsContainer.appendChild(dot);
+        }
+        
+        function updateCarousel() {
+            const offset = -currentSlide * 100;
+            carousel.style.transform = `translateX(${offset}%)`;
+            
+            // Update dots
+            dotsContainer.querySelectorAll('.dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+            
+            // Update button states
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+        
+        function goToSlide(slideIndex) {
+            currentSlide = slideIndex;
+            updateCarousel();
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateCarousel();
+            }
+        }
+        
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateCarousel();
+            }
+        }
+        
+        // Event listeners
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+        
+        // Auto-advance carousel every 5 seconds
+        setInterval(() => {
+            if (currentSlide === totalSlides - 1) {
+                currentSlide = 0;
+            } else {
+                currentSlide++;
+            }
+            updateCarousel();
+        }, 5000);
+        
+        // Initialize carousel
+        updateCarousel();
     </script>
 </body>
 </html>
