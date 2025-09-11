@@ -171,8 +171,7 @@
         .emergency-banner {
             background: var(--cream);
             color: var(--brand-dark);
-            padding: 15px 20px;
-            text-align: center;
+            padding: 15px 0;
             font-size: 18px;
             font-weight: 700;
             letter-spacing: 1px;
@@ -182,26 +181,20 @@
             border-bottom: 3px solid var(--brand);
         }
 
-        .emergency-banner::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(242, 140, 0, 0.1), transparent);
-            animation: pulse 2s infinite;
+        .emergency-track {
+            display: flex;
+            width: max-content;
+            will-change: transform;
         }
 
-        @keyframes pulse {
-            0% { left: -100%; }
-            100% { left: 100%; }
+        .emergency-text {
+            white-space: nowrap;
+            padding: 0 50px;
         }
 
         .emergency-banner a {
             color: var(--brand-dark);
             text-decoration: none;
-            white-space: nowrap;
         }
 
         .emergency-banner a:hover {
@@ -1042,8 +1035,10 @@
 
     <!-- Emergency Availability Banner -->
     <section class="emergency-banner">
-        <div data-en="⚡ EMERGENCY SERVICE 24/7 • CALL 561-247-0018 NOW ⚡" data-es="⚡ SERVICIO DE EMERGENCIA 24/7 • LLAME 561-247-0018 AHORA ⚡">
-            <a href="tel:561-247-0018">⚡ EMERGENCY SERVICE 24/7 • CALL 561-247-0018 NOW ⚡</a>
+        <div class="emergency-track" id="emergencyTrack">
+            <div class="emergency-text">
+                <a href="tel:561-247-0018" data-en="⚡ EMERGENCY SERVICE 24/7 • CALL 561-247-0018 NOW ⚡" data-es="⚡ SERVICIO DE EMERGENCIA 24/7 • LLAME 561-247-0018 AHORA ⚡">⚡ EMERGENCY SERVICE 24/7 • CALL 561-247-0018 NOW ⚡</a>
+            </div>
         </div>
     </section>
 
@@ -1115,7 +1110,7 @@
     <!-- Payment Confidence Section -->
     <section class="payment-section">
         <div class="payment-container">
-            <h2 class="payment-title" data-en="Transparent Pricing" data-es="Precios Transparentes">Transparent Pricing</h2>
+            <h2 class="payment-title" data-en="How to Pay" data-es="Cómo Pagar">How to Pay</h2>
             <p class="payment-subtitle" data-en="Multiple payment options to fit your situation" data-es="Múltiples opciones de pago para adaptarse a tu situación">Multiple payment options to fit your situation</p>
             
             <div class="payment-methods">
@@ -1233,31 +1228,59 @@
             languageToggle.addEventListener('click', toggleLanguage);
         }
 
-        // Payment Marquee Animation
+        // Emergency Banner Marquee Animation
         document.addEventListener('DOMContentLoaded', function() {
-            const track = document.getElementById('paymentTrack');
-            if (!track) return;
+            const emergencyTrack = document.getElementById('emergencyTrack');
+            if (emergencyTrack) {
+                // Clone emergency text for seamless loop
+                const emergencyText = emergencyTrack.innerHTML;
+                emergencyTrack.innerHTML = emergencyText + emergencyText + emergencyText;
 
-            // Clone payment methods for seamless loop
-            const paymentMethods = track.innerHTML;
-            track.innerHTML = paymentMethods + paymentMethods;
+                // Calculate animation duration based on content width
+                const trackWidth = emergencyTrack.scrollWidth / 3; // Third because we tripled content
+                const duration = trackWidth / 80; // 80px per second for faster scroll
 
-            // Calculate animation duration based on content width
-            const trackWidth = track.scrollWidth / 2; // Half because we doubled content
-            const duration = trackWidth / 50; // 50px per second
+                // Apply animation
+                emergencyTrack.style.animation = `emergencyMarquee ${duration}s linear infinite`;
 
-            // Apply animation
-            track.style.animation = `marquee ${duration}s linear infinite`;
+                // Create keyframes dynamically
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes emergencyMarquee {
+                        0% { transform: translateX(0); }
+                        100% { transform: translateX(-${trackWidth}px); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
 
-            // Create keyframes dynamically
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-${trackWidth}px); }
+            // Payment Marquee Animation
+            const paymentTrack = document.getElementById('paymentTrack');
+            if (paymentTrack) {
+                // Clone payment methods for seamless loop
+                const paymentMethods = paymentTrack.innerHTML;
+                paymentTrack.innerHTML = paymentMethods + paymentMethods;
+
+                // Calculate animation duration based on content width
+                const trackWidth = paymentTrack.scrollWidth / 2; // Half because we doubled content
+                const duration = trackWidth / 50; // 50px per second
+
+                // Apply animation
+                paymentTrack.style.animation = `marquee ${duration}s linear infinite`;
+
+                // Create keyframes dynamically if not already created
+                if (!document.querySelector('style[data-marquee]')) {
+                    const style = document.createElement('style');
+                    style.setAttribute('data-marquee', 'true');
+                    style.textContent = `
+                        @keyframes marquee {
+                            0% { transform: translateX(0); }
+                            100% { transform: translateX(-${trackWidth}px); }
+                        }
+                    `;
+                    document.head.appendChild(style);
                 }
-            `;
-            document.head.appendChild(style);
+            }
         });
 
         // Interactive Checklist Functionality
