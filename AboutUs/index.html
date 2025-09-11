@@ -1318,6 +1318,51 @@
                     `;
                 }
             }
+
+            // Update sidebar content
+            const sidebarTitle = document.querySelector('.sidebar-title');
+            if (sidebarTitle) {
+                sidebarTitle.textContent = currentLanguage === 'en' ? 'Quick Contact' : 'Contacto Rápido';
+            }
+
+            const sidebarPhone = document.querySelector('.sidebar-phone');
+            if (sidebarPhone) {
+                sidebarPhone.textContent = currentLanguage === 'en' ? 'Call Us' : 'Llámanos';
+            }
+
+            // Update sidebar info paragraphs
+            const sidebarInfo = document.querySelector('.sidebar-info');
+            if (sidebarInfo) {
+                if (currentLanguage === 'en') {
+                    sidebarInfo.innerHTML = `
+                        <p><strong>24/7 Emergency Service</strong></p>
+                        <p>Available around the clock for immediate assistance</p>
+                        <a href="tel:561-247-0018" class="sidebar-phone">Call Us</a>
+                        <p><strong>Service Areas:</strong></p>
+                        <p>Palm Beach County, Florida and most counties statewide</p>
+                        <p><strong>Languages:</strong></p>
+                        <p>English and Spanish</p>
+                        <p><strong>Payment Methods:</strong></p>
+                        <p>Cash, Zelle, Credit Cards, Bitcoin</p>
+                        <p><strong>Guarantee:</strong></p>
+                        <p>100% Money-Back Guarantee with guaranteed confidentiality</p>
+                    `;
+                } else {
+                    sidebarInfo.innerHTML = `
+                        <p><strong>Servicio de Emergencia 24/7</strong></p>
+                        <p>Disponible las 24 horas para asistencia inmediata</p>
+                        <a href="tel:561-247-0018" class="sidebar-phone">Llámanos</a>
+                        <p><strong>Áreas de Servicio:</strong></p>
+                        <p>Condado de Palm Beach, Florida y la mayoría de condados del estado</p>
+                        <p><strong>Idiomas:</strong></p>
+                        <p>Inglés y Español</p>
+                        <p><strong>Métodos de Pago:</strong></p>
+                        <p>Efectivo, Zelle, Tarjetas de Crédito, Bitcoin</p>
+                        <p><strong>Garantía:</strong></p>
+                        <p>Garantía de Devolución del 100% del Dinero con confidencialidad garantizada</p>
+                    `;
+                }
+            }
         }
 
         languageToggle.addEventListener('click', toggleLanguage);
