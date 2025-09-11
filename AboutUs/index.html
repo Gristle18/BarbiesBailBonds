@@ -1363,6 +1363,36 @@
                     `;
                 }
             }
+
+            // Update footer content
+            const footerContent = document.querySelector('.footer-content');
+            if (footerContent) {
+                if (currentLanguage === 'en') {
+                    footerContent.innerHTML = `
+                        <p>Since 1993, Jerry & Barbie's Bail Bonds has been a trusted, family-owned agency committed to those in need of a bail bondsman in South Florida. We specialize in a wide range of Bail Bonds and in handling Warrants through our Walkthrough Bonds Service. Our service is 100% confidential and you will be dealing with experienced bail bonds agents the entire time.</p>
+                        
+                        <p>Our office is located just a few minutes south of the Palm Beach County Jail where we provide service in Palm Beach County, Broward County, Miami Dade County, Martin County, St Lucie County, Indian River County, and most other Florida counties.</p>
+                        
+                        <p>If a family member, friend, or any other loved one has been arrested and is in need of a bail bondsman, contact us at <a href="tel:+15612470018" class="footer-contact">561-247-0018</a> for immediate service. Our experienced agents are bilingual and available for bail bond service in English and Spanish!</p>
+                    `;
+                } else {
+                    footerContent.innerHTML = `
+                        <p>Desde 1993, Jerry & Barbie's Bail Bonds ha sido una agencia familiar confiable comprometida con aquellos que necesitan un agente de fianzas en el sur de Florida. Nos especializamos en una amplia gama de Fianzas y en el manejo de Órdenes de Arresto a través de nuestro Servicio de Fianzas de Presentación. Nuestro servicio es 100% confidencial y estarás tratando con agentes de fianzas experimentados todo el tiempo.</p>
+                        
+                        <p>Nuestra oficina está ubicada a solo unos minutos al sur de la Cárcel del Condado de Palm Beach donde brindamos servicio en el Condado de Palm Beach, Condado de Broward, Condado de Miami Dade, Condado de Martin, Condado de St Lucie, Condado de Indian River y la mayoría de otros condados de Florida.</p>
+                        
+                        <p>Si un miembro de la familia, amigo o cualquier otro ser querido ha sido arrestado y necesita un agente de fianzas, contáctanos al <a href="tel:+15612470018" class="footer-contact">561-247-0018</a> para servicio inmediato. ¡Nuestros agentes experimentados son bilingües y están disponibles para servicio de fianzas en inglés y español!</p>
+                    `;
+                }
+            }
+
+            // Update copyright footer
+            const copyrightContent = document.querySelector('.copyright-content p');
+            if (copyrightContent) {
+                copyrightContent.textContent = currentLanguage === 'en' ? 
+                    'Copyright © 2024 Barbie\'s Bail Bonds | Bail Bond Services' :
+                    'Copyright © 2024 Barbie\'s Bail Bonds | Servicios de Fianzas';
+            }
         }
 
         languageToggle.addEventListener('click', toggleLanguage);
