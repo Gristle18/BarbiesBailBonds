@@ -145,6 +145,12 @@
             max-width: 600px;
         }
 
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
         .hero-cta {
             background: var(--brand);
             color: var(--white);
@@ -160,6 +166,26 @@
 
         .hero-cta:hover {
             background: var(--brand-dark);
+        }
+
+        .language-toggle {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 6px;
+            display: inline-block;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .language-toggle:hover {
+            background: var(--white);
+            color: var(--dark);
         }
 
         /* Feature Cards Section */
@@ -477,6 +503,10 @@
                 width: 100%;
             }
 
+            .hero-buttons {
+                justify-content: center;
+            }
+
             .content-container {
                 grid-template-columns: 1fr;
                 gap: 30px;
@@ -737,11 +767,14 @@
     <div class="hero-section">
         <div class="hero-content">
             <div class="hero-text">
-                <h1 class="main-title">About Barbie's Bail Bonds</h1>
-                <p class="hero-subtitle">
+                <h1 class="main-title" data-en="About Barbie's Bail Bonds" data-es="Acerca de Barbie's Bail Bonds">About Barbie's Bail Bonds</h1>
+                <p class="hero-subtitle" data-en="Licensed Palm Beach bail bonds agency providing fast, reliable service in Palm Beach County Florida and throughout most counties in the state. Since 1993, our family agency has been helping families bond out their loved ones with 24-hour emergency service." data-es="Agencia de fianzas licenciada de Palm Beach que brinda servicio rápido y confiable en el Condado de Palm Beach, Florida y en la mayoría de los condados del estado. Desde 1993, nuestra agencia familiar ha estado ayudando a las familias a obtener la libertad de sus seres queridos con servicio de emergencia las 24 horas.">
                     Licensed Palm Beach bail bonds agency providing fast, reliable service in Palm Beach County Florida and throughout most counties in the state. Since 1993, our family agency has been helping families bond out their loved ones with 24-hour emergency service.
                 </p>
-                <a href="tel:561-247-0018" class="hero-cta">Call Us</a>
+                <div class="hero-buttons">
+                    <a href="tel:561-247-0018" class="hero-cta" data-en="Call Us" data-es="Llámanos">Call Us</a>
+                    <button class="language-toggle" id="languageToggle" data-en="En Español" data-es="In English">En Español</button>
+                </div>
             </div>
             <div class="hero-image">
                 <a href="https://g.page/r/CcsG2h4Q6V-WEBM/review" target="_blank">
@@ -1180,6 +1213,114 @@
             }
             requestAnimationFrame(step);
         })();
+
+        // Language Toggle Functionality
+        let currentLanguage = 'en';
+        const languageToggle = document.getElementById('languageToggle');
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'es' : 'en';
+            
+            // Update all elements with data attributes
+            document.querySelectorAll('[data-en][data-es]').forEach(element => {
+                const text = currentLanguage === 'en' ? element.getAttribute('data-en') : element.getAttribute('data-es');
+                element.textContent = text;
+            });
+
+            // Update features section
+            const featuresTitle = document.querySelector('.features-title');
+            if (featuresTitle) {
+                featuresTitle.textContent = currentLanguage === 'en' ? 
+                    'Why People Trust Barbie\'s Bail Bonds' : 
+                    'Por Qué la Gente Confía en Barbie\'s Bail Bonds';
+            }
+
+            // Update reviews section
+            const reviewsTitle = document.querySelector('.bbb-title');
+            if (reviewsTitle) {
+                reviewsTitle.textContent = currentLanguage === 'en' ? 
+                    'What Our Clients Are Saying' : 
+                    'Lo Que Dicen Nuestros Clientes';
+            }
+
+            // Update process section
+            const processTitle = document.querySelector('.process-title');
+            if (processTitle) {
+                processTitle.textContent = currentLanguage === 'en' ? 
+                    'Our Simple 3-Step Process' : 
+                    'Nuestro Proceso Simple de 3 Pasos';
+            }
+
+            // Update feature cards
+            const featureTitles = document.querySelectorAll('.feature-title');
+            const featureTexts = document.querySelectorAll('.feature-text');
+            
+            if (featureTitles.length >= 3) {
+                featureTitles[0].textContent = currentLanguage === 'en' ? '30+ Years Experience' : '30+ Años de Experiencia';
+                featureTitles[1].textContent = currentLanguage === 'en' ? 'Bilingual Service' : 'Servicio Bilingüe';
+                featureTitles[2].textContent = currentLanguage === 'en' ? 'Local Palm Beach Experts' : 'Expertos Locales de Palm Beach';
+            }
+
+            if (featureTexts.length >= 3) {
+                featureTexts[0].textContent = currentLanguage === 'en' ? 
+                    'Serving Florida families since 1993 with trusted, reliable bail bond services.' :
+                    'Sirviendo a familias de Florida desde 1993 con servicios de fianzas confiables y de confianza.';
+                featureTexts[1].textContent = currentLanguage === 'en' ? 
+                    'Our licensed agents speak both English and Spanish to better serve our community.' :
+                    'Nuestros agentes licenciados hablan inglés y español para servir mejor a nuestra comunidad.';
+                featureTexts[2].textContent = currentLanguage === 'en' ? 
+                    'A trusted family business committed to helping other families in their time of need.' :
+                    'Un negocio familiar confiable comprometido a ayudar a otras familias en su momento de necesidad.';
+            }
+
+            // Update process steps
+            const stepTitles = document.querySelectorAll('.step-title');
+            const stepDescriptions = document.querySelectorAll('.step-description');
+
+            if (stepTitles.length >= 3) {
+                stepTitles[0].textContent = currentLanguage === 'en' ? 'Call Us' : 'Llámanos';
+                stepTitles[1].textContent = currentLanguage === 'en' ? 'We Handle Everything' : 'Nosotros Manejamos Todo';
+                stepTitles[2].textContent = currentLanguage === 'en' ? 'Your Loved One Gets Released' : 'Tu Ser Querido Es Liberado';
+            }
+
+            if (stepDescriptions.length >= 3) {
+                stepDescriptions[0].textContent = currentLanguage === 'en' ? 
+                    'Contact us at 561-247-0018 immediately. We\'re available 24/7 for emergency bail bond services.' :
+                    'Contáctanos al 561-247-0018 inmediatamente. Estamos disponibles 24/7 para servicios de emergencia de fianzas.';
+                stepDescriptions[1].textContent = currentLanguage === 'en' ? 
+                    'Our experienced agents handle all the paperwork and legal requirements. You can complete the entire process from home.' :
+                    'Nuestros agentes experimentados manejan todo el papeleo y los requisitos legales. Puedes completar todo el proceso desde casa.';
+                stepDescriptions[2].textContent = currentLanguage === 'en' ? 
+                    'We work quickly to secure release from Palm Beach County Jail or any detention facility in Florida.' :
+                    'Trabajamos rápidamente para asegurar la liberación de la Cárcel del Condado de Palm Beach o cualquier instalación de detención en Florida.';
+            }
+
+            // Update main content
+            const mainContent = document.querySelector('.content-main');
+            if (mainContent) {
+                if (currentLanguage === 'en') {
+                    mainContent.innerHTML = `
+                        <p>Barbie's Bail Bonds is a licensed Palm Beach bail bonds agency providing fast, reliable service in Palm Beach County Florida and throughout most counties in the state. Since 1993 our family agency has been helping families bond out their loved ones.</p>
+                        <p>Whether it be from Palm Beach County's Gun Club Jail or any other detention facility in Florida where we have 24 hour emergency service. Our licensed agents speak English and Spanish to help with any questions.</p>
+                        <p>At Barbie's Bail Bonds you will never have to worry about posting bail because we take care of everything. Our comprehensive services include Bail Bonds in Palm Beach Jail and most other Florida counties, allowing you to complete the ENTIRE Bail Bonds Process from home.</p>
+                        <p>We handle both Felony and Misdemeanor Bail Bonds, as well as Walkthrough Bail Bonds (No Arrest). You can use our Online Bail Bond application for immediate service. We accept Cash, Zelle, Credit Cards, and even Bitcoin with guaranteed confidentiality and a 100% Money-Back Guarantee.</p>
+                        <p>With over 30 years of experience serving Florida families since 1993, we provide trusted, reliable bail bond services. We're available around the clock for immediate assistance when you need us most. As a trusted family business committed to helping other families in their time of need, our licensed agents speak both English and Spanish to better serve our community.</p>
+                        <p>Don't let your loved one stay in jail longer than necessary. Our experienced team is ready to help you through the bail process quickly and efficiently.</p>
+                    `;
+                } else {
+                    mainContent.innerHTML = `
+                        <p>Barbie's Bail Bonds es una agencia de fianzas licenciada de Palm Beach que brinda servicio rápido y confiable en el Condado de Palm Beach, Florida y en la mayoría de los condados del estado. Desde 1993, nuestra agencia familiar ha estado ayudando a las familias a obtener la libertad de sus seres queridos.</p>
+                        <p>Ya sea desde la Cárcel Gun Club del Condado de Palm Beach o cualquier otra instalación de detención en Florida donde tenemos servicio de emergencia las 24 horas. Nuestros agentes licenciados hablan inglés y español para ayudar con cualquier pregunta.</p>
+                        <p>En Barbie's Bail Bonds nunca tendrás que preocuparte por pagar la fianza porque nosotros nos encargamos de todo. Nuestros servicios integrales incluyen Fianzas en la Cárcel de Palm Beach y en la mayoría de otros condados de Florida, lo que te permite completar TODO el Proceso de Fianzas desde casa.</p>
+                        <p>Manejamos tanto Fianzas por Delitos Graves como por Delitos Menores, así como Fianzas de Presentación (Sin Arresto). Puedes usar nuestra aplicación de Fianza en Línea para servicio inmediato. Aceptamos Efectivo, Zelle, Tarjetas de Crédito e incluso Bitcoin con confidencialidad garantizada y una Garantía de Devolución del 100% del Dinero.</p>
+                        <p>Con más de 30 años de experiencia sirviendo a familias de Florida desde 1993, brindamos servicios de fianzas confiables y de confianza. Estamos disponibles las 24 horas para asistencia inmediata cuando más nos necesites. Como un negocio familiar confiable comprometido a ayudar a otras familias en su momento de necesidad, nuestros agentes licenciados hablan inglés y español para servir mejor a nuestra comunidad.</p>
+                        <p>No dejes que tu ser querido permanezca en la cárcel más tiempo del necesario. Nuestro equipo experimentado está listo para ayudarte a través del proceso de fianza de manera rápida y eficiente.</p>
+                    `;
+                }
+            }
+        }
+
+        languageToggle.addEventListener('click', toggleLanguage);
     </script>
 </body>
 </html>
