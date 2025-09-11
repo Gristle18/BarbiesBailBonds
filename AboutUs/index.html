@@ -84,6 +84,64 @@
             z-index: 2;
             max-width: 1200px;
             margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 50px;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hero-image {
+            flex: 0 0 300px;
+            text-align: center;
+        }
+
+        .hero-image a {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .hero-image a:hover {
+            transform: scale(1.05);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .hero-placeholder {
+            width: 100%;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .hero-placeholder:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--brand);
+        }
+
+        .hero-placeholder-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
         }
 
         .main-title {
@@ -418,6 +476,17 @@
                 font-size: 18px;
             }
 
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 30px;
+            }
+
+            .hero-image {
+                flex: 0 0 auto;
+                width: 100%;
+            }
+
             .content-container {
                 grid-template-columns: 1fr;
                 gap: 30px;
@@ -677,11 +746,22 @@
     <!-- Hero Section -->
     <div class="hero-section">
         <div class="hero-content">
-            <h1 class="main-title">About Barbie's Bail Bonds</h1>
-            <p class="hero-subtitle">
-                Licensed Palm Beach bail bonds agency providing fast, reliable service in Palm Beach County Florida and throughout most counties in the state. Since 1993, our family agency has been helping families bond out their loved ones with 24-hour emergency service.
-            </p>
-            <a href="tel:561-247-0018" class="hero-cta">Call Us</a>
+            <div class="hero-text">
+                <h1 class="main-title">About Barbie's Bail Bonds</h1>
+                <p class="hero-subtitle">
+                    Licensed Palm Beach bail bonds agency providing fast, reliable service in Palm Beach County Florida and throughout most counties in the state. Since 1993, our family agency has been helping families bond out their loved ones with 24-hour emergency service.
+                </p>
+                <a href="tel:561-247-0018" class="hero-cta">Call Us</a>
+            </div>
+            <div class="hero-image">
+                <a href="https://g.page/r/CcsG2h4Q6V-WEBM/review" target="_blank">
+                    <div class="hero-placeholder">
+                        <div class="hero-placeholder-icon">⭐</div>
+                        <div>Leave us a Review</div>
+                        <div>on Google</div>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 
