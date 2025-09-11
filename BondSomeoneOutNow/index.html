@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bond Someone Out Now • Barbie's Bail Bonds | 24/7 Emergency Service</title>
+    <style>
+        :root {
+            --brand: #F28C00;
+            --brand-dark: #D67700;
+            --dark: #111;
+            --muted: #666;
+            --light-gray: #eee;
+            --white: #fff;
+            --cream: #fff2d1;
+            --black: #000;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: var(--white);
+        }
+
+        /* Hero Section - Immediate Relief Messaging */
+        .hero-section {
+            background: linear-gradient(135deg, var(--dark) 0%, #000 100%);
+            color: var(--white);
+            padding: 80px 20px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 50px;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hero-image {
+            flex: 0 0 500px;
+            text-align: center;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 350px;
+            object-fit: contain;
+        }
+
+        .main-title {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: var(--brand);
+            color: var(--white);
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--brand-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(242, 140, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--white);
+            padding: 16px 32px;
+            border: 2px solid var(--white);
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-secondary:hover {
+            background: var(--white);
+            color: var(--dark);
+            transform: translateY(-2px);
+        }
+
+        .language-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            padding: 12px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .language-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Emergency Availability Banner */
+        .emergency-banner {
+            background: var(--cream);
+            color: var(--brand-dark);
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            border-top: 3px solid var(--brand);
+            border-bottom: 3px solid var(--brand);
+        }
+
+        .emergency-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(242, 140, 0, 0.1), transparent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .emergency-banner a {
+            color: var(--brand-dark);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .emergency-banner a:hover {
+            text-decoration: underline;
+        }
+
+        /* 3-Step Process Section */
+        .process-section {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .process-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .process-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .process-subtitle {
+            font-size: 18px;
+            margin-bottom: 50px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .step {
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--brand);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            margin: 0 auto 20px;
+        }
+
+        .step-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--white);
+        }
+
+        .step-description {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        .step-time {
+            font-size: 14px;
+            color: var(--brand);
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Social Proof Carousel */
+        .testimonials-section {
+            background: var(--cream);
+            padding: 80px 20px;
+            overflow: hidden;
+        }
+
+        .testimonials-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .testimonials-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .testimonials-subtitle {
+            font-size: 18px;
+            margin-bottom: 50px;
+            color: var(--muted);
+        }
+
+        .bbb-marquee {
+            overflow: hidden;
+            position: relative;
+            margin: 40px 0;
+        }
+
+        .bbb-track {
+            display: flex;
+            gap: 12px;
+            width: max-content;
+            will-change: transform;
+        }
+
+        .testimonial-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-width: 350px;
+            max-width: 350px;
+            text-align: left;
+            border: none;
+        }
+
+        .testimonial-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--brand);
+            margin-bottom: 5px;
+        }
+
+        .testimonial-location {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 30px;
+            }
+
+            .hero-image {
+                flex: none;
+                max-width: 100%;
+            }
+
+            .main-title {
+                font-size: 36px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                text-align: center;
+            }
+
+            .process-title {
+                font-size: 28px;
+            }
+
+            .testimonials-title {
+                font-size: 28px;
+            }
+
+            .testimonial-card {
+                min-width: 300px;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 28px;
+            }
+
+            .hero-subtitle {
+                font-size: 16px;
+            }
+
+            .emergency-banner {
+                font-size: 16px;
+                padding: 12px 15px;
+            }
+
+            .testimonial-card {
+                min-width: 280px;
+                max-width: 280px;
+                padding: 20px;
+            }
+        }
+
+        /* Preparation Section */
+        .preparation-section {
+            background: var(--light-gray);
+            padding: 80px 20px;
+        }
+
+        .preparation-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .preparation-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .preparation-subtitle {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: var(--muted);
+        }
+
+        .checklist {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .checklist-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--light-gray);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-item:hover {
+            background: rgba(242, 140, 0, 0.05);
+            border-radius: 8px;
+            margin: 0 -10px;
+            padding: 15px 10px;
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--muted);
+            border-radius: 4px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item.checked .checklist-checkbox {
+            background: var(--brand);
+            border-color: var(--brand);
+            color: var(--white);
+        }
+
+        .checklist-checkbox::after {
+            content: '✓';
+            display: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .checklist-item.checked .checklist-checkbox::after {
+            display: block;
+        }
+
+        .checklist-text {
+            flex: 1;
+            font-size: 16px;
+            color: var(--dark);
+        }
+
+        .checklist-item.checked .checklist-text {
+            color: var(--muted);
+        }
+
+        .reassurance-content {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .reassurance-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .reassurance-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: var(--muted);
+        }
+
+        .reassurance-highlight {
+            background: var(--cream);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--brand);
+            margin-bottom: 25px;
+        }
+
+        .reassurance-highlight h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .reassurance-highlight p {
+            font-size: 16px;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .preparation-ctas {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-ready {
+            background: var(--brand);
+            color: var(--white);
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-ready:hover {
+            background: var(--brand-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-help {
+            background: transparent;
+            color: var(--brand);
+            padding: 16px 32px;
+            border: 2px solid var(--brand);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-help:hover {
+            background: var(--brand);
+            color: var(--white);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--brand);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Payment Section */
+        .payment-section {
+            background: var(--white);
+            padding: 80px 20px;
+        }
+
+        .payment-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .payment-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .payment-subtitle {
+            font-size: 18px;
+            margin-bottom: 50px;
+            color: var(--muted);
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .payment-method {
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .payment-method:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            border-color: var(--brand);
+        }
+
+        .payment-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--brand);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 24px;
+            color: var(--white);
+        }
+
+        .payment-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .payment-description {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .guarantee-banner {
+            background: var(--cream);
+            border: 2px solid var(--brand);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .guarantee-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--brand-dark);
+        }
+
+        .guarantee-text {
+            font-size: 16px;
+            color: var(--muted);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .preparation-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .preparation-ctas {
+                flex-direction: column;
+            }
+
+            .btn-ready,
+            .btn-help {
+                width: 100%;
+            }
+
+            .payment-methods {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* FAQ Accordion Section */
+        .faq-section {
+            background: var(--black);
+            color: var(--white);
+            padding: 80px 20px;
+        }
+
+        .faq-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .faq-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .faq-subtitle {
+            font-size: 18px;
+            margin-bottom: 50px;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .faq-question {
+            padding: 25px 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--white);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .faq-question:hover {
+            color: var(--brand);
+        }
+
+        .faq-toggle {
+            font-size: 24px;
+            color: var(--brand);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .faq-answer-content {
+            padding: 0 30px 25px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .faq-link {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .faq-link a {
+            color: var(--brand);
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .faq-link a:hover {
+            color: var(--white);
+            text-decoration: underline;
+        }
+
+        /* Final Urgency Section */
+        .urgency-section {
+            background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+            color: var(--white);
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .urgency-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .urgency-title {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .urgency-subtitle {
+            font-size: 20px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .urgency-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+
+        .urgency-ctas {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-urgent-primary {
+            background: var(--white);
+            color: var(--brand-dark);
+            padding: 20px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-urgent-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            background: var(--cream);
+        }
+
+        .btn-urgent-secondary {
+            background: transparent;
+            color: var(--white);
+            padding: 20px 40px;
+            border: 3px solid var(--white);
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-urgent-secondary:hover {
+            background: var(--white);
+            color: var(--brand-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive adjustments for FAQ and Urgency */
+        @media (max-width: 768px) {
+            .faq-question {
+                padding: 20px;
+                font-size: 16px;
+            }
+
+            .faq-answer-content {
+                padding: 0 20px 20px;
+                font-size: 15px;
+            }
+
+            .urgency-title {
+                font-size: 32px;
+            }
+
+            .urgency-subtitle {
+                font-size: 18px;
+            }
+
+            .urgency-ctas {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-urgent-primary,
+            .btn-urgent-secondary {
+                width: 100%;
+                max-width: 300px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="main-title" data-en="Get Your Loved One Out Tonight" data-es="Saque a Su Ser Querido Esta Noche">Get Your Loved One Out Tonight</h1>
+                <p class="hero-subtitle" data-en="24/7 emergency bail bonds • Release in 3-6 hours • Complete process from home" data-es="Fianzas de emergencia 24/7 • Liberación en 3-6 horas • Complete el proceso desde casa">24/7 emergency bail bonds • Release in 3-6 hours • Complete process from home</p>
+                <div class="hero-buttons">
+                    <a href="../OnlineApplication/index.html" class="btn-primary" data-en="Start Release Process" data-es="Comenzar Proceso de Liberación">Start Release Process</a>
+                    <a href="tel:561-247-0018" class="btn-secondary" data-en="Call 561-247-0018" data-es="Llamar 561-247-0018">Call 561-247-0018</a>
+                    <button id="languageToggle" class="language-toggle" data-en="En Español" data-es="In English">En Español</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div style="width: 100%; height: 350px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); font-size: 18px;">
+                    Trust & Family Image
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Emergency Availability Banner -->
+    <section class="emergency-banner">
+        <div data-en="⚡ EMERGENCY SERVICE ACTIVE 24/7 • CALL 561-247-0018 NOW ⚡" data-es="⚡ SERVICIO DE EMERGENCIA ACTIVO 24/7 • LLAME 561-247-0018 AHORA ⚡">
+            <a href="tel:561-247-0018">⚡ EMERGENCY SERVICE ACTIVE 24/7 • CALL 561-247-0018 NOW ⚡</a>
+        </div>
+    </section>
+
+    <!-- 3-Step Process Section -->
+    <section class="process-section">
+        <div class="process-container">
+            <h2 class="process-title" data-en="3 Steps to Freedom" data-es="3 Pasos a la Libertad">3 Steps to Freedom</h2>
+            <p class="process-subtitle" data-en="We make the bail bond process simple and fast" data-es="Hacemos que el proceso de fianza sea simple y rápido">We make the bail bond process simple and fast</p>
+            
+            <div class="process-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title" data-en="Call or Apply Online" data-es="Llame o Aplique en Línea">Call or Apply Online</h3>
+                    <p class="step-description" data-en="Contact us 24/7 by phone or start your application online. We'll gather the basic information needed to begin the release process." data-es="Contáctenos 24/7 por teléfono o comience su solicitud en línea. Recopilaremos la información básica necesaria para comenzar el proceso de liberación.">Contact us 24/7 by phone or start your application online. We'll gather the basic information needed to begin the release process.</p>
+                    <div class="step-time" data-en="5 minutes" data-es="5 minutos">5 minutes</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title" data-en="We Handle Everything" data-es="Nosotros Manejamos Todo">We Handle Everything</h3>
+                    <p class="step-description" data-en="Our experienced team processes paperwork, coordinates with the jail, and arranges payment. You stay informed throughout the entire process." data-es="Nuestro equipo experimentado procesa el papeleo, se coordina con la cárcel y organiza el pago. Usted se mantiene informado durante todo el proceso.">Our experienced team processes paperwork, coordinates with the jail, and arranges payment. You stay informed throughout the entire process.</p>
+                    <div class="step-time" data-en="1-2 hours" data-es="1-2 horas">1-2 hours</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title" data-en="They Come Home" data-es="Ellos Regresan a Casa">They Come Home</h3>
+                    <p class="step-description" data-en="Your loved one is released and can return home while awaiting their court date. We'll provide all necessary court information and reminders." data-es="Su ser querido es liberado y puede regresar a casa mientras espera su fecha de corte. Proporcionaremos toda la información y recordatorios necesarios del tribunal.">Your loved one is released and can return home while awaiting their court date. We'll provide all necessary court information and reminders.</p>
+                    <div class="step-time" data-en="3-6 hours total" data-es="3-6 horas total">3-6 hours total</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof Carousel -->
+    <section class="testimonials-section">
+        <div class="testimonials-container">
+            <h2 class="testimonials-title" data-en="Trusted by Families" data-es="Confiado por Familias">Trusted by Families</h2>
+            <p class="testimonials-subtitle" data-en="Real stories from families we've helped reunite" data-es="Historias reales de familias que hemos ayudado a reunir">Real stories from families we've helped reunite</p>
+            
+            <div class="bbb-marquee">
+                <div class="bbb-track" id="testimonialTrack">
+                    <div class="testimonial-card">
+                        <p class="testimonial-text" data-en='"Barbie\'s team got my son out in just 4 hours on a Sunday night. They were professional, caring, and kept me updated every step of the way."' data-es='"El equipo de Barbie sacó a mi hijo en solo 4 horas un domingo por la noche. Fueron profesionales, cariñosos y me mantuvieron informada en cada paso del camino."'>"Barbie's team got my son out in just 4 hours on a Sunday night. They were professional, caring, and kept me updated every step of the way."</p>
+                        <div class="testimonial-author" data-en="Maria S." data-es="María S.">Maria S.</div>
+                        <div class="testimonial-location" data-en="West Palm Beach" data-es="West Palm Beach">West Palm Beach</div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="testimonial-text" data-en='"When my husband was arrested, I was terrified. Barbie\'s made the whole process simple and got him home to our kids by morning."' data-es='"Cuando arrestaron a mi esposo, estaba aterrorizada. Barbie\'s hizo que todo el proceso fuera simple y lo trajo a casa con nuestros hijos por la mañana."'>"When my husband was arrested, I was terrified. Barbie's made the whole process simple and got him home to our kids by morning."</p>
+                        <div class="testimonial-author" data-en="Jennifer R." data-es="Jennifer R.">Jennifer R.</div>
+                        <div class="testimonial-location" data-en="Boca Raton" data-es="Boca Raton">Boca Raton</div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="testimonial-text" data-en='"Fair pricing, no hidden fees, and they worked with our payment plan. My brother was home in 5 hours. Highly recommend!"' data-es='"Precios justos, sin tarifas ocultas, y trabajaron con nuestro plan de pago. Mi hermano estaba en casa en 5 horas. ¡Altamente recomendado!"'>"Fair pricing, no hidden fees, and they worked with our payment plan. My brother was home in 5 hours. Highly recommend!"</p>
+                        <div class="testimonial-author" data-en="Carlos M." data-es="Carlos M.">Carlos M.</div>
+                        <div class="testimonial-location" data-en="Delray Beach" data-es="Delray Beach">Delray Beach</div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="testimonial-text" data-en='"Professional service at 3 AM when we needed it most. They explained everything clearly and delivered on their promises."' data-es='"Servicio profesional a las 3 AM cuando más lo necesitábamos. Explicaron todo claramente y cumplieron sus promesas."'>"Professional service at 3 AM when we needed it most. They explained everything clearly and delivered on their promises."</p>
+                        <div class="testimonial-author" data-en="Linda T." data-es="Linda T.">Linda T.</div>
+                        <div class="testimonial-location" data-en="Boynton Beach" data-es="Boynton Beach">Boynton Beach</div>
+                    </div>
+                    <div class="testimonial-card">
+                        <p class="testimonial-text" data-en='"30+ years in business shows. They know the system and got my daughter released faster than I thought possible."' data-es='"Más de 30 años en el negocio se nota. Conocen el sistema y liberaron a mi hija más rápido de lo que pensé posible."'>"30+ years in business shows. They know the system and got my daughter released faster than I thought possible."</p>
+                        <div class="testimonial-author" data-en="Robert K." data-es="Roberto K.">Robert K.</div>
+                        <div class="testimonial-location" data-en="Lake Worth" data-es="Lake Worth">Lake Worth</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Preparation Section -->
+    <section class="preparation-section">
+        <div class="preparation-container">
+            <div>
+                <h2 class="preparation-title" data-en="We'll Help You Get Ready" data-es="Te Ayudaremos a Prepararte">We'll Help You Get Ready</h2>
+                <p class="preparation-subtitle" data-en="Gather these items to speed up the process" data-es="Reúne estos artículos para acelerar el proceso">Gather these items to speed up the process</p>
+                
+                <div class="checklist">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText" data-en="0% Complete - Let's get started!" data-es="0% Completo - ¡Empecemos!">0% Complete - Let's get started!</div>
+                    
+                    <h3 class="checklist-title" data-en="Preparation Checklist" data-es="Lista de Preparación">Preparation Checklist</h3>
+                    
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checklist-text" data-en="Full name and date of birth of person in jail" data-es="Nombre completo y fecha de nacimiento de la persona en la cárcel">Full name and date of birth of person in jail</div>
+                    </div>
+                    
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checklist-text" data-en="Jail location and booking number (if available)" data-es="Ubicación de la cárcel y número de reserva (si está disponible)">Jail location and booking number (if available)</div>
+                    </div>
+                    
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checklist-text" data-en="Your contact information and relationship" data-es="Tu información de contacto y relación">Your contact information and relationship</div>
+                    </div>
+                    
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checklist-text" data-en="Form of payment (Zelle, Credit/Debit, Cash, Bitcoin)" data-es="Forma de pago (Zelle, Crédito/Débito, Efectivo, Bitcoin)">Form of payment (Zelle, Credit/Debit, Cash, Bitcoin)</div>
+                    </div>
+                    
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <div class="checklist-checkbox"></div>
+                        <div class="checklist-text" data-en="Valid ID for yourself (driver's license or state ID)" data-es="Identificación válida para ti (licencia de conducir o identificación estatal)">Valid ID for yourself (driver's license or state ID)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reassurance-content">
+                <h3 class="reassurance-title" data-en="Don't Have Everything?" data-es="¿No Tienes Todo?">Don't Have Everything?</h3>
+                <p class="reassurance-text" data-en="Don't worry! We work with families every day who don't have all the information immediately. We'll help you find what we need and guide you through each step." data-es="¡No te preocupes! Trabajamos con familias todos los días que no tienen toda la información inmediatamente. Te ayudaremos a encontrar lo que necesitamos y te guiaremos en cada paso.">Don't worry! We work with families every day who don't have all the information immediately. We'll help you find what we need and guide you through each step.</p>
+                
+                <div class="reassurance-highlight">
+                    <h4 data-en="We Can Help You Find:" data-es="Podemos Ayudarte a Encontrar:">We Can Help You Find:</h4>
+                    <p data-en="• Jail location and booking information • Bail amount and charges • Court dates and requirements • Payment options that work for you" data-es="• Ubicación de la cárcel e información de reserva • Monto de la fianza y cargos • Fechas de la corte y requisitos • Opciones de pago que funcionen para ti">• Jail location and booking information<br>• Bail amount and charges<br>• Court dates and requirements<br>• Payment options that work for you</p>
+                </div>
+                
+                <p class="reassurance-text" data-en="Our experienced team has been helping Palm Beach County families for over 30 years. We know the system inside and out, and we'll make sure nothing falls through the cracks." data-es="Nuestro equipo experimentado ha estado ayudando a familias del condado de Palm Beach por más de 30 años. Conocemos el sistema por dentro y por fuera, y nos aseguraremos de que nada se pase por alto.">Our experienced team has been helping Palm Beach County families for over 30 years. We know the system inside and out, and we'll make sure nothing falls through the cracks.</p>
+                
+                <div class="preparation-ctas">
+                    <a href="../OnlineApplication/index.html" class="btn-ready" data-en="I'm Ready to Start" data-es="Estoy Listo para Comenzar">I'm Ready to Start</a>
+                    <a href="../FAQ/index.html" class="btn-help" data-en="I Need Help" data-es="Necesito Ayuda">I Need Help</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Confidence Section -->
+    <section class="payment-section">
+        <div class="payment-container">
+            <h2 class="payment-title" data-en="Transparent Pricing" data-es="Precios Transparentes">Transparent Pricing</h2>
+            <p class="payment-subtitle" data-en="Multiple payment options to fit your situation" data-es="Múltiples opciones de pago para adaptarse a tu situación">Multiple payment options to fit your situation</p>
+            
+            <div class="payment-methods">
+                <div class="payment-method">
+                    <div class="payment-icon">💸</div>
+                    <h3 class="payment-name" data-en="Zelle" data-es="Zelle">Zelle</h3>
+                    <p class="payment-description" data-en="Fast, secure bank transfers" data-es="Transferencias bancarias rápidas y seguras">Fast, secure bank transfers</p>
+                </div>
+                
+                <div class="payment-method">
+                    <div class="payment-icon">💳</div>
+                    <h3 class="payment-name" data-en="Credit/Debit" data-es="Crédito/Débito">Credit/Debit</h3>
+                    <p class="payment-description" data-en="All major cards accepted" data-es="Se aceptan todas las tarjetas principales">All major cards accepted</p>
+                </div>
+                
+                <div class="payment-method">
+                    <div class="payment-icon">💵</div>
+                    <h3 class="payment-name" data-en="Cash" data-es="Efectivo">Cash</h3>
+                    <p class="payment-description" data-en="In-person payments welcome" data-es="Pagos en persona bienvenidos">In-person payments welcome</p>
+                </div>
+                
+                <div class="payment-method">
+                    <div class="payment-icon">₿</div>
+                    <h3 class="payment-name" data-en="Bitcoin" data-es="Bitcoin">Bitcoin</h3>
+                    <p class="payment-description" data-en="Cryptocurrency accepted" data-es="Criptomoneda aceptada">Cryptocurrency accepted</p>
+                </div>
+            </div>
+            
+            <div class="guarantee-banner">
+                <h3 class="guarantee-title" data-en="100% Money-Back Guarantee" data-es="Garantía de Devolución del 100%">100% Money-Back Guarantee</h3>
+                <p class="guarantee-text" data-en="If we can't secure the release for any reason, you get your money back. No questions asked." data-es="Si no podemos asegurar la liberación por cualquier razón, recuperas tu dinero. Sin preguntas.">If we can't secure the release for any reason, you get your money back. No questions asked.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Accordion Section -->
+    <section class="faq-section">
+        <div class="faq-container">
+            <h2 class="faq-title" data-en="Quick Answers" data-es="Respuestas Rápidas">Quick Answers</h2>
+            <p class="faq-subtitle" data-en="Common questions about the bail bond process" data-es="Preguntas comunes sobre el proceso de fianza">Common questions about the bail bond process</p>
+            
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span data-en="How long does the release process take?" data-es="¿Cuánto tiempo toma el proceso de liberación?">How long does the release process take?</span>
+                    <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content" data-en="Most releases happen within 3-6 hours after we receive your information and payment. The exact time depends on the jail's current processing load and the time of day." data-es="La mayoría de las liberaciones ocurren dentro de 3-6 horas después de que recibimos su información y pago. El tiempo exacto depende de la carga de procesamiento actual de la cárcel y la hora del día.">Most releases happen within 3-6 hours after we receive your information and payment. The exact time depends on the jail's current processing load and the time of day.</div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span data-en="What if I can't afford the full bail amount?" data-es="¿Qué pasa si no puedo pagar el monto completo de la fianza?">What if I can't afford the full bail amount?</span>
+                    <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content" data-en="You don't pay the full bail amount. You typically pay us 10% of the total bail amount as our fee. We post the full bail with the court. We also offer payment plans to make it even more affordable." data-es="No pagas el monto completo de la fianza. Típicamente nos pagas el 10% del monto total de la fianza como nuestra tarifa. Nosotros ponemos la fianza completa en el tribunal. También ofrecemos planes de pago para hacerlo aún más asequible.">You don't pay the full bail amount. You typically pay us 10% of the total bail amount as our fee. We post the full bail with the court. We also offer payment plans to make it even more affordable.</div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span data-en="Do I get my money back after court?" data-es="¿Recupero mi dinero después de la corte?">Do I get my money back after court?</span>
+                    <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content" data-en="The fee you pay to us (typically 10%) is non-refundable - this is how bail bond companies work. However, if the defendant appears for all court dates, you have no additional obligations to us." data-es="La tarifa que nos pagas (típicamente 10%) no es reembolsable - así es como funcionan las compañías de fianzas. Sin embargo, si el acusado se presenta a todas las fechas de la corte, no tienes obligaciones adicionales con nosotros.">The fee you pay to us (typically 10%) is non-refundable - this is how bail bond companies work. However, if the defendant appears for all court dates, you have no additional obligations to us.</div>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span data-en="What happens if they miss court?" data-es="¿Qué pasa si faltan a la corte?">What happens if they miss court?</span>
+                    <span class="faq-toggle">+</span>
+                </button>
+                <div class="faq-answer">
+                    <div class="faq-answer-content" data-en="If the defendant misses court, we'll work with you to resolve the situation quickly. We have 180 days to return them to custody. Our priority is helping families stay together, so we'll explore all options before taking enforcement action." data-es="Si el acusado falta a la corte, trabajaremos contigo para resolver la situación rápidamente. Tenemos 180 días para devolverlos a custodia. Nuestra prioridad es ayudar a las familias a mantenerse juntas, así que exploraremos todas las opciones antes de tomar acción de cumplimiento.">If the defendant misses court, we'll work with you to resolve the situation quickly. We have 180 days to return them to custody. Our priority is helping families stay together, so we'll explore all options before taking enforcement action.</div>
+                </div>
+            </div>
+            
+            <div class="faq-link">
+                <a href="../FAQ/index.html" data-en="View All Frequently Asked Questions →" data-es="Ver Todas las Preguntas Frecuentes →">View All Frequently Asked Questions →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final Urgency Section -->
+    <section class="urgency-section">
+        <div class="urgency-container">
+            <h2 class="urgency-title" data-en="Don't Wait" data-es="No Esperes">Don't Wait</h2>
+            <p class="urgency-subtitle" data-en="Every Hour Counts" data-es="Cada Hora Cuenta">Every Hour Counts</p>
+            <p class="urgency-text" data-en="The sooner you start the process, the sooner your loved one comes home. Our team is standing by 24/7 to help you through this difficult time." data-es="Cuanto antes comiences el proceso, antes regresará tu ser querido a casa. Nuestro equipo está esperando 24/7 para ayudarte en este momento difícil.">The sooner you start the process, the sooner your loved one comes home. Our team is standing by 24/7 to help you through this difficult time.</p>
+            
+            <div class="urgency-ctas">
+                <a href="../OnlineApplication/index.html" class="btn-urgent-primary" data-en="Start Now" data-es="Comenzar Ahora">Start Now</a>
+                <a href="tel:561-247-0018" class="btn-urgent-secondary" data-en="Call 561-247-0018" data-es="Llamar 561-247-0018">Call 561-247-0018</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chatbot Integration -->
+    <iframe src="../components/chatbot.html" style="position: fixed; bottom: 20px; right: 20px; width: 350px; height: 500px; border: none; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 1000; display: none;" id="chatbotFrame"></iframe>
+    
+    <button onclick="toggleChatbot()" style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--brand); color: var(--white); border: none; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1001;" id="chatbotToggle">💬</button>
+
+    <script>
+        // Language Toggle Functionality
+        let currentLanguage = 'en';
+        const languageToggle = document.getElementById('languageToggle');
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'es' : 'en';
+            
+            // Update all elements with data attributes
+            document.querySelectorAll('[data-en][data-es]').forEach(element => {
+                const text = currentLanguage === 'en' ? element.getAttribute('data-en') : element.getAttribute('data-es');
+                if (element.tagName === 'INPUT' && element.type === 'submit') {
+                    element.value = text;
+                } else {
+                    element.textContent = text;
+                }
+            });
+
+            // Update language toggle button
+            languageToggle.textContent = currentLanguage === 'en' ? 'En Español' : 'In English';
+        }
+
+        if (languageToggle) {
+            languageToggle.addEventListener('click', toggleLanguage);
+        }
+
+        // Testimonial Marquee Animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.getElementById('testimonialTrack');
+            if (!track) return;
+
+            // Clone testimonials for seamless loop
+            const testimonials = track.innerHTML;
+            track.innerHTML = testimonials + testimonials;
+
+            // Calculate animation duration based on content width
+            const trackWidth = track.scrollWidth / 2; // Half because we doubled content
+            const duration = trackWidth / 50; // 50px per second
+
+            // Apply animation
+            track.style.animation = `marquee ${duration}s linear infinite`;
+
+            // Create keyframes dynamically
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes marquee {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-${trackWidth}px); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        // Interactive Checklist Functionality
+        function toggleCheck(item) {
+            item.classList.toggle('checked');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const items = document.querySelectorAll('.checklist-item');
+            const checkedItems = document.querySelectorAll('.checklist-item.checked');
+            const percentage = Math.round((checkedItems.length / items.length) * 100);
+            
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            progressFill.style.width = percentage + '%';
+            
+            if (currentLanguage === 'en') {
+                if (percentage === 0) {
+                    progressText.textContent = "0% Complete - Let's get started!";
+                } else if (percentage === 100) {
+                    progressText.textContent = "100% Complete - You're ready!";
+                } else {
+                    progressText.textContent = percentage + "% Complete - Keep going!";
+                }
+            } else {
+                if (percentage === 0) {
+                    progressText.textContent = "0% Completo - ¡Empecemos!";
+                } else if (percentage === 100) {
+                    progressText.textContent = "100% Completo - ¡Estás listo!";
+                } else {
+                    progressText.textContent = percentage + "% Completo - ¡Sigue así!";
+                }
+            }
+        }
+
+        // FAQ Accordion Functionality
+        function toggleFaq(button) {
+            const faqItem = button.parentElement;
+            const allItems = document.querySelectorAll('.faq-item');
+            
+            // Close all other items
+            allItems.forEach(item => {
+                if (item !== faqItem) {
+                    item.classList.remove('active');
+                    item.querySelector('.faq-toggle').textContent = '+';
+                }
+            });
+            
+            // Toggle current item
+            faqItem.classList.toggle('active');
+            const toggle = button.querySelector('.faq-toggle');
+            toggle.textContent = faqItem.classList.contains('active') ? '+' : '+';
+        }
+
+        // Chatbot Toggle
+        function toggleChatbot() {
+            const chatbotFrame = document.getElementById('chatbotFrame');
+            const chatbotToggle = document.getElementById('chatbotToggle');
+            
+            if (chatbotFrame.style.display === 'none') {
+                chatbotFrame.style.display = 'block';
+                chatbotToggle.textContent = '✕';
+            } else {
+                chatbotFrame.style.display = 'none';
+                chatbotToggle.textContent = '💬';
+            }
+        }
+    </script>
+</body>
+</html>
