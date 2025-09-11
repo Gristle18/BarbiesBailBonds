@@ -705,10 +705,16 @@
         }
 
         .payment-methods {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            overflow: hidden;
+            position: relative;
+            margin: 40px 0;
+        }
+
+        .payment-track {
+            display: flex;
             gap: 30px;
-            margin-bottom: 40px;
+            width: max-content;
+            will-change: transform;
         }
 
         .payment-method {
@@ -718,6 +724,8 @@
             text-align: center;
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            min-width: 250px;
+            max-width: 250px;
         }
 
         .payment-method:hover {
@@ -1102,43 +1110,6 @@
         </div>
     </section>
 
-    <!-- Social Proof Carousel -->
-    <section class="testimonials-section">
-        <div class="testimonials-container">
-            <h2 class="testimonials-title" data-en="Trusted by Families" data-es="Confiado por Familias">Trusted by Families</h2>
-            <p class="testimonials-subtitle" data-en="Real stories from families we've helped reunite" data-es="Historias reales de familias que hemos ayudado a reunir">Real stories from families we've helped reunite</p>
-            
-            <div class="bbb-marquee">
-                <div class="bbb-track" id="testimonialTrack">
-                    <div class="testimonial-card">
-                        <p class="testimonial-text" data-en='"Barbie\'s team got my son out in just 4 hours on a Sunday night. They were professional, caring, and kept me updated every step of the way."' data-es='"El equipo de Barbie sacó a mi hijo en solo 4 horas un domingo por la noche. Fueron profesionales, cariñosos y me mantuvieron informada en cada paso del camino."'>"Barbie's team got my son out in just 4 hours on a Sunday night. They were professional, caring, and kept me updated every step of the way."</p>
-                        <div class="testimonial-author" data-en="Maria S." data-es="María S.">Maria S.</div>
-                        <div class="testimonial-location" data-en="West Palm Beach" data-es="West Palm Beach">West Palm Beach</div>
-                    </div>
-                    <div class="testimonial-card">
-                        <p class="testimonial-text" data-en='"When my husband was arrested, I was terrified. Barbie\'s made the whole process simple and got him home to our kids by morning."' data-es='"Cuando arrestaron a mi esposo, estaba aterrorizada. Barbie\'s hizo que todo el proceso fuera simple y lo trajo a casa con nuestros hijos por la mañana."'>"When my husband was arrested, I was terrified. Barbie's made the whole process simple and got him home to our kids by morning."</p>
-                        <div class="testimonial-author" data-en="Jennifer R." data-es="Jennifer R.">Jennifer R.</div>
-                        <div class="testimonial-location" data-en="Boca Raton" data-es="Boca Raton">Boca Raton</div>
-                    </div>
-                    <div class="testimonial-card">
-                        <p class="testimonial-text" data-en='"Fair pricing, no hidden fees, and they worked with our payment plan. My brother was home in 5 hours. Highly recommend!"' data-es='"Precios justos, sin tarifas ocultas, y trabajaron con nuestro plan de pago. Mi hermano estaba en casa en 5 horas. ¡Altamente recomendado!"'>"Fair pricing, no hidden fees, and they worked with our payment plan. My brother was home in 5 hours. Highly recommend!"</p>
-                        <div class="testimonial-author" data-en="Carlos M." data-es="Carlos M.">Carlos M.</div>
-                        <div class="testimonial-location" data-en="Delray Beach" data-es="Delray Beach">Delray Beach</div>
-                    </div>
-                    <div class="testimonial-card">
-                        <p class="testimonial-text" data-en='"Professional service at 3 AM when we needed it most. They explained everything clearly and delivered on their promises."' data-es='"Servicio profesional a las 3 AM cuando más lo necesitábamos. Explicaron todo claramente y cumplieron sus promesas."'>"Professional service at 3 AM when we needed it most. They explained everything clearly and delivered on their promises."</p>
-                        <div class="testimonial-author" data-en="Linda T." data-es="Linda T.">Linda T.</div>
-                        <div class="testimonial-location" data-en="Boynton Beach" data-es="Boynton Beach">Boynton Beach</div>
-                    </div>
-                    <div class="testimonial-card">
-                        <p class="testimonial-text" data-en='"30+ years in business shows. They know the system and got my daughter released faster than I thought possible."' data-es='"Más de 30 años en el negocio se nota. Conocen el sistema y liberaron a mi hija más rápido de lo que pensé posible."'>"30+ years in business shows. They know the system and got my daughter released faster than I thought possible."</p>
-                        <div class="testimonial-author" data-en="Robert K." data-es="Roberto K.">Robert K.</div>
-                        <div class="testimonial-location" data-en="Lake Worth" data-es="Lake Worth">Lake Worth</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
 
     <!-- Payment Confidence Section -->
@@ -1148,28 +1119,30 @@
             <p class="payment-subtitle" data-en="Multiple payment options to fit your situation" data-es="Múltiples opciones de pago para adaptarse a tu situación">Multiple payment options to fit your situation</p>
             
             <div class="payment-methods">
-                <div class="payment-method">
-                    <div class="payment-icon">💸</div>
-                    <h3 class="payment-name" data-en="Zelle" data-es="Zelle">Zelle</h3>
-                    <p class="payment-description" data-en="Fast, secure bank transfers" data-es="Transferencias bancarias rápidas y seguras">Fast, secure bank transfers</p>
-                </div>
-                
-                <div class="payment-method">
-                    <div class="payment-icon">💳</div>
-                    <h3 class="payment-name" data-en="Credit/Debit" data-es="Crédito/Débito">Credit/Debit</h3>
-                    <p class="payment-description" data-en="All major cards accepted" data-es="Se aceptan todas las tarjetas principales">All major cards accepted</p>
-                </div>
-                
-                <div class="payment-method">
-                    <div class="payment-icon">💵</div>
-                    <h3 class="payment-name" data-en="Cash" data-es="Efectivo">Cash</h3>
-                    <p class="payment-description" data-en="In-person payments welcome" data-es="Pagos en persona bienvenidos">In-person payments welcome</p>
-                </div>
-                
-                <div class="payment-method">
-                    <div class="payment-icon">₿</div>
-                    <h3 class="payment-name" data-en="Bitcoin" data-es="Bitcoin">Bitcoin</h3>
-                    <p class="payment-description" data-en="Cryptocurrency accepted" data-es="Criptomoneda aceptada">Cryptocurrency accepted</p>
+                <div class="payment-track" id="paymentTrack">
+                    <div class="payment-method">
+                        <div class="payment-icon">💸</div>
+                        <h3 class="payment-name" data-en="Zelle" data-es="Zelle">Zelle</h3>
+                        <p class="payment-description" data-en="Fast, secure bank transfers" data-es="Transferencias bancarias rápidas y seguras">Fast, secure bank transfers</p>
+                    </div>
+                    
+                    <div class="payment-method">
+                        <div class="payment-icon">💳</div>
+                        <h3 class="payment-name" data-en="Credit/Debit" data-es="Crédito/Débito">Credit/Debit</h3>
+                        <p class="payment-description" data-en="All major cards accepted" data-es="Se aceptan todas las tarjetas principales">All major cards accepted</p>
+                    </div>
+                    
+                    <div class="payment-method">
+                        <div class="payment-icon">💵</div>
+                        <h3 class="payment-name" data-en="Cash" data-es="Efectivo">Cash</h3>
+                        <p class="payment-description" data-en="In-person payments welcome" data-es="Pagos en persona bienvenidos">In-person payments welcome</p>
+                    </div>
+                    
+                    <div class="payment-method">
+                        <div class="payment-icon">₿</div>
+                        <h3 class="payment-name" data-en="Bitcoin" data-es="Bitcoin">Bitcoin</h3>
+                        <p class="payment-description" data-en="Cryptocurrency accepted" data-es="Criptomoneda aceptada">Cryptocurrency accepted</p>
+                    </div>
                 </div>
             </div>
             
@@ -1273,14 +1246,14 @@
             languageToggle.addEventListener('click', toggleLanguage);
         }
 
-        // Testimonial Marquee Animation
+        // Payment Marquee Animation
         document.addEventListener('DOMContentLoaded', function() {
-            const track = document.getElementById('testimonialTrack');
+            const track = document.getElementById('paymentTrack');
             if (!track) return;
 
-            // Clone testimonials for seamless loop
-            const testimonials = track.innerHTML;
-            track.innerHTML = testimonials + testimonials;
+            // Clone payment methods for seamless loop
+            const paymentMethods = track.innerHTML;
+            track.innerHTML = paymentMethods + paymentMethods;
 
             // Calculate animation duration based on content width
             const trackWidth = track.scrollWidth / 2; // Half because we doubled content
