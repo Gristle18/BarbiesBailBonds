@@ -37,12 +37,17 @@ function doPost(e) {
     
     console.log('Parsed form data:', JSON.stringify(formData, null, 2));
     
-    // Validate required fields
-    const requiredFields = ['yourName', 'yourPhone', 'defendantName', 'caseNumber'];
+    // Validate required fields (caseNumber is optional)
+    const requiredFields = ['yourName', 'yourPhone', 'defendantName'];
     for (const field of requiredFields) {
       if (!formData[field] || formData[field].trim() === '') {
         throw new Error(`Required field missing: ${field}`);
       }
+    }
+    
+    // Ensure optional fields have default values
+    if (!formData.caseNumber) {
+      formData.caseNumber = '';
     }
     
     // Group files by document type
