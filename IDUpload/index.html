@@ -2724,17 +2724,45 @@
             
             console.log('✅ Parsed result:', result);
             
+            // Detailed analysis of the response
             if (result.success) {
+              console.log('🎯 Upload Success Details:');
+              console.log('  📊 Processed files:', result.processed || 0);
+              console.log('  📝 Details array length:', result.details?.length || 0);
+              console.log('  💬 Message:', result.message);
+              
+              if (result.details && result.details.length > 0) {
+                console.log('  📄 Processing details:');
+                result.details.forEach((detail, index) => {
+                  console.log(`    ${index + 1}:`, detail);
+                });
+              } else {
+                console.warn('⚠️ No details provided in successful response - files may not have been processed');
+              }
+              
+              if (result.processed === 0) {
+                console.warn('⚠️ Server reported 0 processed files - this indicates a backend processing issue');
+                console.warn('   Check Google Apps Script logs for errors during file processing');
+              }
+              
               // Hide error message
               errorMsg.style.display = 'none';
               
-              // Show detailed success message
+              // Show detailed success message with debugging info
+              const processedCount = result.processed || 0;
+              const expectedCount = fileCount;
+              const processingStatus = processedCount === expectedCount 
+                ? '✅ All files processed' 
+                : `⚠️ ${processedCount}/${expectedCount} files processed`;
+                
               successMsg.innerHTML = suffix === 'Es' 
                 ? `<strong>✅ ¡Documentos subidos exitosamente!</strong><br>
-                   Archivos procesados: ${result.processed || fileCount}<br>
+                   Estado: ${processingStatus}<br>
+                   ${processedCount === 0 ? '<span style="color: orange;">⚠️ Verificar registros del servidor</span><br>' : ''}
                    Nos comunicaremos pronto.`
                 : `<strong>✅ Documents uploaded successfully!</strong><br>
-                   Files processed: ${result.processed || fileCount}<br>
+                   Status: ${processingStatus}<br>
+                   ${processedCount === 0 ? '<span style="color: orange;">⚠️ Check server logs for processing issues</span><br>' : ''}
                    We'll reach out shortly.`;
               successMsg.style.display = 'block';
               

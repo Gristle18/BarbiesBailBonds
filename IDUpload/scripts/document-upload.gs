@@ -25,17 +25,34 @@ const CONFIG = {
  */
 function doPost(e) {
   console.log('=== Document Upload Request Received ===');
-  console.log('Request data:', JSON.stringify(e, null, 2));
+  console.log('Request timestamp:', new Date().toISOString());
+  console.log('Request data keys:', Object.keys(e || {}));
+  console.log('Request parameters:', JSON.stringify(e?.parameter || {}, null, 2));
+  console.log('Request postData type:', e?.postData?.type);
+  console.log('Request postData length:', e?.postData?.contents?.length || 0);
   
   try {
+    console.log('🔍 Starting form data parsing...');
     // Parse the incoming multipart data
     const formData = parseMultipartData(e);
     
     if (!formData) {
+      console.error('❌ Form data parsing failed - no data returned');
       throw new Error('No form data could be parsed from request');
     }
     
-    console.log('Parsed form data:', JSON.stringify(formData, null, 2));
+    console.log('✅ Form data parsed successfully');
+    console.log('📊 Form data summary:');
+    console.log('  Field count:', Object.keys(formData).length);
+    console.log('  Fields:', Object.keys(formData));
+    
+    // Log file fields specifically
+    const fileFields = Object.keys(formData).filter(key => 
+      formData[key] && typeof formData[key] === 'object' && formData[key].bytes
+    );
+    console.log('  📁 File fields found:', fileFields.length, fileFields);
+    
+    console.log('📝 Detailed form data:', JSON.stringify(formData, null, 2));
     
     // Validate required fields (caseNumber is optional)
     const requiredFields = ['yourName', 'yourPhone', 'defendantName'];
@@ -51,17 +68,48 @@ function doPost(e) {
     }
     
     // Group files by document type
+    console.log('🗂️ Starting file grouping by document type...');
     const documentGroups = groupFilesByDocumentType(formData);
-    console.log('Document groups:', JSON.stringify(documentGroups, null, 2));
+    
+    console.log('📊 Document groups summary:');
+    console.log('  Group count:', Object.keys(documentGroups).length);
+    Object.entries(documentGroups).forEach(([type, data]) => {
+      console.log(`  📁 ${type}: ${data?.files?.length || 0} files`);
+    });
+    console.log('📝 Full document groups:', JSON.stringify(documentGroups, null, 2));
     
     // Process each document type
+    console.log('🚀 Starting document processing...');
     const results = [];
+    let totalProcessed = 0;
+    
     for (const [documentType, data] of Object.entries(documentGroups)) {
-      if (data.files.length > 0) {
+      if (!data.files || data.files.length === 0) {
+        console.log(`⏭️ Skipping ${documentType} - no files (data:`, data, ')');
+        continue;
+      }
+      
+      console.log(`🔄 Processing ${data.files.length} files for document type: ${documentType}`);
+      console.log(`📁 Files for ${documentType}:`, data.files.map(f => f?.filename || f?.name || 'unnamed'));
+      
+      try {
         const result = processDocumentType(documentType, formData, data.files);
+        console.log(`✅ Successfully processed ${documentType}:`, result);
         results.push(result);
+        totalProcessed += data.files.length;
+      } catch (error) {
+        console.error(`❌ Error processing ${documentType}:`, error);
+        console.error('Error stack:', error.stack);
+        results.push({
+          documentType,
+          success: false,
+          error: error.message,
+          filesCount: data.files.length
+        });
       }
     }
+    
+    console.log(`📊 Processing complete - ${totalProcessed} files processed total`);
     
     // Send email notification
     try {
@@ -71,13 +119,20 @@ function doPost(e) {
       // Don't fail the whole upload if email fails
     }
     
+    console.log('🎯 Preparing response...');
+    const response = {
+      success: true,
+      message: 'Documents uploaded successfully!',
+      processed: totalProcessed,
+      documentsProcessed: results.length,
+      details: results,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('📤 Final response:', JSON.stringify(response, null, 2));
+    
     return ContentService
-      .createTextOutput(JSON.stringify({
-        success: true,
-        message: 'Documents uploaded successfully!',
-        processed: results.length,
-        details: results
-      }))
+      .createTextOutput(JSON.stringify(response))
       .setMimeType(ContentService.MimeType.JSON);
       
   } catch (error) {
@@ -138,6 +193,8 @@ function parseMultipartData(e) {
  * Group uploaded files by document type
  */
 function groupFilesByDocumentType(formData) {
+  console.log('🗂️ groupFilesByDocumentType called with keys:', Object.keys(formData));
+  
   const groups = {
     'Government ID': { files: [] },
     'Proof of Address': { files: [] },
@@ -145,33 +202,56 @@ function groupFilesByDocumentType(formData) {
     'Other': { files: [] }
   };
   
-  // Look for dynamic document sections (these come from the Add Document button)
+  // First, find all documentType fields to understand the structure
+  const documentTypes = {};
   for (const [key, value] of Object.entries(formData)) {
-    if (key.includes('_front_input') || key.includes('_back_input') || key.includes('_input')) {
-      // This is a file upload field
-      if (value && value !== '') {
-        // Determine document type from the section context
-        // This is a simplified approach - in reality, you'd need to track which
-        // dynamic section corresponds to which document type
-        
-        if (key.includes('front') || key.includes('back')) {
-          groups['Government ID'].files.push({
-            name: key.includes('front') ? 'ID_Front' : 'ID_Back',
-            data: value,
-            type: key.includes('front') ? 'front' : 'back'
-          });
-        } else {
-          // For non-ID documents, we'd need additional logic to determine type
-          // This would come from the dynamic section data
-          groups['Other'].files.push({
-            name: 'Document',
-            data: value,
-            type: 'document'
-          });
-        }
-      }
+    if (key.startsWith('documentType_')) {
+      const sectionIndex = key.replace('documentType_', '');
+      documentTypes[sectionIndex] = value;
+      console.log(`📝 Found document section ${sectionIndex}: ${value}`);
     }
   }
+  
+  console.log('📊 Document sections found:', documentTypes);
+  
+  // Process files based on document sections
+  for (const [key, value] of Object.entries(formData)) {
+    // Look for file fields: document_0_front_input, document_0_back_input, etc.
+    const fileMatch = key.match(/^document_(\d+)_(.+)$/);
+    
+    if (fileMatch && value && typeof value === 'object' && value.bytes) {
+      const sectionIndex = fileMatch[1];
+      const fileType = fileMatch[2]; // front_input, back_input, input
+      const documentType = documentTypes[sectionIndex] || 'Other';
+      
+      console.log(`📁 Processing file: ${key}`);
+      console.log(`  Section: ${sectionIndex}, Type: ${documentType}, FileType: ${fileType}`);
+      console.log(`  File size: ${value.bytes?.length || 0} bytes`);
+      console.log(`  Filename: ${value.filename || 'unknown'}`);
+      
+      if (!groups[documentType]) {
+        console.warn(`⚠️ Unknown document type: ${documentType}, defaulting to 'Other'`);
+        documentType = 'Other';
+      }
+      
+      groups[documentType].files.push({
+        name: value.filename || `${documentType}_${fileType}`,
+        data: value,
+        type: fileType,
+        sectionIndex: sectionIndex,
+        bytes: value.bytes,
+        filename: value.filename
+      });
+      
+      console.log(`✅ Added file to ${documentType} group`);
+    }
+  }
+  
+  // Log final group summary
+  console.log('📊 Final grouping results:');
+  Object.entries(groups).forEach(([type, data]) => {
+    console.log(`  ${type}: ${data.files.length} files`);
+  });
   
   return groups;
 }
