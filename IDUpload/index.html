@@ -2352,7 +2352,14 @@
           const documentSections = form.querySelectorAll('.dynamic-doc-section');
           console.log(`Found ${documentSections.length} document sections`);
           
+          // Also check for files in the entire form as backup
+          const allFileInputs = form.querySelectorAll('input[type="file"]');
+          console.log(`📁 Total file inputs in form: ${allFileInputs.length}`);
+          
           let hasFiles = false;
+          let totalFiles = 0;
+          
+          // Method 1: Check in document sections
           for (const section of documentSections) {
             const fileInputs = section.querySelectorAll('input[type="file"]');
             console.log(`Section has ${fileInputs.length} file inputs`);
@@ -2365,16 +2372,32 @@
               if (input.files && input.files.length > 0) {
                 console.log(`✅ Found file: ${input.files[0].name}`);
                 hasFiles = true;
-                break;
+                totalFiles += input.files.length;
               } else {
                 console.log(`❌ No files in this input`);
               }
             }
-            if (hasFiles) break;
+          }
+          
+          // Method 2: Backup check - scan all file inputs in form
+          if (!hasFiles) {
+            console.log('🔍 Backup method: Checking all file inputs in form...');
+            for (const input of allFileInputs) {
+              console.log(`🔍 Form input:`, {
+                id: input.id,
+                files: input.files ? input.files.length : 'null',
+                value: input.value
+              });
+              if (input.files && input.files.length > 0) {
+                console.log(`✅ Found file via backup method: ${input.files[0].name}`);
+                hasFiles = true;
+                totalFiles += input.files.length;
+              }
+            }
           }
           
           if (!hasFiles) {
-            console.log('❌ No files uploaded');
+            console.log('❌ No files uploaded (checked both methods)');
             errorMsg.textContent = suffix === 'Es'
               ? 'Por favor suba al menos un documento.'
               : 'Please upload at least one document.';
@@ -2382,6 +2405,8 @@
             errorMsg.style.background = 'var(--error)';
             return;
           }
+          
+          console.log(`✅ Found ${totalFiles} total files`);
           
           console.log('✅ Validation passed, proceeding with upload...');
 
@@ -2449,7 +2474,9 @@
             
             // Add documents from all sections
             const documentSections = form.querySelectorAll('.dynamic-doc-section');
+            const allFormFileInputs = form.querySelectorAll('input[type="file"]');
             console.log(`📁 Found ${documentSections.length} document sections`);
+            console.log(`📁 Found ${allFormFileInputs.length} total file inputs in form`);
             
             let fileCount = 0;
             documentSections.forEach((section, index) => {
@@ -2503,6 +2530,33 @@
                 }
               });
             });
+            
+            // Backup method: If no files found in sections, process all file inputs
+            if (fileCount === 0) {
+              console.log('🔍 Backup processing: No files found in sections, trying all form inputs...');
+              allFormFileInputs.forEach((input, index) => {
+                if (input.files && input.files.length > 0) {
+                  const file = input.files[0];
+                  console.log(`📎 Backup: Adding file ${file.name}`);
+                  
+                  // Default to Government ID if we can't determine type
+                  let docType = 'Government ID';
+                  const inputId = input.id || '';
+                  
+                  formData.append(`documentType_${index}`, docType);
+                  
+                  if (inputId.includes('front') || inputId.includes('Front')) {
+                    formData.append(`document_${index}_front_input`, file);
+                  } else if (inputId.includes('back') || inputId.includes('Back')) {
+                    formData.append(`document_${index}_back_input`, file);
+                  } else {
+                    formData.append(`document_${index}_front_input`, file);
+                  }
+                  
+                  fileCount++;
+                }
+              });
+            }
             
             console.log(`📊 Total files to upload: ${fileCount}`);
             
