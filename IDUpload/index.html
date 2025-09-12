@@ -2634,25 +2634,41 @@
               fileInputs.forEach((input, inputIndex) => {
                 if (input.files && input.files[0]) {
                   const file = input.files[0];
-                  console.log(`📎 Adding file: ${file.name} (${file.size} bytes)`);
+                  console.log(`📎 Processing file from input ${input.id}:`);
+                  console.log(`  📄 Name: ${file.name}`);
+                  console.log(`  📊 Size: ${file.size} bytes`);
+                  console.log(`  🏷️ Type: ${file.type}`);
+                  console.log(`  🔍 instanceof File: ${file instanceof File}`);
+                  console.log(`  🔍 instanceof Blob: ${file instanceof Blob}`);
+                  console.log(`  📋 Constructor: ${file.constructor.name}`);
                   
                   // Determine if this is front/back based on input structure
+                  let fieldName;
                   if (docType === 'Government ID') {
                     // Look for front/back indicators in the input structure
                     const inputId = input.id || '';
                     const inputText = input.closest('div')?.textContent || '';
                     
                     if (inputId.includes('front') || inputText.includes('Front') || inputText.includes('Frente')) {
-                      formData.append(`document_${index}_front_input`, file);
+                      fieldName = `document_${index}_front_input`;
                     } else if (inputId.includes('back') || inputText.includes('Back') || inputText.includes('Reverso')) {
-                      formData.append(`document_${index}_back_input`, file);
+                      fieldName = `document_${index}_back_input`;
                     } else {
                       // Default to front if we can't determine
-                      formData.append(`document_${index}_front_input`, file);
+                      fieldName = `document_${index}_front_input`;
                     }
                   } else {
                     // Other document types use simple naming
-                    formData.append(`document_${index}_input`, file);
+                    fieldName = `document_${index}_input`;
+                  }
+                  
+                  console.log(`📤 Appending file to FormData with field name: ${fieldName}`);
+                  
+                  try {
+                    formData.append(fieldName, file);
+                    console.log(`✅ Successfully appended file to FormData`);
+                  } catch (appendError) {
+                    console.error(`❌ Error appending file to FormData:`, appendError);
                   }
                   
                   fileCount++;
@@ -2689,6 +2705,33 @@
             
             console.log(`📊 Total files to upload: ${fileCount}`);
             
+            // Debug FormData contents before sending
+            console.log('🔍 FormData debugging - iterating through all entries:');
+            let textFields = 0;
+            let fileFields = 0;
+            for (let [key, value] of formData.entries()) {
+              if (value instanceof File) {
+                console.log(`  📎 FILE: ${key} = ${value.name} (${value.size} bytes, ${value.type})`);
+                fileFields++;
+              } else {
+                console.log(`  📝 TEXT: ${key} = ${value}`);
+                textFields++;
+              }
+            }
+            console.log(`📊 FormData summary: ${textFields} text fields, ${fileFields} file fields`);
+            
+            if (fileFields === 0) {
+              console.error('❌ CRITICAL: No files found in FormData before sending!');
+              console.error('❌ This means files were not properly added to FormData.');
+              
+              errorMsg.textContent = suffix === 'Es'
+                ? 'Error crítico: Los archivos no se agregaron correctamente al formulario.'
+                : 'Critical Error: Files were not properly added to form data.';
+              errorMsg.style.display = 'block';
+              errorMsg.style.background = 'var(--error)';
+              return;
+            }
+            
             // Update progress message
             errorMsg.textContent = suffix === 'Es' 
               ? `Subiendo ${fileCount} archivo(s)...` 
@@ -2698,10 +2741,15 @@
             const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9DvZFje5f_ssDVNh7eXaARwbK0VdCCzJct6iw22K10PRJMVkGnhVHjVBv3dvfmqvk/exec';
             
             console.log('🌐 Sending to Apps Script:', APPS_SCRIPT_URL);
+            console.log('🚀 Fetch configuration:');
+            console.log('  Method: POST');
+            console.log('  Body: FormData with', fileFields, 'files and', textFields, 'text fields');
+            console.log('  Headers: (letting browser set Content-Type automatically for multipart)');
             
             const response = await fetch(APPS_SCRIPT_URL, {
               method: 'POST',
               body: formData
+              // Important: Do NOT set Content-Type header - let browser set it automatically for multipart/form-data
             });
             
             console.log('📡 Response status:', response.status);
