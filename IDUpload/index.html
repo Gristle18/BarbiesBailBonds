@@ -1315,6 +1315,13 @@
       // This is the exact logic from the original initializeAllDropzones function
       const updateList = (files) => {
         console.log(`📋 Updating dynamic file list for ${targetId}:`, files?.length || 0, 'files');
+        console.log(`🔍 Input element at update time:`, {
+          inputId: input.id,
+          inputExists: !!document.getElementById(input.id),
+          inputFiles: input.files?.length || 0,
+          filesParameter: files?.length || 0
+        });
+        
         if (!files || files.length === 0) { 
           // Reset dropzone to original state
           const isSpanish = targetId.endsWith('Es');
@@ -1378,6 +1385,9 @@
             zone.style.position = 'relative';
             zone.style.overflow = 'hidden';
             
+            console.log(`🖼️ Creating image preview for ${targetId} - preserving ${input.files.length} files`);
+            const filesToPreserve = input.files;
+            
             zone.innerHTML = `
               <img id="${targetId}_preview" src="${url}" data-target-id="${targetId}" style="
                 width: 100%; 
@@ -1432,6 +1442,22 @@
               ">Scroll: Zoom • Drag: Pan</div>
             `;
             
+            // CRITICAL FIX: Reassign files to new input element
+            const newInput = document.getElementById(targetId);
+            if (newInput && filesToPreserve && filesToPreserve.length > 0) {
+              console.log(`🔧 Reassigning ${filesToPreserve.length} files to new input element`);
+              try {
+                newInput.files = filesToPreserve;
+                console.log(`✅ Files successfully reassigned: ${newInput.files.length} files`);
+                // Update input reference
+                input = newInput;
+              } catch (e) {
+                console.error(`❌ Failed to reassign files:`, e);
+              }
+            } else {
+              console.warn(`⚠️ Could not reassign files: newInput=${!!newInput}, filesToPreserve=${filesToPreserve?.length || 0}`);
+            }
+            
             // Add zoom and pan functionality - simplified version
             const previewImg = document.getElementById(targetId + '_preview');
             if (previewImg) {
@@ -1482,6 +1508,9 @@
           zone.style.border = '2px solid var(--brand)';
           zone.style.position = 'relative';
           zone.style.overflow = 'hidden';
+          
+          console.log(`📄 Creating PDF preview for ${targetId} - preserving ${input.files.length} files`);
+          const pdfFilesToPreserve = input.files;
           
           zone.innerHTML = `
             <div id="${targetId}_pdf_preview" style="
@@ -1535,6 +1564,22 @@
               " title="Remove file">×</button>
             </div>
           `;
+          
+          // CRITICAL FIX: Reassign files to new input element for PDF
+          const newPdfInput = document.getElementById(targetId);
+          if (newPdfInput && pdfFilesToPreserve && pdfFilesToPreserve.length > 0) {
+            console.log(`🔧 Reassigning ${pdfFilesToPreserve.length} PDF files to new input element`);
+            try {
+              newPdfInput.files = pdfFilesToPreserve;
+              console.log(`✅ PDF files successfully reassigned: ${newPdfInput.files.length} files`);
+              // Update input reference
+              input = newPdfInput;
+            } catch (e) {
+              console.error(`❌ Failed to reassign PDF files:`, e);
+            }
+          } else {
+            console.warn(`⚠️ Could not reassign PDF files: newInput=${!!newPdfInput}, filesToPreserve=${pdfFilesToPreserve?.length || 0}`);
+          }
           
           list.innerHTML = `
             <div class="file-item">
@@ -2035,6 +2080,9 @@
                 zone.style.position = 'relative';
                 zone.style.overflow = 'hidden';
                 
+                console.log(`🖼️ Creating second image preview for ${targetId} - preserving ${input.files.length} files`);
+                const filesToPreserve2 = input.files;
+                
                 zone.innerHTML = `
                   <img id="${targetId}_preview" src="${url}" data-target-id="${targetId}" style="
                     width: 100%; 
@@ -2088,6 +2136,22 @@
                     z-index: 10;
                   ">Scroll: Zoom • Drag: Pan</div>
                 `;
+                
+                // CRITICAL FIX: Reassign files to new input element
+                const newInput2 = document.getElementById(targetId);
+                if (newInput2 && filesToPreserve2 && filesToPreserve2.length > 0) {
+                  console.log(`🔧 Reassigning ${filesToPreserve2.length} files to second new input element`);
+                  try {
+                    newInput2.files = filesToPreserve2;
+                    console.log(`✅ Files successfully reassigned to second input: ${newInput2.files.length} files`);
+                    // Update input reference
+                    input = newInput2;
+                  } catch (e) {
+                    console.error(`❌ Failed to reassign files to second input:`, e);
+                  }
+                } else {
+                  console.warn(`⚠️ Could not reassign files to second input: newInput=${!!newInput2}, filesToPreserve=${filesToPreserve2?.length || 0}`);
+                }
                 
                 // Add zoom and pan functionality
                 const previewImg = document.getElementById(targetId + '_preview');
@@ -2189,6 +2253,9 @@
               zone.style.position = 'relative';
               zone.style.overflow = 'hidden';
               
+              console.log(`📄 Creating second PDF preview for ${targetId} - preserving ${input.files.length} files`);
+              const pdfFilesToPreserve2 = input.files;
+              
               zone.innerHTML = `
                 <div id="${targetId}_pdf_preview" style="
                   width: 100%; 
@@ -2241,6 +2308,22 @@
                   " title="Remove file">×</button>
                 </div>
               `;
+              
+              // CRITICAL FIX: Reassign files to new input element for second PDF
+              const newPdfInput2 = document.getElementById(targetId);
+              if (newPdfInput2 && pdfFilesToPreserve2 && pdfFilesToPreserve2.length > 0) {
+                console.log(`🔧 Reassigning ${pdfFilesToPreserve2.length} PDF files to second new input element`);
+                try {
+                  newPdfInput2.files = pdfFilesToPreserve2;
+                  console.log(`✅ PDF files successfully reassigned to second input: ${newPdfInput2.files.length} files`);
+                  // Update input reference
+                  input = newPdfInput2;
+                } catch (e) {
+                  console.error(`❌ Failed to reassign PDF files to second input:`, e);
+                }
+              } else {
+                console.warn(`⚠️ Could not reassign PDF files to second input: newInput=${!!newPdfInput2}, filesToPreserve=${pdfFilesToPreserve2?.length || 0}`);
+              }
               
               // Store the file data on the PDF element for later use
               const pdfPreview = document.getElementById(targetId + '_pdf_preview');
