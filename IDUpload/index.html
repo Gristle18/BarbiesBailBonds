@@ -2741,42 +2741,100 @@
             const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9DvZFje5f_ssDVNh7eXaARwbK0VdCCzJct6iw22K10PRJMVkGnhVHjVBv3dvfmqvk/exec';
             
             console.log('🌐 Sending to Apps Script:', APPS_SCRIPT_URL);
-            console.log('🚀 Using XMLHttpRequest instead of fetch() to ensure multipart data transmission');
+            console.log('🚀 Using hidden iframe form submission for Google Apps Script compatibility');
             console.log('  Method: POST');
             console.log('  Body: FormData with', fileFields, 'files and', textFields, 'text fields');
-            console.log('  Headers: (letting browser set Content-Type automatically for multipart)');
+            console.log('  This method bypasses CORS and multipart issues with Google Apps Script');
             
-            // Use XMLHttpRequest instead of fetch for better Google Apps Script compatibility
+            // Create a hidden form and iframe for file upload
             const responseText = await new Promise((resolve, reject) => {
-              const xhr = new XMLHttpRequest();
+              // Create hidden iframe
+              const iframe = document.createElement('iframe');
+              iframe.style.display = 'none';
+              iframe.name = 'upload-target-' + Date.now();
+              document.body.appendChild(iframe);
               
-              xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                  if (xhr.status === 200) {
-                    console.log('📡 XMLHttpRequest Response status:', xhr.status);
-                    console.log('📡 XMLHttpRequest Response headers:', xhr.getAllResponseHeaders());
-                    resolve(xhr.responseText);
-                  } else {
-                    console.error('❌ XMLHttpRequest failed with status:', xhr.status);
-                    console.error('❌ XMLHttpRequest response text:', xhr.responseText);
-                    reject(new Error(`HTTP error! status: ${xhr.status}`));
-                  }
+              // Create hidden form
+              const hiddenForm = document.createElement('form');
+              hiddenForm.method = 'POST';
+              hiddenForm.action = APPS_SCRIPT_URL;
+              hiddenForm.target = iframe.name;
+              hiddenForm.enctype = 'multipart/form-data';
+              hiddenForm.style.display = 'none';
+              
+              // Add all FormData entries to the hidden form
+              for (let [key, value] of formData.entries()) {
+                const input = document.createElement('input');
+                
+                if (value instanceof File) {
+                  // Create file input
+                  input.type = 'file';
+                  input.name = key;
+                  
+                  // Transfer the file to the new input
+                  const dt = new DataTransfer();
+                  dt.items.add(value);
+                  input.files = dt.files;
+                  
+                  console.log(`📁 Added file input: ${key} = ${value.name}`);
+                } else {
+                  // Create text input
+                  input.type = 'hidden';
+                  input.name = key;
+                  input.value = value;
+                  
+                  console.log(`📝 Added text input: ${key} = ${value}`);
+                }
+                
+                hiddenForm.appendChild(input);
+              }
+              
+              // Handle iframe response
+              let responseReceived = false;
+              const timeoutId = setTimeout(() => {
+                if (!responseReceived) {
+                  cleanup();
+                  reject(new Error('Upload timeout after 30 seconds'));
+                }
+              }, 30000);
+              
+              const cleanup = () => {
+                clearTimeout(timeoutId);
+                if (hiddenForm.parentNode) hiddenForm.parentNode.removeChild(hiddenForm);
+                if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+              };
+              
+              iframe.onload = function() {
+                if (responseReceived) return;
+                responseReceived = true;
+                
+                try {
+                  const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                  const responseBody = iframeDoc.body.textContent || iframeDoc.body.innerText || '';
+                  
+                  console.log('📡 Hidden iframe response received:', responseBody.length, 'characters');
+                  console.log('📨 Response preview:', responseBody.substring(0, 200));
+                  
+                  cleanup();
+                  resolve(responseBody);
+                } catch (error) {
+                  console.error('❌ Error reading iframe response:', error);
+                  cleanup();
+                  reject(new Error('Could not read response from iframe'));
                 }
               };
               
-              xhr.onerror = function() {
-                console.error('❌ XMLHttpRequest network error');
-                reject(new Error('Network error occurred'));
+              iframe.onerror = function() {
+                if (responseReceived) return;
+                responseReceived = true;
+                cleanup();
+                reject(new Error('Iframe error occurred'));
               };
               
-              console.log('📡 Opening XMLHttpRequest...');
-              xhr.open('POST', APPS_SCRIPT_URL, true);
-              
-              // DO NOT set Content-Type - let browser set it automatically for multipart
-              // xhr.setRequestHeader('Content-Type', 'multipart/form-data'); // This would break it!
-              
-              console.log('📡 Sending XMLHttpRequest with FormData...');
-              xhr.send(formData);
+              // Add form to document and submit
+              document.body.appendChild(hiddenForm);
+              console.log('📤 Submitting hidden form with', hiddenForm.elements.length, 'form elements');
+              hiddenForm.submit();
             });
             console.log('📨 Raw response:', responseText);
             
