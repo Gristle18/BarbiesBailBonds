@@ -155,45 +155,6 @@ function doPost(e) {
     }
     
     debugLog('🎯 Preparing response...');
-    
-    // Check if this is a direct form submission that needs redirect
-    if (formData.returnUrl) {
-      debugLog('🔄 Direct form submission detected, redirecting to: ' + formData.returnUrl);
-      
-      // Create an HTML response that redirects back to the page
-      const redirectHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Upload Complete</title>
-          <script>
-            // Redirect back to the main page with upload result
-            const returnUrl = "${formData.returnUrl}";
-            const separator = returnUrl.includes('?') ? '&' : '?';
-            const finalUrl = returnUrl + separator + 'files=${totalProcessed}&status=success';
-            window.location.href = finalUrl;
-          </script>
-        </head>
-        <body>
-          <h2>Upload Complete!</h2>
-          <p>Processed ${totalProcessed} files successfully.</p>
-          <p>Redirecting back to main page...</p>
-          <script>
-            setTimeout(function() {
-              const returnUrl = "${formData.returnUrl}";
-              const separator = returnUrl.includes('?') ? '&' : '?';
-              const finalUrl = returnUrl + separator + 'files=${totalProcessed}&status=success';
-              window.location.href = finalUrl;
-            }, 2000);
-          </script>
-        </body>
-        </html>
-      `;
-      
-      return HtmlService.createHtmlOutput(redirectHtml);
-    }
-    
-    // Regular JSON response for AJAX requests
     const response = {
       success: true,
       message: 'Documents uploaded successfully!',

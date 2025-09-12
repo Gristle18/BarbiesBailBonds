@@ -2738,73 +2738,104 @@
               : `Uploading ${fileCount} file(s)...`;
             
             // Google Apps Script Web App URL configured
-            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyjLcMrB-Fd9MYjPEV6gVQ4LEC-nmJqDP9bruE96BF0VeRrfQNoDVl5nIxKYSkpJ8rd/exec';
+            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9DvZFje5f_ssDVNh7eXaARwbK0VdCCzJct6iw22K10PRJMVkGnhVHjVBv3dvfmqvk/exec';
             
             console.log('🌐 Sending to Apps Script:', APPS_SCRIPT_URL);
-            console.log('🚀 Using direct form submission to Google Apps Script');
+            console.log('🚀 Using hidden iframe form submission for Google Apps Script compatibility');
             console.log('  Method: POST');
             console.log('  Body: FormData with', fileFields, 'files and', textFields, 'text fields');
-            console.log('  This will submit the form and show success/error message');
+            console.log('  This method bypasses CORS and multipart issues with Google Apps Script');
             
-            // Create a direct form submission (this will navigate away briefly but return with result)
-            const hiddenForm = document.createElement('form');
-            hiddenForm.method = 'POST';
-            hiddenForm.action = APPS_SCRIPT_URL;
-            hiddenForm.enctype = 'multipart/form-data';
-            hiddenForm.style.display = 'none';
-            
-            // Add all FormData entries to the form
-            for (let [key, value] of formData.entries()) {
-              const input = document.createElement('input');
+            // Create a hidden form and iframe for file upload
+            const responseText = await new Promise((resolve, reject) => {
+              // Create hidden iframe
+              const iframe = document.createElement('iframe');
+              iframe.style.display = 'none';
+              iframe.name = 'upload-target-' + Date.now();
+              document.body.appendChild(iframe);
               
-              if (value instanceof File) {
-                // Create file input
-                input.type = 'file';
-                input.name = key;
+              // Create hidden form
+              const hiddenForm = document.createElement('form');
+              hiddenForm.method = 'POST';
+              hiddenForm.action = APPS_SCRIPT_URL;
+              hiddenForm.target = iframe.name;
+              hiddenForm.enctype = 'multipart/form-data';
+              hiddenForm.style.display = 'none';
+              
+              // Add all FormData entries to the hidden form
+              for (let [key, value] of formData.entries()) {
+                const input = document.createElement('input');
                 
-                // Transfer the file to the new input
-                const dt = new DataTransfer();
-                dt.items.add(value);
-                input.files = dt.files;
+                if (value instanceof File) {
+                  // Create file input
+                  input.type = 'file';
+                  input.name = key;
+                  
+                  // Transfer the file to the new input
+                  const dt = new DataTransfer();
+                  dt.items.add(value);
+                  input.files = dt.files;
+                  
+                  console.log(`📁 Added file input: ${key} = ${value.name}`);
+                } else {
+                  // Create text input
+                  input.type = 'hidden';
+                  input.name = key;
+                  input.value = value;
+                  
+                  console.log(`📝 Added text input: ${key} = ${value}`);
+                }
                 
-                console.log(`📁 Added file input: ${key} = ${value.name}`);
-              } else {
-                // Create text input
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                
-                console.log(`📝 Added text input: ${key} = ${value}`);
+                hiddenForm.appendChild(input);
               }
               
-              hiddenForm.appendChild(input);
-            }
-            
-            // Add a return URL so Google Apps Script can redirect back
-            const returnInput = document.createElement('input');
-            returnInput.type = 'hidden';
-            returnInput.name = 'returnUrl';
-            returnInput.value = window.location.href + '?upload=success';
-            hiddenForm.appendChild(returnInput);
-            
-            // Show loading message
-            errorMsg.innerHTML = suffix === 'Es'
-              ? '🚀 <strong>Subiendo archivos...</strong><br>Esta página se actualizará cuando termine la carga.'
-              : '🚀 <strong>Uploading files...</strong><br>This page will refresh when upload completes.';
-            errorMsg.style.display = 'block';
-            errorMsg.style.background = '#2196F3'; // Blue for info
-            
-            // Add form to document and submit
-            document.body.appendChild(hiddenForm);
-            console.log('📤 Submitting form directly to Google Apps Script with', hiddenForm.elements.length, 'form elements');
-            
-            // Small delay to let user see the loading message
-            setTimeout(() => {
+              // Handle iframe response
+              let responseReceived = false;
+              const timeoutId = setTimeout(() => {
+                if (!responseReceived) {
+                  cleanup();
+                  reject(new Error('Upload timeout after 30 seconds'));
+                }
+              }, 30000);
+              
+              const cleanup = () => {
+                clearTimeout(timeoutId);
+                if (hiddenForm.parentNode) hiddenForm.parentNode.removeChild(hiddenForm);
+                if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+              };
+              
+              iframe.onload = function() {
+                if (responseReceived) return;
+                responseReceived = true;
+                
+                try {
+                  const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                  const responseBody = iframeDoc.body.textContent || iframeDoc.body.innerText || '';
+                  
+                  console.log('📡 Hidden iframe response received:', responseBody.length, 'characters');
+                  console.log('📨 Response preview:', responseBody.substring(0, 200));
+                  
+                  cleanup();
+                  resolve(responseBody);
+                } catch (error) {
+                  console.error('❌ Error reading iframe response:', error);
+                  cleanup();
+                  reject(new Error('Could not read response from iframe'));
+                }
+              };
+              
+              iframe.onerror = function() {
+                if (responseReceived) return;
+                responseReceived = true;
+                cleanup();
+                reject(new Error('Iframe error occurred'));
+              };
+              
+              // Add form to document and submit
+              document.body.appendChild(hiddenForm);
+              console.log('📤 Submitting hidden form with', hiddenForm.elements.length, 'form elements');
               hiddenForm.submit();
-            }, 1000);
-            
-            // Don't continue with the rest of the code since we're submitting directly
-            return;
+            });
             console.log('📨 Raw response:', responseText);
             
             let result;
@@ -2959,44 +2990,6 @@
       console.log('Page fully loaded');
       console.log('Dropzones found:', document.querySelectorAll('.dropzone').length);
       console.log('Upload forms found:', document.querySelectorAll('#uploadFormEn, #uploadFormEs').length);
-      
-      // Check if page was loaded with upload success parameters
-      const urlParams = new URLSearchParams(window.location.search);
-      const uploadStatus = urlParams.get('status');
-      const filesProcessed = urlParams.get('files');
-      
-      if (uploadStatus === 'success') {
-        console.log('🎉 Upload success detected from URL parameters');
-        console.log('📊 Files processed:', filesProcessed);
-        
-        // Show success message
-        const successMsgEn = document.getElementById('successMsgEn');
-        const successMsgEs = document.getElementById('successMsgEs');
-        
-        if (successMsgEn) {
-          successMsgEn.innerHTML = `<strong>✅ Upload Successful!</strong><br>Processed ${filesProcessed || 0} files.<br>We'll reach out shortly.`;
-          successMsgEn.style.display = 'block';
-        }
-        
-        if (successMsgEs) {
-          successMsgEs.innerHTML = `<strong>✅ ¡Carga Exitosa!</strong><br>Se procesaron ${filesProcessed || 0} archivos.<br>Nos comunicaremos pronto.`;
-          successMsgEs.style.display = 'block';
-        }
-        
-        // Clean up URL parameters after showing success
-        const cleanUrl = window.location.origin + window.location.pathname;
-        window.history.replaceState({}, document.title, cleanUrl);
-        
-        // Reset forms
-        const formEn = document.getElementById('uploadFormEn');
-        const formEs = document.getElementById('uploadFormEs');
-        if (formEn) formEn.reset();
-        if (formEs) formEs.reset();
-        
-        // Clear any dynamic sections
-        const dynamicSections = document.querySelectorAll('.dynamic-doc-section');
-        dynamicSections.forEach(section => section.remove());
-      }
     });
 
     // Modal preview functionality removed - keeping only in-box thumbnails
