@@ -188,43 +188,135 @@ function doPost(e) {
 }
 
 /**
- * Parse multipart form data from the request
+ * Parse multipart form data from the request - handles both text fields and files
  */
 function parseMultipartData(e) {
-  console.log('Parsing multipart data...');
+  debugLog('🔧 parseMultipartData: Starting to parse multipart data...');
   
-  // Try to get data from different possible locations
   let formData = {};
   
-  // Method 1: Check e.parameter (most common)
+  // Handle text parameters first
   if (e.parameter && Object.keys(e.parameter).length > 0) {
-    console.log('Found data in e.parameter');
-    formData = e.parameter;
+    debugLog('📝 Found ' + Object.keys(e.parameter).length + ' text parameters in e.parameter');
+    formData = {...e.parameter};
+    debugLog('📝 Text parameters: ' + JSON.stringify(Object.keys(formData)));
   }
   
-  // Method 2: Check e.parameters
-  if (Object.keys(formData).length === 0 && e.parameters) {
-    console.log('Found data in e.parameters');
+  // Handle e.parameters as backup for text fields
+  if (e.parameters && Object.keys(e.parameters).length > 0) {
+    debugLog('📝 Found parameters in e.parameters');
     for (const [key, value] of Object.entries(e.parameters)) {
-      formData[key] = Array.isArray(value) ? value[0] : value;
-    }
-  }
-  
-  // Method 3: Try to parse postData contents
-  if (Object.keys(formData).length === 0 && e.postData && e.postData.contents) {
-    console.log('Trying to parse postData contents');
-    try {
-      const urlParams = new URLSearchParams(e.postData.contents);
-      for (const [key, value] of urlParams) {
-        formData[key] = value;
+      if (!formData[key]) { // Don't overwrite e.parameter data
+        formData[key] = Array.isArray(value) ? value[0] : value;
       }
-    } catch (parseError) {
-      console.log('Could not parse postData as URL parameters');
     }
   }
   
-  console.log('Parsed form data keys:', Object.keys(formData));
-  return Object.keys(formData).length > 0 ? formData : null;
+  // Handle files from postData (multipart/form-data)
+  if (e.postData && e.postData.type === 'multipart/form-data' && e.postData.contents) {
+    debugLog('📁 Found multipart form data, parsing for files...');
+    debugLog('📁 postData length: ' + e.postData.contents.length);
+    
+    try {
+      // Parse multipart boundary from content type
+      const boundary = e.postData.type.match(/boundary=([^;]+)/);
+      if (!boundary) {
+        debugError('❌ No multipart boundary found in content type');
+        return formData;
+      }
+      
+      debugLog('📁 Multipart boundary: ' + boundary[1]);
+      const boundaryString = '--' + boundary[1];
+      const parts = e.postData.contents.split(boundaryString);
+      
+      debugLog('📁 Found ' + (parts.length - 2) + ' multipart sections'); // Exclude first empty and last --
+      
+      let fileCount = 0;
+      for (let i = 1; i < parts.length - 1; i++) { // Skip first empty and last --
+        const part = parts[i];
+        if (!part.trim()) continue;
+        
+        try {
+          // Extract headers and content
+          const headerEndIndex = part.indexOf('\r\n\r\n');
+          if (headerEndIndex === -1) continue;
+          
+          const headers = part.substring(0, headerEndIndex);
+          const content = part.substring(headerEndIndex + 4);
+          
+          // Parse Content-Disposition header
+          const nameMatch = headers.match(/name="([^"]+)"/);
+          const filenameMatch = headers.match(/filename="([^"]+)"/);
+          
+          if (!nameMatch) continue;
+          
+          const fieldName = nameMatch[1];
+          
+          if (filenameMatch) {
+            // This is a file field
+            const filename = filenameMatch[1];
+            
+            // Extract content type
+            const contentTypeMatch = headers.match(/Content-Type:\s*([^\r\n]+)/);
+            const contentType = contentTypeMatch ? contentTypeMatch[1] : 'application/octet-stream';
+            
+            // Remove trailing \r\n from content
+            let fileContent = content;
+            if (fileContent.endsWith('\r\n')) {
+              fileContent = fileContent.slice(0, -2);
+            }
+            
+            // Convert string to bytes (Google Apps Script specific)
+            const bytes = Utilities.newBlob(fileContent, contentType, filename).getBytes();
+            
+            formData[fieldName] = {
+              filename: filename,
+              bytes: bytes,
+              contentType: contentType
+            };
+            
+            fileCount++;
+            debugLog('📎 Extracted file: ' + fieldName + ' -> ' + filename + ' (' + bytes.length + ' bytes, ' + contentType + ')');
+            
+          } else {
+            // This is a text field - but we likely already have it from e.parameter
+            if (!formData[fieldName]) {
+              let textValue = content;
+              if (textValue.endsWith('\r\n')) {
+                textValue = textValue.slice(0, -2);
+              }
+              formData[fieldName] = textValue;
+              debugLog('📝 Extracted text field: ' + fieldName + ' = ' + textValue);
+            }
+          }
+          
+        } catch (partError) {
+          debugError('❌ Error parsing multipart section ' + i + ': ' + partError.message);
+        }
+      }
+      
+      debugLog('✅ Multipart parsing complete: ' + fileCount + ' files extracted');
+      
+    } catch (parseError) {
+      debugError('❌ Error parsing multipart data: ' + parseError.message);
+      debugError('Error stack: ' + parseError.stack);
+    }
+  } else {
+    debugLog('📝 No multipart form data found (postData type: ' + (e.postData?.type || 'none') + ')');
+  }
+  
+  const totalFields = Object.keys(formData).length;
+  const fileFields = Object.keys(formData).filter(key => 
+    formData[key] && typeof formData[key] === 'object' && formData[key].bytes
+  ).length;
+  
+  debugLog('🎯 parseMultipartData complete:');
+  debugLog('  📊 Total fields: ' + totalFields);
+  debugLog('  📁 File fields: ' + fileFields);
+  debugLog('  📝 Text fields: ' + (totalFields - fileFields));
+  debugLog('  🔑 All field names: ' + JSON.stringify(Object.keys(formData)));
+  
+  return totalFields > 0 ? formData : null;
 }
 
 /**
