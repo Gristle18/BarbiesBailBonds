@@ -861,22 +861,6 @@
 
       <div class="section-title" style="margin-top:18px;">Upload Files</div>
       <div class="grid">
-        <div class="full">
-          <label for="idFrontEn">Government ID – Front</label>
-          <div class="dropzone" data-target="idFrontEn" style="position: relative;">
-            <div class="drop-hint">Drag & drop image/PDF here or click to select</div>
-            <input id="idFrontEn" name="idFront" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-          </div>
-          <div class="file-list" id="idFrontEnList"></div>
-        </div>
-        <div class="full">
-          <label for="idBackEn">Government ID – Back</label>
-          <div class="dropzone" data-target="idBackEn" style="position: relative;">
-            <div class="drop-hint">Drag & drop image/PDF here or click to select</div>
-            <input id="idBackEn" name="idBack" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-          </div>
-          <div class="file-list" id="idBackEnList"></div>
-        </div>
         <div class="full" id="additionalDocsContainerEn">
           <div id="addDocButtonEn" class="add-doc-button" onclick="showDocumentDropdown('En')">
             <div class="plus-icon">+</div>
@@ -921,22 +905,6 @@
 
       <div class="section-title" style="margin-top:18px;">Subir Archivos</div>
       <div class="grid">
-        <div class="full">
-          <label for="idFrontEs">ID Gubernamental – Frente</label>
-          <div class="dropzone" data-target="idFrontEs" style="position: relative;">
-            <div class="drop-hint">Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar</div>
-            <input id="idFrontEs" name="idFront" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-          </div>
-          <div class="file-list" id="idFrontEsList"></div>
-        </div>
-        <div class="full">
-          <label for="idBackEs">ID Gubernamental – Reverso</label>
-          <div class="dropzone" data-target="idBackEs" style="position: relative;">
-            <div class="drop-hint">Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar</div>
-            <input id="idBackEs" name="idBack" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-          </div>
-          <div class="file-list" id="idBackEsList"></div>
-        </div>
         <div class="full" id="additionalDocsContainerEs">
           <div id="addDocButtonEs" class="add-doc-button" onclick="showDocumentDropdown('Es')">
             <div class="plus-icon">+</div>
@@ -1114,6 +1082,7 @@
     // Document types for dropdown
     const documentTypes = {
       'en': [
+        'Government ID',
         'Court Papers',
         'Proof of Income',
         'Property Documents',
@@ -1125,6 +1094,7 @@
         'Other Documents'
       ],
       'es': [
+        'ID Gubernamental',
         'Documentos de la Corte',
         'Comprobante de Ingresos',
         'Documentos de Propiedad',
@@ -1199,38 +1169,102 @@
 
       // Generate unique ID for this section
       const sectionId = `dynamicDoc${suffix}_${Date.now()}`;
-      const inputId = `${sectionId}_input`;
+      
+      // Check if this is Government ID and handle specially
+      const isGovernmentID = documentType === 'Government ID' || documentType === 'ID Gubernamental';
+      const isSpanish = suffix === 'Es';
       
       // Create new document section
       const section = document.createElement('div');
       section.className = 'dynamic-doc-section';
-      section.innerHTML = `
-        <div class="doc-section-header">
-          <span class="doc-section-title">${documentType}</span>
-          <button type="button" class="remove-doc-btn" onclick="removeDocumentSection('${sectionId}')" title="Remove">−</button>
-        </div>
-        <div class="dropzone" data-target="${inputId}" style="position: relative;">
-          <div class="drop-hint">Drag & drop files here or click to select</div>
-          <input id="${inputId}" name="dynamic_docs[]" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-        </div>
-        <div class="file-list" id="${inputId}List"></div>
-      `;
+      
+      if (isGovernmentID) {
+        // Special handling for Government ID - create front and back uploads
+        const frontInputId = `${sectionId}_front_input`;
+        const backInputId = `${sectionId}_back_input`;
+        const frontLabel = isSpanish ? 'ID Gubernamental – Frente' : 'Government ID – Front';
+        const backLabel = isSpanish ? 'ID Gubernamental – Reverso' : 'Government ID – Back';
+        const dropHint = isSpanish ? 'Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar' : 'Drag & drop image/PDF here or click to select';
+        
+        section.innerHTML = `
+          <div class="doc-section-header">
+            <span class="doc-section-title">${documentType}</span>
+            <button type="button" class="remove-doc-btn" onclick="removeDocumentSection('${sectionId}')" title="Remove">−</button>
+          </div>
+          <div class="grid" style="margin-bottom: 10px;">
+            <div class="full">
+              <label for="${frontInputId}">${frontLabel}</label>
+              <div class="dropzone" data-target="${frontInputId}" style="position: relative;">
+                <div class="drop-hint">${dropHint}</div>
+                <input id="${frontInputId}" name="idFront" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+              </div>
+              <div class="file-list" id="${frontInputId}List"></div>
+            </div>
+            <div class="full">
+              <label for="${backInputId}">${backLabel}</label>
+              <div class="dropzone" data-target="${backInputId}" style="position: relative;">
+                <div class="drop-hint">${dropHint}</div>
+                <input id="${backInputId}" name="idBack" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+              </div>
+              <div class="file-list" id="${backInputId}List"></div>
+            </div>
+          </div>
+        `;
+      } else {
+        // Regular document section
+        const inputId = `${sectionId}_input`;
+        const dropHint = isSpanish ? 'Arrastre y suelte archivos aquí o haga clic para seleccionar' : 'Drag & drop files here or click to select';
+        
+        section.innerHTML = `
+          <div class="doc-section-header">
+            <span class="doc-section-title">${documentType}</span>
+            <button type="button" class="remove-doc-btn" onclick="removeDocumentSection('${sectionId}')" title="Remove">−</button>
+          </div>
+          <div class="dropzone" data-target="${inputId}" style="position: relative;">
+            <div class="drop-hint">${dropHint}</div>
+            <input id="${inputId}" name="dynamic_docs[]" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+          </div>
+          <div class="file-list" id="${inputId}List"></div>
+        `;
+      }
 
       // Insert before the add button
       container.insertBefore(section, addButton);
       
       // Initialize dropzone functionality for the new section using the original system
       setTimeout(() => {
-        // Find the new dropzone and initialize it using the original system's method
-        const zone = document.querySelector(`.dropzone[data-target="${inputId}"]`);
-        const input = document.getElementById(inputId);
-        const list = document.getElementById(inputId + 'List');
-        
-        if (zone && input && list) {
+        if (isGovernmentID) {
+          // Initialize both front and back dropzones for Government ID
+          const frontInputId = `${sectionId}_front_input`;
+          const backInputId = `${sectionId}_back_input`;
           
-          // Call the original system's dropzone initialization logic
-          initializeOriginalDropzone(inputId, zone, input, list);
+          // Initialize front dropzone
+          const frontZone = document.querySelector(`.dropzone[data-target="${frontInputId}"]`);
+          const frontInput = document.getElementById(frontInputId);
+          const frontList = document.getElementById(frontInputId + 'List');
+          
+          if (frontZone && frontInput && frontList) {
+            initializeOriginalDropzone(frontInputId, frontZone, frontInput, frontList);
+          }
+          
+          // Initialize back dropzone
+          const backZone = document.querySelector(`.dropzone[data-target="${backInputId}"]`);
+          const backInput = document.getElementById(backInputId);
+          const backList = document.getElementById(backInputId + 'List');
+          
+          if (backZone && backInput && backList) {
+            initializeOriginalDropzone(backInputId, backZone, backInput, backList);
+          }
         } else {
+          // Initialize regular document dropzone
+          const inputId = `${sectionId}_input`;
+          const zone = document.querySelector(`.dropzone[data-target="${inputId}"]`);
+          const input = document.getElementById(inputId);
+          const list = document.getElementById(inputId + 'List');
+          
+          if (zone && input && list) {
+            initializeOriginalDropzone(inputId, zone, input, list);
+          }
         }
       }, 50);
       
