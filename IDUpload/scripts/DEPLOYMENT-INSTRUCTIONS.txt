@@ -1,0 +1,271 @@
+GOOGLE APPS SCRIPT DEPLOYMENT INSTRUCTIONS
+================================================================
+Barbie's Bail Bonds Document Upload System Setup Guide
+
+OVERVIEW:
+This guide will help you deploy the Google Apps Script that handles document uploads
+from the IDUpload page to organized Google Drive folders with spreadsheet tracking.
+
+================================================================
+
+STEP 1: SET UP GOOGLE DRIVE FOLDER STRUCTURE
+================================================================
+
+1. Open Google Drive (https://drive.google.com)
+
+2. Create main folder:
+   - Click "New" > "Folder"
+   - Name it "Barbie's Bail Bonds Documents"
+
+3. Inside the main folder, create 4 subfolders:
+   - Government ID
+   - Proof of Address
+   - Proof of Employment
+   - Other
+
+4. Create a Google Sheets file in each subfolder:
+   a) Go into "Government ID" folder
+   b) Click "New" > "Google Sheets"
+   c) Name it "Government ID Records"
+   d) Repeat for other 3 folders with appropriate names
+
+5. IMPORTANT: Note down all the IDs (you'll need these later)
+   - To get folder ID: Right-click folder > "Get Link" > copy the ID from the URL
+   - To get spreadsheet ID: Open sheet > copy ID from URL bar
+   
+   Example URL: https://drive.google.com/drive/folders/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs28nUHEUg
+   The ID is: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs28nUHEUg
+
+================================================================
+
+STEP 2: CREATE GOOGLE APPS SCRIPT PROJECT
+================================================================
+
+1. Go to Google Apps Script (https://script.google.com)
+
+2. Click "New Project"
+
+3. Delete the default code
+
+4. Copy and paste the entire contents of "document-upload.gs" file
+
+5. Update the CONFIG object (lines 6-20) with YOUR folder and spreadsheet IDs:
+   
+   const CONFIG = {
+     folders: {
+       'Government ID': 'YOUR_GOVT_ID_FOLDER_ID_HERE',
+       'Proof of Address': 'YOUR_ADDRESS_FOLDER_ID_HERE', 
+       'Proof of Employment': 'YOUR_EMPLOYMENT_FOLDER_ID_HERE',
+       'Other': 'YOUR_OTHER_FOLDER_ID_HERE'
+     },
+     
+     spreadsheets: {
+       'Government ID': 'YOUR_GOVT_ID_SPREADSHEET_ID_HERE',
+       'Proof of Address': 'YOUR_ADDRESS_SPREADSHEET_ID_HERE',
+       'Proof of Employment': 'YOUR_EMPLOYMENT_SPREADSHEET_ID_HERE', 
+       'Other': 'YOUR_OTHER_SPREADSHEET_ID_HERE'
+     }
+   };
+
+6. Save the project:
+   - Click the disk icon or Ctrl+S
+   - Name it "Barbie's Bail Bonds Document Upload"
+
+================================================================
+
+STEP 3: ENABLE REQUIRED SERVICES
+================================================================
+
+1. In the Apps Script editor, click "Services" (+ icon) in the left sidebar
+
+2. Add these services:
+   - Google Drive API (if not already added)
+   - Google Sheets API (if not already added)
+   - Gmail API (for email notifications)
+
+================================================================
+
+STEP 4: TEST THE SCRIPT (OPTIONAL BUT RECOMMENDED)
+================================================================
+
+1. In the Apps Script editor, select the "testDocumentUpload" function from the dropdown
+
+2. Click "Run" (play button)
+
+3. First time will ask for permissions:
+   - Click "Review permissions"
+   - Choose your Google account
+   - Click "Advanced" > "Go to Barbie's Bail Bonds Document Upload (unsafe)"
+   - Click "Allow"
+
+4. Check the execution log for any errors
+
+================================================================
+
+STEP 5: DEPLOY AS WEB APP
+================================================================
+
+1. Click "Deploy" > "New deployment"
+
+2. Click the gear icon next to "Type" and select "Web app"
+
+3. Configure deployment:
+   - Description: "Document Upload Handler"
+   - Execute as: "Me (your email)"
+   - Who has access: "Anyone" (this allows your website to access it)
+
+4. Click "Deploy"
+
+5. IMPORTANT: Copy the Web app URL that appears
+   - It looks like: https://script.google.com/macros/s/AKfycbx.../exec
+   - You'll need this URL for the next step
+
+6. If you see warnings about verification:
+   - This is normal for unverified apps
+   - Click "Advanced" > "Go to Barbie's Bail Bonds Document Upload (unsafe)"
+   - Click "Allow"
+
+================================================================
+
+STEP 6: UPDATE EMAIL NOTIFICATION
+================================================================
+
+1. In the script, find line ~280 (in sendNotificationEmail function)
+
+2. Replace 'admin@barbiesbailbonds.com' with your actual email:
+   const notificationEmail = 'your-email@yourdomain.com';
+
+3. Save the script
+
+4. Redeploy:
+   - Click "Deploy" > "Manage deployments"
+   - Click edit (pencil icon) next to your deployment
+   - Change version to "New version"
+   - Click "Deploy"
+
+================================================================
+
+STEP 7: UPDATE IDUPLOAD PAGE
+================================================================
+
+Now you need to update the IDUpload page to use your Apps Script URL.
+The Web app URL you copied in Step 5 needs to be added to the index.html file.
+
+This will be done in the next step of the implementation.
+
+================================================================
+
+STEP 8: SET FOLDER PERMISSIONS (RECOMMENDED)
+================================================================
+
+1. For each Google Drive folder:
+   - Right-click folder > "Share"
+   - Add your team members with "Editor" access
+   - Consider restricting public access
+
+2. For each spreadsheet:
+   - Open the sheet
+   - Click "Share" in top-right
+   - Add team members who need to view/edit data
+
+================================================================
+
+TROUBLESHOOTING
+================================================================
+
+PROBLEM: "Permission denied" errors
+SOLUTION: 
+- Make sure the Apps Script has permissions to access Drive and Sheets
+- Re-run the authorization process
+- Check that folder/spreadsheet IDs are correct
+
+PROBLEM: "Function not found" errors  
+SOLUTION:
+- Make sure you copied the entire script code
+- Check that the doPost function exists
+- Verify the script saved properly
+
+PROBLEM: Files not appearing in Drive
+SOLUTION:
+- Check that folder IDs in CONFIG are correct
+- Verify the folder structure matches what's expected
+- Look in the Apps Script execution logs for errors
+
+PROBLEM: Spreadsheets not updating
+SOLUTION:
+- Check that spreadsheet IDs in CONFIG are correct  
+- Verify spreadsheets are in the correct folders
+- Make sure the script has edit permissions on the sheets
+
+PROBLEM: No email notifications
+SOLUTION:
+- Update the email address in sendNotificationEmail function
+- Check your spam folder
+- Verify Gmail service is enabled in the script
+
+================================================================
+
+TESTING THE COMPLETE SYSTEM
+================================================================
+
+Once everything is set up:
+
+1. Go to your IDUpload page
+2. Fill out the form completely
+3. Upload test documents (one of each type)
+4. Submit the form
+5. Check:
+   - Files appear in correct Drive folders
+   - Spreadsheet rows are created with correct data
+   - Email notification is received
+   - No errors in Apps Script execution log
+
+================================================================
+
+MAINTENANCE
+================================================================
+
+TO UPDATE THE SCRIPT:
+1. Edit the code in Apps Script editor
+2. Save the changes
+3. Deploy > "Manage deployments" > Edit > "New version" > Deploy
+4. No need to change the URL in your website
+
+TO ADD NEW DOCUMENT TYPES:
+1. Create new folder and spreadsheet in Drive
+2. Add the IDs to CONFIG object in the script
+3. Update the groupFilesByDocumentType function if needed
+4. Redeploy the script
+
+TO MONITOR USAGE:
+- Check Apps Script > Executions for logs and errors
+- Monitor Google Drive storage usage
+- Review email notifications for upload activity
+
+================================================================
+
+SECURITY NOTES
+================================================================
+
+- The script runs with your Google account permissions
+- Only share the Web app URL with your website - don't make it public
+- Regularly review who has access to your Drive folders
+- Consider setting up a dedicated Google account for this script
+- Monitor the execution logs for any suspicious activity
+
+================================================================
+
+SUPPORT
+================================================================
+
+If you encounter issues:
+1. Check the Apps Script execution logs first
+2. Verify all IDs in the CONFIG object are correct
+3. Test each step individually
+4. Make sure all permissions are granted
+5. Check that services (Drive, Sheets, Gmail) are enabled
+
+================================================================
+
+This completes the Google Apps Script deployment setup.
+Next step: Update the IDUpload page to submit to your deployed script URL.

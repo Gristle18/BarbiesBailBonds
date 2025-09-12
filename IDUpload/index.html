@@ -975,6 +975,14 @@
   </footer>
 
   <script>
+    // ======================================
+    // GOOGLE APPS SCRIPT CONFIGURATION
+    // ======================================
+    // After deploying your Google Apps Script:
+    // 1. Replace 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE' with your actual Web App URL
+    // 2. The URL should look like: https://script.google.com/macros/s/AKfycbx.../exec
+    // 3. Find this URL on line ~2408 in the submitUpload function
+    // ======================================
 
     // Language selection functionality
     function showUploadForm(language) {
@@ -2359,11 +2367,94 @@
             }
           }
 
-          // For now, just show success message (no backend configured yet)
-          errorMsg.textContent = suffix === 'Es'
-            ? 'Carga aún no configurada. Por favor envíe sus fotos por texto a 561-247-0018.'
-            : 'Upload not configured yet. Please text your photos to 561-247-0018.';
-          errorMsg.style.display = 'block';
+          // Submit to Google Apps Script
+          try {
+            if (submitBtn) {
+              submitBtn.disabled = true;
+              submitBtn.textContent = suffix === 'Es' ? 'Enviando...' : 'Submitting...';
+            }
+
+            // Create FormData object
+            const formData = new FormData();
+            
+            // Add basic form fields
+            formData.append('yourName', document.getElementById('yourName' + suffix)?.value || '');
+            formData.append('yourPhone', document.getElementById('yourPhone' + suffix)?.value || '');
+            formData.append('defendantName', document.getElementById('defendantName' + suffix)?.value || '');
+            formData.append('caseNumber', document.getElementById('caseNumber' + suffix)?.value || '');
+            
+            // Add documents from all sections
+            const documentSections = form.querySelectorAll('.document-section');
+            documentSections.forEach((section, index) => {
+              const typeSelect = section.querySelector('select');
+              if (typeSelect) {
+                const docType = typeSelect.value;
+                formData.append(`documentType_${index}`, docType);
+                
+                if (docType === 'Government ID') {
+                  // Handle front/back for Government ID
+                  const frontInput = section.querySelector('input[data-type="front"]');
+                  const backInput = section.querySelector('input[data-type="back"]');
+                  
+                  if (frontInput?.files[0]) {
+                    formData.append(`document_${index}_front_input`, frontInput.files[0]);
+                  }
+                  if (backInput?.files[0]) {
+                    formData.append(`document_${index}_back_input`, backInput.files[0]);
+                  }
+                } else {
+                  // Handle single file for other document types
+                  const fileInput = section.querySelector('input[type="file"]:not([data-type])');
+                  if (fileInput?.files[0]) {
+                    formData.append(`document_${index}_input`, fileInput.files[0]);
+                  }
+                }
+              }
+            });
+            
+            // Replace this with your actual Google Apps Script Web App URL after deployment
+            const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+            
+            if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
+              throw new Error('Apps Script URL not configured yet');
+            }
+            
+            const response = await fetch(APPS_SCRIPT_URL, {
+              method: 'POST',
+              body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+              successMsg.style.display = 'block';
+              form.reset();
+              // Reset dynamic sections to initial state
+              const additionalSections = form.querySelectorAll('.document-section:not(:first-child)');
+              additionalSections.forEach(section => section.remove());
+            } else {
+              throw new Error(result.message || 'Upload failed');
+            }
+            
+          } catch (error) {
+            console.error('Upload error:', error);
+            if (error.message === 'Apps Script URL not configured yet') {
+              errorMsg.textContent = suffix === 'Es'
+                ? 'Carga aún no configurada. Por favor envíe sus fotos por texto a 561-247-0018.'
+                : 'Upload not configured yet. Please text your photos to 561-247-0018.';
+            } else {
+              errorMsg.textContent = suffix === 'Es'
+                ? 'Error al subir archivos. Por favor envíe sus fotos por texto a 561-247-0018.'
+                : 'Upload error. Please text your photos to 561-247-0018.';
+            }
+            errorMsg.style.display = 'block';
+          } finally {
+            // Re-enable submit button
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = suffix === 'Es' ? 'Enviar' : 'Submit';
+            }
+          }
         });
       }
     })();
