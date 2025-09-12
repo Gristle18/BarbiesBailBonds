@@ -2357,10 +2357,17 @@
             const fileInputs = section.querySelectorAll('input[type="file"]');
             console.log(`Section has ${fileInputs.length} file inputs`);
             for (const input of fileInputs) {
+              console.log(`🔍 Input details:`, {
+                id: input.id,
+                files: input.files ? input.files.length : 'null',
+                value: input.value
+              });
               if (input.files && input.files.length > 0) {
                 console.log(`✅ Found file: ${input.files[0].name}`);
                 hasFiles = true;
                 break;
+              } else {
+                console.log(`❌ No files in this input`);
               }
             }
             if (hasFiles) break;
