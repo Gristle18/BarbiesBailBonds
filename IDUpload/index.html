@@ -2741,25 +2741,43 @@
             const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9DvZFje5f_ssDVNh7eXaARwbK0VdCCzJct6iw22K10PRJMVkGnhVHjVBv3dvfmqvk/exec';
             
             console.log('🌐 Sending to Apps Script:', APPS_SCRIPT_URL);
-            console.log('🚀 Fetch configuration:');
+            console.log('🚀 Using XMLHttpRequest instead of fetch() to ensure multipart data transmission');
             console.log('  Method: POST');
             console.log('  Body: FormData with', fileFields, 'files and', textFields, 'text fields');
             console.log('  Headers: (letting browser set Content-Type automatically for multipart)');
             
-            const response = await fetch(APPS_SCRIPT_URL, {
-              method: 'POST',
-              body: formData
-              // Important: Do NOT set Content-Type header - let browser set it automatically for multipart/form-data
+            // Use XMLHttpRequest instead of fetch for better Google Apps Script compatibility
+            const responseText = await new Promise((resolve, reject) => {
+              const xhr = new XMLHttpRequest();
+              
+              xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                  if (xhr.status === 200) {
+                    console.log('📡 XMLHttpRequest Response status:', xhr.status);
+                    console.log('📡 XMLHttpRequest Response headers:', xhr.getAllResponseHeaders());
+                    resolve(xhr.responseText);
+                  } else {
+                    console.error('❌ XMLHttpRequest failed with status:', xhr.status);
+                    console.error('❌ XMLHttpRequest response text:', xhr.responseText);
+                    reject(new Error(`HTTP error! status: ${xhr.status}`));
+                  }
+                }
+              };
+              
+              xhr.onerror = function() {
+                console.error('❌ XMLHttpRequest network error');
+                reject(new Error('Network error occurred'));
+              };
+              
+              console.log('📡 Opening XMLHttpRequest...');
+              xhr.open('POST', APPS_SCRIPT_URL, true);
+              
+              // DO NOT set Content-Type - let browser set it automatically for multipart
+              // xhr.setRequestHeader('Content-Type', 'multipart/form-data'); // This would break it!
+              
+              console.log('📡 Sending XMLHttpRequest with FormData...');
+              xhr.send(formData);
             });
-            
-            console.log('📡 Response status:', response.status);
-            console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
-            
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const responseText = await response.text();
             console.log('📨 Raw response:', responseText);
             
             let result;
