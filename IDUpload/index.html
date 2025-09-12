@@ -2413,7 +2413,7 @@
           // Size/type checks (<=10MB per file)
           console.log('🔍 Checking file sizes and types...');
           const okTypes = ['image/jpeg','image/png','image/webp','image/heic','application/pdf'];
-          const allFileInputs = form.querySelectorAll('input[type="file"]');
+          // Use the allFileInputs already declared above
           
           for (const input of allFileInputs) {
             if (!input.files) continue;
