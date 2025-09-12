@@ -2367,28 +2367,46 @@
             }
           }
 
-          // Submit to Google Apps Script
+          // Submit to Google Apps Script with debugging
           try {
+            console.log('🚀 Starting upload process...');
+            
             if (submitBtn) {
               submitBtn.disabled = true;
               submitBtn.textContent = suffix === 'Es' ? 'Enviando...' : 'Submitting...';
             }
 
+            // Show progress message
+            errorMsg.textContent = suffix === 'Es' ? 'Preparando archivos...' : 'Preparing files...';
+            errorMsg.style.display = 'block';
+            errorMsg.style.background = '#2196F3'; // Blue for info
+
             // Create FormData object
             const formData = new FormData();
             
             // Add basic form fields
-            formData.append('yourName', document.getElementById('yourName' + suffix)?.value || '');
-            formData.append('yourPhone', document.getElementById('yourPhone' + suffix)?.value || '');
-            formData.append('defendantName', document.getElementById('defendantName' + suffix)?.value || '');
-            formData.append('caseNumber', document.getElementById('caseNumber' + suffix)?.value || '');
+            const yourName = document.getElementById('yourName' + suffix)?.value || '';
+            const yourPhone = document.getElementById('yourPhone' + suffix)?.value || '';
+            const defendantName = document.getElementById('defendantName' + suffix)?.value || '';
+            const caseNumber = document.getElementById('caseNumber' + suffix)?.value || '';
+            
+            console.log('📝 Form data:', { yourName, yourPhone, defendantName, caseNumber });
+            
+            formData.append('yourName', yourName);
+            formData.append('yourPhone', yourPhone);
+            formData.append('defendantName', defendantName);
+            formData.append('caseNumber', caseNumber);
             
             // Add documents from all sections
             const documentSections = form.querySelectorAll('.document-section');
+            console.log(`📁 Found ${documentSections.length} document sections`);
+            
+            let fileCount = 0;
             documentSections.forEach((section, index) => {
               const typeSelect = section.querySelector('select');
               if (typeSelect) {
                 const docType = typeSelect.value;
+                console.log(`📄 Section ${index}: ${docType}`);
                 formData.append(`documentType_${index}`, docType);
                 
                 if (docType === 'Government ID') {
@@ -2397,55 +2415,111 @@
                   const backInput = section.querySelector('input[data-type="back"]');
                   
                   if (frontInput?.files[0]) {
+                    console.log(`📸 Adding front file: ${frontInput.files[0].name} (${frontInput.files[0].size} bytes)`);
                     formData.append(`document_${index}_front_input`, frontInput.files[0]);
+                    fileCount++;
                   }
                   if (backInput?.files[0]) {
+                    console.log(`📸 Adding back file: ${backInput.files[0].name} (${backInput.files[0].size} bytes)`);
                     formData.append(`document_${index}_back_input`, backInput.files[0]);
+                    fileCount++;
                   }
                 } else {
                   // Handle single file for other document types
                   const fileInput = section.querySelector('input[type="file"]:not([data-type])');
                   if (fileInput?.files[0]) {
+                    console.log(`📎 Adding file: ${fileInput.files[0].name} (${fileInput.files[0].size} bytes)`);
                     formData.append(`document_${index}_input`, fileInput.files[0]);
+                    fileCount++;
                   }
                 }
               }
             });
             
+            console.log(`📊 Total files to upload: ${fileCount}`);
+            
+            // Update progress message
+            errorMsg.textContent = suffix === 'Es' 
+              ? `Subiendo ${fileCount} archivo(s)...` 
+              : `Uploading ${fileCount} file(s)...`;
+            
             // Google Apps Script Web App URL configured
             const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxHNm5r1gnvFbCSQgrGY7NM1EZSuLMATyxTVncn6Q86bHiHCasSvPvypfWn3rbUHsVR/exec';
             
-            if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
-              throw new Error('Apps Script URL not configured yet');
-            }
+            console.log('🌐 Sending to Apps Script:', APPS_SCRIPT_URL);
             
             const response = await fetch(APPS_SCRIPT_URL, {
               method: 'POST',
               body: formData
             });
             
-            const result = await response.json();
+            console.log('📡 Response status:', response.status);
+            console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+            
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const responseText = await response.text();
+            console.log('📨 Raw response:', responseText);
+            
+            let result;
+            try {
+              result = JSON.parse(responseText);
+            } catch (parseError) {
+              console.error('❌ JSON parse error:', parseError);
+              throw new Error(`Invalid response format: ${responseText.substring(0, 100)}...`);
+            }
+            
+            console.log('✅ Parsed result:', result);
             
             if (result.success) {
+              // Hide error message
+              errorMsg.style.display = 'none';
+              
+              // Show detailed success message
+              successMsg.innerHTML = suffix === 'Es' 
+                ? `<strong>✅ ¡Documentos subidos exitosamente!</strong><br>
+                   Archivos procesados: ${result.processed || fileCount}<br>
+                   Nos comunicaremos pronto.`
+                : `<strong>✅ Documents uploaded successfully!</strong><br>
+                   Files processed: ${result.processed || fileCount}<br>
+                   We'll reach out shortly.`;
               successMsg.style.display = 'block';
+              
               form.reset();
               // Reset dynamic sections to initial state
               const additionalSections = form.querySelectorAll('.document-section:not(:first-child)');
               additionalSections.forEach(section => section.remove());
+              
+              console.log('🎉 Upload completed successfully!');
             } else {
               throw new Error(result.message || 'Upload failed');
             }
             
           } catch (error) {
-            console.error('Upload error:', error);
+            console.error('❌ Upload error:', error);
+            console.error('❌ Error stack:', error.stack);
+            
+            // Reset error message background to red
+            errorMsg.style.background = 'var(--error)';
+            
             if (error.message === 'Apps Script URL not configured yet') {
               errorMsg.textContent = suffix === 'Es'
                 ? 'Carga aún no configurada. Por favor envíe sus fotos por texto a 561-247-0018.'
                 : 'Upload not configured yet. Please text your photos to 561-247-0018.';
+            } else if (error.message.includes('HTTP error')) {
+              errorMsg.innerHTML = suffix === 'Es'
+                ? `<strong>❌ Error de conexión:</strong><br>${error.message}<br>Por favor envíe sus fotos por texto a <span style="white-space: nowrap;">561-247-0018</span>`
+                : `<strong>❌ Connection Error:</strong><br>${error.message}<br>Please text your photos to <span style="white-space: nowrap;">561-247-0018</span>`;
+            } else if (error.message.includes('Invalid response')) {
+              errorMsg.innerHTML = suffix === 'Es'
+                ? `<strong>❌ Error de respuesta del servidor:</strong><br>Revise la consola para más detalles<br>Por favor envíe sus fotos por texto a <span style="white-space: nowrap;">561-247-0018</span>`
+                : `<strong>❌ Server Response Error:</strong><br>Check console for details<br>Please text your photos to <span style="white-space: nowrap;">561-247-0018</span>`;
             } else {
-              errorMsg.textContent = suffix === 'Es'
-                ? 'Error al subir archivos. Por favor envíe sus fotos por texto a 561-247-0018.'
-                : 'Upload error. Please text your photos to 561-247-0018.';
+              errorMsg.innerHTML = suffix === 'Es'
+                ? `<strong>❌ Error al subir archivos:</strong><br>${error.message}<br>Por favor envíe sus fotos por texto a <span style="white-space: nowrap;">561-247-0018</span>`
+                : `<strong>❌ Upload Error:</strong><br>${error.message}<br>Please text your photos to <span style="white-space: nowrap;">561-247-0018</span>`;
             }
             errorMsg.style.display = 'block';
           } finally {
