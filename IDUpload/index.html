@@ -2349,7 +2349,7 @@
           
           // Check that at least one document section has files
           console.log('📁 Checking for uploaded documents...');
-          const documentSections = form.querySelectorAll('.document-section');
+          const documentSections = form.querySelectorAll('.dynamic-doc-section');
           console.log(`Found ${documentSections.length} document sections`);
           
           let hasFiles = false;
@@ -2441,42 +2441,60 @@
             formData.append('caseNumber', caseNumber);
             
             // Add documents from all sections
-            const documentSections = form.querySelectorAll('.document-section');
+            const documentSections = form.querySelectorAll('.dynamic-doc-section');
             console.log(`📁 Found ${documentSections.length} document sections`);
             
             let fileCount = 0;
             documentSections.forEach((section, index) => {
-              const typeSelect = section.querySelector('select');
-              if (typeSelect) {
-                const docType = typeSelect.value;
-                console.log(`📄 Section ${index}: ${docType}`);
-                formData.append(`documentType_${index}`, docType);
-                
-                if (docType === 'Government ID') {
-                  // Handle front/back for Government ID
-                  const frontInput = section.querySelector('input[data-type="front"]');
-                  const backInput = section.querySelector('input[data-type="back"]');
-                  
-                  if (frontInput?.files[0]) {
-                    console.log(`📸 Adding front file: ${frontInput.files[0].name} (${frontInput.files[0].size} bytes)`);
-                    formData.append(`document_${index}_front_input`, frontInput.files[0]);
-                    fileCount++;
-                  }
-                  if (backInput?.files[0]) {
-                    console.log(`📸 Adding back file: ${backInput.files[0].name} (${backInput.files[0].size} bytes)`);
-                    formData.append(`document_${index}_back_input`, backInput.files[0]);
-                    fileCount++;
-                  }
-                } else {
-                  // Handle single file for other document types
-                  const fileInput = section.querySelector('input[type="file"]:not([data-type])');
-                  if (fileInput?.files[0]) {
-                    console.log(`📎 Adding file: ${fileInput.files[0].name} (${fileInput.files[0].size} bytes)`);
-                    formData.append(`document_${index}_input`, fileInput.files[0]);
-                    fileCount++;
-                  }
-                }
+              console.log(`📄 Section ${index}: Analyzing structure...`);
+              
+              // Try to determine document type from section content
+              let docType = 'Other';
+              
+              // Look for document type in the section (could be in text or data attributes)
+              const sectionText = section.textContent || '';
+              if (sectionText.includes('Government ID') || sectionText.includes('ID Gubernamental')) {
+                docType = 'Government ID';
+              } else if (sectionText.includes('Proof of Address') || sectionText.includes('Comprobante de Domicilio')) {
+                docType = 'Proof of Address';
+              } else if (sectionText.includes('Proof of Employment') || sectionText.includes('Comprobante de Empleo')) {
+                docType = 'Proof of Employment';
               }
+              
+              console.log(`📄 Section ${index}: ${docType}`);
+              formData.append(`documentType_${index}`, docType);
+              
+              // Find all file inputs in this section
+              const fileInputs = section.querySelectorAll('input[type="file"]');
+              console.log(`📁 Section ${index} has ${fileInputs.length} file inputs`);
+              
+              fileInputs.forEach((input, inputIndex) => {
+                if (input.files && input.files[0]) {
+                  const file = input.files[0];
+                  console.log(`📎 Adding file: ${file.name} (${file.size} bytes)`);
+                  
+                  // Determine if this is front/back based on input structure
+                  if (docType === 'Government ID') {
+                    // Look for front/back indicators in the input structure
+                    const inputId = input.id || '';
+                    const inputText = input.closest('div')?.textContent || '';
+                    
+                    if (inputId.includes('front') || inputText.includes('Front') || inputText.includes('Frente')) {
+                      formData.append(`document_${index}_front_input`, file);
+                    } else if (inputId.includes('back') || inputText.includes('Back') || inputText.includes('Reverso')) {
+                      formData.append(`document_${index}_back_input`, file);
+                    } else {
+                      // Default to front if we can't determine
+                      formData.append(`document_${index}_front_input`, file);
+                    }
+                  } else {
+                    // Other document types use simple naming
+                    formData.append(`document_${index}_input`, file);
+                  }
+                  
+                  fileCount++;
+                }
+              });
             });
             
             console.log(`📊 Total files to upload: ${fileCount}`);
@@ -2532,7 +2550,7 @@
               
               form.reset();
               // Reset dynamic sections to initial state
-              const additionalSections = form.querySelectorAll('.document-section:not(:first-child)');
+              const additionalSections = form.querySelectorAll('.dynamic-doc-section');
               additionalSections.forEach(section => section.remove());
               
               console.log('🎉 Upload completed successfully!');
