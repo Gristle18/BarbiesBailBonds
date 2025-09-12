@@ -2327,45 +2327,88 @@
         }
 
 
-        // Submit handler - for now just show message that backend isn't configured
+        // Submit handler with debugging
         form?.addEventListener('submit', async (e) => {
+          console.log('🎯 Form submit event triggered!', suffix);
           e.preventDefault();
           successMsg.style.display = 'none';
           errorMsg.style.display = 'none';
 
           // Basic required checks
-          const requiredIds = ['yourName' + suffix, 'yourPhone' + suffix, 'idFront' + suffix];
+          console.log('🔍 Checking required fields...');
+          const requiredIds = ['yourName' + suffix, 'yourPhone' + suffix];
           for (const id of requiredIds) {
             const el = document.getElementById(id);
-            if (!el || (el.type === 'file' ? el.files.length === 0 : !el.value)) {
+            console.log(`📝 Checking ${id}:`, el?.value);
+            if (!el || !el.value.trim()) {
+              console.log(`❌ Required field missing: ${id}`);
               el?.reportValidity?.();
               return;
             }
           }
+          
+          // Check that at least one document section has files
+          console.log('📁 Checking for uploaded documents...');
+          const documentSections = form.querySelectorAll('.document-section');
+          console.log(`Found ${documentSections.length} document sections`);
+          
+          let hasFiles = false;
+          for (const section of documentSections) {
+            const fileInputs = section.querySelectorAll('input[type="file"]');
+            console.log(`Section has ${fileInputs.length} file inputs`);
+            for (const input of fileInputs) {
+              if (input.files && input.files.length > 0) {
+                console.log(`✅ Found file: ${input.files[0].name}`);
+                hasFiles = true;
+                break;
+              }
+            }
+            if (hasFiles) break;
+          }
+          
+          if (!hasFiles) {
+            console.log('❌ No files uploaded');
+            errorMsg.textContent = suffix === 'Es'
+              ? 'Por favor suba al menos un documento.'
+              : 'Please upload at least one document.';
+            errorMsg.style.display = 'block';
+            errorMsg.style.background = 'var(--error)';
+            return;
+          }
+          
+          console.log('✅ Validation passed, proceeding with upload...');
 
           // Size/type checks (<=10MB per file)
+          console.log('🔍 Checking file sizes and types...');
           const okTypes = ['image/jpeg','image/png','image/webp','image/heic','application/pdf'];
-          const fileInputs = ['idFront' + suffix, 'idBack' + suffix, 'docs' + suffix];
-          for (const id of fileInputs) {
-            const input = document.getElementById(id);
-            if (!input || !input.files) continue;
+          const allFileInputs = form.querySelectorAll('input[type="file"]');
+          
+          for (const input of allFileInputs) {
+            if (!input.files) continue;
             for (const f of input.files) {
+              console.log(`📎 Checking file: ${f.name} (${f.size} bytes, ${f.type})`);
               if (f.size > 10 * 1024 * 1024) { // 10MB
+                console.log(`❌ File too large: ${f.name}`);
                 errorMsg.textContent = suffix === 'Es' 
                   ? `Archivo demasiado grande: ${f.name} (máximo 10MB)`
                   : `File too large: ${f.name} (max 10MB)`;
                 errorMsg.style.display = 'block';
+                errorMsg.style.background = 'var(--error)';
                 return;
               }
               if (!okTypes.includes(f.type)) {
+                console.log(`❌ Unsupported file type: ${f.name} (${f.type})`);
                 errorMsg.textContent = suffix === 'Es'
                   ? `Tipo no soportado: ${f.name}`
                   : `Unsupported type: ${f.name}`;
                 errorMsg.style.display = 'block';
+                errorMsg.style.background = 'var(--error)';
                 return;
               }
             }
           }
+          
+          console.log('✅ All files passed validation');
 
           // Submit to Google Apps Script with debugging
           try {
