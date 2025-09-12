@@ -1173,6 +1173,8 @@
       // Create new document section
       const section = document.createElement('div');
       section.className = 'dynamic-doc-section';
+      // Store document type for reliable detection during form submission
+      section.setAttribute('data-document-type', documentType);
       
       if (isGovernmentID) {
         // Special handling for Government ID - create front and back uploads
@@ -2582,6 +2584,17 @@
             formData.append('defendantName', defendantName);
             formData.append('caseNumber', caseNumber);
             
+            // Helper function to normalize Spanish document types to English for backend
+            function normalizeDocumentType(docType) {
+              const translations = {
+                'ID Gubernamental': 'Government ID',
+                'Comprobante de Domicilio': 'Proof of Address', 
+                'Comprobante de Empleo': 'Proof of Employment',
+                'Otro': 'Other'
+              };
+              return translations[docType] || docType;
+            }
+            
             // Add documents from all sections
             const documentSections = form.querySelectorAll('.dynamic-doc-section');
             const allFormFileInputs = form.querySelectorAll('input[type="file"]');
@@ -2592,21 +2605,27 @@
             documentSections.forEach((section, index) => {
               console.log(`📄 Section ${index}: Analyzing structure...`);
               
-              // Try to determine document type from section content
-              let docType = 'Other';
+              // Try to determine document type from section data attribute (most reliable)
+              let docType = section.getAttribute('data-document-type') || 'Other';
               
-              // Look for document type in the section (could be in text or data attributes)
-              const sectionText = section.textContent || '';
-              if (sectionText.includes('Government ID') || sectionText.includes('ID Gubernamental')) {
-                docType = 'Government ID';
-              } else if (sectionText.includes('Proof of Address') || sectionText.includes('Comprobante de Domicilio')) {
-                docType = 'Proof of Address';
-              } else if (sectionText.includes('Proof of Employment') || sectionText.includes('Comprobante de Empleo')) {
-                docType = 'Proof of Employment';
+              // Fallback: Look for document type in the section text content
+              if (docType === 'Other') {
+                const sectionText = section.textContent || '';
+                if (sectionText.includes('Government ID') || sectionText.includes('ID Gubernamental')) {
+                  docType = 'Government ID';
+                } else if (sectionText.includes('Proof of Address') || sectionText.includes('Comprobante de Domicilio')) {
+                  docType = 'Proof of Address';
+                } else if (sectionText.includes('Proof of Employment') || sectionText.includes('Comprobante de Empleo')) {
+                  docType = 'Proof of Employment';
+                }
               }
               
-              console.log(`📄 Section ${index}: ${docType}`);
-              formData.append(`documentType_${index}`, docType);
+              console.log(`📄 Section ${index}: Detected document type: '${docType}' (from data-attribute: '${section.getAttribute('data-document-type') || 'none'}')`);
+              
+              // Normalize Spanish document types to English for backend compatibility
+              const normalizedDocType = normalizeDocumentType(docType);
+              console.log(`📄 Section ${index}: ${docType} → ${normalizedDocType}`);
+              formData.append(`documentType_${index}`, normalizedDocType);
               
               // Find all file inputs in this section
               const fileInputs = section.querySelectorAll('input[type="file"]');
