@@ -1273,13 +1273,35 @@
     // Global function to remove document section
     window.removeDocumentSection = function(sectionId) {
       
-      // Find by the input ID within the section since that contains our sectionId
-      const input = document.getElementById(`${sectionId}_input`);
-      const section = input?.closest('.dynamic-doc-section');
+      // Try to find the section by looking for different input ID patterns
+      let section = null;
+      
+      // First try regular document input
+      let input = document.getElementById(`${sectionId}_input`);
+      if (input) {
+        section = input.closest('.dynamic-doc-section');
+      }
+      
+      // If not found, try Government ID front input
+      if (!section) {
+        input = document.getElementById(`${sectionId}_front_input`);
+        if (input) {
+          section = input.closest('.dynamic-doc-section');
+        }
+      }
+      
+      // If still not found, try Government ID back input
+      if (!section) {
+        input = document.getElementById(`${sectionId}_back_input`);
+        if (input) {
+          section = input.closest('.dynamic-doc-section');
+        }
+      }
       
       if (section) {
         section.remove();
       } else {
+        console.log('Could not find section to remove:', sectionId);
       }
     };
 
