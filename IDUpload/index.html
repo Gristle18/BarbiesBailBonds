@@ -1303,9 +1303,18 @@
 
     // Initialize dropzone using the original system's exact logic
     function initializeOriginalDropzone(targetId, zone, input, list) {
+      console.log(`🔧 Initializing dynamic dropzone: ${targetId}`);
+      console.log(`📂 Elements found:`, {
+        zone: !!zone,
+        input: !!input,
+        list: !!list,
+        inputType: input?.type,
+        inputMultiple: input?.multiple
+      });
       
       // This is the exact logic from the original initializeAllDropzones function
       const updateList = (files) => {
+        console.log(`📋 Updating dynamic file list for ${targetId}:`, files?.length || 0, 'files');
         if (!files || files.length === 0) { 
           // Reset dropzone to original state
           const isSpanish = targetId.endsWith('Es');
@@ -2260,10 +2269,15 @@
 
           // Simple click handler - no preview modal
           zone.addEventListener('click', (e) => {
+            console.log(`🖱️ Dynamic dropzone clicked: ${targetId}`);
             // No preview modal functionality - just log clicks
             if (e.target.classList.contains('preview-thumb') || e.target.id.includes('_preview')) {
+              console.log('🖼️ Clicked on preview, not triggering file input');
               return;
             }
+            console.log('🎯 Triggering file input click');
+            e.preventDefault();
+            input.click();
           });
 
           // Drag and drop
@@ -2283,14 +2297,23 @@
             e.preventDefault();
             zone.classList.remove('dragover');
             
+            const files = e.dataTransfer.files;
+            console.log(`🎯 Files dropped on dynamic ${targetId}:`, files.length, 'files');
+            
+            // Log each dropped file
+            Array.from(files).forEach((file, i) => {
+              console.log(`  📎 Dropped file ${i + 1}: ${file.name} (${file.type}, ${(file.size/1024/1024).toFixed(2)} MB)`);
+            });
             
             if (input.multiple) {
-              input.files = e.dataTransfer.files;
+              console.log(`✅ Setting ${files.length} files to multi-file input ${targetId}`);
+              input.files = files;
             } else {
+              console.log(`✅ Setting first file to single-file input ${targetId}`);
               // For single input, take the first file
               const dt = new DataTransfer();
-              if (e.dataTransfer.files[0]) {
-                dt.items.add(e.dataTransfer.files[0]);
+              if (files[0]) {
+                dt.items.add(files[0]);
               }
               input.files = dt.files;
             }
@@ -2299,6 +2322,10 @@
 
           // File input change
           input.addEventListener('change', () => {
+            console.log(`📁 Dynamic file input changed for ${targetId}: ${input.files.length} files selected`);
+            Array.from(input.files).forEach((file, i) => {
+              console.log(`  📄 Selected file ${i + 1}: ${file.name} (${file.type}, ${(file.size/1024/1024).toFixed(2)} MB)`);
+            });
             updateList(input.files);
           });
         });
