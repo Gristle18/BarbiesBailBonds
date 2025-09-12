@@ -3,20 +3,20 @@
  * Routes documents from IDUpload page to organized Google Drive folders with spreadsheet tracking
  */
 
-// Configuration - UPDATE THESE WITH YOUR ACTUAL IDs
+// Configuration - ACTUAL Google Drive IDs
 const CONFIG = {
   folders: {
-    'Government ID': 'REPLACE_WITH_GOVT_ID_FOLDER_ID',
-    'Proof of Address': 'REPLACE_WITH_ADDRESS_FOLDER_ID', 
-    'Proof of Employment': 'REPLACE_WITH_EMPLOYMENT_FOLDER_ID',
-    'Other': 'REPLACE_WITH_OTHER_FOLDER_ID'
+    'Government ID': '1jaAaDP_I9PlcfoIOxOexma4ls7DP9P7b',
+    'Proof of Address': '1eSTcKw6v20jagojceU4KGFyVndC8xQqA', 
+    'Proof of Employment': '1Cugr4TB6mKsbT62MzEM9t1gtmPgN9I8Y',
+    'Other': '1rEWjhQEqhLxBddXd4oHUOiN0EG0Dzx5o'
   },
   
   spreadsheets: {
-    'Government ID': 'REPLACE_WITH_GOVT_ID_SPREADSHEET_ID',
-    'Proof of Address': 'REPLACE_WITH_ADDRESS_SPREADSHEET_ID',
-    'Proof of Employment': 'REPLACE_WITH_EMPLOYMENT_SPREADSHEET_ID', 
-    'Other': 'REPLACE_WITH_OTHER_SPREADSHEET_ID'
+    'Government ID': '1PGRHMVC1HPJ_pSDWdTlYGkw1HfKl4uowLO8IX7stPcw',
+    'Proof of Address': '18PspzNXT6f84izsMOu3QPyn_SPkFGa_k9qntg0tyMug',
+    'Proof of Employment': '1JoDbIluaJVmgb8iZ42zw_nj11RKBiFK-JT0j4oTPiiw', 
+    'Other': '1WY4Ee4acWO_rxgr5y9l7BFa6_TGGJkgy_70HUDUuUWw'
   }
 };
 
