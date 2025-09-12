@@ -69,8 +69,10 @@
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .full { grid-column: 1/-1; }
     label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
-    input[type="text"], input[type="tel"], input[type="email"], input[type="file"] {
+    input[type="text"], input[type="tel"], input[type="email"], input[type="file"], input:not([type]), textarea, select {
       width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; background:#fff; color:#111;
+      height: auto;
+      min-height: 48px;
     }
     .hint { color: #555; font-size: 13px; margin-top: 6px; }
 
