@@ -3,6 +3,32 @@
  * Routes documents from IDUpload page to organized Google Drive folders with spreadsheet tracking
  */
 
+// Global array to collect all console logs for sending back to frontend
+let debugLogs = [];
+
+// Override console.log to capture logs for frontend
+const originalConsoleLog = console.log;
+const originalConsoleError = console.error;
+const originalConsoleWarn = console.warn;
+
+console.log = function(...args) {
+  const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+  debugLogs.push({ level: 'log', message: message, timestamp: new Date().toISOString() });
+  originalConsoleLog.apply(console, args);
+};
+
+console.error = function(...args) {
+  const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+  debugLogs.push({ level: 'error', message: message, timestamp: new Date().toISOString() });
+  originalConsoleError.apply(console, args);
+};
+
+console.warn = function(...args) {
+  const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+  debugLogs.push({ level: 'warn', message: message, timestamp: new Date().toISOString() });
+  originalConsoleWarn.apply(console, args);
+};
+
 // Configuration - ACTUAL Google Drive IDs
 const CONFIG = {
   folders: {
@@ -24,6 +50,8 @@ const CONFIG = {
  * Main POST handler - receives form data and files from IDUpload page
  */
 function doPost(e) {
+  // Reset debug logs for this request
+  debugLogs = [];
   console.log('=== Document Upload Request Received ===');
   console.log('Request timestamp:', new Date().toISOString());
   console.log('Request data keys:', Object.keys(e || {}));
@@ -126,10 +154,11 @@ function doPost(e) {
       processed: totalProcessed,
       documentsProcessed: results.length,
       details: results,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      debugLogs: debugLogs
     };
     
-    console.log('📤 Final response:', JSON.stringify(response, null, 2));
+    console.log('📤 Final response (excluding debugLogs for brevity):', JSON.stringify({...response, debugLogs: `${debugLogs.length} log entries`}, null, 2));
     
     return ContentService
       .createTextOutput(JSON.stringify(response))
@@ -143,7 +172,9 @@ function doPost(e) {
       .createTextOutput(JSON.stringify({
         success: false,
         message: 'Upload failed: ' + error.toString(),
-        error: error.toString()
+        error: error.toString(),
+        debugLogs: debugLogs,
+        timestamp: new Date().toISOString()
       }))
       .setMimeType(ContentService.MimeType.JSON);
   }

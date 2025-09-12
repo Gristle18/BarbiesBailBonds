@@ -2724,12 +2724,34 @@
             
             console.log('✅ Parsed result:', result);
             
+            // Display server debug logs in browser console
+            if (result.debugLogs && result.debugLogs.length > 0) {
+              console.log(`🔗 === Google Apps Script Debug Logs (${result.debugLogs.length} entries) ===`);
+              result.debugLogs.forEach((log, index) => {
+                const timestamp = new Date(log.timestamp).toLocaleTimeString();
+                const prefix = `[GAS ${timestamp}]`;
+                
+                switch (log.level) {
+                  case 'error':
+                    console.error(`${prefix} ${log.message}`);
+                    break;
+                  case 'warn':
+                    console.warn(`${prefix} ${log.message}`);
+                    break;
+                  default:
+                    console.log(`${prefix} ${log.message}`);
+                }
+              });
+              console.log('🔗 === End Google Apps Script Debug Logs ===');
+            }
+            
             // Detailed analysis of the response
             if (result.success) {
               console.log('🎯 Upload Success Details:');
               console.log('  📊 Processed files:', result.processed || 0);
               console.log('  📝 Details array length:', result.details?.length || 0);
               console.log('  💬 Message:', result.message);
+              console.log('  🔗 Server debug logs:', result.debugLogs?.length || 0, 'entries');
               
               if (result.details && result.details.length > 0) {
                 console.log('  📄 Processing details:');
@@ -2742,7 +2764,7 @@
               
               if (result.processed === 0) {
                 console.warn('⚠️ Server reported 0 processed files - this indicates a backend processing issue');
-                console.warn('   Check Google Apps Script logs for errors during file processing');
+                console.warn('   Check server debug logs above for detailed error information');
               }
               
               // Hide error message
@@ -2773,6 +2795,33 @@
               
               console.log('🎉 Upload completed successfully!');
             } else {
+              // Handle server error response
+              console.error('❌ Server reported failure:', result.message || 'No error message provided');
+              if (result.error) {
+                console.error('❌ Error details:', result.error);
+              }
+              
+              // Display server debug logs for failed requests too
+              if (result.debugLogs && result.debugLogs.length > 0) {
+                console.log(`🔗 === Google Apps Script Error Debug Logs (${result.debugLogs.length} entries) ===`);
+                result.debugLogs.forEach((log, index) => {
+                  const timestamp = new Date(log.timestamp).toLocaleTimeString();
+                  const prefix = `[GAS ${timestamp}]`;
+                  
+                  switch (log.level) {
+                    case 'error':
+                      console.error(`${prefix} ${log.message}`);
+                      break;
+                    case 'warn':
+                      console.warn(`${prefix} ${log.message}`);
+                      break;
+                    default:
+                      console.log(`${prefix} ${log.message}`);
+                  }
+                });
+                console.log('🔗 === End Google Apps Script Error Debug Logs ===');
+              }
+              
               throw new Error(result.message || 'Upload failed');
             }
             
