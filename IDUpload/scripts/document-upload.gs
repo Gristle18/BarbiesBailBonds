@@ -3,31 +3,32 @@
  * Routes documents from IDUpload page to organized Google Drive folders with spreadsheet tracking
  */
 
-// Global array to collect all console logs for sending back to frontend
+// Global array to collect all debug logs for sending back to frontend
 let debugLogs = [];
 
-// Override console.log to capture logs for frontend
-const originalConsoleLog = console.log;
-const originalConsoleError = console.error;
-const originalConsoleWarn = console.warn;
+// Custom debug logging functions that work reliably in Google Apps Script
+function debugLog(message, level = 'log') {
+  const timestamp = new Date().toISOString();
+  const logEntry = { level: level, message: String(message), timestamp: timestamp };
+  debugLogs.push(logEntry);
+  
+  // Still log to Google Apps Script console for server-side debugging
+  if (level === 'error') {
+    console.error(`[${timestamp}] ${message}`);
+  } else if (level === 'warn') {
+    console.warn(`[${timestamp}] ${message}`);
+  } else {
+    console.log(`[${timestamp}] ${message}`);
+  }
+}
 
-console.log = function(...args) {
-  const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
-  debugLogs.push({ level: 'log', message: message, timestamp: new Date().toISOString() });
-  originalConsoleLog.apply(console, args);
-};
+function debugError(message) {
+  debugLog(message, 'error');
+}
 
-console.error = function(...args) {
-  const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
-  debugLogs.push({ level: 'error', message: message, timestamp: new Date().toISOString() });
-  originalConsoleError.apply(console, args);
-};
-
-console.warn = function(...args) {
-  const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
-  debugLogs.push({ level: 'warn', message: message, timestamp: new Date().toISOString() });
-  originalConsoleWarn.apply(console, args);
-};
+function debugWarn(message) {
+  debugLog(message, 'warn');
+}
 
 // Configuration - ACTUAL Google Drive IDs
 const CONFIG = {
@@ -52,35 +53,41 @@ const CONFIG = {
 function doPost(e) {
   // Reset debug logs for this request
   debugLogs = [];
-  console.log('=== Document Upload Request Received ===');
-  console.log('Request timestamp:', new Date().toISOString());
-  console.log('Request data keys:', Object.keys(e || {}));
-  console.log('Request parameters:', JSON.stringify(e?.parameter || {}, null, 2));
-  console.log('Request postData type:', e?.postData?.type);
-  console.log('Request postData length:', e?.postData?.contents?.length || 0);
+  debugLog('=== Document Upload Request Received ===');
+  debugLog('Request timestamp: ' + new Date().toISOString());
+  debugLog('Request data keys: ' + JSON.stringify(Object.keys(e || {})));
+  debugLog('Request parameters: ' + JSON.stringify(e?.parameter || {}));
+  debugLog('Request postData type: ' + (e?.postData?.type || 'none'));
+  debugLog('Request postData length: ' + (e?.postData?.contents?.length || 0));
   
   try {
-    console.log('🔍 Starting form data parsing...');
+    debugLog('🔍 Starting form data parsing...');
     // Parse the incoming multipart data
     const formData = parseMultipartData(e);
     
     if (!formData) {
-      console.error('❌ Form data parsing failed - no data returned');
+      debugError('❌ Form data parsing failed - no data returned');
       throw new Error('No form data could be parsed from request');
     }
     
-    console.log('✅ Form data parsed successfully');
-    console.log('📊 Form data summary:');
-    console.log('  Field count:', Object.keys(formData).length);
-    console.log('  Fields:', Object.keys(formData));
+    debugLog('✅ Form data parsed successfully');
+    debugLog('📊 Form data summary:');
+    debugLog('  Field count: ' + Object.keys(formData).length);
+    debugLog('  Fields: ' + JSON.stringify(Object.keys(formData)));
     
     // Log file fields specifically
     const fileFields = Object.keys(formData).filter(key => 
       formData[key] && typeof formData[key] === 'object' && formData[key].bytes
     );
-    console.log('  📁 File fields found:', fileFields.length, fileFields);
+    debugLog('  📁 File fields found: ' + fileFields.length + ' - ' + JSON.stringify(fileFields));
     
-    console.log('📝 Detailed form data:', JSON.stringify(formData, null, 2));
+    debugLog('📝 Detailed form data keys and types:');
+    Object.keys(formData).forEach(key => {
+      const value = formData[key];
+      const type = typeof value;
+      const isFile = value && typeof value === 'object' && value.bytes;
+      debugLog('  ' + key + ': ' + type + (isFile ? ' (FILE - ' + (value.bytes?.length || 0) + ' bytes)' : ' - ' + JSON.stringify(value).substring(0, 100)));
+    });
     
     // Validate required fields (caseNumber is optional)
     const requiredFields = ['yourName', 'yourPhone', 'defendantName'];
@@ -96,38 +103,38 @@ function doPost(e) {
     }
     
     // Group files by document type
-    console.log('🗂️ Starting file grouping by document type...');
+    debugLog('🗂️ Starting file grouping by document type...');
     const documentGroups = groupFilesByDocumentType(formData);
     
-    console.log('📊 Document groups summary:');
-    console.log('  Group count:', Object.keys(documentGroups).length);
+    debugLog('📊 Document groups summary:');
+    debugLog('  Group count: ' + Object.keys(documentGroups).length);
     Object.entries(documentGroups).forEach(([type, data]) => {
-      console.log(`  📁 ${type}: ${data?.files?.length || 0} files`);
+      debugLog('  📁 ' + type + ': ' + (data?.files?.length || 0) + ' files');
     });
-    console.log('📝 Full document groups:', JSON.stringify(documentGroups, null, 2));
+    debugLog('📝 Full document groups: ' + JSON.stringify(documentGroups));
     
     // Process each document type
-    console.log('🚀 Starting document processing...');
+    debugLog('🚀 Starting document processing...');
     const results = [];
     let totalProcessed = 0;
     
     for (const [documentType, data] of Object.entries(documentGroups)) {
       if (!data.files || data.files.length === 0) {
-        console.log(`⏭️ Skipping ${documentType} - no files (data:`, data, ')');
+        debugLog('⏭️ Skipping ' + documentType + ' - no files (data: ' + JSON.stringify(data) + ')');
         continue;
       }
       
-      console.log(`🔄 Processing ${data.files.length} files for document type: ${documentType}`);
-      console.log(`📁 Files for ${documentType}:`, data.files.map(f => f?.filename || f?.name || 'unnamed'));
+      debugLog('🔄 Processing ' + data.files.length + ' files for document type: ' + documentType);
+      debugLog('📁 Files for ' + documentType + ': ' + JSON.stringify(data.files.map(f => f?.filename || f?.name || 'unnamed')));
       
       try {
         const result = processDocumentType(documentType, formData, data.files);
-        console.log(`✅ Successfully processed ${documentType}:`, result);
+        debugLog('✅ Successfully processed ' + documentType + ': ' + JSON.stringify(result));
         results.push(result);
         totalProcessed += data.files.length;
       } catch (error) {
-        console.error(`❌ Error processing ${documentType}:`, error);
-        console.error('Error stack:', error.stack);
+        debugError('❌ Error processing ' + documentType + ': ' + error.message);
+        debugError('Error stack: ' + error.stack);
         results.push({
           documentType,
           success: false,
@@ -137,17 +144,17 @@ function doPost(e) {
       }
     }
     
-    console.log(`📊 Processing complete - ${totalProcessed} files processed total`);
+    debugLog('📊 Processing complete - ' + totalProcessed + ' files processed total');
     
     // Send email notification
     try {
       sendNotificationEmail(formData, results);
     } catch (emailError) {
-      console.log('Email notification failed:', emailError.toString());
+      debugWarn('Email notification failed: ' + emailError.toString());
       // Don't fail the whole upload if email fails
     }
     
-    console.log('🎯 Preparing response...');
+    debugLog('🎯 Preparing response...');
     const response = {
       success: true,
       message: 'Documents uploaded successfully!',
@@ -158,15 +165,15 @@ function doPost(e) {
       debugLogs: debugLogs
     };
     
-    console.log('📤 Final response (excluding debugLogs for brevity):', JSON.stringify({...response, debugLogs: `${debugLogs.length} log entries`}, null, 2));
+    debugLog('📤 Final response prepared with ' + debugLogs.length + ' debug log entries');
     
     return ContentService
       .createTextOutput(JSON.stringify(response))
       .setMimeType(ContentService.MimeType.JSON);
       
   } catch (error) {
-    console.error('Error processing upload:', error.toString());
-    console.error('Error stack:', error.stack);
+    debugError('Error processing upload: ' + error.toString());
+    debugError('Error stack: ' + error.stack);
     
     return ContentService
       .createTextOutput(JSON.stringify({
@@ -224,7 +231,7 @@ function parseMultipartData(e) {
  * Group uploaded files by document type
  */
 function groupFilesByDocumentType(formData) {
-  console.log('🗂️ groupFilesByDocumentType called with keys:', Object.keys(formData));
+  debugLog('🗂️ groupFilesByDocumentType called with keys: ' + JSON.stringify(Object.keys(formData)));
   
   const groups = {
     'Government ID': { files: [] },
@@ -239,11 +246,11 @@ function groupFilesByDocumentType(formData) {
     if (key.startsWith('documentType_')) {
       const sectionIndex = key.replace('documentType_', '');
       documentTypes[sectionIndex] = value;
-      console.log(`📝 Found document section ${sectionIndex}: ${value}`);
+      debugLog('📝 Found document section ' + sectionIndex + ': ' + value);
     }
   }
   
-  console.log('📊 Document sections found:', documentTypes);
+  debugLog('📊 Document sections found: ' + JSON.stringify(documentTypes));
   
   // Process files based on document sections
   for (const [key, value] of Object.entries(formData)) {
@@ -253,20 +260,20 @@ function groupFilesByDocumentType(formData) {
     if (fileMatch && value && typeof value === 'object' && value.bytes) {
       const sectionIndex = fileMatch[1];
       const fileType = fileMatch[2]; // front_input, back_input, input
-      const documentType = documentTypes[sectionIndex] || 'Other';
+      let documentType = documentTypes[sectionIndex] || 'Other';
       
-      console.log(`📁 Processing file: ${key}`);
-      console.log(`  Section: ${sectionIndex}, Type: ${documentType}, FileType: ${fileType}`);
-      console.log(`  File size: ${value.bytes?.length || 0} bytes`);
-      console.log(`  Filename: ${value.filename || 'unknown'}`);
+      debugLog('📁 Processing file: ' + key);
+      debugLog('  Section: ' + sectionIndex + ', Type: ' + documentType + ', FileType: ' + fileType);
+      debugLog('  File size: ' + (value.bytes?.length || 0) + ' bytes');
+      debugLog('  Filename: ' + (value.filename || 'unknown'));
       
       if (!groups[documentType]) {
-        console.warn(`⚠️ Unknown document type: ${documentType}, defaulting to 'Other'`);
+        debugWarn('⚠️ Unknown document type: ' + documentType + ', defaulting to Other');
         documentType = 'Other';
       }
       
       groups[documentType].files.push({
-        name: value.filename || `${documentType}_${fileType}`,
+        name: value.filename || (documentType + '_' + fileType),
         data: value,
         type: fileType,
         sectionIndex: sectionIndex,
@@ -274,14 +281,14 @@ function groupFilesByDocumentType(formData) {
         filename: value.filename
       });
       
-      console.log(`✅ Added file to ${documentType} group`);
+      debugLog('✅ Added file to ' + documentType + ' group');
     }
   }
   
   // Log final group summary
-  console.log('📊 Final grouping results:');
+  debugLog('📊 Final grouping results:');
   Object.entries(groups).forEach(([type, data]) => {
-    console.log(`  ${type}: ${data.files.length} files`);
+    debugLog('  ' + type + ': ' + data.files.length + ' files');
   });
   
   return groups;
