@@ -1,0 +1,13 @@
+# OCR and Image Processing
+pytesseract>=0.3.10
+easyocr>=1.7.0
+opencv-python>=4.8.0
+Pillow>=10.0.0
+
+# PDF Processing
+PyMuPDF>=1.23.0
+reportlab>=4.0.0
+
+# General utilities
+numpy>=1.24.0
+pathlib2>=2.3.7
