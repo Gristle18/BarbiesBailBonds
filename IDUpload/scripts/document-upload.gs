@@ -48,7 +48,8 @@ const CONFIG = {
 };
 
 /**
- * Main POST handler - receives form data and files from IDUpload page
+ * Main POST handler - receives JSON data with base64 files from IDUpload page
+ * Updated to work like bail-bond-application
  */
 function doPost(e) {
   // Reset debug logs for this request
@@ -56,14 +57,24 @@ function doPost(e) {
   debugLog('=== Document Upload Request Received ===');
   debugLog('Request timestamp: ' + new Date().toISOString());
   debugLog('Request data keys: ' + JSON.stringify(Object.keys(e || {})));
-  debugLog('Request parameters: ' + JSON.stringify(e?.parameter || {}));
   debugLog('Request postData type: ' + (e?.postData?.type || 'none'));
   debugLog('Request postData length: ' + (e?.postData?.contents?.length || 0));
   
   try {
-    debugLog('🔍 Starting form data parsing...');
-    // Parse the incoming multipart data
-    const formData = parseMultipartData(e);
+    let formData = null;
+    
+    // Parse JSON data (like bail-bond-application does)
+    if (e.postData && e.postData.contents) {
+      debugLog('Parsing JSON from postData.contents');
+      try {
+        formData = JSON.parse(e.postData.contents);
+        debugLog('Successfully parsed JSON data');
+        debugLog('Form fields: ' + JSON.stringify(Object.keys(formData)));
+      } catch (jsonError) {
+        debugError('JSON parsing failed: ' + jsonError.toString());
+        throw new Error('Invalid JSON data received');
+      }
+    }
     
     if (!formData) {
       debugError('❌ Form data parsing failed - no data returned');
@@ -89,62 +100,47 @@ function doPost(e) {
       debugLog('  ' + key + ': ' + type + (isFile ? ' (FILE - ' + (value.bytes?.length || 0) + ' bytes)' : ' - ' + JSON.stringify(value).substring(0, 100)));
     });
     
-    // Validate required fields (caseNumber is optional)
-    const requiredFields = ['yourName', 'yourPhone', 'defendantName'];
+    // Validate required fields
+    const requiredFields = ['yourName', 'yourPhone'];
     for (const field of requiredFields) {
       if (!formData[field] || formData[field].trim() === '') {
         throw new Error(`Required field missing: ${field}`);
       }
     }
     
-    // Ensure optional fields have default values
-    if (!formData.caseNumber) {
-      formData.caseNumber = '';
-    }
+    debugLog('Processing upload for: ' + formData.yourName);
+    debugLog('Document sections: ' + (formData.documentSections ? formData.documentSections.length : 0));
     
-    // Group files by document type
-    debugLog('🗂️ Starting file grouping by document type...');
-    const documentGroups = groupFilesByDocumentType(formData);
-    
-    debugLog('📊 Document groups summary:');
-    debugLog('  Group count: ' + Object.keys(documentGroups).length);
-    Object.entries(documentGroups).forEach(([type, data]) => {
-      debugLog('  📁 ' + type + ': ' + (data?.files?.length || 0) + ' files');
-    });
-    debugLog('📝 Full document groups: ' + JSON.stringify(documentGroups));
-    
-    // Process each document type
-    debugLog('🚀 Starting document processing...');
+    // Process document sections with base64 files
     const results = [];
-    let totalProcessed = 0;
+    let totalFilesProcessed = 0;
     
-    for (const [documentType, data] of Object.entries(documentGroups)) {
-      if (!data.files || data.files.length === 0) {
-        debugLog('⏭️ Skipping ' + documentType + ' - no files (data: ' + JSON.stringify(data) + ')');
-        continue;
-      }
+    if (formData.documentSections && Array.isArray(formData.documentSections)) {
+      debugLog('Processing ' + formData.documentSections.length + ' document sections');
       
-      debugLog('🔄 Processing ' + data.files.length + ' files for document type: ' + documentType);
-      debugLog('📁 Files for ' + documentType + ': ' + JSON.stringify(data.files.map(f => f?.filename || f?.name || 'unnamed')));
-      
-      try {
-        const result = processDocumentType(documentType, formData, data.files);
-        debugLog('✅ Successfully processed ' + documentType + ': ' + JSON.stringify(result));
-        results.push(result);
-        totalProcessed += data.files.length;
-      } catch (error) {
-        debugError('❌ Error processing ' + documentType + ': ' + error.message);
-        debugError('Error stack: ' + error.stack);
-        results.push({
-          documentType,
-          success: false,
-          error: error.message,
-          filesCount: data.files.length
-        });
+      for (const section of formData.documentSections) {
+        const documentType = section.documentType || 'Other';
+        debugLog('Processing ' + documentType + ' with ' + (section.files ? section.files.length : 0) + ' files');
+        
+        if (section.files && section.files.length > 0) {
+          try {
+            const result = processDocumentSection(documentType, formData, section.files);
+            results.push(result);
+            totalFilesProcessed += section.files.length;
+            debugLog('✅ Successfully processed ' + documentType);
+          } catch (error) {
+            debugError('Error processing ' + documentType + ': ' + error.toString());
+            results.push({
+              documentType: documentType,
+              success: false,
+              error: error.toString()
+            });
+          }
+        }
       }
     }
     
-    debugLog('📊 Processing complete - ' + totalProcessed + ' files processed total');
+    debugLog('📊 Processing complete - ' + totalFilesProcessed + ' files processed total');
     
     // Send email notification
     try {
@@ -158,9 +154,8 @@ function doPost(e) {
     const response = {
       success: true,
       message: 'Documents uploaded successfully!',
-      processed: totalProcessed,
-      documentsProcessed: results.length,
-      details: results,
+      filesProcessed: totalFilesProcessed,
+      results: results,
       timestamp: new Date().toISOString(),
       debugLogs: debugLogs
     };
@@ -387,36 +382,87 @@ function groupFilesByDocumentType(formData) {
 }
 
 /**
- * Process a specific document type
+ * Process a document section with base64 files
  */
-function processDocumentType(documentType, formData, files) {
-  console.log(`Processing ${documentType} with ${files.length} files`);
+function processDocumentSection(documentType, formData, files) {
+  debugLog('Processing ' + documentType + ' with ' + files.length + ' files');
   
-  try {
-    // Get folder and spreadsheet for this document type
-    const folderId = CONFIG.folders[documentType];
-    const spreadsheetId = CONFIG.spreadsheets[documentType];
-    
-    if (!folderId || !spreadsheetId) {
-      throw new Error(`Configuration missing for document type: ${documentType}`);
-    }
-    
-    // Upload files to Drive
-    const uploadedFiles = uploadFilesToDrive(files, folderId, formData);
-    
-    // Update spreadsheet
-    updateSpreadsheetRecord(spreadsheetId, documentType, formData, uploadedFiles);
-    
-    return {
-      documentType: documentType,
-      filesUploaded: uploadedFiles.length,
-      files: uploadedFiles
-    };
-    
-  } catch (error) {
-    console.error(`Error processing ${documentType}:`, error.toString());
-    throw error;
+  const folderId = CONFIG.folders[documentType];
+  const spreadsheetId = CONFIG.spreadsheets[documentType];
+  
+  if (!folderId || !spreadsheetId) {
+    throw new Error('Configuration missing for document type: ' + documentType);
   }
+  
+  const folder = DriveApp.getFolderById(folderId);
+  const uploadedFiles = [];
+  
+  // Upload each base64 file to Drive
+  for (let i = 0; i < files.length; i++) {
+    const fileData = files[i];
+    
+    try {
+      // Create filename with timestamp
+      const timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd_HHmmss');
+      const safeName = formData.yourName.replace(/[^a-zA-Z0-9]/g, '');
+      const extension = getFileExtension(fileData.filename, fileData.contentType);
+      const filename = safeName + '_' + documentType.replace(/\s+/g, '') + '_' + timestamp + '_' + (i + 1) + extension;
+      
+      // Decode base64 and create blob
+      const blob = Utilities.newBlob(
+        Utilities.base64Decode(fileData.base64),
+        fileData.contentType,
+        filename
+      );
+      
+      // Create file in Drive
+      const file = folder.createFile(blob);
+      
+      uploadedFiles.push({
+        name: fileData.filename,
+        driveFilename: filename,
+        url: file.getUrl(),
+        id: file.getId()
+      });
+      
+      debugLog('Uploaded: ' + filename);
+      
+    } catch (fileError) {
+      debugError('Error uploading file ' + fileData.filename + ': ' + fileError.toString());
+      throw fileError;
+    }
+  }
+  
+  // Update spreadsheet
+  updateSpreadsheet(spreadsheetId, documentType, formData, uploadedFiles);
+  
+  return {
+    documentType: documentType,
+    success: true,
+    filesUploaded: uploadedFiles.length,
+    files: uploadedFiles
+  };
+}
+
+/**
+ * Get file extension from filename or content type
+ */
+function getFileExtension(filename, contentType) {
+  // Try to get from filename first
+  if (filename && filename.includes('.')) {
+    return '.' + filename.split('.').pop();
+  }
+  
+  // Fallback to content type
+  const typeMap = {
+    'image/jpeg': '.jpg',
+    'image/png': '.png',
+    'image/webp': '.webp',
+    'image/heic': '.heic',
+    'application/pdf': '.pdf'
+  };
+  
+  return typeMap[contentType] || '.bin';
 }
 
 /**
@@ -468,7 +514,7 @@ function uploadFilesToDrive(files, folderId, formData) {
 /**
  * Update spreadsheet with document record
  */
-function updateSpreadsheetRecord(spreadsheetId, documentType, formData, uploadedFiles) {
+function updateSpreadsheet(spreadsheetId, documentType, formData, uploadedFiles) {
   console.log(`Updating spreadsheet ${spreadsheetId} for ${documentType}`);
   
   try {
