@@ -418,12 +418,19 @@ function processDocumentSection(documentType, formData, files) {
       // Create file in Drive
       const file = folder.createFile(blob);
       
-      uploadedFiles.push({
+      const uploadedFile = {
         name: fileData.filename,
         driveFilename: filename,
         url: file.getUrl(),
         id: file.getId()
-      });
+      };
+      
+      // Preserve type property if present (for Government ID front/back distinction)
+      if (fileData.type) {
+        uploadedFile.type = fileData.type;
+      }
+      
+      uploadedFiles.push(uploadedFile);
       
       debugLog('Uploaded: ' + filename);
       

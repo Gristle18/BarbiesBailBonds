@@ -987,17 +987,24 @@
     /**
      * Convert file to base64 string (like bail-bond-application approach)
      */
-    function fileToBase64(file) {
+    function fileToBase64(file, type = null) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
           const base64 = reader.result.split(',')[1];
-          resolve({
+          const result = {
             filename: file.name,
             contentType: file.type,
             size: file.size,
             base64: base64
-          });
+          };
+          
+          // Add type property if provided (for Government ID front/back distinction)
+          if (type) {
+            result.type = type;
+          }
+          
+          resolve(result);
         };
         reader.onerror = reject;
         reader.readAsDataURL(file);
@@ -2646,10 +2653,20 @@
                       : `Processing: ${file.name}...`;
                     
                     try {
-                      const fileData = await fileToBase64(file);
+                      // Detect if this is a Government ID front/back file
+                      let fileType = null;
+                      if (docType === 'Government ID' && input.id) {
+                        if (input.id.includes('_front_')) {
+                          fileType = 'front';
+                        } else if (input.id.includes('_back_')) {
+                          fileType = 'back';
+                        }
+                      }
+                      
+                      const fileData = await fileToBase64(file, fileType);
                       sectionData.files.push(fileData);
                       totalFiles++;
-                      console.log(`✅ Converted ${file.name} (${(file.size/1024).toFixed(2)} KB)`);
+                      console.log(`✅ Converted ${file.name} (${(file.size/1024).toFixed(2)} KB)${fileType ? ` as ${fileType}` : ''}`);
                     } catch (err) {
                       console.error(`❌ Failed to convert ${file.name}:`, err);
                     }
