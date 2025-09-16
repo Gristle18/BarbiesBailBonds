@@ -1,0 +1,34 @@
+Admin Search Page – Setup Instructions
+========================================
+
+This page provides administrative search functionality for Barbie's Bail Bonds staff
+to search through uploaded documents and client data from the IDUpload system.
+
+Search Capabilities:
+- Search by client name
+- Search by defendant name  
+- Search by case/booking number
+- Search by phone number
+- Filter by document type (Government ID, Proof of Address, etc.)
+- Filter by date range
+- View document thumbnails and download links
+
+Google Apps Script Integration:
+1) Create a new Google Apps Script project with search functionality that:
+   - Queries the same spreadsheets used by IDUpload system
+   - Returns matching records with file URLs
+   - Supports pagination for large result sets
+2) Deploy as Web App with appropriate permissions
+3) Update the SEARCH_ENDPOINT in the JavaScript code
+
+Security Considerations:
+- This page should be password protected or behind authentication
+- Access should be limited to authorized Barbie's Bail Bonds staff only
+- Consider IP restrictions if hosting publicly
+
+Data Sources:
+- Government ID Records spreadsheet
+- Proof of Address Records spreadsheet  
+- Proof of Employment Records spreadsheet
+- Other Records spreadsheet
+- Google Drive folders with uploaded documents
