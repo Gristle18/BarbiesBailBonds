@@ -984,6 +984,26 @@
     // 3. Find this URL on line ~2408 in the submitUpload function
     // ======================================
 
+    /**
+     * Convert file to base64 string (like bail-bond-application approach)
+     */
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result.split(',')[1];
+          resolve({
+            filename: file.name,
+            contentType: file.type,
+            size: file.size,
+            base64: base64
+          });
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
     // Language selection functionality
     function showUploadForm(language) {
       // Hide language selection
@@ -2556,7 +2576,7 @@
 
           // Submit to Google Apps Script with debugging
           try {
-            console.log('🚀 Starting upload process...');
+            console.log('🚀 Starting upload process (FIXED - JSON with base64)...');
             
             if (submitBtn) {
               submitBtn.disabled = true;
@@ -2564,391 +2584,132 @@
             }
 
             // Show progress message
-            errorMsg.textContent = suffix === 'Es' ? 'Preparando archivos...' : 'Preparing files...';
+            errorMsg.textContent = suffix === 'Es' ? 'Convirtiendo archivos...' : 'Converting files...';
             errorMsg.style.display = 'block';
             errorMsg.style.background = '#2196F3'; // Blue for info
 
-            // Create FormData object
-            const formData = new FormData();
+            // Create JSON object (like bail-bond-application does)
+            const jsonData = {
+              timestamp: new Date().toISOString(),
+              yourName: document.getElementById('yourName' + suffix)?.value || '',
+              yourPhone: document.getElementById('yourPhone' + suffix)?.value || '',
+              defendantName: document.getElementById('defendantName' + suffix)?.value || '',
+              caseNumber: document.getElementById('caseNumber' + suffix)?.value || '',
+              language: suffix === 'Es' ? 'spanish' : 'english',
+              documentSections: []
+            };
             
-            // Add basic form fields
-            const yourName = document.getElementById('yourName' + suffix)?.value || '';
-            const yourPhone = document.getElementById('yourPhone' + suffix)?.value || '';
-            const defendantName = document.getElementById('defendantName' + suffix)?.value || '';
-            const caseNumber = document.getElementById('caseNumber' + suffix)?.value || '';
+            console.log('📝 Form data:', jsonData);
             
-            console.log('📝 Form data:', { yourName, yourPhone, defendantName, caseNumber });
+            // Process document sections and convert files to base64
+            const documentSections = form.querySelectorAll('.dynamic-doc-section');
+            console.log(`📁 Found ${documentSections.length} document sections`);
             
-            formData.append('yourName', yourName);
-            formData.append('yourPhone', yourPhone);
-            formData.append('defendantName', defendantName);
-            formData.append('caseNumber', caseNumber);
+            let totalFiles = 0;
             
-            // Helper function to normalize Spanish document types to English for backend
-            function normalizeDocumentType(docType) {
+            // Convert all files to base64
+            for (let index = 0; index < documentSections.length; index++) {
+              const section = documentSections[index];
+              
+              // Get document type - check select first, then data attribute
+              const docTypeSelect = section.querySelector('select[id*="documentType"]');
+              let docType = docTypeSelect ? docTypeSelect.value : (section.getAttribute('data-document-type') || 'Other');
+              
+              // Normalize Spanish document types
               const translations = {
                 'ID Gubernamental': 'Government ID',
-                'Comprobante de Domicilio': 'Proof of Address', 
+                'Comprobante de Domicilio': 'Proof of Address',
                 'Comprobante de Empleo': 'Proof of Employment',
                 'Otro': 'Other'
               };
-              return translations[docType] || docType;
-            }
-            
-            // Add documents from all sections
-            const documentSections = form.querySelectorAll('.dynamic-doc-section');
-            const allFormFileInputs = form.querySelectorAll('input[type="file"]');
-            console.log(`📁 Found ${documentSections.length} document sections`);
-            console.log(`📁 Found ${allFormFileInputs.length} total file inputs in form`);
-            
-            let fileCount = 0;
-            documentSections.forEach((section, index) => {
-              console.log(`📄 Section ${index}: Analyzing structure...`);
+              docType = translations[docType] || docType;
               
-              // Try to determine document type from section data attribute (most reliable)
-              let docType = section.getAttribute('data-document-type') || 'Other';
+              console.log(`📄 Processing section ${index}: ${docType}`);
               
-              // Fallback: Look for document type in the section text content
-              if (docType === 'Other') {
-                const sectionText = section.textContent || '';
-                if (sectionText.includes('Government ID') || sectionText.includes('ID Gubernamental')) {
-                  docType = 'Government ID';
-                } else if (sectionText.includes('Proof of Address') || sectionText.includes('Comprobante de Domicilio')) {
-                  docType = 'Proof of Address';
-                } else if (sectionText.includes('Proof of Employment') || sectionText.includes('Comprobante de Empleo')) {
-                  docType = 'Proof of Employment';
-                }
-              }
-              
-              console.log(`📄 Section ${index}: Detected document type: '${docType}' (from data-attribute: '${section.getAttribute('data-document-type') || 'none'}')`);
-              
-              // Normalize Spanish document types to English for backend compatibility
-              const normalizedDocType = normalizeDocumentType(docType);
-              console.log(`📄 Section ${index}: ${docType} → ${normalizedDocType}`);
-              formData.append(`documentType_${index}`, normalizedDocType);
+              const sectionData = {
+                documentType: docType,
+                files: []
+              };
               
               // Find all file inputs in this section
               const fileInputs = section.querySelectorAll('input[type="file"]');
               console.log(`📁 Section ${index} has ${fileInputs.length} file inputs`);
               
-              fileInputs.forEach((input, inputIndex) => {
-                if (input.files && input.files[0]) {
-                  const file = input.files[0];
-                  console.log(`📎 Processing file from input ${input.id}:`);
-                  console.log(`  📄 Name: ${file.name}`);
-                  console.log(`  📊 Size: ${file.size} bytes`);
-                  console.log(`  🏷️ Type: ${file.type}`);
-                  console.log(`  🔍 instanceof File: ${file instanceof File}`);
-                  console.log(`  🔍 instanceof Blob: ${file instanceof Blob}`);
-                  console.log(`  📋 Constructor: ${file.constructor.name}`);
-                  
-                  // Determine if this is front/back based on input structure
-                  let fieldName;
-                  if (docType === 'Government ID') {
-                    // Look for front/back indicators in the input structure
-                    const inputId = input.id || '';
-                    const inputText = input.closest('div')?.textContent || '';
-                    
-                    if (inputId.includes('front') || inputText.includes('Front') || inputText.includes('Frente')) {
-                      fieldName = `document_${index}_front_input`;
-                    } else if (inputId.includes('back') || inputText.includes('Back') || inputText.includes('Reverso')) {
-                      fieldName = `document_${index}_back_input`;
-                    } else {
-                      // Default to front if we can't determine
-                      fieldName = `document_${index}_front_input`;
-                    }
-                  } else {
-                    // Other document types use simple naming
-                    fieldName = `document_${index}_input`;
-                  }
-                  
-                  console.log(`📤 Appending file to FormData with field name: ${fieldName}`);
-                  
-                  try {
-                    formData.append(fieldName, file);
-                    console.log(`✅ Successfully appended file to FormData`);
-                  } catch (appendError) {
-                    console.error(`❌ Error appending file to FormData:`, appendError);
-                  }
-                  
-                  fileCount++;
-                }
-              });
-            });
-            
-            // Backup method: If no files found in sections, process all file inputs
-            if (fileCount === 0) {
-              console.log('🔍 Backup processing: No files found in sections, trying all form inputs...');
-              allFormFileInputs.forEach((input, index) => {
+              // Convert each file to base64
+              for (const input of fileInputs) {
                 if (input.files && input.files.length > 0) {
-                  const file = input.files[0];
-                  console.log(`📎 Backup: Adding file ${file.name}`);
-                  
-                  // Default to Government ID if we can't determine type
-                  let docType = 'Government ID';
-                  const inputId = input.id || '';
-                  
-                  formData.append(`documentType_${index}`, docType);
-                  
-                  if (inputId.includes('front') || inputId.includes('Front')) {
-                    formData.append(`document_${index}_front_input`, file);
-                  } else if (inputId.includes('back') || inputId.includes('Back')) {
-                    formData.append(`document_${index}_back_input`, file);
-                  } else {
-                    formData.append(`document_${index}_front_input`, file);
+                  for (const file of input.files) {
+                    console.log(`📎 Converting ${file.name} to base64...`);
+                    
+                    errorMsg.textContent = suffix === 'Es' 
+                      ? `Procesando: ${file.name}...`
+                      : `Processing: ${file.name}...`;
+                    
+                    try {
+                      const fileData = await fileToBase64(file);
+                      sectionData.files.push(fileData);
+                      totalFiles++;
+                      console.log(`✅ Converted ${file.name} (${(file.size/1024).toFixed(2)} KB)`);
+                    } catch (err) {
+                      console.error(`❌ Failed to convert ${file.name}:`, err);
+                    }
                   }
-                  
-                  fileCount++;
                 }
-              });
-            }
-            
-            console.log(`📊 Total files to upload: ${fileCount}`);
-            
-            // Debug FormData contents before sending
-            console.log('🔍 FormData debugging - iterating through all entries:');
-            let textFields = 0;
-            let fileFields = 0;
-            for (let [key, value] of formData.entries()) {
-              if (value instanceof File) {
-                console.log(`  📎 FILE: ${key} = ${value.name} (${value.size} bytes, ${value.type})`);
-                fileFields++;
-              } else {
-                console.log(`  📝 TEXT: ${key} = ${value}`);
-                textFields++;
+              }
+              
+              if (sectionData.files.length > 0) {
+                jsonData.documentSections.push(sectionData);
               }
             }
-            console.log(`📊 FormData summary: ${textFields} text fields, ${fileFields} file fields`);
             
-            if (fileFields === 0) {
-              console.error('❌ CRITICAL: No files found in FormData before sending!');
-              console.error('❌ This means files were not properly added to FormData.');
-              
-              errorMsg.textContent = suffix === 'Es'
-                ? 'Error crítico: Los archivos no se agregaron correctamente al formulario.'
-                : 'Critical Error: Files were not properly added to form data.';
-              errorMsg.style.display = 'block';
-              errorMsg.style.background = 'var(--error)';
-              return;
+            console.log(`📊 Total files converted: ${totalFiles}`);
+            
+            if (totalFiles === 0) {
+              throw new Error(suffix === 'Es' 
+                ? 'No se encontraron archivos para cargar'
+                : 'No files found to upload');
             }
             
             // Update progress message
             errorMsg.textContent = suffix === 'Es' 
-              ? `Subiendo ${fileCount} archivo(s)...` 
-              : `Uploading ${fileCount} file(s)...`;
+              ? 'Enviando al servidor...'
+              : 'Sending to server...';
             
             // Google Apps Script Web App URL configured
             const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9DvZFje5f_ssDVNh7eXaARwbK0VdCCzJct6iw22K10PRJMVkGnhVHjVBv3dvfmqvk/exec';
             
-            console.log('🌐 Sending to Apps Script:', APPS_SCRIPT_URL);
-            console.log('🚀 Using hidden iframe form submission for Google Apps Script compatibility');
-            console.log('  Method: POST');
-            console.log('  Body: FormData with', fileFields, 'files and', textFields, 'text fields');
-            console.log('  This method bypasses CORS and multipart issues with Google Apps Script');
+            console.log('🌐 Sending JSON to Apps Script:', APPS_SCRIPT_URL);
+            console.log('📦 Payload size:', JSON.stringify(jsonData).length, 'characters');
             
-            // Create a hidden form and iframe for file upload
-            const responseText = await new Promise((resolve, reject) => {
-              // Create hidden iframe
-              const iframe = document.createElement('iframe');
-              iframe.style.display = 'none';
-              iframe.name = 'upload-target-' + Date.now();
-              document.body.appendChild(iframe);
-              
-              // Create hidden form
-              const hiddenForm = document.createElement('form');
-              hiddenForm.method = 'POST';
-              hiddenForm.action = APPS_SCRIPT_URL;
-              hiddenForm.target = iframe.name;
-              hiddenForm.enctype = 'multipart/form-data';
-              hiddenForm.style.display = 'none';
-              
-              // Add all FormData entries to the hidden form
-              for (let [key, value] of formData.entries()) {
-                const input = document.createElement('input');
-                
-                if (value instanceof File) {
-                  // Create file input
-                  input.type = 'file';
-                  input.name = key;
-                  
-                  // Transfer the file to the new input
-                  const dt = new DataTransfer();
-                  dt.items.add(value);
-                  input.files = dt.files;
-                  
-                  console.log(`📁 Added file input: ${key} = ${value.name}`);
-                } else {
-                  // Create text input
-                  input.type = 'hidden';
-                  input.name = key;
-                  input.value = value;
-                  
-                  console.log(`📝 Added text input: ${key} = ${value}`);
-                }
-                
-                hiddenForm.appendChild(input);
-              }
-              
-              // Handle iframe response
-              let responseReceived = false;
-              const timeoutId = setTimeout(() => {
-                if (!responseReceived) {
-                  cleanup();
-                  reject(new Error('Upload timeout after 30 seconds'));
-                }
-              }, 30000);
-              
-              const cleanup = () => {
-                clearTimeout(timeoutId);
-                if (hiddenForm.parentNode) hiddenForm.parentNode.removeChild(hiddenForm);
-                if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-              };
-              
-              iframe.onload = function() {
-                if (responseReceived) return;
-                responseReceived = true;
-                
-                try {
-                  const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                  const responseBody = iframeDoc.body.textContent || iframeDoc.body.innerText || '';
-                  
-                  console.log('📡 Hidden iframe response received:', responseBody.length, 'characters');
-                  console.log('📨 Response preview:', responseBody.substring(0, 200));
-                  
-                  cleanup();
-                  resolve(responseBody);
-                } catch (error) {
-                  console.error('❌ Error reading iframe response:', error);
-                  cleanup();
-                  reject(new Error('Could not read response from iframe'));
-                }
-              };
-              
-              iframe.onerror = function() {
-                if (responseReceived) return;
-                responseReceived = true;
-                cleanup();
-                reject(new Error('Iframe error occurred'));
-              };
-              
-              // Add form to document and submit
-              document.body.appendChild(hiddenForm);
-              console.log('📤 Submitting hidden form with', hiddenForm.elements.length, 'form elements');
-              hiddenForm.submit();
+            // Send as JSON exactly like bail-bond-application does
+            const response = await fetch(APPS_SCRIPT_URL, {
+              method: 'POST',
+              mode: 'no-cors', // Same as bail-bond-application
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(jsonData)
             });
-            console.log('📨 Raw response:', responseText);
             
-            let result;
-            try {
-              result = JSON.parse(responseText);
-            } catch (parseError) {
-              console.error('❌ JSON parse error:', parseError);
-              throw new Error(`Invalid response format: ${responseText.substring(0, 100)}...`);
+            // With no-cors, we can't read response but that's ok
+            console.log('✅ Upload request sent successfully');
+            
+            // Show success message
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'block';
+            successMsg.textContent = suffix === 'Es'
+              ? '¡Documentos enviados exitosamente!'
+              : 'Documents uploaded successfully!';
+            
+            // Reset form
+            form.reset();
+            form.querySelectorAll('.file-list').forEach(el => el.textContent = '');
+            
+            // Clear dynamic sections
+            const dynamicContainer = document.getElementById('dynamicDocumentSections' + suffix);
+            if (dynamicContainer) {
+              dynamicContainer.innerHTML = '';
             }
-            
-            console.log('✅ Parsed result:', result);
-            
-            // Display server debug logs in browser console
-            if (result.debugLogs && result.debugLogs.length > 0) {
-              console.log(`🔗 === Google Apps Script Debug Logs (${result.debugLogs.length} entries) ===`);
-              result.debugLogs.forEach((log, index) => {
-                const timestamp = new Date(log.timestamp).toLocaleTimeString();
-                const prefix = `[GAS ${timestamp}]`;
-                
-                switch (log.level) {
-                  case 'error':
-                    console.error(`${prefix} ${log.message}`);
-                    break;
-                  case 'warn':
-                    console.warn(`${prefix} ${log.message}`);
-                    break;
-                  default:
-                    console.log(`${prefix} ${log.message}`);
-                }
-              });
-              console.log('🔗 === End Google Apps Script Debug Logs ===');
-            }
-            
-            // Detailed analysis of the response
-            if (result.success) {
-              console.log('🎯 Upload Success Details:');
-              console.log('  📊 Processed files:', result.processed || 0);
-              console.log('  📝 Details array length:', result.details?.length || 0);
-              console.log('  💬 Message:', result.message);
-              console.log('  🔗 Server debug logs:', result.debugLogs?.length || 0, 'entries');
-              
-              if (result.details && result.details.length > 0) {
-                console.log('  📄 Processing details:');
-                result.details.forEach((detail, index) => {
-                  console.log(`    ${index + 1}:`, detail);
-                });
-              } else {
-                console.warn('⚠️ No details provided in successful response - files may not have been processed');
-              }
-              
-              if (result.processed === 0) {
-                console.warn('⚠️ Server reported 0 processed files - this indicates a backend processing issue');
-                console.warn('   Check server debug logs above for detailed error information');
-              }
-              
-              // Hide error message
-              errorMsg.style.display = 'none';
-              
-              // Show detailed success message with debugging info
-              const processedCount = result.processed || 0;
-              const expectedCount = fileCount;
-              const processingStatus = processedCount === expectedCount 
-                ? '✅ All files processed' 
-                : `⚠️ ${processedCount}/${expectedCount} files processed`;
-                
-              successMsg.innerHTML = suffix === 'Es' 
-                ? `<strong>✅ ¡Documentos subidos exitosamente!</strong><br>
-                   Estado: ${processingStatus}<br>
-                   ${processedCount === 0 ? '<span style="color: orange;">⚠️ Verificar registros del servidor</span><br>' : ''}
-                   Nos comunicaremos pronto.`
-                : `<strong>✅ Documents uploaded successfully!</strong><br>
-                   Status: ${processingStatus}<br>
-                   ${processedCount === 0 ? '<span style="color: orange;">⚠️ Check server logs for processing issues</span><br>' : ''}
-                   We'll reach out shortly.`;
-              successMsg.style.display = 'block';
-              
-              form.reset();
-              // Reset dynamic sections to initial state
-              const additionalSections = form.querySelectorAll('.dynamic-doc-section');
-              additionalSections.forEach(section => section.remove());
-              
-              console.log('🎉 Upload completed successfully!');
-            } else {
-              // Handle server error response
-              console.error('❌ Server reported failure:', result.message || 'No error message provided');
-              if (result.error) {
-                console.error('❌ Error details:', result.error);
-              }
-              
-              // Display server debug logs for failed requests too
-              if (result.debugLogs && result.debugLogs.length > 0) {
-                console.log(`🔗 === Google Apps Script Error Debug Logs (${result.debugLogs.length} entries) ===`);
-                result.debugLogs.forEach((log, index) => {
-                  const timestamp = new Date(log.timestamp).toLocaleTimeString();
-                  const prefix = `[GAS ${timestamp}]`;
-                  
-                  switch (log.level) {
-                    case 'error':
-                      console.error(`${prefix} ${log.message}`);
-                      break;
-                    case 'warn':
-                      console.warn(`${prefix} ${log.message}`);
-                      break;
-                    default:
-                      console.log(`${prefix} ${log.message}`);
-                  }
-                });
-                console.log('🔗 === End Google Apps Script Error Debug Logs ===');
-              }
-              
-              throw new Error(result.message || 'Upload failed');
-            }
-            
           } catch (error) {
             console.error('❌ Upload error:', error);
             console.error('❌ Error stack:', error.stack);
