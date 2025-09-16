@@ -4,14 +4,31 @@ Admin Search Page – Setup Instructions
 This page provides administrative search functionality for Barbie's Bail Bonds staff
 to search through uploaded documents and client data from the IDUpload system.
 
+Semicolon-Delimited Search Interface:
+The admin search uses a single search box with semicolon parsing for multi-criteria queries.
+
+Search Examples:
+- "John Smith; 561-555-0123" → Find records matching both name AND phone
+- "Government ID; 2024-01-15" → Find Government IDs uploaded on specific date
+- "Jane Doe; BC2024001; Proof of Address" → Multi-field precise matching
+- "Smith; West Palm Beach" → Name and location-based search
+
+Search Processing Logic:
+1. Split input on semicolons to create separate search terms
+2. Generate OpenAI embeddings for each term individually
+3. Vector search each term against all spreadsheet data
+4. Cross-reference results to find rows matching multiple terms
+5. Score by term overlap (higher score = more terms match same row)
+6. Return complete client records ranked by confidence
+
 Search Capabilities:
-- Search by client name
-- Search by defendant name  
-- Search by case/booking number
-- Search by phone number
-- Filter by document type (Government ID, Proof of Address, etc.)
-- Filter by date range
-- View document thumbnails and download links
+- Semantic name matching (fuzzy matching for misspellings)
+- Partial phone number matching (561-555 matches 561-555-0123)
+- Document type filtering (ID matches Government ID)
+- Date range flexibility (January 2024 matches specific dates)
+- Case/booking number exact and partial matching
+- Cross-spreadsheet result aggregation
+- Complete row return with source attribution
 
 Google Apps Script Integration:
 1) Create a new Google Apps Script project with search functionality that:
@@ -26,9 +43,30 @@ Security Considerations:
 - Access should be limited to authorized Barbie's Bail Bonds staff only
 - Consider IP restrictions if hosting publicly
 
-Data Sources:
-- Government ID Records spreadsheet
-- Proof of Address Records spreadsheet  
-- Proof of Employment Records spreadsheet
-- Other Records spreadsheet
-- Google Drive folders with uploaded documents
+Multiple Spreadsheet Access:
+The admin search will need to query across multiple spreadsheets simultaneously:
+
+Primary IDUpload Spreadsheets:
+- Government ID Records: 1PGRHMVC1HPJ_pSDWdTlYGkw1HfKl4uowLO8IX7stPcw
+- Proof of Address Records: 18PspzNXT6f84izsMOu3QPyn_SPkFGa_k9qntg0tyMug  
+- Proof of Employment Records: 1JoDbIluaJVmgb8iZ42zw_nj11RKBiFK-JT0j4oTPiiw
+- Other Records: 1WY4Ee4acWO_rxgr5y9l7BFa6_TGGJkgy_70HUDUuUWw
+
+Additional Spreadsheets:
+- [Add other spreadsheet IDs as needed]
+- [Bail bond application data]
+- [Client records]
+- [Case tracking sheets]
+
+Google Apps Script Implementation:
+- Create search functions that query all relevant spreadsheets
+- Aggregate results from multiple sources
+- Handle different data schemas across spreadsheets
+- Implement efficient search indexing if needed
+- Return unified search results with source identification
+
+Search Strategy:
+- Cross-spreadsheet name matching
+- Phone number lookup across all sources
+- Case number correlation
+- Date range filtering across all records
