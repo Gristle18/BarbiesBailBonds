@@ -428,7 +428,7 @@
   <script>
     // Configuration
     const CONFIG = {
-      SEARCH_ENDPOINT: 'https://script.google.com/macros/s/AKfycbzyjZAdh1wCgMUmFuBiAtc7vSv0-xmvhbi_G2ZUW-MVYyVVSejpyPRZ4dDe7rgZEvgH5Q/exec',
+      SEARCH_ENDPOINT: 'https://script.google.com/macros/s/AKfycbxJqtPhbPH82eD8B6_tn9Z957XSdxaGQoL55bpe6tMVXPPhqvc5siEelrzXVo7J0aSqgA/exec',
       MAX_QUERY_LENGTH: 500,
       DEBOUNCE_DELAY: 300
     };
@@ -494,7 +494,7 @@
         const timeoutId = setTimeout(() => {
           cleanup();
           reject(new Error('JSONP request timeout'));
-        }, 30000);
+        }, 60000);
 
         function cleanup() {
           clearTimeout(timeoutId);
