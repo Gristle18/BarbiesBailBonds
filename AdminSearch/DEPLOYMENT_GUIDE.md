@@ -2,22 +2,36 @@
 
 ## Current Status
 ✅ **Encoded data ready**: 4,246 defendant records with OpenAI embeddings
+✅ **Data split into 3 files**: Each under 65MB for Google Sheets compatibility
 ✅ **HTML interface complete**: Search UI with semicolon-delimited queries
-✅ **Google Apps Script ready**: RAG search implementation complete
+✅ **Google Apps Script updated**: Multi-sheet search implementation ready
 ⏳ **Deployment needed**: Upload data & deploy Apps Script
 
 ## Step 1: Upload Encoded Data to Google Sheets
 
+### Important: The data has been split into 3 parts due to size limitations
+
+### 1.1 Upload Part 1 (Rows 1-1,500)
 1. Open Google Sheets
-2. Create a new spreadsheet named "AdminSearch Encoded Data"
+2. Create a new spreadsheet named "AdminSearch Data Part 1"
 3. Import the CSV file:
-   - File → Import → Upload → Select `AdminSearch/assets/encoded_defendant_data.csv`
+   - File → Import → Upload → Select `AdminSearch/assets/encoded_defendant_data_part1.csv`
    - Import location: Replace current sheet
    - Separator type: Comma
    - Click "Import data"
-4. Copy the spreadsheet ID from the URL:
-   - URL format: `https://docs.google.com/spreadsheets/d/[SPREADSHEET_ID]/edit`
-   - Copy the ID between `/d/` and `/edit`
+4. Copy the spreadsheet ID from the URL (save for later)
+
+### 1.2 Upload Part 2 (Rows 1,501-3,000)
+1. Create another new spreadsheet named "AdminSearch Data Part 2"
+2. Import: `AdminSearch/assets/encoded_defendant_data_part2.csv`
+3. Use same import settings as above
+4. Copy the spreadsheet ID (save for later)
+
+### 1.3 Upload Part 3 (Rows 3,001-4,246)
+1. Create another new spreadsheet named "AdminSearch Data Part 3"
+2. Import: `AdminSearch/assets/encoded_defendant_data_part3.csv`
+3. Use same import settings as above
+4. Copy the spreadsheet ID (save for later)
 
 ## Step 2: Deploy Google Apps Script
 
@@ -28,17 +42,25 @@
 
 ### 2.2 Add the Code
 1. Delete the default code in Code.gs
-2. Copy the entire contents of `AdminSearch/scripts/admin-search.gs`
+2. Copy the entire contents of `AdminSearch/scripts/admin-search-multi.gs`
 3. Paste it into Code.gs
 
 ### 2.3 Update Configuration
-1. Find line 22 in the code:
+1. Find lines 15-19 in the code:
    ```javascript
-   ENCODED_DATA_SHEET_ID: 'YOUR_ENCODED_DATA_SHEET_ID_HERE',
+   ENCODED_DATA_SHEET_IDS: [
+     'YOUR_PART1_SHEET_ID_HERE', // Replace with Part 1 sheet ID
+     'YOUR_PART2_SHEET_ID_HERE', // Replace with Part 2 sheet ID
+     'YOUR_PART3_SHEET_ID_HERE'  // Replace with Part 3 sheet ID
+   ],
    ```
-2. Replace with your spreadsheet ID from Step 1:
+2. Replace with your three spreadsheet IDs from Step 1:
    ```javascript
-   ENCODED_DATA_SHEET_ID: 'your-actual-spreadsheet-id-here',
+   ENCODED_DATA_SHEET_IDS: [
+     'your-part1-sheet-id',
+     'your-part2-sheet-id',
+     'your-part3-sheet-id'
+   ],
    ```
 
 ### 2.4 Deploy as Web App
@@ -104,18 +126,25 @@
 }
 ```
 
+## File Sizes
+- **Part 1**: 61MB (1,500 records)
+- **Part 2**: 61MB (1,500 records)
+- **Part 3**: 51MB (1,246 records)
+- **Total**: 4,246 records across 3 sheets
+
 ## Troubleshooting
 
 ### "Search endpoint not configured"
 - Ensure you've updated the SEARCH_ENDPOINT in index.html
 
 ### "OpenAI API key not configured"
-- The API key is already in the script (line 9)
+- The API key is already in the script (line 10)
 - If expired, get a new key from OpenAI
 
 ### "Encoded data sheet not found"
-- Verify the spreadsheet ID is correct
-- Ensure the spreadsheet is not deleted or restricted
+- Verify all three spreadsheet IDs are correct
+- Ensure none of the spreadsheets are deleted or restricted
+- Check that you replaced all three placeholder IDs
 
 ### No results returned
 - Check that the CSV was imported correctly

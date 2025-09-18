@@ -12,7 +12,8 @@
       "Bash(git fetch:*)",
       "Bash(mkdir:*)",
       "Bash(mv:*)",
-      "WebFetch(domain:support.google.com)"
+      "WebFetch(domain:support.google.com)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": []
