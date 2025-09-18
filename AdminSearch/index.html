@@ -634,10 +634,27 @@
         debugLog('✅ JSON parsed successfully', {
           success: data.success,
           hasResults: !!data.results,
-          resultCount: data.results ? data.results.length : 0
+          resultCount: data.results ? data.results.length : 0,
+          hasError: !!data.error,
+          hasDebug: !!data.debug
         });
 
         if (!data.success) {
+          debugLog('❌ Server returned error response', {
+            error: data.error,
+            errorName: data.errorName,
+            errorMessage: data.errorMessage,
+            debug: data.debug
+          });
+
+          if (data.debug) {
+            debugLog('🔍 Server debug info', data.debug);
+          }
+
+          if (data.errorStack) {
+            debugLog('📚 Server error stack', { stack: data.errorStack });
+          }
+
           throw new Error(data.error || 'Search failed');
         }
 
