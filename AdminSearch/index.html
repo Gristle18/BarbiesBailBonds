@@ -487,27 +487,98 @@
       noResults.style.display = 'none';
     }
 
+    // Debug logging function
+    function debugLog(message, data = null) {
+      const timestamp = new Date().toISOString();
+      const logMessage = `[${timestamp}] ${message}`;
+      console.log(logMessage, data || '');
+
+      // Also show debug info in UI for Google Sites debugging
+      const debugDiv = document.getElementById('debugInfo') || createDebugDiv();
+      const debugEntry = document.createElement('div');
+      debugEntry.style.fontSize = '12px';
+      debugEntry.style.color = '#666';
+      debugEntry.style.marginBottom = '5px';
+      debugEntry.style.fontFamily = 'monospace';
+      debugEntry.textContent = logMessage + (data ? ' | ' + JSON.stringify(data).substring(0, 100) : '');
+      debugDiv.appendChild(debugEntry);
+
+      // Keep only last 10 debug entries
+      while (debugDiv.children.length > 10) {
+        debugDiv.removeChild(debugDiv.firstChild);
+      }
+    }
+
+    function createDebugDiv() {
+      const debugDiv = document.createElement('div');
+      debugDiv.id = 'debugInfo';
+      debugDiv.style.position = 'fixed';
+      debugDiv.style.bottom = '10px';
+      debugDiv.style.right = '10px';
+      debugDiv.style.width = '400px';
+      debugDiv.style.maxHeight = '200px';
+      debugDiv.style.overflow = 'auto';
+      debugDiv.style.background = 'rgba(0,0,0,0.8)';
+      debugDiv.style.color = 'white';
+      debugDiv.style.padding = '10px';
+      debugDiv.style.borderRadius = '5px';
+      debugDiv.style.fontSize = '11px';
+      debugDiv.style.fontFamily = 'monospace';
+      debugDiv.style.zIndex = '9999';
+
+      const title = document.createElement('div');
+      title.textContent = 'Debug Log (Click to toggle)';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '5px';
+      title.style.cursor = 'pointer';
+      title.onclick = () => {
+        const content = debugDiv.querySelector('.debug-content');
+        content.style.display = content.style.display === 'none' ? 'block' : 'none';
+      };
+
+      const content = document.createElement('div');
+      content.className = 'debug-content';
+
+      debugDiv.appendChild(title);
+      debugDiv.appendChild(content);
+      document.body.appendChild(debugDiv);
+
+      return content;
+    }
+
     // Perform search
     async function performSearch() {
+      debugLog('🔍 Starting search function');
+
       const query = searchInput.value.trim();
-      
+      debugLog('📝 Query input', { query: query, length: query.length });
+
       if (!query) {
+        debugLog('❌ Empty query validation failed');
         showError('Please enter search terms');
         return;
       }
 
       if (query.length > CONFIG.MAX_QUERY_LENGTH) {
+        debugLog('❌ Query too long validation failed', { length: query.length, max: CONFIG.MAX_QUERY_LENGTH });
         showError(`Search query too long (max ${CONFIG.MAX_QUERY_LENGTH} characters)`);
         return;
       }
 
       // Check if endpoint is configured
       if (!CONFIG.SEARCH_ENDPOINT || CONFIG.SEARCH_ENDPOINT === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+        debugLog('❌ Endpoint not configured');
         showError('Search endpoint not configured. Please set up Google Apps Script Web App URL.');
         return;
       }
 
-      console.log('🔍 Performing search:', query);
+      debugLog('🌐 Endpoint configured', { endpoint: CONFIG.SEARCH_ENDPOINT });
+      debugLog('🏠 Current location', {
+        protocol: window.location.protocol,
+        host: window.location.host,
+        origin: window.location.origin,
+        href: window.location.href
+      });
 
       // Show loading
       hideAllResults();
@@ -515,21 +586,57 @@
       searchButton.disabled = true;
       searchButton.textContent = '⏳';
 
+      const requestPayload = {
+        query: query,
+        timestamp: new Date().toISOString()
+      };
+
+      debugLog('📤 Preparing request', requestPayload);
+
       try {
-        // Send search request
-        const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
+        debugLog('🚀 About to send fetch request');
+
+        // Test if fetch is available
+        if (typeof fetch === 'undefined') {
+          throw new Error('Fetch API not available');
+        }
+
+        debugLog('✅ Fetch API is available');
+
+        const requestOptions = {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            query: query,
-            timestamp: new Date().toISOString()
-          })
+          body: JSON.stringify(requestPayload)
+        };
+
+        debugLog('📋 Request options', requestOptions);
+
+        // Send search request
+        const response = await fetch(CONFIG.SEARCH_ENDPOINT, requestOptions);
+
+        debugLog('📨 Fetch response received', {
+          status: response.status,
+          statusText: response.statusText,
+          ok: response.ok,
+          headers: Object.fromEntries(response.headers.entries()),
+          url: response.url
         });
 
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        debugLog('📖 About to parse JSON response');
         const data = await response.json();
-        
+
+        debugLog('✅ JSON parsed successfully', {
+          success: data.success,
+          hasResults: !!data.results,
+          resultCount: data.results ? data.results.length : 0
+        });
+
         if (!data.success) {
           throw new Error(data.error || 'Search failed');
         }
@@ -538,10 +645,18 @@
         displayResults(data);
 
       } catch (error) {
+        debugLog('❌ Error caught', {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          toString: error.toString()
+        });
+
         console.error('❌ Search error:', error);
         showError(`Search failed: ${error.message}`);
         hideAllResults();
       } finally {
+        debugLog('🏁 Search function complete');
         searchButton.disabled = false;
         searchButton.textContent = '🔍';
       }
