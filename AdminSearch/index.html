@@ -431,6 +431,78 @@
       transform: translateY(-1px);
     }
 
+    .result-dropdown {
+      margin-top: 15px;
+      border-top: 1px solid var(--light-gray);
+      padding-top: 15px;
+    }
+
+    .result-dropdown-toggle {
+      background: none;
+      border: none;
+      color: var(--brand);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .result-dropdown-toggle:hover {
+      background: #f8f9fa;
+      color: var(--brand-dark);
+    }
+
+    .result-dropdown-icon {
+      transition: transform 0.2s ease;
+      font-size: 12px;
+    }
+
+    .result-dropdown-toggle.expanded .result-dropdown-icon {
+      transform: rotate(180deg);
+    }
+
+    .result-dropdown-content {
+      display: none;
+      margin-top: 10px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+
+    .result-dropdown-content.show {
+      display: block;
+    }
+
+    .result-all-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+    }
+
+    .result-field-complete {
+      font-size: 13px;
+    }
+
+    .result-field-complete .result-label {
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 2px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .result-field-complete .result-value {
+      color: var(--muted);
+      word-break: break-word;
+    }
+
     .no-results {
       text-align: center;
       padding: 60px 30px;
@@ -1116,8 +1188,60 @@
               ${fileLinks || '<span style="color: var(--muted); font-size: 12px;">No files</span>'}
             </div>
           </div>
+
+          <div class="result-dropdown">
+            <button class="result-dropdown-toggle" onclick="toggleResultDropdown(this)">
+              <span>View All Fields</span>
+              <span class="result-dropdown-icon">▼</span>
+            </button>
+            <div class="result-dropdown-content">
+              <div class="result-all-fields">
+                ${createAllFieldsHTML(result)}
+              </div>
+            </div>
+          </div>
         </div>
       `;
+    }
+
+    // Create HTML for all available fields in result
+    function createAllFieldsHTML(result) {
+      if (!result.completeData) {
+        return '<div style="color: var(--muted); font-style: italic;">Complete data not available for this result.</div>';
+      }
+
+      // Get all fields from completeData, excluding empty ones
+      const fields = Object.entries(result.completeData)
+        .filter(([key, value]) => value && value.toString().trim() !== '')
+        .sort(([a], [b]) => a.localeCompare(b)) // Sort alphabetically
+        .map(([key, value]) => `
+          <div class="result-field-complete">
+            <div class="result-label">${escapeHtml(key)}</div>
+            <div class="result-value">${escapeHtml(value.toString())}</div>
+          </div>
+        `);
+
+      if (fields.length === 0) {
+        return '<div style="color: var(--muted); font-style: italic;">No additional fields available.</div>';
+      }
+
+      return fields.join('');
+    }
+
+    // Toggle dropdown visibility
+    function toggleResultDropdown(button) {
+      const content = button.nextElementSibling;
+      const isExpanded = button.classList.contains('expanded');
+
+      if (isExpanded) {
+        button.classList.remove('expanded');
+        content.classList.remove('show');
+        button.querySelector('span:first-child').textContent = 'View All Fields';
+      } else {
+        button.classList.add('expanded');
+        content.classList.add('show');
+        button.querySelector('span:first-child').textContent = 'Hide All Fields';
+      }
     }
 
     // Escape HTML to prevent XSS
