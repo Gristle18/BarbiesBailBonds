@@ -1100,15 +1100,36 @@
         let data = null;
 
         try {
-          // Try JSONP first for Google Sites compatibility
-          debugLog('🔄 Trying JSONP request for Google Sites compatibility');
-          data = await makeJSONPRequest(CONFIG.SEARCH_ENDPOINT, requestPayload);
-          debugLog('📨 JSONP response received', { success: data.success, hasResults: !!data.results });
-        } catch (jsonpError) {
-          debugLog('⚠️ JSONP failed - Google Sites CORS restrictions prevent fetch fallback', { error: jsonpError.message });
+          // Try modern fetch first for better Safari compatibility
+          debugLog('🚀 Trying modern fetch request');
+          const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestPayload)
+          });
 
-          // On Google Sites, fetch will likely fail due to CORS, so provide helpful error
-          throw new Error(`Search timed out after 2 minutes. This may indicate:\n1. OpenAI API is taking longer than usual\n2. Large dataset processing is slow\n3. Try a shorter, more specific search term\n\nOriginal error: ${jsonpError.message}`);
+          if (response.ok) {
+            data = await response.json();
+            debugLog('✅ Fetch response received', { success: data.success, hasResults: !!data.results });
+          } else {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+        } catch (fetchError) {
+          debugLog('⚠️ Fetch failed, trying JSONP fallback', { error: fetchError.message });
+
+          try {
+            // Fallback to JSONP for Google Sites compatibility
+            debugLog('🔄 Trying JSONP fallback for Google Sites compatibility');
+            data = await makeJSONPRequest(CONFIG.SEARCH_ENDPOINT, requestPayload);
+            debugLog('📨 JSONP response received', { success: data.success, hasResults: !!data.results });
+          } catch (jsonpError) {
+            debugLog('❌ Both fetch and JSONP failed', { fetchError: fetchError.message, jsonpError: jsonpError.message });
+
+            // Both methods failed
+            throw new Error(`Search failed. This may indicate:\n1. Network connectivity issues\n2. Server timeout (try a more specific search)\n3. Browser compatibility issue\n\nTry using Chrome or Edge browser for best results.\n\nErrors: Fetch: ${fetchError.message} | JSONP: ${jsonpError.message}`);
+          }
         }
 
         debugLog('✅ JSON parsed successfully', {
@@ -1287,9 +1308,21 @@
       return div.innerHTML;
     }
 
+    // Detect Safari browser and show compatibility notice
+    function checkBrowserCompatibility() {
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+      if (isSafari) {
+        console.log('Safari browser detected - CORS improvements applied');
+        // Optional: You could show a subtle notice here if needed
+        // showError('Safari detected: Enhanced compatibility mode enabled.');
+      }
+    }
+
     // Initialize page
     document.addEventListener('DOMContentLoaded', () => {
       console.log('AdminSearch initialized');
+      checkBrowserCompatibility();
       initializeDateDropdowns();
       searchInput.focus();
     });
