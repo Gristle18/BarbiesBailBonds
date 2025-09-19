@@ -1607,6 +1607,8 @@
         // Make request to backend with CORS fallback
         let data;
         try {
+          // Try modern fetch first for better Safari compatibility
+          debugLog('🚀 Trying modern fetch request');
           const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
             method: 'POST',
             headers: {
@@ -1633,8 +1635,11 @@
           } catch (jsonpError) {
             debugLog('❌ Both fetch and JSONP failed', { fetchError: fetchError.message, jsonpError: jsonpError.message });
 
-            // Both methods failed
-            throw new Error(`Quick search failed. This may indicate:\n1. Network connectivity issues\n2. Server timeout (try a more specific search)\n3. Browser compatibility issue\n\nTry using Chrome or Edge browser for best results.\n\nErrors: Fetch: ${fetchError.message} | JSONP: ${jsonpError.message}`);
+            // Both methods failed - provide Safari-specific guidance
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            const safariNote = isSafari ? '\n\nSafari users: Try disabling "Prevent cross-site tracking" in Safari > Privacy settings.' : '';
+
+            throw new Error(`Quick search failed. This may indicate:\n1. Network connectivity issues\n2. Server timeout (try a more specific search)\n3. Browser compatibility issue\n\nTry using Chrome or Edge browser for best results.${safariNote}\n\nErrors: Fetch: ${fetchError.message} | JSONP: ${jsonpError.message}`);
           }
         }
 
@@ -1682,9 +1687,9 @@
       const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
       if (isSafari) {
-        console.log('Safari browser detected - CORS improvements applied');
-        // Optional: You could show a subtle notice here if needed
-        // showError('Safari detected: Enhanced compatibility mode enabled.');
+        console.log('Safari browser detected - CORS improvements applied for both Quick Search and Advanced Search');
+        // Safari-specific optimizations are applied in both search functions
+        debugLog('🦁 Safari compatibility mode enabled');
       }
     }
 
