@@ -170,46 +170,67 @@
       text-align: center;
     }
 
-    .date-filter-container {
+    .date-row {
       display: flex;
-      gap: 15px;
-      align-items: center;
+      gap: 30px;
       justify-content: center;
+      align-items: flex-start;
       flex-wrap: wrap;
+      margin-bottom: 20px;
     }
 
-    .date-input-group {
+    .date-group {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
+      gap: 8px;
+      min-width: 200px;
     }
 
-    .date-input-group label {
-      font-size: 12px;
+    .date-group-label {
+      font-size: 14px;
       font-weight: 600;
-      color: var(--muted);
+      color: var(--dark);
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .date-input {
+    .date-selectors {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .date-select {
       padding: 8px 12px;
       border: 2px solid #ddd;
       border-radius: 6px;
-      font-size: 14px;
+      font-size: 13px;
       background: var(--white);
       color: var(--dark);
-      transition: border-color 0.2s ease;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      min-width: 60px;
     }
 
-    .date-input:focus {
+    .date-select:focus {
       border-color: var(--brand);
       outline: none;
+      box-shadow: 0 0 0 2px rgba(242, 140, 0, 0.1);
     }
 
-    .date-clear-btn {
-      background: var(--muted);
-      color: var(--white);
+    .date-select:hover {
+      border-color: var(--brand-dark);
+    }
+
+    .date-filter-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .date-clear-btn, .date-preset-btn {
       border: none;
       padding: 8px 16px;
       border-radius: 6px;
@@ -219,8 +240,23 @@
       transition: all 0.2s ease;
     }
 
+    .date-clear-btn {
+      background: var(--muted);
+      color: var(--white);
+    }
+
     .date-clear-btn:hover {
       background: var(--dark);
+      transform: translateY(-1px);
+    }
+
+    .date-preset-btn {
+      background: var(--brand);
+      color: var(--white);
+    }
+
+    .date-preset-btn:hover {
+      background: var(--brand-dark);
       transform: translateY(-1px);
     }
 
@@ -475,20 +511,48 @@
 
       <!-- Date Range Filter -->
       <div class="date-filter-section">
-        <div class="date-filter-title">📅 Date Range Filter (Optional - improves performance)</div>
-        <div class="date-filter-container">
-          <div class="date-input-group">
-            <label for="startDate">From:</label>
-            <input type="date" id="startDate" class="date-input">
+        <div class="date-filter-title">📅 Date Range Filter (Max 1 year span - improves performance)</div>
+
+        <div class="date-row">
+          <div class="date-group">
+            <div class="date-group-label">From:</div>
+            <div class="date-selectors">
+              <select id="startYear" class="date-select">
+                <option value="">Year</option>
+              </select>
+              <select id="startMonth" class="date-select">
+                <option value="">Month</option>
+              </select>
+              <select id="startDay" class="date-select">
+                <option value="">Day</option>
+              </select>
+            </div>
           </div>
-          <div class="date-input-group">
-            <label for="endDate">To:</label>
-            <input type="date" id="endDate" class="date-input">
+
+          <div class="date-group">
+            <div class="date-group-label">To:</div>
+            <div class="date-selectors">
+              <select id="endYear" class="date-select">
+                <option value="">Year</option>
+              </select>
+              <select id="endMonth" class="date-select">
+                <option value="">Month</option>
+              </select>
+              <select id="endDay" class="date-select">
+                <option value="">Day</option>
+              </select>
+            </div>
           </div>
-          <button type="button" class="date-clear-btn" onclick="clearDateRange()">Clear Dates</button>
         </div>
+
+        <div class="date-filter-actions">
+          <button type="button" class="date-clear-btn" onclick="clearDateRange()">Clear All</button>
+          <button type="button" class="date-preset-btn" onclick="setCurrentYear()">Current Year</button>
+        </div>
+
         <div class="date-filter-help">
-          Leave empty to search all records, or set dates to search only within that range
+          <strong>Examples:</strong> Select "2024" only = Jan 1, 2024 to now | Select "2024 + March" = March 2024 only<br>
+          Partial selections work! Leave end date empty to search from start date to present.
         </div>
       </div>
     </div>
@@ -572,20 +636,137 @@
       searchInput.focus();
     }
 
-    // Clear date range
-    function clearDateRange() {
-      document.getElementById('startDate').value = '';
-      document.getElementById('endDate').value = '';
+    // Initialize date dropdowns
+    function initializeDateDropdowns() {
+      const currentYear = new Date().getFullYear();
+      const startYear = 2015; // Assuming data starts from 2015
+
+      // Populate year dropdowns
+      ['startYear', 'endYear'].forEach(id => {
+        const select = document.getElementById(id);
+        for (let year = currentYear; year >= startYear; year--) {
+          const option = document.createElement('option');
+          option.value = year;
+          option.textContent = year;
+          select.appendChild(option);
+        }
+      });
+
+      // Populate month dropdowns
+      const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+
+      ['startMonth', 'endMonth'].forEach(id => {
+        const select = document.getElementById(id);
+        months.forEach((month, index) => {
+          const option = document.createElement('option');
+          option.value = index + 1;
+          option.textContent = month;
+          select.appendChild(option);
+        });
+      });
+
+      // Populate day dropdowns
+      ['startDay', 'endDay'].forEach(id => {
+        const select = document.getElementById(id);
+        for (let day = 1; day <= 31; day++) {
+          const option = document.createElement('option');
+          option.value = day;
+          option.textContent = day;
+          select.appendChild(option);
+        }
+      });
+
+      // Add change listeners for smart date handling
+      document.getElementById('startYear').addEventListener('change', updateDateConstraints);
+      document.getElementById('startMonth').addEventListener('change', updateDateConstraints);
+      document.getElementById('endYear').addEventListener('change', updateDateConstraints);
+      document.getElementById('endMonth').addEventListener('change', updateDateConstraints);
     }
 
-    // Get date range values
+    // Update date constraints to enforce 1-year max range
+    function updateDateConstraints() {
+      const startYear = parseInt(document.getElementById('startYear').value);
+      const endYear = parseInt(document.getElementById('endYear').value);
+
+      if (startYear && endYear) {
+        if (Math.abs(endYear - startYear) > 1) {
+          showError('Date range cannot exceed 1 year. Please adjust your selection.');
+          // Reset the problematic selection
+          if (endYear > startYear + 1) {
+            document.getElementById('endYear').value = '';
+          } else if (endYear < startYear - 1) {
+            document.getElementById('startYear').value = '';
+          }
+        }
+      }
+    }
+
+    // Clear date range
+    function clearDateRange() {
+      ['startYear', 'startMonth', 'startDay', 'endYear', 'endMonth', 'endDay'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+    }
+
+    // Set current year preset
+    function setCurrentYear() {
+      clearDateRange();
+      document.getElementById('startYear').value = new Date().getFullYear();
+    }
+
+    // Get date range values with smart partial date handling
     function getDateRange() {
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
+      const startYear = document.getElementById('startYear').value;
+      const startMonth = document.getElementById('startMonth').value;
+      const startDay = document.getElementById('startDay').value;
+
+      const endYear = document.getElementById('endYear').value;
+      const endMonth = document.getElementById('endMonth').value;
+      const endDay = document.getElementById('endDay').value;
+
+      if (!startYear && !endYear) {
+        return { hasDateFilter: false };
+      }
+
+      // Build start date
+      let startDate = null;
+      if (startYear) {
+        const year = parseInt(startYear);
+        const month = startMonth ? parseInt(startMonth) - 1 : 0; // January = 0
+        const day = startDay ? parseInt(startDay) : 1;
+        startDate = new Date(year, month, day).toISOString().split('T')[0];
+      }
+
+      // Build end date with smart defaults
+      let endDate = null;
+      if (endYear) {
+        const year = parseInt(endYear);
+        const month = endMonth ? parseInt(endMonth) - 1 : 11; // December = 11
+        const day = endDay ? parseInt(endDay) : new Date(year, endMonth ? parseInt(endMonth) : 12, 0).getDate(); // Last day of month
+        endDate = new Date(year, month, day).toISOString().split('T')[0];
+      } else if (startYear && !endYear) {
+        // If only start year specified, end date is now
+        endDate = new Date().toISOString().split('T')[0];
+      }
+
+      // Validate 1-year maximum range
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const yearDiff = (end - start) / (1000 * 60 * 60 * 24 * 365);
+
+        if (yearDiff > 1) {
+          showError('Date range exceeds 1 year maximum. Please adjust your selection.');
+          return { hasDateFilter: false };
+        }
+      }
 
       return {
-        startDate: startDate || null,
-        endDate: endDate || null,
+        startDate: startDate,
+        endDate: endDate,
         hasDateFilter: !!(startDate || endDate)
       };
     }
@@ -927,6 +1108,7 @@
     // Initialize page
     document.addEventListener('DOMContentLoaded', () => {
       console.log('AdminSearch initialized');
+      initializeDateDropdowns();
       searchInput.focus();
     });
   </script>
