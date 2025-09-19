@@ -26,6 +26,17 @@
       color: var(--dark);
       background: var(--light-gray);
       min-height: 100vh;
+      overflow-x: hidden; /* Hide horizontal scrollbar */
+    }
+
+    /* Hide scrollbars for webkit browsers */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Hide scrollbars for Firefox */
+    html {
+      scrollbar-width: none;
     }
 
     /* Remove focus outline and prevent text editing cursor */
