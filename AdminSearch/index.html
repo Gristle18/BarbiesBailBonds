@@ -933,18 +933,23 @@
       console.log(logMessage, data || '');
 
       // Also show debug info in UI for Google Sites debugging
-      const debugDiv = document.getElementById('debugInfo') || createDebugDiv();
+      let debugDiv = document.getElementById('debugInfo');
+      if (!debugDiv) {
+        debugDiv = createDebugDiv();
+      }
+
+      const debugContent = debugDiv.querySelector('.debug-content');
       const debugEntry = document.createElement('div');
       debugEntry.style.fontSize = '12px';
       debugEntry.style.color = '#666';
       debugEntry.style.marginBottom = '5px';
       debugEntry.style.fontFamily = 'monospace';
       debugEntry.textContent = logMessage + (data ? ' | ' + JSON.stringify(data).substring(0, 100) : '');
-      debugDiv.appendChild(debugEntry);
+      debugContent.appendChild(debugEntry);
 
       // Keep only last 10 debug entries
-      while (debugDiv.children.length > 10) {
-        debugDiv.removeChild(debugDiv.firstChild);
+      while (debugContent.children.length > 10) {
+        debugContent.removeChild(debugContent.firstChild);
       }
     }
 
@@ -982,7 +987,7 @@
       debugDiv.appendChild(content);
       document.body.appendChild(debugDiv);
 
-      return content;
+      return debugDiv;
     }
 
     // Perform search
