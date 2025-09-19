@@ -1,0 +1,10 @@
+fix: prevent unnecessary API calls on FAQ page load
+
+- FAQ data now only fetches when user actually searches
+- Prevents quota consumption from page visits without interaction
+- Shows "Start typing to search..." message on initial load
+- FAQ items initialize after first search
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>

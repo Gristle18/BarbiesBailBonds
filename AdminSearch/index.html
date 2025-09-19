@@ -402,7 +402,10 @@
     <!-- Loading -->
     <div class="loading" id="loading">
       <div class="loading-spinner"></div>
-      Searching across all client records...
+      <div id="loadingText">Searching across all client records...</div>
+      <div style="font-size: 12px; color: var(--muted); margin-top: 10px;">
+        First search may take 1-2 minutes while generating embeddings
+      </div>
     </div>
 
     <!-- Results Section -->
@@ -493,8 +496,8 @@
         const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
         const timeoutId = setTimeout(() => {
           cleanup();
-          reject(new Error('JSONP request timeout'));
-        }, 60000);
+          reject(new Error('JSONP request timeout after 2 minutes'));
+        }, 120000); // Extended to 2 minutes for OpenAI processing
 
         function cleanup() {
           clearTimeout(timeoutId);
@@ -659,6 +662,20 @@
         debugLog('🔄 Trying JSONP request for Google Sites compatibility');
         const data = await makeJSONPRequest(CONFIG.SEARCH_ENDPOINT, requestPayload);
         debugLog('📨 JSONP response received', { success: data.success, hasResults: !!data.results });
+
+        // If JSONP fails, try regular fetch as backup
+        if (!data || data.error) {
+          debugLog('🔄 JSONP failed, trying regular fetch as backup');
+          const fetchResponse = await fetch(CONFIG.SEARCH_ENDPOINT, requestOptions);
+
+          if (!fetchResponse.ok) {
+            throw new Error(`HTTP ${fetchResponse.status}: ${fetchResponse.statusText}`);
+          }
+
+          const backupData = await fetchResponse.json();
+          debugLog('📨 Fetch response received', { success: backupData.success, hasResults: !!backupData.results });
+          return backupData;
+        }
 
         debugLog('✅ JSON parsed successfully', {
           success: data.success,

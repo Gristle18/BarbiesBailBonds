@@ -1,0 +1,15 @@
+tree 6d5273977706e6c75f261b904faf9b158a3bfbfa
+parent be5c48bd4d9c7492b401c6599856301eaf0dc137
+author Barbies Bail Bonds <noreply@barbiesbailbonds.com> 1757526379 -0400
+committer Barbies Bail Bonds <noreply@barbiesbailbonds.com> 1757526379 -0400
+
+fix: prevent unnecessary API calls on FAQ page load
+
+- FAQ data now only fetches when user actually searches
+- Prevents quota consumption from page visits without interaction
+- Shows "Start typing to search..." message on initial load
+- FAQ items initialize after first search
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
