@@ -568,11 +568,11 @@
     <!-- Search Section -->
     <div class="search-section">
       <div class="search-container">
-        <input 
-          type="text" 
-          class="search-input" 
+        <input
+          type="text"
+          class="search-input"
           id="searchInput"
-          placeholder="Enter search terms separated by semicolons (e.g., John Smith; 561-555-0123; Government ID)"
+          placeholder="Enter search terms (e.g., John Smith, Ricardo Perez, 561-555-0123)"
           autocomplete="off"
         >
         <button class="search-button" id="searchButton">
@@ -581,15 +581,15 @@
       </div>
       
       <div class="search-help">
-        Use semicolons (;) to search multiple criteria. Examples:
+        Search examples:
       </div>
       
       <div class="search-examples">
         <span class="example-tag" onclick="setSearchExample('Ricardo Perez')">Ricardo Perez</span>
-        <span class="example-tag" onclick="setSearchExample('John Smith; 561-555-0123')">Name + Phone</span>
-        <span class="example-tag" onclick="setSearchExample('Government ID; 2024-01-15')">Document + Date</span>
-        <span class="example-tag" onclick="setSearchExample('Jane Doe; BC2024001')">Name + Case Number</span>
-        <span class="example-tag" onclick="setSearchExample('Smith; West Palm Beach')">Name + Location</span>
+        <span class="example-tag" onclick="setSearchExample('John Smith 561-555-0123')">Name + Phone</span>
+        <span class="example-tag" onclick="setSearchExample('Government ID 2024-01-15')">Document + Date</span>
+        <span class="example-tag" onclick="setSearchExample('Jane Doe BC2024001')">Name + Case Number</span>
+        <span class="example-tag" onclick="setSearchExample('Smith West Palm Beach')">Name + Location</span>
       </div>
 
       <!-- Date Range Filter -->
@@ -668,7 +668,7 @@
       <div class="no-results-icon">🔍</div>
       <h3>No results found</h3>
       <p>Try different search terms or check your spelling.<br>
-      Use semicolons to separate multiple search criteria.</p>
+      Use natural language like "John Smith phone number" or "Government ID 2024".</p>
     </div>
   </div>
 
