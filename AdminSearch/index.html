@@ -1000,14 +1000,101 @@
         content.style.display = content.style.display === 'none' ? 'block' : 'none';
       };
 
+      // Add copy button
+      const copyButton = document.createElement('span');
+      copyButton.textContent = ' 📋';
+      copyButton.style.cursor = 'pointer';
+      copyButton.style.marginLeft = '10px';
+      copyButton.style.fontSize = '12px';
+      copyButton.title = 'Copy debug log to clipboard';
+      copyButton.onclick = (e) => {
+        e.stopPropagation(); // Prevent toggle when clicking copy
+        copyDebugLog(debugDiv);
+      };
+      title.appendChild(copyButton);
+
       const content = document.createElement('div');
       content.className = 'debug-content';
+      content.style.cursor = 'pointer';
+      content.title = 'Click to copy debug log';
+      content.onclick = () => {
+        copyDebugLog(debugDiv);
+      };
 
       debugDiv.appendChild(title);
       debugDiv.appendChild(content);
       document.body.appendChild(debugDiv);
 
       return debugDiv;
+    }
+
+    // Copy debug log to clipboard
+    function copyDebugLog(debugDiv) {
+      try {
+        const debugContent = debugDiv.querySelector('.debug-content');
+        const debugEntries = Array.from(debugContent.children);
+        const debugText = debugEntries.map(entry => entry.textContent).join('\n');
+
+        if (navigator.clipboard && window.isSecureContext) {
+          // Use modern clipboard API
+          navigator.clipboard.writeText(debugText).then(() => {
+            showTemporaryMessage('Debug log copied to clipboard! 📋');
+          }).catch(() => {
+            fallbackCopyText(debugText);
+          });
+        } else {
+          // Fallback for older browsers
+          fallbackCopyText(debugText);
+        }
+      } catch (error) {
+        console.error('Failed to copy debug log:', error);
+        showTemporaryMessage('Failed to copy debug log');
+      }
+    }
+
+    // Fallback copy method
+    function fallbackCopyText(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        showTemporaryMessage('Debug log copied to clipboard! 📋');
+      } catch (err) {
+        showTemporaryMessage('Copy failed - please manually select and copy');
+      }
+
+      document.body.removeChild(textArea);
+    }
+
+    // Show temporary message
+    function showTemporaryMessage(message) {
+      const messageDiv = document.createElement('div');
+      messageDiv.textContent = message;
+      messageDiv.style.position = 'fixed';
+      messageDiv.style.top = '20px';
+      messageDiv.style.right = '20px';
+      messageDiv.style.background = '#28a745';
+      messageDiv.style.color = 'white';
+      messageDiv.style.padding = '10px 15px';
+      messageDiv.style.borderRadius = '5px';
+      messageDiv.style.zIndex = '10000';
+      messageDiv.style.fontSize = '14px';
+      messageDiv.style.fontWeight = 'bold';
+
+      document.body.appendChild(messageDiv);
+
+      setTimeout(() => {
+        if (messageDiv.parentNode) {
+          document.body.removeChild(messageDiv);
+        }
+      }, 2000);
     }
 
     // Perform search
