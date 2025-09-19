@@ -756,10 +756,15 @@
       if (startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
-        const yearDiff = (end - start) / (1000 * 60 * 60 * 24 * 365);
+        const daysDiff = (end - start) / (1000 * 60 * 60 * 24);
 
-        if (yearDiff > 1) {
-          showError('Date range exceeds 1 year maximum. Please adjust your selection.');
+        if (daysDiff > 365) {
+          showError(`Date range of ${Math.round(daysDiff)} days exceeds 365 day (1 year) maximum. Please select a shorter range.`);
+          return { hasDateFilter: false };
+        }
+
+        if (daysDiff < 0) {
+          showError('Start date cannot be after end date. Please adjust your selection.');
           return { hasDateFilter: false };
         }
       }
@@ -939,6 +944,16 @@
       searchButton.textContent = '⏳';
 
       const dateRange = getDateRange();
+
+      // Don't proceed if date validation failed
+      if (dateRange.hasDateFilter === false && (document.getElementById('startYear').value || document.getElementById('endYear').value)) {
+        // User tried to set dates but validation failed - reset loading state
+        hideAllResults();
+        searchButton.disabled = false;
+        searchButton.textContent = '🔍';
+        return;
+      }
+
       const requestPayload = {
         query: query,
         timestamp: new Date().toISOString(),
