@@ -1592,6 +1592,101 @@
       return div.innerHTML;
     }
 
+    // Clear all field search inputs - make globally accessible
+    window.clearAllFields = function() {
+      document.getElementById('caseBookingInput').value = '';
+      document.getElementById('nameInput').value = '';
+      document.getElementById('dobInput').value = '';
+      document.getElementById('ssnInput').value = '';
+      document.getElementById('drInput').value = '';
+      document.getElementById('powerInput').value = '';
+    }
+
+    // Perform field-specific search
+    async function performFieldSearch() {
+      debugLog('🔍 Starting field search');
+
+      const fields = {
+        caseBooking: document.getElementById('caseBookingInput').value.trim(),
+        name: document.getElementById('nameInput').value.trim(),
+        dob: document.getElementById('dobInput').value.trim(),
+        ssn: document.getElementById('ssnInput').value.trim(),
+        dr: document.getElementById('drInput').value.trim(),
+        power: document.getElementById('powerInput').value.trim()
+      };
+
+      // Check if at least one field has a value
+      const hasValues = Object.values(fields).some(value => value);
+      if (!hasValues) {
+        showError('Please enter at least one search field');
+        return;
+      }
+
+      debugLog('📝 Field search values', fields);
+
+      // Show loading state
+      hideAllResults();
+      document.getElementById('searchResults').innerHTML = '<div class="loading">Searching exact field matches...</div>';
+
+      try {
+        // Build search query from fields
+        const searchTerms = [];
+        if (fields.caseBooking) searchTerms.push(fields.caseBooking);
+        if (fields.name) searchTerms.push(fields.name);
+        if (fields.dob) searchTerms.push(fields.dob);
+        if (fields.ssn) searchTerms.push(fields.ssn);
+        if (fields.dr) searchTerms.push(fields.dr);
+        if (fields.power) searchTerms.push(fields.power);
+
+        const query = searchTerms.join('; ');
+        debugLog('🔍 Field search query', { query, fields });
+
+        // Get date range
+        const dateFilter = getDateRange();
+
+        // Prepare request
+        const requestPayload = {
+          query: query,
+          searchType: 'field', // Indicate this is a field search
+          fields: fields, // Include specific fields for exact matching
+          dateFilter: dateFilter
+        };
+
+        debugLog('📤 Field search request', requestPayload);
+
+        // Make request to same endpoint but with field search type
+        const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestPayload),
+          mode: 'cors'
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        debugLog('📨 Field search response', { success: data.success, resultCount: data.results ? data.results.length : 0 });
+
+        if (!data.success) {
+          throw new Error(data.error || 'Field search failed');
+        }
+
+        console.log('✅ Field search results:', data);
+        displayResults(data);
+
+      } catch (error) {
+        console.error('❌ Field search error:', error);
+        debugLog('❌ Field search failed', { error: error.message, stack: error.stack });
+
+        document.getElementById('searchResults').innerHTML = '';
+        showError(`Field search failed: ${error.message}`);
+      }
+    }
+
     // Detect Safari browser and show compatibility notice
     function checkBrowserCompatibility() {
       const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
