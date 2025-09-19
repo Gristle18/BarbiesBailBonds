@@ -766,6 +766,26 @@
       document.getElementById('startMonth').addEventListener('change', updateDateConstraints);
       document.getElementById('endYear').addEventListener('change', updateDateConstraints);
       document.getElementById('endMonth').addEventListener('change', updateDateConstraints);
+
+      // Auto-fill with today's date to 365 days back
+      autoFillDateRange();
+    }
+
+    // Auto-fill date range: today to 365 days back
+    function autoFillDateRange() {
+      const today = new Date();
+      const oneYearBack = new Date();
+      oneYearBack.setDate(today.getDate() - 365);
+
+      // Set end date to today
+      document.getElementById('endYear').value = today.getFullYear();
+      document.getElementById('endMonth').value = today.getMonth() + 1; // Months are 0-indexed
+      document.getElementById('endDay').value = today.getDate();
+
+      // Set start date to 365 days back
+      document.getElementById('startYear').value = oneYearBack.getFullYear();
+      document.getElementById('startMonth').value = oneYearBack.getMonth() + 1;
+      document.getElementById('startDay').value = oneYearBack.getDate();
     }
 
     // Update date constraints to enforce 1-year max range
