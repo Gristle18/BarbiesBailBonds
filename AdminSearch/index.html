@@ -1227,9 +1227,9 @@
       }
 
       // Get all fields from completeData, excluding empty ones
+      // Keep original Google Sheet column order (no sorting)
       const fields = Object.entries(result.completeData)
         .filter(([key, value]) => value && value.toString().trim() !== '')
-        .sort(([a], [b]) => b.localeCompare(a)) // Sort alphabetically (Z to A)
         .map(([key, value]) => `
           <div class="result-field-complete">
             <div class="result-label">${escapeHtml(key)}</div>
