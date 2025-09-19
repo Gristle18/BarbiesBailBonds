@@ -563,10 +563,9 @@
     <!-- Loading -->
     <div class="loading" id="loading">
       <div class="loading-spinner"></div>
-      <div id="loadingText">Searching across all client records...</div>
-      <div style="font-size: 12px; color: var(--muted); margin-top: 10px;">
-        Generating embedding for search query and comparing with 4,246 records<br>
-        <em>May take up to 3 minutes depending on OpenAI API response time</em>
+      <div id="loadingText">Processing search...</div>
+      <div id="loadingDetails" style="font-size: 12px; color: var(--muted); margin-top: 10px;">
+        Generating embedding for search query and analyzing records
       </div>
     </div>
 
@@ -944,6 +943,14 @@
       searchButton.textContent = '⏳';
 
       const dateRange = getDateRange();
+
+      // Update loading message based on search scope
+      const loadingDetails = document.getElementById('loadingDetails');
+      if (dateRange.hasDateFilter) {
+        loadingDetails.textContent = 'Generating embedding for search query and analyzing filtered records';
+      } else {
+        loadingDetails.textContent = 'Generating embedding for search query and analyzing all 4,246 records';
+      }
 
       // Don't proceed if date validation failed
       if (dateRange.hasDateFilter === false && (document.getElementById('startYear').value || document.getElementById('endYear').value)) {
