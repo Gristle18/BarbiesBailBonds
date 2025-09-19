@@ -658,23 +658,25 @@
 
         debugLog('📋 Request options', requestOptions);
 
-        // Try JSONP first for Google Sites compatibility
-        debugLog('🔄 Trying JSONP request for Google Sites compatibility');
-        const data = await makeJSONPRequest(CONFIG.SEARCH_ENDPOINT, requestPayload);
-        debugLog('📨 JSONP response received', { success: data.success, hasResults: !!data.results });
+        let data = null;
 
-        // If JSONP fails, try regular fetch as backup
-        if (!data || data.error) {
-          debugLog('🔄 JSONP failed, trying regular fetch as backup');
+        try {
+          // Try JSONP first for Google Sites compatibility
+          debugLog('🔄 Trying JSONP request for Google Sites compatibility');
+          data = await makeJSONPRequest(CONFIG.SEARCH_ENDPOINT, requestPayload);
+          debugLog('📨 JSONP response received', { success: data.success, hasResults: !!data.results });
+        } catch (jsonpError) {
+          debugLog('⚠️ JSONP failed, trying regular fetch as backup', { error: jsonpError.message });
+
+          // Fallback to regular fetch
           const fetchResponse = await fetch(CONFIG.SEARCH_ENDPOINT, requestOptions);
 
           if (!fetchResponse.ok) {
             throw new Error(`HTTP ${fetchResponse.status}: ${fetchResponse.statusText}`);
           }
 
-          const backupData = await fetchResponse.json();
-          debugLog('📨 Fetch response received', { success: backupData.success, hasResults: !!backupData.results });
-          return backupData;
+          data = await fetchResponse.json();
+          debugLog('📨 Fetch response received', { success: data.success, hasResults: !!data.results });
         }
 
         debugLog('✅ JSON parsed successfully', {
