@@ -1589,7 +1589,7 @@
 
       // Show loading state
       hideAllResults();
-      document.getElementById('searchResults').innerHTML = '<div class="loading">Searching all records...</div>';
+      document.getElementById('resultsList').innerHTML = '<div class="loading">Searching all records...</div>';
 
       try {
         // Get date range
@@ -1632,7 +1632,7 @@
         console.error('❌ Quick search error:', error);
         debugLog('❌ Quick search failed', { error: error.message, stack: error.stack });
 
-        document.getElementById('searchResults').innerHTML = '';
+        document.getElementById('resultsList').innerHTML = '';
         showError(`Quick search failed: ${error.message}`);
       }
     }
