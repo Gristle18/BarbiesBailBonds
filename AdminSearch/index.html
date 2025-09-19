@@ -154,6 +154,84 @@
       color: var(--white);
     }
 
+    .date-filter-section {
+      margin-top: 25px;
+      padding: 20px;
+      background: var(--cream);
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+
+    .date-filter-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .date-filter-container {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .date-input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .date-input-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .date-input {
+      padding: 8px 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      background: var(--white);
+      color: var(--dark);
+      transition: border-color 0.2s ease;
+    }
+
+    .date-input:focus {
+      border-color: var(--brand);
+      outline: none;
+    }
+
+    .date-clear-btn {
+      background: var(--muted);
+      color: var(--white);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .date-clear-btn:hover {
+      background: var(--dark);
+      transform: translateY(-1px);
+    }
+
+    .date-filter-help {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
     .loading {
       text-align: center;
       padding: 40px;
@@ -388,11 +466,30 @@
       </div>
       
       <div class="search-examples">
+        <span class="example-tag" onclick="setSearchExample('Ricardo Perez')">Ricardo Perez</span>
         <span class="example-tag" onclick="setSearchExample('John Smith; 561-555-0123')">Name + Phone</span>
         <span class="example-tag" onclick="setSearchExample('Government ID; 2024-01-15')">Document + Date</span>
         <span class="example-tag" onclick="setSearchExample('Jane Doe; BC2024001')">Name + Case Number</span>
         <span class="example-tag" onclick="setSearchExample('Smith; West Palm Beach')">Name + Location</span>
-        <span class="example-tag" onclick="setSearchExample('Proof of Address')">Document Type</span>
+      </div>
+
+      <!-- Date Range Filter -->
+      <div class="date-filter-section">
+        <div class="date-filter-title">📅 Date Range Filter (Optional - improves performance)</div>
+        <div class="date-filter-container">
+          <div class="date-input-group">
+            <label for="startDate">From:</label>
+            <input type="date" id="startDate" class="date-input">
+          </div>
+          <div class="date-input-group">
+            <label for="endDate">To:</label>
+            <input type="date" id="endDate" class="date-input">
+          </div>
+          <button type="button" class="date-clear-btn" onclick="clearDateRange()">Clear Dates</button>
+        </div>
+        <div class="date-filter-help">
+          Leave empty to search all records, or set dates to search only within that range
+        </div>
       </div>
     </div>
 
@@ -475,6 +572,24 @@
       searchInput.focus();
     }
 
+    // Clear date range
+    function clearDateRange() {
+      document.getElementById('startDate').value = '';
+      document.getElementById('endDate').value = '';
+    }
+
+    // Get date range values
+    function getDateRange() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+
+      return {
+        startDate: startDate || null,
+        endDate: endDate || null,
+        hasDateFilter: !!(startDate || endDate)
+      };
+    }
+
     // Show error message
     function showError(message) {
       errorMessage.textContent = message;
@@ -527,6 +642,16 @@
           query: data.query,
           timestamp: data.timestamp
         });
+
+        // Add date filter parameters if present
+        if (data.dateFilter && data.dateFilter.hasDateFilter) {
+          if (data.dateFilter.startDate) {
+            params.append('startDate', data.dateFilter.startDate);
+          }
+          if (data.dateFilter.endDate) {
+            params.append('endDate', data.dateFilter.endDate);
+          }
+        }
 
         script.src = url + '?' + params.toString();
         document.head.appendChild(script);
@@ -632,9 +757,11 @@
       searchButton.disabled = true;
       searchButton.textContent = '⏳';
 
+      const dateRange = getDateRange();
       const requestPayload = {
         query: query,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        dateFilter: dateRange
       };
 
       debugLog('📤 Preparing request', requestPayload);
