@@ -691,50 +691,41 @@
       <div class="subtitle">Search client records and uploaded documents</div>
     </div>
 
-    <!-- Main Search Section -->
+    <!-- Quick Search Section -->
     <div class="search-section">
       <h3 style="margin-bottom: 20px; color: var(--dark); font-size: 18px; font-weight: 600;">Quick Search</h3>
 
-      <div class="field-search-container">
-        <div class="field-search-grid">
-          <div class="field-input-group">
-            <label for="caseBookingInput">Case/Booking No</label>
-            <input type="text" id="caseBookingInput" placeholder="Enter case or booking number">
-          </div>
-          <div class="field-input-group">
-            <label for="nameInput">Name</label>
-            <input type="text" id="nameInput" placeholder="Last, First">
-          </div>
-          <div class="field-input-group">
-            <label for="dobInput">DOB</label>
-            <input type="text" id="dobInput" placeholder="MM/DD/YYYY or partial">
-          </div>
-          <div class="field-input-group">
-            <label for="ssnInput">Social Security No</label>
-            <input type="text" id="ssnInput" placeholder="XXX-XX-XXXX">
-          </div>
-          <div class="field-input-group">
-            <label for="drInput">DR No</label>
-            <input type="text" id="drInput" placeholder="Enter DR number">
-          </div>
-          <div class="field-input-group">
-            <label for="powerInput">Power No</label>
-            <input type="text" id="powerInput" placeholder="Enter power number">
-          </div>
-        </div>
+      <div class="search-container">
+        <input
+          type="text"
+          class="search-input"
+          id="quickSearchInput"
+          placeholder="Search anything: name, case number, phone, SSN, power number..."
+          autocomplete="off"
+        >
+        <button class="search-button" id="quickSearchButton">
+          🔍
+        </button>
+      </div>
 
-        <div class="field-search-actions">
-          <button class="search-button-main" id="fieldSearchButton">
-            🔍 Search
-          </button>
-          <button class="clear-button" onclick="clearAllFields()">
-            Clear All
-          </button>
-        </div>
+      <div class="field-search-actions">
+        <button class="search-button-main" id="fieldSearchButton">
+          🔍 Search All Records
+        </button>
+        <button class="clear-button" onclick="clearQuickSearch()">
+          Clear
+        </button>
       </div>
 
       <div class="search-help">
-        Enter information in any combination of fields above for exact matching
+        Universal search - enter any information and we'll search all fields across both databases
+      </div>
+
+      <div class="search-examples">
+        <span class="example-tag" onclick="setQuickSearchExample('John Smith')">John Smith</span>
+        <span class="example-tag" onclick="setQuickSearchExample('561-247-0018')">Phone Number</span>
+        <span class="example-tag" onclick="setQuickSearchExample('BC2024001')">Case Number</span>
+        <span class="example-tag" onclick="setQuickSearchExample('123-45-6789')">SSN</span>
       </div>
     </div>
 
@@ -859,9 +850,11 @@
     };
 
     // DOM elements
-    const searchInput = document.getElementById('searchInput');
-    const searchButton = document.getElementById('searchButton');
-    const fieldSearchButton = document.getElementById('fieldSearchButton');
+    const searchInput = document.getElementById('searchInput'); // Advanced search
+    const searchButton = document.getElementById('searchButton'); // Advanced search
+    const quickSearchInput = document.getElementById('quickSearchInput'); // Quick search
+    const quickSearchButton = document.getElementById('quickSearchButton'); // Quick search
+    const fieldSearchButton = document.getElementById('fieldSearchButton'); // Quick search main button
     const loading = document.getElementById('loading');
     const resultsSection = document.getElementById('resultsSection');
     const resultsCount = document.getElementById('resultsCount');
@@ -869,14 +862,6 @@
     const resultsList = document.getElementById('resultsList');
     const noResults = document.getElementById('noResults');
     const errorMessage = document.getElementById('errorMessage');
-
-    // Field search inputs
-    const caseBookingInput = document.getElementById('caseBookingInput');
-    const nameInput = document.getElementById('nameInput');
-    const dobInput = document.getElementById('dobInput');
-    const ssnInput = document.getElementById('ssnInput');
-    const drInput = document.getElementById('drInput');
-    const powerInput = document.getElementById('powerInput');
 
     let searchTimeout;
 
@@ -897,22 +882,38 @@
       }, CONFIG.DEBOUNCE_DELAY);
     });
 
+    // Advanced search event listeners
     searchButton.addEventListener('click', performSearch);
-    fieldSearchButton.addEventListener('click', performFieldSearch);
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+    });
 
-    // Add Enter key support for field inputs
-    [caseBookingInput, nameInput, dobInput, ssnInput, drInput, powerInput].forEach(input => {
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          performFieldSearch();
-        }
-      });
+    // Quick search event listeners
+    fieldSearchButton.addEventListener('click', performQuickSearch);
+    quickSearchButton.addEventListener('click', performQuickSearch);
+    quickSearchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        performQuickSearch();
+      }
     });
 
     // Set search example - make globally accessible
     window.setSearchExample = function(example) {
       searchInput.value = example;
       searchInput.focus();
+    }
+
+    // Set quick search example - make globally accessible
+    window.setQuickSearchExample = function(example) {
+      quickSearchInput.value = example;
+      quickSearchInput.focus();
+    }
+
+    // Clear quick search - make globally accessible
+    window.clearQuickSearch = function() {
+      quickSearchInput.value = '';
     }
 
     // Initialize date dropdowns
@@ -1592,69 +1593,36 @@
       return div.innerHTML;
     }
 
-    // Clear all field search inputs - make globally accessible
-    window.clearAllFields = function() {
-      document.getElementById('caseBookingInput').value = '';
-      document.getElementById('nameInput').value = '';
-      document.getElementById('dobInput').value = '';
-      document.getElementById('ssnInput').value = '';
-      document.getElementById('drInput').value = '';
-      document.getElementById('powerInput').value = '';
-    }
+    // Perform universal quick search
+    async function performQuickSearch() {
+      debugLog('🔍 Starting quick search');
 
-    // Perform field-specific search
-    async function performFieldSearch() {
-      debugLog('🔍 Starting field search');
-
-      const fields = {
-        caseBooking: document.getElementById('caseBookingInput').value.trim(),
-        name: document.getElementById('nameInput').value.trim(),
-        dob: document.getElementById('dobInput').value.trim(),
-        ssn: document.getElementById('ssnInput').value.trim(),
-        dr: document.getElementById('drInput').value.trim(),
-        power: document.getElementById('powerInput').value.trim()
-      };
-
-      // Check if at least one field has a value
-      const hasValues = Object.values(fields).some(value => value);
-      if (!hasValues) {
-        showError('Please enter at least one search field');
+      const query = quickSearchInput.value.trim();
+      if (!query) {
+        showError('Please enter something to search for');
         return;
       }
 
-      debugLog('📝 Field search values', fields);
+      debugLog('📝 Quick search query', { query });
 
       // Show loading state
       hideAllResults();
-      document.getElementById('searchResults').innerHTML = '<div class="loading">Searching exact field matches...</div>';
+      document.getElementById('searchResults').innerHTML = '<div class="loading">Searching all records...</div>';
 
       try {
-        // Build search query from fields
-        const searchTerms = [];
-        if (fields.caseBooking) searchTerms.push(fields.caseBooking);
-        if (fields.name) searchTerms.push(fields.name);
-        if (fields.dob) searchTerms.push(fields.dob);
-        if (fields.ssn) searchTerms.push(fields.ssn);
-        if (fields.dr) searchTerms.push(fields.dr);
-        if (fields.power) searchTerms.push(fields.power);
-
-        const query = searchTerms.join('; ');
-        debugLog('🔍 Field search query', { query, fields });
-
         // Get date range
         const dateFilter = getDateRange();
 
-        // Prepare request
+        // Prepare request for universal search
         const requestPayload = {
           query: query,
-          searchType: 'field', // Indicate this is a field search
-          fields: fields, // Include specific fields for exact matching
+          searchType: 'universal', // New search type for universal search
           dateFilter: dateFilter
         };
 
-        debugLog('📤 Field search request', requestPayload);
+        debugLog('📤 Quick search request', requestPayload);
 
-        // Make request to same endpoint but with field search type
+        // Make request to backend
         const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
           method: 'POST',
           headers: {
@@ -1669,21 +1637,21 @@
         }
 
         const data = await response.json();
-        debugLog('📨 Field search response', { success: data.success, resultCount: data.results ? data.results.length : 0 });
+        debugLog('📨 Quick search response', { success: data.success, resultCount: data.results ? data.results.length : 0 });
 
         if (!data.success) {
-          throw new Error(data.error || 'Field search failed');
+          throw new Error(data.error || 'Quick search failed');
         }
 
-        console.log('✅ Field search results:', data);
+        console.log('✅ Quick search results:', data);
         displayResults(data);
 
       } catch (error) {
-        console.error('❌ Field search error:', error);
-        debugLog('❌ Field search failed', { error: error.message, stack: error.stack });
+        console.error('❌ Quick search error:', error);
+        debugLog('❌ Quick search failed', { error: error.message, stack: error.stack });
 
         document.getElementById('searchResults').innerHTML = '';
-        showError(`Field search failed: ${error.message}`);
+        showError(`Quick search failed: ${error.message}`);
       }
     }
 
