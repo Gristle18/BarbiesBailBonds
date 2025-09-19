@@ -708,14 +708,6 @@
         </button>
       </div>
 
-      <div class="field-search-actions">
-        <button class="search-button-main" id="fieldSearchButton">
-          🔍 Search All Records
-        </button>
-        <button class="clear-button" onclick="clearQuickSearch()">
-          Clear
-        </button>
-      </div>
 
       <div class="search-help">
         Universal search - enter any information and we'll search all fields across both databases
@@ -797,10 +789,6 @@
           </div>
         </div>
 
-        <div class="date-filter-actions">
-          <button type="button" class="date-clear-btn" onclick="clearDateRange()">Clear All</button>
-          <button type="button" class="date-preset-btn" onclick="setCurrentYear()">Current Year</button>
-        </div>
 
         <div class="date-filter-help">
           <strong>Examples:</strong> Select "2024" only = Jan 1, 2024 to now | Select "2024 + March" = March 2024 only<br>
@@ -854,7 +842,6 @@
     const searchButton = document.getElementById('searchButton'); // Advanced search
     const quickSearchInput = document.getElementById('quickSearchInput'); // Quick search
     const quickSearchButton = document.getElementById('quickSearchButton'); // Quick search
-    const fieldSearchButton = document.getElementById('fieldSearchButton'); // Quick search main button
     const loading = document.getElementById('loading');
     const resultsSection = document.getElementById('resultsSection');
     const resultsCount = document.getElementById('resultsCount');
@@ -891,7 +878,6 @@
     });
 
     // Quick search event listeners
-    fieldSearchButton.addEventListener('click', performQuickSearch);
     quickSearchButton.addEventListener('click', performQuickSearch);
     quickSearchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
@@ -911,10 +897,6 @@
       quickSearchInput.focus();
     }
 
-    // Clear quick search - make globally accessible
-    window.clearQuickSearch = function() {
-      quickSearchInput.value = '';
-    }
 
     // Initialize date dropdowns
     function initializeDateDropdowns() {
