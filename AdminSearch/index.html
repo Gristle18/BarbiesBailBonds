@@ -404,7 +404,8 @@
       <div class="loading-spinner"></div>
       <div id="loadingText">Searching across all client records...</div>
       <div style="font-size: 12px; color: var(--muted); margin-top: 10px;">
-        Generating embedding for search query and comparing with 4,246 records
+        Generating embedding for search query and comparing with 4,246 records<br>
+        <em>May take up to 3 minutes depending on OpenAI API response time</em>
       </div>
     </div>
 
@@ -496,8 +497,8 @@
         const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
         const timeoutId = setTimeout(() => {
           cleanup();
-          reject(new Error('JSONP request timeout after 2 minutes'));
-        }, 120000); // Extended to 2 minutes for OpenAI processing
+          reject(new Error('JSONP request timeout after 3 minutes'));
+        }, 180000); // Extended to 3 minutes for OpenAI processing
 
         function cleanup() {
           clearTimeout(timeoutId);
@@ -666,17 +667,10 @@
           data = await makeJSONPRequest(CONFIG.SEARCH_ENDPOINT, requestPayload);
           debugLog('📨 JSONP response received', { success: data.success, hasResults: !!data.results });
         } catch (jsonpError) {
-          debugLog('⚠️ JSONP failed, trying regular fetch as backup', { error: jsonpError.message });
+          debugLog('⚠️ JSONP failed - Google Sites CORS restrictions prevent fetch fallback', { error: jsonpError.message });
 
-          // Fallback to regular fetch
-          const fetchResponse = await fetch(CONFIG.SEARCH_ENDPOINT, requestOptions);
-
-          if (!fetchResponse.ok) {
-            throw new Error(`HTTP ${fetchResponse.status}: ${fetchResponse.statusText}`);
-          }
-
-          data = await fetchResponse.json();
-          debugLog('📨 Fetch response received', { success: data.success, hasResults: !!data.results });
+          // On Google Sites, fetch will likely fail due to CORS, so provide helpful error
+          throw new Error(`Search timed out after 2 minutes. This may indicate:\n1. OpenAI API is taking longer than usual\n2. Large dataset processing is slow\n3. Try a shorter, more specific search term\n\nOriginal error: ${jsonpError.message}`);
         }
 
         debugLog('✅ JSON parsed successfully', {
