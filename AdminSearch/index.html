@@ -1229,7 +1229,7 @@
       // Get all fields from completeData, excluding empty ones
       const fields = Object.entries(result.completeData)
         .filter(([key, value]) => value && value.toString().trim() !== '')
-        .sort(([a], [b]) => a.localeCompare(b)) // Sort alphabetically
+        .sort(([a], [b]) => b.localeCompare(a)) // Sort alphabetically (Z to A)
         .map(([key, value]) => `
           <div class="result-field-complete">
             <div class="result-label">${escapeHtml(key)}</div>
