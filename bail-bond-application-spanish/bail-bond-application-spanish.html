@@ -8,6 +8,7 @@
     * { box-sizing: border-box; }
     body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:transparent; color:#fff; overflow: -moz-scrollbars-none; -ms-overflow-style: none; }
     body::-webkit-scrollbar { width: 0px; background: transparent; }
+    .invisible-spacer { height: 200vh; width: 100%; background: #000000; visibility: visible; pointer-events: none; }
     .wrap { max-width: 880px; margin: 24px auto 40px; padding: 0 16px; }
     .section { margin: 28px 0; padding: 20px; display:none; background:transparent; }
     .section.active { display:block; }
@@ -30,328 +31,131 @@
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
     .loading-indicator { display: none; text-align: center; margin: 20px 0; color: #F5A00D; font-weight: 600; }
     @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
-    
-    /* Invisible spacer to double page height */
-    .invisible-spacer {
-        height: 200vh; /* Double the viewport height */
-        width: 100%;
-        background: #000000; /* Pure black */
-        visibility: visible;
-        pointer-events: none;
-    }
 
     /* Chatbot Widget Styles */
-    .chat-container {
-        position: fixed !important;
-        top: 550px !important;
-        right: clamp(12px, 3vw, 28px) !important;
-        bottom: auto !important;
-        left: auto !important;
-        transform: none !important;
-        z-index: 1000;
-        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
-
-    /* Adjust launcher vertical offset for tablet and phone */
-    @media (max-width: 1024px) {
-        .chat-container { top: 525px !important; }
-    }
-    @media (max-width: 600px) {
-        .chat-container { top: 500px !important; }
-    }
-
-    .chat-button {
-        width: clamp(60px, 9vw, 84px);
-        height: clamp(60px, 9vw, 84px);
-        background: linear-gradient(135deg, #F28C00, #D67700);
-        border: none;
-        border-radius: 50%;
-        color: white;
-        font-size: clamp(22px, 4vw, 30px);
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 4px 15px rgba(242, 140, 0, 0.4);
-        transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-        animation: pulse 2s infinite;
-    }
-
-    .chat-button:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 20px rgba(242, 140, 0, 0.6);
-    }
-
-    .chat-button.active {
-        transform: rotate(45deg);
-        background: #666;
-    }
-
-    @keyframes pulse {
-        0%, 100% { box-shadow: 0 4px 15px rgba(242, 140, 0, 0.4); }
-        50% { box-shadow: 0 4px 15px rgba(242, 140, 0, 0.8), 0 0 0 10px rgba(242, 140, 0, 0.1); }
-    }
-
-    .chat-interface {
-        display: none;
-        position: absolute;
-        bottom: 80px;
-        right: 0;
-        width: 350px;
-        height: 500px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-        overflow: hidden;
-        opacity: 0;
-        transform: translateY(20px) scale(0.9);
-        transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-    }
-
-    .chat-interface.open {
-        display: flex;
-        flex-direction: column;
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-
-    .chat-header {
-        background: linear-gradient(135deg, #F28C00, #D67700);
-        color: white;
-        padding: 16px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .chat-title {
-        font-size: 16px;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .chat-subtitle {
-        font-size: 12px;
-        opacity: 0.8;
-        margin: 2px 0 0 0;
-    }
-
-    .chat-close {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 18px;
-        cursor: pointer;
-        padding: 4px 8px;
-        border-radius: 4px;
-        transition: background 0.2s;
-    }
-
-    .chat-close:hover {
-        background: rgba(255,255,255,0.2);
-    }
-
-    .chat-messages {
-        flex: 1;
-        overflow-y: auto;
-        padding: 16px;
-        background: #f8f9fa;
-        scrollbar-width: thin;
-        scrollbar-color: #ddd transparent;
-    }
-
-    .chat-messages::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    .chat-messages::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .chat-messages::-webkit-scrollbar-thumb {
-        background: #ddd;
-        border-radius: 2px;
-    }
-
-    .chat-input-container {
-        padding: 12px 16px;
-        background: white;
-        border-top: 1px solid #eee;
-        display: flex;
-        gap: 8px;
-        align-items: flex-end;
-    }
-
-    .chat-input {
-        flex: 1;
-        padding: 8px 12px;
-        border: 2px solid #eee;
-        border-radius: 20px;
-        font-size: 14px;
-        outline: none;
-        resize: none;
-        max-height: 80px;
-        transition: border-color 0.2s;
-    }
-
-    .chat-input:focus {
-        border-color: #F28C00;
-    }
-
-    .chat-send {
-        background: #F28C00;
-        color: white;
-        border: none;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-        font-size: 16px;
-    }
-
-    .chat-send:hover:not(:disabled) {
-        background: #D67700;
-        transform: scale(1.1);
-    }
-
-    .chat-send:disabled {
-        background: #ccc;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .message {
-        margin-bottom: 12px;
-        display: flex;
-        gap: 8px;
-        align-items: flex-end;
-    }
-
-    .message.user {
-        flex-direction: row-reverse;
-    }
-
-    .message-bubble {
-        max-width: 75%;
-        padding: 10px 14px;
-        border-radius: 18px;
-        font-size: 14px;
-        line-height: 1.4;
-        word-wrap: break-word;
-    }
-
-    .message.assistant .message-bubble {
-        background: white;
-        color: #333;
-        border-bottom-left-radius: 4px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .message.user .message-bubble {
-        background: linear-gradient(135deg, #F28C00, #D67700);
-        color: white;
-        border-bottom-right-radius: 4px;
-    }
-
-    .message-avatar {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        flex-shrink: 0;
-    }
-
-    .message.assistant .message-avatar {
-        background: #F28C00;
-        color: white;
-    }
-
-    .message.user .message-avatar {
-        background: #666;
-        color: white;
-    }
-
-    .welcome-message {
-        text-align: center;
-        color: #666;
-        padding: 30px 20px;
-        font-size: 14px;
-        line-height: 1.6;
-    }
-
-    .typing-indicator {
-        display: none;
-        padding: 8px 16px;
-        color: #666;
-        font-size: 12px;
-        font-style: italic;
-    }
-
-    .typing-dots {
-        display: inline-flex;
-        gap: 2px;
-        margin-left: 4px;
-    }
-
-    .typing-dots span {
-        width: 4px;
-        height: 4px;
-        background: #666;
-        border-radius: 50%;
-        animation: typing 1.4s infinite ease-in-out;
-    }
-
+    .chat-container { position: fixed !important; top: 550px !important; right: clamp(12px, 3vw, 28px) !important; bottom: auto !important; left: auto !important; transform: none !important; z-index: 1000; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    @media (max-width: 1024px) { .chat-container { top: 525px !important; } }
+    @media (max-width: 600px) { .chat-container { top: 500px !important; } }
+    .chat-button { width: clamp(60px, 9vw, 84px); height: clamp(60px, 9vw, 84px); background: linear-gradient(135deg, #F28C00, #D67700); border: none; border-radius: 50%; color: white; font-size: clamp(22px, 4vw, 30px); cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(242, 140, 0, 0.4); transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); animation: pulse 2s infinite; }
+    .chat-button:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(242, 140, 0, 0.6); }
+    .chat-button.active { transform: rotate(45deg); background: #666; }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 4px 15px rgba(242, 140, 0, 0.4); } 50% { box-shadow: 0 4px 15px rgba(242, 140, 0, 0.8), 0 0 0 10px rgba(242, 140, 0, 0.1); } }
+    .chat-interface { display: none; position: absolute; bottom: 80px; right: 0; width: 350px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); overflow: hidden; opacity: 0; transform: translateY(20px) scale(0.9); transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); }
+    .chat-interface.open { display: flex; flex-direction: column; opacity: 1; transform: translateY(0) scale(1); }
+    .chat-header { background: linear-gradient(135deg, #F28C00, #D67700); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .chat-title { font-size: 16px; font-weight: 600; margin: 0; }
+    .chat-subtitle { font-size: 12px; opacity: 0.8; margin: 2px 0 0 0; }
+    .chat-close { background: none; border: none; color: white; font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s; }
+    .chat-close:hover { background: rgba(255,255,255,0.2); }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; background: #f8f9fa; scrollbar-width: thin; scrollbar-color: #ddd transparent; }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+    .chat-input-container { padding: 12px 16px; background: white; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: flex-end; }
+    .chat-input { flex: 1; padding: 8px 12px; border: 2px solid #eee; border-radius: 20px; font-size: 14px; outline: none; resize: none; max-height: 80px; transition: border-color 0.2s; }
+    .chat-input:focus { border-color: #F28C00; }
+    .chat-send { background: #F28C00; color: white; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 16px; }
+    .chat-send:hover:not(:disabled) { background: #D67700; transform: scale(1.1); }
+    .chat-send:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+    .message { margin-bottom: 12px; display: flex; gap: 8px; align-items: flex-end; }
+    .message.user { flex-direction: row-reverse; }
+    .message-bubble { max-width: 75%; padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.4; word-wrap: break-word; }
+    .message.assistant .message-bubble { background: white; color: #333; border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .message.user .message-bubble { background: linear-gradient(135deg, #F28C00, #D67700); color: white; border-bottom-right-radius: 4px; }
+    .message-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .message.assistant .message-avatar { background: #F28C00; color: white; }
+    .message.user .message-avatar { background: #666; color: white; }
+    .welcome-message { text-align: center; color: #666; padding: 30px 20px; font-size: 14px; line-height: 1.6; }
+    .typing-indicator { display: none; padding: 8px 16px; color: #666; font-size: 12px; font-style: italic; }
+    .typing-dots { display: inline-flex; gap: 2px; margin-left: 4px; }
+    .typing-dots span { width: 4px; height: 4px; background: #666; border-radius: 50%; animation: typing 1.4s infinite ease-in-out; }
     .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
     .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
-
-    @keyframes typing {
-        0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-        40% { transform: scale(1); opacity: 1; }
-    }
-
-    /* Mobile Responsive for Chatbot */
-    @media (max-width: 600px) {
-        .chat-interface {
-            height: 400px !important; /* 100px shorter on mobile */
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .chat-interface {
-            width: calc(100vw - 40px);
-            height: calc(100vh - 120px);
-            bottom: 80px;
-            right: -10px;
-        }
-        
-        .chat-container {
-            bottom: 20px;
-            right: 20px;
-        }
-    }
+    @keyframes typing { 0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+    @media (max-width: 600px) { .chat-interface { height: 400px !important; } }
+    @media (max-width: 480px) { .chat-interface { width: calc(100vw - 40px); height: calc(100vh - 120px); bottom: 80px; right: -10px; } .chat-container { bottom: 20px; right: 20px; } }
   </style>
 </head>
 <body>
   <div class="wrap">
+    <!-- Progress Bar -->
+    <div style="background:#fff; padding:20px; border-radius:12px; margin-bottom:30px;">
+      <div style="color:#333; font-size:16px; font-weight:600; margin-bottom:10px; text-align:center;">Progreso de la Solicitud</div>
+      <div style="background:#eee; height:8px; border-radius:4px; overflow:hidden;">
+        <div id="progressBar" style="background:#F28C00; height:100%; width:0%; transition:width 0.3s ease;"></div>
+      </div>
+      <div id="progressText" style="color:#666; font-size:14px; text-align:center; margin-top:8px;">Paso 1 de 23</div>
+    </div>
+
     <form id="f" novalidate>
 
-      <!-- STEP 1: Intake (2 questions) -->
+      <!-- STEP 1: ID Upload -->
       <div class="section active" data-step="0">
+        <div style="text-align:center; margin-bottom:30px;">
+          <h2 style="color:#fff; font-size:28px; margin-bottom:15px; font-weight:700;">📸 Subir su Identificación</h2>
+          <p style="color:#fff; font-size:16px; line-height:1.5;">
+            Por favor tome fotos del frente y reverso de su identificación emitida por el gobierno.
+          </p>
+        </div>
+
+        <div style="background:#fff; padding:30px; border-radius:12px; margin:20px 0;">
+          <div class="grid" style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:0 -10px;">
+            <style>
+              @media (max-width: 768px) {
+                .grid { grid-template-columns: 1fr !important; }
+              }
+            </style>
+
+            <!-- ID Front -->
+            <div style="text-align:center;">
+              <div style="font-size:18px; font-weight:600; margin-bottom:15px; color:#333;">ID Frente</div>
+              <div style="border:2px dashed #ddd; padding:30px 20px; border-radius:8px; background:#f9f9f9; min-height:180px; display:flex; flex-direction:column; justify-content:center;">
+                <div style="font-size:16px; margin-bottom:10px; color:#666; font-weight:600;">ID FRENTE</div>
+                <input type="file" id="idFront" accept="image/*" style="display:none;" onchange="handleIDUpload(this, 'front')">
+                <button type="button" onclick="document.getElementById('idFront').click()" style="background:#F28C00; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-size:14px; cursor:pointer; margin-bottom:10px;">
+                  Subir Frente
+                </button>
+                <div style="font-size:12px; color:#666;">Solo JPG, PNG</div>
+              </div>
+              <div id="frontPreview" style="margin-top:10px;"></div>
+            </div>
+
+            <!-- ID Back -->
+            <div style="text-align:center;">
+              <div style="font-size:18px; font-weight:600; margin-bottom:15px; color:#333;">ID Reverso</div>
+              <div style="border:2px dashed #ddd; padding:30px 20px; border-radius:8px; background:#f9f9f9; min-height:180px; display:flex; flex-direction:column; justify-content:center;">
+                <div style="font-size:16px; margin-bottom:10px; color:#666; font-weight:600;">ID REVERSO</div>
+                <input type="file" id="idBack" accept="image/*" style="display:none;" onchange="handleIDUpload(this, 'back')">
+                <button type="button" onclick="document.getElementById('idBack').click()" style="background:#F28C00; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-size:14px; cursor:pointer; margin-bottom:10px;">
+                  Subir Reverso
+                </button>
+                <div style="font-size:12px; color:#666;">Solo JPG, PNG</div>
+              </div>
+              <div id="backPreview" style="margin-top:10px;"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <div style="background:#fff2d1; padding:20px; border-radius:8px; margin:20px 0; text-align:center;">
+          <div style="color:#333; font-weight:600; margin-bottom:8px;">¿Tiene Problemas?</div>
+          <div style="color:#666;">Envíe fotos directamente por texto a <span style="color:#F28C00; font-weight:600; white-space: nowrap;">561-247-0018</span> o llame al <a href="tel:+15612470018" style="color:#F28C00; text-decoration:none; white-space: nowrap;">561-247-0018</a></div>
+        </div>
+
+        <div class="step-actions">
+          <button class="primary" type="button" data-next id="uploadNextBtn">Continuar</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Intake (2 questions) -->
+      <div class="section" data-step="1">
         <div class="grid">
           <div class="full">
-            <label for="whoAreYou">¿Quién eres?<span class="req">*</span></label>
+            <label for="whoAreYou">¿Quién es usted?<span class="req">*</span></label>
             <select id="whoAreYou" name="whoAreYou" required>
               <option value="" hidden>Seleccionar…</option>
               <option value="Indemnitor">Garante — garantía financiera que promete al tribunal que el acusado comparecerá</option>
-              <option value="Defendant">Acusado — la persona en la cárcel / siendo afianzada</option>
+              <option value="Defendant">Acusado — la persona en la cárcel / siendo afianzado</option>
             </select>
           </div>
           <div class="full">
@@ -375,11 +179,11 @@
             <input id="indemnitorName" name="indemnitorName" required />
           </div>
           <div>
-            <label for="relation">¿Su Relación con la Persona en la Cárcel y/o Siendo Afianzada?<span class="req">*</span></label>
+            <label for="relation">Su Relación con la Persona en la Cárcel y/o Siendo Afianzado?<span class="req">*</span></label>
             <input id="relation" name="relation" required />
           </div>
           <div>
-            <label for="indemnitorDob">¿Cuál es Su Fecha de Nacimiento?<span class="req">*</span></label>
+            <label for="indemnitorDob">¿Cuál es Su Fecha de Nacimiento<span class="req">*</span></label>
             <input id="indemnitorDob" name="indemnitorDob" type="date" required />
           </div>
           <div>
@@ -387,8 +191,8 @@
             <input id="indemnitorSsn" name="indemnitorSsn" inputmode="numeric" />
           </div>
           <div>
-            <label for="indemnitorDl">Licencia de Conducir (o ID) #<span class="req">*</span></label>
-            <input id="indemnitorDl" name="indemnitorDl" required />
+            <label for="indemnitorDl">Número de Licencia de Conducir (o ID)</label>
+            <input id="indemnitorDl" name="indemnitorDl" />
           </div>
         </div>
         <div class="step-actions">
@@ -401,11 +205,11 @@
       <div class="section" data-step="2">
         <div class="grid">
           <div>
-            <label for="indemnitorCell">Teléfono Celular #<span class="req">*</span></label>
+            <label for="indemnitorCell">Número de Celular<span class="req">*</span></label>
             <input id="indemnitorCell" name="indemnitorCell" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
-            <label for="indemnitorHomePhone">Teléfono de Casa #</label>
+            <label for="indemnitorHomePhone">Número de Casa</label>
             <input id="indemnitorHomePhone" name="indemnitorHomePhone" type="tel" inputmode="tel" data-phone />
           </div>
           <div>
@@ -417,7 +221,8 @@
             <input id="indemnitorAddress" name="indemnitorAddress" required />
           </div>
           <div>
-            <label for="indemnitorHowLong">¿Cuánto Tiempo Viviendo en la Dirección Actual?<span class="req">*</span></label>
+            <label for="indemnitorHowLong">¿Cuánto Tiempo Viviendo en la Dirección Actual<span class="req">*</span></label>
+            <div class="hint">Ejemplos: "2 años", "6 meses", "Menos de 1 año", "Más de 3 años"</div>
             <input id="indemnitorHowLong" name="indemnitorHowLong" required />
           </div>
         </div>
@@ -432,6 +237,7 @@
         <div class="grid">
           <div>
             <label for="indemnitorWorkType">Tipo de Trabajo<span class="req">*</span></label>
+            <div class="hint">Ejemplos: "Gerente", "Trabajador de Construcción", "Enfermera", "Trabajador Independiente", "Jubilado"</div>
             <input id="indemnitorWorkType" name="indemnitorWorkType" required />
           </div>
           <div>
@@ -439,15 +245,16 @@
             <input id="indemnitorEmployer" name="indemnitorEmployer" required />
           </div>
           <div>
-            <label for="indemnitorWorkPhone">Teléfono del Trabajo # (NO será llamado)</label>
+            <label for="indemnitorWorkPhone">Número de Trabajo (NO será llamado)</label>
             <input id="indemnitorWorkPhone" name="indemnitorWorkPhone" type="tel" inputmode="tel" data-phone />
           </div>
           <div class="full">
-            <label for="indemnitorWorkAddress">Dirección del Trabajo</label>
+            <label for="indemnitorWorkAddress">Dirección de Trabajo</label>
             <input id="indemnitorWorkAddress" name="indemnitorWorkAddress" />
           </div>
           <div class="full">
             <label for="indemnitorVehicle">Vehículo del Garante<span class="req">*</span></label>
+            <div class="hint">Ejemplos: "Honda Civic 2018", "Ford F-150 2020", "Sin vehículo"</div>
             <input id="indemnitorVehicle" name="indemnitorVehicle" required />
           </div>
         </div>
@@ -476,11 +283,11 @@
             <input id="defendantDob" name="defendantDob" type="date" required />
           </div>
           <div>
-            <label for="defendantSsn">Número de Seguro Social # (opcional)</label>
+            <label for="defendantSsn">Número de Seguro Social (opcional)</label>
             <input id="defendantSsn" name="defendantSsn" inputmode="numeric" />
           </div>
           <div>
-            <label for="defendantDl">Licencia de Conducir o ID # (opcional)</label>
+            <label for="defendantDl">Número de Licencia de Conducir o ID (opcional)</label>
             <input id="defendantDl" name="defendantDl" />
           </div>
         </div>
@@ -515,11 +322,11 @@
             </select>
           </div>
           <div>
-            <label for="defendantCell">Teléfono Celular #<span class="req">*</span></label>
+            <label for="defendantCell">Número de Celular<span class="req">*</span></label>
             <input id="defendantCell" name="defendantCell" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
-            <label for="defendantHomePhone">Teléfono de Casa # (Omitir si no tiene)</label>
+            <label for="defendantHomePhone">Número de Casa (Omitir si no tiene)</label>
             <input id="defendantHomePhone" name="defendantHomePhone" type="tel" inputmode="tel" data-phone />
           </div>
         </div>
@@ -541,7 +348,8 @@
             <input id="defendantAddress" name="defendantAddress" required />
           </div>
           <div>
-            <label for="defendantHowLong">¿Cuánto Tiempo ha Vivido el Acusado en la Dirección Actual?<span class="req">*</span></label>
+            <label for="defendantHowLong">¿Cuánto Tiempo ha Vivido el Acusado en la Dirección Actual<span class="req">*</span></label>
+            <div class="hint">Ejemplos: "2 años", "6 meses", "Menos de 1 año", "Más de 3 años"</div>
             <input id="defendantHowLong" name="defendantHowLong" required />
           </div>
           <div>
@@ -569,6 +377,7 @@
         <div class="grid">
           <div>
             <label for="defendantWorkType">Tipo de Trabajo del Acusado</label>
+            <div class="hint">Ejemplos: "Gerente", "Trabajador de Construcción", "Enfermera", "Trabajador Independiente", "Desempleado"</div>
             <input id="defendantWorkType" name="defendantWorkType" />
           </div>
           <div>
@@ -576,11 +385,11 @@
             <input id="defendantEmployer" name="defendantEmployer" />
           </div>
           <div>
-            <label for="defendantWorkPhone">Teléfono del Trabajo del Acusado # (NO será llamado)</label>
+            <label for="defendantWorkPhone">Número de Trabajo del Acusado (NO será llamado)</label>
             <input id="defendantWorkPhone" name="defendantWorkPhone" type="tel" inputmode="tel" data-phone />
           </div>
           <div class="full">
-            <label for="defendantWorkAddress">Dirección del Trabajo del Acusado</label>
+            <label for="defendantWorkAddress">Dirección de Trabajo del Acusado</label>
             <input id="defendantWorkAddress" name="defendantWorkAddress" />
           </div>
           <div class="full">
@@ -599,15 +408,16 @@
         <div class="grid">
           <div class="full">
             <label>Por favor Seleccione o Toque con su Dedo SOLO si la respuesta es "Sí":</label>
-            <div class="hint">Estas preguntas son sobre la persona siendo afianzada</div>
+            <div class="hint">Estas preguntas son sobre la persona siendo afianzada. Solo marque las casillas si la respuesta es SÍ.</div>
             <div class="checks">
-              <label><input type="checkbox" id="q_fta" name="q_fta" value="Yes"> ¿Ha Faltado a Comparecer en la Corte en el Pasado?</label>
-              <label><input type="checkbox" id="q_supervision" name="q_supervision" value="Yes"> ¿Está Actualmente en Libertad Condicional, Libertad Vigilada, o SOR?</label>
-              <label><input type="checkbox" id="q_otherBond" name="q_otherBond" value="Yes"> ¿Está Actualmente en Fianza por Otro Caso?</label>
+              <label><input type="checkbox" id="q_fta" name="q_fta" value="Yes"> ¿Ha Faltado a Comparecer ante el Tribunal en el Pasado?</label>
+              <label><input type="checkbox" id="q_supervision" name="q_supervision" value="Yes"> ¿Está Actualmente en Libertad Condicional, Libertad Vigilada, o SOR (Registro de Delincuente Sexual)?</label>
+              <label><input type="checkbox" id="q_otherBond" name="q_otherBond" value="Yes"> ¿Está Actualmente Bajo Fianza por Otro Caso?</label>
             </div>
           </div>
           <div class="full">
-            <label for="defendantVehicle">Vehículo del Acusado para llegar a la Corte<span class="req">*</span></label>
+            <label for="defendantVehicle">Vehículo del Acusado para ir al Tribunal<span class="req">*</span></label>
+            <div class="hint">Ejemplos: "Honda Civic 2018", "Familiar lo llevará", "Transporte público", "Uber/Taxi"</div>
             <input id="defendantVehicle" name="defendantVehicle" required />
           </div>
         </div>
@@ -621,7 +431,7 @@
       <div class="section" data-step="9">
         <div class="grid">
           <div>
-            <label for="relationshipStatus">Estado de Relación</label>
+            <label for="relationshipStatus">Estado de la Relación</label>
             <select id="relationshipStatus" name="relationshipStatus">
               <option value="" hidden>Seleccionar…</option>
               <option>Soltero</option>
@@ -641,11 +451,12 @@
             <input id="partnerDob" name="partnerDob" type="date" />
           </div>
           <div>
-            <label for="partnerCell">Teléfono Celular # de la Pareja</label>
+            <label for="partnerCell">Número de Celular de la Pareja</label>
             <input id="partnerCell" name="partnerCell" type="tel" inputmode="tel" data-phone />
           </div>
           <div>
             <label for="partnerWorkType">Tipo de Trabajo de la Pareja</label>
+            <div class="hint">Ejemplos: "Gerente", "Trabajador de Construcción", "Enfermera", "Trabajador Independiente", "Desempleado"</div>
             <input id="partnerWorkType" name="partnerWorkType" />
           </div>
         </div>
@@ -677,7 +488,7 @@
             <input id="motherName" name="motherName" />
           </div>
           <div>
-            <label for="motherPhone">Teléfono # de la Madre</label>
+            <label for="motherPhone">Número de la Madre</label>
             <input id="motherPhone" name="motherPhone" type="tel" inputmode="tel" data-phone />
           </div>
           <div class="full">
@@ -689,7 +500,7 @@
             <input id="fatherName" name="fatherName" />
           </div>
           <div>
-            <label for="fatherPhone">Teléfono # del Padre</label>
+            <label for="fatherPhone">Número del Padre</label>
             <input id="fatherPhone" name="fatherPhone" type="tel" inputmode="tel" data-phone />
           </div>
         </div>
@@ -721,7 +532,7 @@
             <input id="sibling1Name" name="sibling1Name" />
           </div>
           <div>
-            <label for="sibling1Phone">1. Teléfono # del Hermano/Hermana</label>
+            <label for="sibling1Phone">1. Número del Hermano/Hermana</label>
             <input id="sibling1Phone" name="sibling1Phone" type="tel" inputmode="tel" data-phone />
           </div>
           <div>
@@ -729,7 +540,7 @@
             <input id="sibling2Name" name="sibling2Name" />
           </div>
           <div>
-            <label for="sibling2Phone">2. Teléfono # del Hermano/Hermana</label>
+            <label for="sibling2Phone">2. Número del Hermano/Hermana</label>
             <input id="sibling2Phone" name="sibling2Phone" type="tel" inputmode="tel" data-phone />
           </div>
         </div>
@@ -751,7 +562,7 @@
             <input id="ref1Relation" name="ref1Relation" required />
           </div>
           <div>
-            <label for="ref1Phone">Referencia #1 - Teléfono #<span class="req">*</span></label>
+            <label for="ref1Phone">Referencia #1 - Número<span class="req">*</span></label>
             <input id="ref1Phone" name="ref1Phone" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
@@ -773,7 +584,7 @@
       <div class="section" data-step="15">
         <div class="grid">
           <div>
-            <label for="ref2Phone">Referencia #2 - Teléfono #<span class="req">*</span></label>
+            <label for="ref2Phone">Referencia #2 - Número<span class="req">*</span></label>
             <input id="ref2Phone" name="ref2Phone" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
@@ -785,7 +596,7 @@
             <input id="ref3Relation" name="ref3Relation" required />
           </div>
           <div>
-            <label for="ref3Phone">Referencia #3 - Teléfono #<span class="req">*</span></label>
+            <label for="ref3Phone">Referencia #3 - Número<span class="req">*</span></label>
             <input id="ref3Phone" name="ref3Phone" type="tel" inputmode="tel" data-phone required />
           </div>
         </div>
@@ -803,19 +614,15 @@
             <input id="emergency1Name" name="emergency1Name" required />
           </div>
           <div>
-            <label for="emergency1Phone">Teléfono de Emergencia #1<span class="req">*</span></label>
+            <label for="emergency1Phone">Número de Emergencia #1<span class="req">*</span></label>
             <input id="emergency1Phone" name="emergency1Phone" type="tel" inputmode="tel" data-phone required />
-          </div>
-          <div class="full">
-            <label for="emergency1Relation">Relación de Emergencia #1<span class="req">*</span></label>
-            <input id="emergency1Relation" name="emergency1Relation" required />
           </div>
           <div>
             <label for="emergency2Name">Contacto de Emergencia #2<span class="req">*</span></label>
             <input id="emergency2Name" name="emergency2Name" required />
           </div>
           <div>
-            <label for="emergency2Phone">Teléfono de Emergencia #2<span class="req">*</span></label>
+            <label for="emergency2Phone">Número de Emergencia #2<span class="req">*</span></label>
             <input id="emergency2Phone" name="emergency2Phone" type="tel" inputmode="tel" data-phone required />
           </div>
         </div>
@@ -825,41 +632,31 @@
         </div>
       </div>
 
-      <!-- STEP 8B: Emergency Contacts (1) -->
-      <div class="section" data-step="17">
-        <div class="grid">
-          <div class="full">
-            <label for="emergency2Relation">Relación de Emergencia #2<span class="req">*</span></label>
-            <input id="emergency2Relation" name="emergency2Relation" required />
-          </div>
-        </div>
-        <div class="step-actions">
-          <button class="ghost" type="button" data-back>Atrás</button>
-          <button class="primary" type="button" data-next>Siguiente</button>
-        </div>
-      </div>
 
       <!-- STEP 9: Terms and Conditions -->
       <div class="section" data-step="18">
         <div class="agreement-text">
-Términos y Condiciones de la Solicitud para Fianza de Comparecencia
+Términos y Condiciones de Solicitud para Fianza de Comparecencia
 
-Los siguientes términos y condiciones para la Fianza de Comparecencia para la cual U.S. Fire Insurance Company (USFIC) o su Agente y las partes acuerdan que dicha fianza de comparecencia está condicionada al cumplimiento total de todos dichos términos y condiciones y es parte de dicha fianza y solicitud por lo tanto.
+Los siguientes términos y condiciones para la Fianza de Comparecencia para la cual U.S. Fire Insurance Company (USFIC) o su Agente y las partes acuerdan que dicha fianza de comparecencia está condicionada al cumplimiento completo de todos dichos términos y condiciones y es parte de dicha fianza y solicitud por lo tanto.
 
-1. USFIC como la Compañía de Fianza, a través de su agente debidamente designado, tendrá control y jurisdicción sobre el principal durante el término para el cual la fianza es ejecutada y tendrá el derecho de aprehender, arrestar y entregar el principal a los funcionarios apropiados en cualquier momento según lo provisto por la ley.
+1. USFIC como la Compañía de Fianzas, a través de su agente debidamente designado, tendrá control y jurisdicción sobre el principal durante el término por el cual se ejecuta la fianza y tendrá el derecho de aprehender, arrestar y entregar al principal a los funcionarios apropiados en cualquier momento según lo dispuesto por la ley.
 
-2. En el evento de que la entrega del principal sea hecha antes del tiempo fijado para las comparecencias del principal, y por razones distintas a las enumeradas abajo en el párrafo 3, entonces el principal tendrá derecho a un reembolso de la prima de la fianza.
+2. En caso de que se haga la entrega del principal antes del tiempo establecido para las comparecencias del principal, y por razones distintas a las enumeradas a continuación en el párrafo 3, entonces el principal tendrá derecho a un reembolso de la prima de la fianza.
 
-3. Se entiende y acuerda que la ocurrencia de cualquiera de los siguientes eventos constituirá una violación de la obligación del principal a USFIC aquí bajo, y USFIC tendrá el derecho de inmediatamente aprehender, arrestar, y entregar al principal, y el principal no tendrá derecho a ningún reembolso de prima en absoluto. Dichos eventos que constituirán una violación de las obligaciones del principal aquí bajo son:
-   (a) Si el principal debe partir de la jurisdicción de la corte sin el consentimiento escrito de la corte y la Compañía de Fianza o su Agente.
-   (b) Si el principal debe mudarse de una dirección a otra sin notificar a la Compañía de Fianza o su Agente por escrito antes de tal mudanza.
-   (c) Si el principal debe cometer cualquier acto que constituya evidencia razonable de la intención del principal de causar una pérdida de dicha fianza.
-   (d) Si el principal es arrestado e encarcelado por cualquier ofensa distinta a una violación menor de tráfico.
-   (e) Si el principal debe hacer cualquier declaración falsa material en la solicitud para fianza de comparecencia.
+3. Se entiende y acuerda que la ocurrencia de cualquiera de los siguientes eventos constituirá un incumplimiento de la obligación del principal hacia USFIC en este documento, y USFIC tendrá el derecho de aprehender, arrestar y entregar inmediatamente al principal, y el principal no tendrá derecho a ningún reembolso de prima en absoluto. Dichos eventos que constituirán un incumplimiento de las obligaciones del principal en este documento son:
+   (a) Si el principal se va de la jurisdicción del tribunal sin el consentimiento por escrito del tribunal y la Compañía de Fianzas o su Agente.
+   (b) Si el principal se muda de una dirección a otra sin notificar a la Compañía de Fianzas o su Agente por escrito antes de dicha mudanza.
+   (c) Si el principal comete cualquier acto que constituya evidencia razonable de la intención del principal de causar una pérdida de dicha fianza.
+   (d) Si el principal es arrestado y encarcelado por cualquier delito que no sea una violación menor de tránsito.
+   (e) Si el principal hace cualquier declaración material falsa en la solicitud para fianza de comparecencia.
 
-Bajo penas de perjurio, declaro que he leído lo anterior, y la información proporcionada es verdadera y correcta sin reservas. La información y representaciones hechas en esta Solicitud son con el propósito de inducir a la Fianza a emprender la(s) fianza(s) para la cual he aplicado con la intención de que la Fianza confíe completamente en la información y representaciones contenidas aquí. Acepto indemnizar y mantener libre de daño a la Compañía de Fianza y sus Agentes por todas y cualesquiera pérdidas que puedan surgir de la ejecución de la(s) fianza(s) solicitada(s) aquí, a menos que esté prohibido por la ley o regulación aplicable.
+Bajo penas de perjurio, declaro que he leído lo anterior, y la información proporcionada es verdadera y correcta sin reserva. La información y representaciones hechas en esta Solicitud son con el propósito de inducir a la Fianza a emprender la(s) fianza(s) para la(s) cual(es) he solicitado con la intención de que la Fianza confíe completamente en la información y representaciones contenidas en este documento. Acepto indemnizar y eximir de responsabilidad a la Compañía de Fianzas y sus Agentes por todas y cualquier pérdidas que puedan surgir de la ejecución de la(s) fianza(s) solicitada(s) en este documento, a menos que esté prohibido por ley o regulación aplicable.
 
 ***SOLO PROCEDA SI ESTÁ DE ACUERDO CON LO ANTERIOR***
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="termsRead" name="termsRead" value="Yes" required> He leído y acepto los Términos y Condiciones anteriores<span class="req">*</span></label>
         </div>
         <div class="step-actions">
           <button class="ghost" type="button" data-back>Atrás</button>
@@ -872,21 +669,24 @@ Bajo penas de perjurio, declaro que he leído lo anterior, y la información pro
         <div class="agreement-text">
 Pagaré Contingente
 
-Por valor recibido el suscrito, conjunta y separadamente promete(n) pagar a U.S. FIRE INSURANCE COMPANY o su Agente, Jerry Casal Bail Bonds, LLC a la demanda la suma principal de la fianza si y solo si ocurre una violación de los términos y condiciones de la fianza de caución o fianzas colocadas en nombre del acusado.
+Por valor recibido el abajo firmante, conjunta y solidariamente promete(n) pagar a U.S. FIRE INSURANCE COMPANY o su Agente, Jerry Casal Bail Bonds, LLC a demanda la suma principal de la fianza si y solo si ocurre un incumplimiento de los términos y condiciones de la fianza de caución o fianzas posteadas en nombre del acusado.
 
-El acusado para el cual esto está siendo presentado escrito anteriormente en este formulario (en adelante "Acusado"), junto con cualquier continuación y modificaciones, cualquier extensión, sustitución, incremento o apelación de los mismos (en adelante "Fianza"), o sobre el pago de cualquier gasto incurrido por el beneficiario o tenedor (en adelante "Beneficiario") para producir al Acusado ante la corte o cortes apropiadas de jurisdicción competente en el caso anterior, con interés sobre la misma a la tasa de CATORCE por ciento (14%), por año, desde la fecha de ocurrencia de la Contingencia antes mencionada, hasta ser pagado completamente. Todos los creadores o endosantes, ahora o en el futuro convirtiéndose en partes de este documento, conjunta y separadamente renuncian a la demanda, aviso de no pago y protesta: y en caso de que este pagaré entre en incumplimiento y sea puesto en manos de un abogado para cobro, los anteriores aceptan pagar honorarios razonables de abogado y todos los otros costos para hacer tal cobro y además aceptan que las cortes de jurisdicción original y cortes de apelación pueden otorgar honorarios razonables de abogado al Beneficiario en el evento de litigio y/o apelaciones.
+El acusado por el cual esto está siendo presentado escrito previamente en este formulario (en adelante "Acusado"), junto con cualquier continuación y modificación, cualquier extensión, sustitución, incremento o apelación de los mismos (en adelante "Fianza"), o al pago de cualquier gasto incurrido por el beneficiario o tenedor (en adelante "Beneficiario") para producir al Acusado ante el tribunal o tribunales apropiados de jurisdicción competente en el caso anterior, con intereses sobre los mismos a la tasa de CATORCE por ciento (14%), por año, desde la fecha de ocurrencia de la Contingencia arriba declarada, hasta que sea pagado completamente. Todos los otorgantes o endosantes, ahora o en el futuro convirtiéndose en partes de este documento, conjunta y solidariamente renuncian a la demanda, aviso de no pago y protesta: y en caso de que esta nota entre en incumplimiento y sea colocada en manos de un abogado para cobranza, los anteriores acuerdan pagar honorarios razonables de abogado y todos los otros costos para hacer dicha cobranza y además acuerdan que los tribunales de jurisdicción original y tribunales de apelación pueden otorgar honorarios razonables de abogado al Beneficiario en caso de litigio y/o apelaciones.
 
-Se acuerda además y se entiende específicamente entre las partes a este Pagaré que actualmente no hay préstamo pendiente o deuda representada por este Pagaré Contingente, y que este Pagaré es dado para asegurar adelantos hasta e incluyendo la cantidad establecida arriba junto con interés si y cuando hay una violación de los términos y condiciones, incluyendo pero no limitado a pérdida o confiscación, de la Fianza. Se acuerda además y se entiende específicamente que este Pagaré se volverá nulo y sin efecto en tal momento como todas las obligaciones bajo la Fianza colocada en nombre del Acusado hayan sido cumplidas y el Beneficiario haya sido descargado de toda responsabilidad y debidamente exonerado por escrito y hasta tal momento como lo mismo ocurra el pagaré permanecerá en plena fuerza y efecto.
+Se acuerda además y se entiende específicamente entre las partes de este Pagaré que actualmente no hay préstamo o deuda pendiente representada por este Pagaré Contingente, y que este Pagaré se da para asegurar adelantos hasta e incluyendo la cantidad establecida anteriormente junto con intereses si y cuando hay un incumplimiento de los términos y condiciones, incluyendo pero no limitado a pérdida o estreatura, de la Fianza. Se acuerda además y se entiende específicamente que este Pagaré se volverá nulo e inválido en el momento en que todas las obligaciones bajo la Fianza posteada en nombre del Acusado hayan sido cumplidas y el Beneficiario haya sido liberado de toda responsabilidad y debidamente exonerado por escrito y hasta que ocurra dicho tiempo la nota permanecerá en plena vigencia y efecto.
 
-(a) Toda y cualquier responsabilidad, pérdida, costos, daños, gastos, primas y honorarios de abogados surgiendo o incurridos por el Beneficiario en conexión con la Fianza titulada arriba, o cualquier otra reconocimiento, empresa u otra obligación, hasta ahora o en el futuro ejecutada, asumida o procurada por el Beneficiario a instancia o solicitud o en nombre de cualquiera de dueño de la propiedad gravada por la Hipoteca asegurando el Pagaré (en adelante, "Dueño") o del nombre del principal; Este Pagaré y la Hipoteca de fecha par con este servirán para asegurar:
-(b) Para el pago de todas las primas en tales Fianzas;
-(c) Para el desempeño de cada acuerdo (incluyendo continuaciones o modificaciones, cualquier extensión, sustitución, incremento o apelación de los mismos, con o sin consentimiento del Dueño) hecho por el Dueño o Acusado en conexión con dichas Fianzas;
-(d) Contra cualquier responsabilidad, pérdida, costos, gastos, y honorarios de abogados en conexión con cualquier reclamo a la seguridad colateral por persona reclamando adversamente al Dueño o a los Principales nombrados en las Fianzas;
-(e) Cualquier y todos los adelantos futuros hechos con o sin consentimiento del Dueño por el Beneficiario en nombre del Acusado incluyendo pero no necesariamente limitado a incrementos, modificaciones, extensiones o sustituciones, o la creación de cualquier obligación futura por el Beneficiario en conexión con el asunto descrito arriba, o cualquier fianza de caución u obligación emprendida por el Beneficiario en nombre del Acusado incluyendo, sin limitar, al colocar una nueva fianza para y en nombre del Acusado en la naturaleza de una fianza de apelación o sustitución extensión o modificación de la Fianza existente.
+(a) Cualquier y toda responsabilidad, pérdida, costos, daños, gastos, primas y honorarios de abogados que surjan o sean incurridos por el Beneficiario en conexión con la Fianza arriba mencionada, o cualquier otra fianza, compromiso u otra obligación, ejecutada, asumida o procurada por el Beneficiario a instancia o solicitud o en nombre del propietario de la propiedad gravada por la Hipoteca que asegura el Pagaré (en adelante, "Propietario") o del nombre del principal; Este Pagaré y la Hipoteca de igual fecha servirán para asegurar:
+(b) Para el pago de todas las primas en dichas Fianzas;
+(c) Para el cumplimiento de cada acuerdo (incluyendo continuaciones o modificaciones, cualquier extensión, sustitución, incremento o apelación de los mismos, con o sin consentimiento del Propietario) hecho por el Propietario o Acusado en conexión con dichas Fianzas;
+(d) Contra cualquier responsabilidad, pérdida, costos, gastos y honorarios de abogados en conexión con cualquier reclamo a la garantía colateral por persona que reclame adversamente al Propietario o a los Principales nombrados en las Fianzas;
+(e) Cualquier y todos los adelantos futuros hechos con o sin consentimiento del Propietario por el Beneficiario en nombre del Acusado incluyendo pero no necesariamente limitado a incrementos, modificaciones, extensiones o sustituciones, o la creación de cualquier obligación futura por el Beneficiario en conexión con el asunto arriba descrito, o cualquier fianza o obligación emprendida por el Beneficiario en nombre del Acusado incluyendo, sin limitar, a la posición de una nueva fianza para y en nombre del Acusado en la naturaleza de una fianza de apelación o sustitución extensión o modificación de la Fianza existente.
 
 Este Pagaré es Ejecutado en la fecha en que este formulario es enviado.
 
 ***SOLO PROCEDA SI ESTÁ DE ACUERDO CON LO ANTERIOR***
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="promissoryRead" name="promissoryRead" value="Yes" required> He leído y acepto el Pagaré Contingente anterior<span class="req">*</span></label>
         </div>
         <div class="step-actions">
           <button class="ghost" type="button" data-back>Atrás</button>
@@ -897,35 +697,38 @@ Este Pagaré es Ejecutado en la fecha en que este formulario es enviado.
       <!-- STEP 11: Indemnity Agreement -->
       <div class="section" data-step="20">
         <div class="agreement-text">
-Acuerdo de Indemnización para Fianza de Caución
+Acuerdo de Indemnización para Fianza
 
-El(los) Garante(s) suscrito(s) ("Garantes") hace(n) solicitud a U.S. Fire Insurance Company a través de su Agente Productor debidamente licenciado y designado Jerry Casal Bail Bonds, LLC (colectivamente referido aquí como "Fianza") para la ejecución de una empresa de caución ("Fianza de Caución") en la Cantidad Penal de cantidad de fianza dada para el acusado en adelante referido como el "Principal" y "Garante" y en consideración de que la Fianza arregle para la ejecución o continuación de esta Fianza de Caución, el(los) Garante(s) conjunta y separadamente acepta(n) lo siguiente:
+El(Los) abajo firmante(s) Indemnizador(es) ("Indemnizadores") hace(n) solicitud a U.S. Fire Insurance Company a través de su Agente Productor debidamente licenciado y designado Jerry Casal Bail Bonds, LLC (colectivamente referidos en este documento como "Fianza") para la ejecución de un compromiso de fianza ("Fianza de Caución") en el Monto Penal de la cantidad de fianza dada para el acusado en adelante referido como el "Principal" e "Indemnizador" y en consideración de que la Fianza arregle para la ejecución o continuación de esta Fianza de Caución, Indemnizador(es) conjunta y solidariamente acuerda(n) como sigue:
 
-Por buena y valiosa consideración, el Principal suscrito y Garante(s) por este medio acuerdan indemnizar y mantener libre de daño a la compañía de Fianza y/o su(s) agente(s) por todas las pérdidas no prohibidas de otra manera por la ley o reglas del Departamento de Instituciones Financieras y Seguros de Florida, y
+Por buena y valiosa consideración, el Principal abajo firmante e Indemnizador(es) por este medio acuerdan indemnizar y eximir de responsabilidad a la compañía de Fianza y/o su(s) agente(s) por todas las pérdidas no prohibidas de otra manera por ley o reglas del Departamento de Instituciones Financieras y Seguros de Florida, y
 
-1) Pagar a la Fianza la prima establecida por Florida para esta Fianza de Caución. La prima es ganada sobre la liberación del Principal de la facilidad de detención. El hecho de que el Acusado pueda haber sido arrestado impropiamente, o su fianza reducida o su caso desestimado, no obligará el retorno de ninguna porción de dicha prima.
+1) Pagar a la Fianza la prima establecida de Florida para esta Fianza de Caución. La prima se gana al momento de la liberación del Principal de la instalación de detención. El hecho de que el Acusado pueda haber sido arrestado inapropiadamente, o su fianza reducida o su caso desestimado, no obligará la devolución de ninguna porción de dicha prima.
 
-2) Reembolsar a la Fianza por gastos reales que incurra causados por cualquier violación por el Principal de los términos de la solicitud y Fianza de Caución, incluyendo gastos o responsabilidades incurridas como resultado de buscar, recapturar o retornar al Principal a custodia o en aprehender o esforzarse por aprehender al Principal, incluyendo honorarios legales por hacer solicitud a una corte por una orden para anular o dejar sin efecto una orden de pérdida o juicio entrado en la misma. En el evento de que el Acusado falle en seguir cualquier y todas las instrucciones o si la corte confisca o revoca la fianza y se vuelve necesario para el Fiancista de Caución o Fianza investigar, aprehender y entregar al Acusado a la corte, los Honorarios de Fugitivo serán gobernados por un Contrato de Honorarios de Fugitivo separado entre el Garante y la Fianza.
+2) Reembolsar a la Fianza por gastos reales en que incurra causados por cualquier incumplimiento por el Principal de los términos de la solicitud y Fianza de Caución, incluyendo gastos o responsabilidades incurridas como resultado de buscar, recapturar o devolver al Principal a custodia o en aprehender o intentar aprehender al Principal, incluyendo honorarios legales para hacer solicitud a un tribunal para una orden de anular o dejar de lado una orden de pérdida o juicio ingresado sobre la misma. En caso de que el Acusado falle en seguir cualquier y todas las instrucciones o si el tribunal pierde o revoca la fianza y se vuelve necesario para el Fiancista o Fianza investigar, aprehender y entregar al Acusado al tribunal, las Tarifas de Fugitivo serán gobernadas por un Contrato de Tarifa de Fugitivo separado entre Indemnizador y Fianza.
 
-3) Pagar a la Fianza un honorario razonable de abogado, no menos de Quinientos Dólares ($500.00), en el evento de que sea necesario instituir acción legal surgiendo de este Acuerdo.
+3) Pagar a la Fianza un honorario razonable de abogado, no menos de Quinientos Dólares ($500.00), en caso de que sea necesario instituir acción legal que surja de este Acuerdo.
 
-4) Proporcionar a la Fianza sobre demanda, una cantidad monetaria igual a la Cantidad Penal para ser mantenida como colateral si la Fianza descubre que cualquier información fue ocultada o mal representada por el Garante o Principal, o sobre otra causa razonable material al riesgo asumido por la Fianza. Si la corte incrementa la cantidad penal de la Fianza de Caución sobre la cantidad establecida arriba, el(los) Garante(s) y Principal acuerdan proporcionar colateral adicional como la Fianza pueda requerir si la Fianza, a su sola discreción, desea permanecer en la Fianza de Caución.
+4) Proporcionar a la Fianza bajo demanda, una cantidad monetaria igual al Monto Penal para ser mantenida como garantía si la Fianza descubre que cualquier información fue ocultada o tergiversada por el Indemnizador o Principal, o por otra causa razonable material al riesgo asumido de la Fianza. Si el tribunal aumenta el monto penal de la Fianza de Caución sobre la cantidad establecida anteriormente, Indemnizador(es) y Principal acuerdan proporcionar garantía adicional como la Fianza pueda requerir si la Fianza, a su sola discreción, desea permanecer en la Fianza de Caución.
 
-5) Pagar a la Fianza inmediatamente sobre demanda la cantidad penal de la Fianza de Caución después de cualquier violación de condiciones de fianza o entrada de Confiscación (pérdida) conforme a estatutos gobernantes.
+5) Pagar a la Fianza inmediatamente bajo demanda el monto penal de la Fianza de Caución después de cualquier incumplimiento de condiciones de fianza o entrada de Estreatura (pérdida) conforme a los estatutos gobernantes.
 
-6) Ayudar a la Fianza en asegurar liberación o exoneración de la Fianza de toda responsabilidad bajo la Fianza de Caución, incluyendo la entrega del Principal a la Corte sobre dirección de la Fianza.
+6) Ayudar a la Fianza en asegurar liberación o exoneración de la Fianza de toda responsabilidad bajo la Fianza de Caución, incluyendo la entrega del Principal al Tribunal bajo dirección de la Fianza.
 
-7) El(los) Garante(s) y Principal por este medio otorgan a la Fianza un Interés de Seguridad en todo dinero u otra propiedad en su posesión o en adelante adquirida de tiempo en tiempo conforme al Capítulo 679, Estatutos de Florida y/o Artículo 9 del Código Comercial Uniforme. La Fianza está autorizada a legalmente gravamen sobre dicho dinero o propiedad en la manera proporcionada por la ley y para aplicar cualquier depósito(s) y/o procedimientos sin aviso hacia cualquier responsabilidad, pérdidas, costos, daños y gastos incurridos por la Fianza como proporcionado en este Acuerdo. Si el colateral colocado con la Fianza está en exceso de la fianza confiscada, tal exceso será retornado oportunamente al Garante y/o Principal según apropiado después de primero aplicar el colateral a cualquier confiscación y sujeto a cualquier reclamo de la Fianza por Prima impaga u otros cargos legales, incluyendo pero no limitado a reembolso de honorarios de registro de documentos y sellos y honorarios de archivo, cargos de tarjeta de crédito, y cualquier cargo de monitoreo electrónico.
+7) Indemnizador(es) y Principal por este medio otorgan a la Fianza un Interés de Seguridad en todo dinero u otra propiedad en su posesión o adquirida de vez en cuando conforme al Capítulo 679, Estatutos de Florida y/o Artículo 9 del Código Comercial Uniforme. La Fianza está autorizada a gravar legalmente dicho dinero o propiedad en la manera provista por ley y a aplicar cualquier depósito(s) y/o productos sin aviso hacia cualquier responsabilidad, pérdida, costos, daños y gastos incurridos por la Fianza como se proporciona en este Acuerdo. Si la garantía colocada con la Fianza está en exceso de la fianza perdida, dicho exceso será devuelto oportunamente al Indemnizador y/o Principal según sea apropiado después de primero aplicar la garantía a cualquier pérdida y sujeto a cualquier reclamo de la Fianza por Prima impaga u otros cargos legales, incluyendo pero no limitado a reembolso de tarifas de registro de documentos y sellos y tarifas de archivo, cargos de tarjeta de crédito, y cualquier cargo de monitoreo electrónico.
 
-8) Las obligaciones del(de los) Garante(s) y Principal aquí bajo son conjuntas y separadas. Cualquier cantidad debida llevará interés a la tasa máxima permitida por la ley. La Fianza no estará primero obligada a proceder contra el Principal en la Fianza de Caución antes de tener recurso contra el(los) Garante(s) o cualquiera de ellos. Los Garantes expresamente renuncian a cualquier beneficio de ley requiriendo que la Fianza haga reclamo sobre o proceder o hacer cumplir sus remedios contra el Principal antes de hacer demanda sobre o proceder y/o hacer cumplir sus remedios contra cualquiera uno o más de los Garante(s). Por buena y valiosa consideración, el Principal suscrito por este medio acuerda indemnizar y/o mantener libre de daño a la Fianza por 100% de cualquier y todas las pérdidas no prohibidas de otra manera por la ley o reglas y regulaciones promulgadas bajo cualquier estatuto aplicable.
+8) Las obligaciones del(de los) Indemnizador(es) y Principal en este documento son conjuntas y solidarias. Cualquier cantidad debida llevará interés a la tasa máxima permitida por ley. La Fianza no estará primero obligada a proceder contra el Principal en Fianza de Caución antes de tener recurso contra el(los) Indemnizador(es) o cualquiera de ellos. Los Indemnizadores expresamente renuncian a cualquier beneficio de ley que requiera que la Fianza haga reclamo sobre o proceda o haga cumplir sus remedios contra el Principal antes de hacer demanda sobre o proceder y/o hacer cumplir sus remedios contra cualquiera o más de los Indemnizador(es). Por buena y valiosa consideración, el Principal abajo firmante por este medio acuerda indemnizar y/o eximir de responsabilidad a la Fianza por 100% de cualquier y todas las pérdidas no prohibidas de otra manera por ley o reglas y regulaciones promulgadas bajo cualquier estatuto aplicable.
 
-9) Como un inducement para que la Fianza suscriba la Fianza de Caución, el(los) Garante(s) y Principal garantizan que todas las declaraciones hechas por ellos en la Solicitud para Fianza sean verdaderas y acuerdan avisar a la Fianza de cualquier cambio, incluyendo pero no limitado a cambio de número de teléfono, dirección o empleo de cualquier el Principal o de cualquiera de los Garante(s) o cualquier otro cambio material en circunstancias dentro de cuarenta y ocho (48) horas después de que tal cambio haya ocurrido. CUALQUIER FALLA POR EL PRINCIPAL PARA ASÍ NOTIFICAR A LA FIANZA CONSTITUIRÁ RAZONES PARA CREER QUE EL PRINCIPAL INTENTA HUIR Y SERÁ CAUSA PARA ENTREGA INMEDIATA DEL PRINCIPAL.
+9) Como una inducción para que la Fianza suscriba la Fianza de Caución, Indemnizador(es) y Principal garantizan que todas las declaraciones hechas por ellos en la Solicitud para Fianza sean verdaderas y acuerdan avisar a la Fianza de cualquier cambio, incluyendo pero no limitado a cambio de número de teléfono, dirección o empleo de ya sea el Principal o de cualquiera de los Indemnizador(es) o cualquier otro cambio material en circunstancias dentro de cuarenta y ocho (48) horas después de que dicho cambio haya ocurrido. CUALQUIER FALLA POR EL PRINCIPAL EN ASÍ NOTIFICAR A LA FIANZA CONSTITUIRÁ MOTIVOS PARA CREER QUE EL PRINCIPAL INTENTA HUIR Y SERÁ CAUSA PARA ENTREGA INMEDIATA DEL PRINCIPAL.
 
-10) El suscrito acuerda que estas obligaciones aplican a cualquier y todas las Fianzas de Caución ejecutadas por el mismo cargo por el cual la Fianza de Caución mencionada arriba fue ejecutada o cualquier cargo surgiendo de la misma transacción sin importar si dichas Fianzas de Caución son archivadas antes o después de convicción, incluyendo apelaciones, pero no en una cantidad mayor.
+10) El abajo firmante acuerda que estas obligaciones se aplican a cualquier y todas las Fianzas de Caución ejecutadas por el mismo cargo por el cual la Fianza de Caución arriba mencionada fue ejecutada o cualquier cargo que surja de la misma transacción sin importar si dichas Fianzas de Caución son archivadas antes o después de convicción, incluyendo apelaciones, pero no en una cantidad mayor.
 
-11) El suscrito autoriza a cualquier persona, agencia, sociedad o corporación teniendo cualquier información concerniente a mi carácter, crédito, y reputación financiera a liberar tal información a la Fianza, incluyendo pero no limitado a reportes de crédito e investigaciones de antecedentes. Tal información es para ser usada para asegurar la comparecencia del Principal en corte o aprehensión en el caso de una confiscación de fianza. El suscrito por este medio libera a tal persona, agencia, sociedad o corporación de cualquier responsabilidad que pueda ser incurrida en liberar esta información a la Fianza incluyendo responsabilidad bajo Ley Federal.
+11) El abajo firmante autoriza a cualquier persona, agencia, sociedad o corporación que tenga cualquier información concerniente a mi carácter, crédito, y reputación financiera a liberar dicha información a la Fianza, incluyendo pero no limitado a reportes de crédito e investigaciones de antecedentes. Dicha información es para ser usada para asegurar la comparecencia del Principal en tribunal o aprehensión en el caso de una estreatura de fianza. El abajo firmante por este medio libera a dicha persona, agencia, sociedad o corporación de cualquier responsabilidad que pueda ser incurrida al liberar esta información a la Fianza incluyendo responsabilidad bajo Ley Federal.
 
-HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIBO DE UNA COPIA DEL ACUERDO DE INDEMNIZACIÓN O HE IMPRESO UNA COPIA. SOY EL VERDADERO Y LEGAL DUEÑO DE LA PROPIEDAD, YA SEA REAL O PERSONAL, ESTABLECIDA EN LA SOLICITUD PARA FIANZA (CUAL SOLICITUD COMPLETA ES HECHA PARTE DE ESTO POR REFERENCIA). POSEO TAL PROPIEDAD LIBRE Y CLARA DE TODOS LOS GRAVÁMENES O CARGAS EXCEPTO COMO HE REVELADO POR ESCRITO. PROMETO NO TRANSFERIR O GRAVAR NINGUNA DE DICHA PROPIEDAD HASTA QUE MI RESPONSABILIDAD BAJO ESTE ACUERDO DE INDEMNIZACIÓN Y LA SOLICITUD PARA FIANZA HAYA SIDO LIBERADA. ENTIENDO QUE LA FIANZA ESTÁ PERMITIENDO QUE LA FIANZA DE CAUCIÓN PERMANEZCA EN FUERZA CONFIANDO EN LAS DECLARACIONES HECHAS POR MÍ.
+HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SUS CONTENIDOS. RECONOZCO RECIBO DE UNA COPIA DEL ACUERDO DE INDEMNIZACIÓN O HE IMPRESO UNA COPIA. SOY EL VERDADERO Y LEGÍTIMO PROPIETARIO DE LA PROPIEDAD, YA SEA REAL O PERSONAL, ESTABLECIDA EN LA SOLICITUD PARA FIANZA (CUYA SOLICITUD ENTERA ES HECHA PARTE DE ESTE DOCUMENTO POR REFERENCIA). POSEO DICHA PROPIEDAD LIBRE Y CLARA DE TODOS LOS GRAVÁMENES O CARGAS EXCEPTO COMO HE REVELADO POR ESCRITO. PROMETO NO TRANSFERIR O GRAVAR CUALQUIERA DE DICHA PROPIEDAD HASTA QUE MI RESPONSABILIDAD BAJO ESTE ACUERDO DE INDEMNIZACIÓN Y LA SOLICITUD PARA FIANZA HAYA SIDO LIBERADA. ENTIENDO QUE LA FIANZA ESTÁ PERMITIENDO QUE LA FIANZA DE CAUCIÓN PERMANEZCA EN VIGOR CONFIANDO EN LAS DECLARACIONES HECHAS POR MÍ.
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="indemnityRead" name="indemnityRead" value="Yes" required> He leído y acepto el Acuerdo de Indemnización anterior<span class="req">*</span></label>
         </div>
         <div class="step-actions">
           <button class="ghost" type="button" data-back>Atrás</button>
@@ -937,7 +740,7 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIB
       <div class="section" data-step="21">
         <div class="grid">
           <div class="full">
-            <label for="agreeName">AL ESCRIBIR SU NOMBRE Y ENVIAR ABAJO USTED ACEPTA TODOS LOS TÉRMINOS Y CONDICIONES ANTERIORES Y QUE LA INFORMACIÓN ES COMPLETAMENTE CORRECTA Y VERDADERA Y QUE USTED ES LA PERSONA ENVIANDO LA SOLICITUD.<span class="req">*</span></label>
+            <label for="agreeName">AL ESCRIBIR SU NOMBRE Y ENVIAR A CONTINUACIÓN USTED ACEPTA TODOS LOS TÉRMINOS Y CONDICIONES ANTERIORES Y QUE LA INFORMACIÓN ES ENTERAMENTE CORRECTA Y VERDADERA Y QUE USTED ES LA PERSONA QUE ENVÍA LA SOLICITUD.<span class="req">*</span></label>
             <input id="agreeName" name="agreeName" required />
           </div>
         </div>
@@ -951,19 +754,20 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIB
         </div>
       </div>
 
+
       <!-- STEP 13: Application Complete -->
-      <div class="section" data-step="22" id="completionSection">
+      <div class="section" data-step="23" id="completionSection">
         <div style="text-align:center; padding:40px 20px;">
           <div style="font-size:48px; margin-bottom:20px;">⚠️</div>
           <h2 style="color:#fff; font-size:24px; margin-bottom:20px; font-weight:700;">Siguiente Paso: Le Llamaremos</h2>
           <p style="color:#fff; font-size:16px; line-height:1.5; margin-bottom:20px;">
-            No se preocupe, todo está listo. Le llamaremos inmediatamente después de recibir para completar su proceso de fianza.
+            No se preocupe, ya está todo listo. Le llamaremos inmediatamente después de recibir para completar su proceso de fianza.
           </p>
           <p style="color:#fff; font-size:16px; line-height:1.5; margin-bottom:30px;">
-            👉 Si aún no ha hablado con nosotros, envíe un mensaje de texto rápido al <span style="color:#F5A00D; font-weight:bold;">561-247-0018</span> para que podamos contactarlo rápidamente.
+            👉 Si aún no ha hablado con nosotros, envíe un texto rápido al <span style="color:#F5A00D; font-weight:bold;">561-247-0018</span> para que sepamos contactarle rápido.
           </p>
           <a href="sms:561-247-0018" style="display:inline-block; background:#F5A00D; color:#111; padding:16px 32px; border-radius:10px; font-weight:700; font-size:16px; text-decoration:none; cursor:pointer;">
-            ENVIAR MENSAJE
+            ENVÍANOS TEXTO
           </a>
         </div>
       </div>
@@ -980,93 +784,114 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIB
       sections.forEach((s, i) => {
         s.classList.toggle('active', i === idx);
       });
+
+      // Update progress bar
+      const totalSteps = 23; // Total steps including upload and completion
+      const currentStep = idx + 1;
+      const progressPercent = (currentStep / totalSteps) * 100;
+
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+
+      if (progressBar) {
+        progressBar.style.width = `${progressPercent}%`;
+      }
+
+      if (progressText) {
+        if (idx === 23) {
+          progressText.textContent = '¡Solicitud Completa!';
+        } else {
+          progressText.textContent = `Paso ${currentStep} de ${totalSteps}`;
+        }
+      }
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // Update labels based on user role
     function updateLabelsForRole(role) {
       userRole = role;
-      
+
       if (role === 'Indemnitor') {
         // Update indemnitor section labels (steps 1-3) to refer to "Your" info
         document.querySelector('label[for="indemnitorName"]').innerHTML = 'Su Nombre Completo<span class="req">*</span>';
         document.querySelector('label[for="indemnitorDob"]').innerHTML = 'Su Fecha de Nacimiento<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorCell"]').innerHTML = 'Su Teléfono Celular #<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorCell"]').innerHTML = 'Su Número de Celular<span class="req">*</span>';
         document.querySelector('label[for="indemnitorEmail"]').innerHTML = 'Su Dirección de Correo Electrónico';
         document.querySelector('label[for="indemnitorAddress"]').innerHTML = 'Su Dirección de Casa<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorHowLong"]').innerHTML = '¿Cuánto Tiempo Ha Vivido en la Dirección Actual?<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorHowLong"]').innerHTML = '¿Cuánto Tiempo Ha Vivido en la Dirección Actual<span class="req">*</span>';
         document.querySelector('label[for="indemnitorWorkType"]').innerHTML = 'Su Tipo de Trabajo<span class="req">*</span>';
         document.querySelector('label[for="indemnitorEmployer"]').innerHTML = 'Su Nombre del Empleador<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorWorkPhone"]').innerHTML = 'Su Teléfono del Trabajo # (NO será llamado)';
-        document.querySelector('label[for="indemnitorWorkAddress"]').innerHTML = 'Su Dirección del Trabajo';
+        document.querySelector('label[for="indemnitorWorkPhone"]').innerHTML = 'Su Número de Trabajo (NO será llamado)';
+        document.querySelector('label[for="indemnitorWorkAddress"]').innerHTML = 'Su Dirección de Trabajo';
         document.querySelector('label[for="indemnitorVehicle"]').innerHTML = 'Su Vehículo<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorHomePhone"]').innerHTML = 'Su Teléfono de Casa #';
-        document.querySelector('label[for="relation"]').innerHTML = 'Su Relación con la Persona en la Cárcel y/o Siendo Afianzada?<span class="req">*</span>';
-        
+        document.querySelector('label[for="indemnitorHomePhone"]').innerHTML = 'Su Número de Casa';
+        document.querySelector('label[for="relation"]').innerHTML = 'Su Relación con la Persona en la Cárcel y/o Siendo Afianzado?<span class="req">*</span>';
+
         // Keep checkbox section hint as default for indemnitors (about defendant)
         const checkboxHint = document.querySelector('.section[data-step="8"] .hint');
         if (checkboxHint) {
           checkboxHint.innerHTML = 'Estas preguntas son sobre la persona siendo afianzada';
         }
-        
+
         // Update section info messages for indemnitors
         const indemnitorSectionInfo = document.querySelector('.section[data-step="1"] .section-info');
         if (indemnitorSectionInfo) {
-          indemnitorSectionInfo.innerHTML = 'Por favor proporcione la siguiente información sobre usted (la persona afianzando a la persona arrestada).';
+          indemnitorSectionInfo.innerHTML = 'Por favor proporcione la siguiente información sobre usted mismo (la persona afianzando a la persona arrestada).';
         }
-        
+
         const defendantSectionInfo = document.querySelector('.section[data-step="4"] .section-info');
         if (defendantSectionInfo) {
           defendantSectionInfo.innerHTML = 'Las siguientes preguntas son sobre el acusado (la persona arrestada o persona que necesita una fianza).';
         }
-        
+
         // Defendant section labels remain as "Defendant's"
       } else if (role === 'Defendant') {
         // Update indemnitor section labels (steps 1-3) to refer to "Indemnitor's" info
         document.querySelector('label[for="indemnitorName"]').innerHTML = 'Nombre Completo del Garante<span class="req">*</span>';
         document.querySelector('label[for="indemnitorDob"]').innerHTML = 'Fecha de Nacimiento del Garante<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorCell"]').innerHTML = 'Teléfono Celular del Garante #<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorCell"]').innerHTML = 'Número de Celular del Garante<span class="req">*</span>';
         document.querySelector('label[for="indemnitorEmail"]').innerHTML = 'Dirección de Correo Electrónico del Garante';
         document.querySelector('label[for="indemnitorAddress"]').innerHTML = 'Dirección de Casa del Garante<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorHowLong"]').innerHTML = '¿Cuánto Tiempo Ha Vivido el Garante en la Dirección Actual?<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorHowLong"]').innerHTML = '¿Cuánto Tiempo Ha Vivido el Garante en la Dirección Actual<span class="req">*</span>';
         document.querySelector('label[for="indemnitorWorkType"]').innerHTML = 'Tipo de Trabajo del Garante<span class="req">*</span>';
         document.querySelector('label[for="indemnitorEmployer"]').innerHTML = 'Nombre del Empleador del Garante<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorWorkPhone"]').innerHTML = 'Teléfono del Trabajo del Garante # (NO será llamado)';
-        document.querySelector('label[for="indemnitorWorkAddress"]').innerHTML = 'Dirección del Trabajo del Garante';
+        document.querySelector('label[for="indemnitorWorkPhone"]').innerHTML = 'Número de Trabajo del Garante (NO será llamado)';
+        document.querySelector('label[for="indemnitorWorkAddress"]').innerHTML = 'Dirección de Trabajo del Garante';
         document.querySelector('label[for="indemnitorVehicle"]').innerHTML = 'Vehículo del Garante<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorHomePhone"]').innerHTML = 'Teléfono de Casa del Garante #';
-        document.querySelector('label[for="relation"]').innerHTML = '¿Relación del Garante con Usted?<span class="req">*</span>';
-        
+        document.querySelector('label[for="indemnitorHomePhone"]').innerHTML = 'Número de Casa del Garante';
+        document.querySelector('label[for="relation"]').innerHTML = 'Relación del Garante con Usted?<span class="req">*</span>';
+
         // Update defendant section labels to refer to "Your" info
         document.querySelector('label[for="defendantName"]').innerHTML = 'Su Nombre Completo<span class="req">*</span>';
         document.querySelector('label[for="defendantNick"]').innerHTML = 'Su Apodo (Si no es el nombre real)';
         document.querySelector('label[for="defendantDob"]').innerHTML = 'Su Fecha de Nacimiento<span class="req">*</span>';
-        document.querySelector('label[for="defendantSsn"]').innerHTML = 'Su Número de Seguro Social # (opcional)';
-        document.querySelector('label[for="defendantDl"]').innerHTML = 'Su Licencia de Conducir o ID # (opcional)';
-        document.querySelector('label[for="defendantCell"]').innerHTML = 'Su Teléfono Celular #<span class="req">*</span>';
-        document.querySelector('label[for="defendantHomePhone"]').innerHTML = 'Su Teléfono de Casa # (Omitir si no tiene)';
+        document.querySelector('label[for="defendantSsn"]').innerHTML = 'Su Número de Seguro Social (opcional)';
+        document.querySelector('label[for="defendantDl"]').innerHTML = 'Su Número de Licencia de Conducir o ID (opcional)';
+        document.querySelector('label[for="defendantCell"]').innerHTML = 'Su Número de Celular<span class="req">*</span>';
+        document.querySelector('label[for="defendantHomePhone"]').innerHTML = 'Su Número de Casa (Omitir si no tiene)';
         document.querySelector('label[for="defendantEmail"]').innerHTML = 'Su Dirección de Correo Electrónico';
         document.querySelector('label[for="defendantAddress"]').innerHTML = 'Su Dirección de Casa<span class="req">*</span>';
-        document.querySelector('label[for="defendantHowLong"]').innerHTML = '¿Cuánto Tiempo Ha Vivido en la Dirección Actual?<span class="req">*</span>';
+        document.querySelector('label[for="defendantHowLong"]').innerHTML = '¿Cuánto Tiempo Ha Vivido en la Dirección Actual<span class="req">*</span>';
         document.querySelector('label[for="defendantWorkType"]').innerHTML = 'Su Tipo de Trabajo';
         document.querySelector('label[for="defendantEmployer"]').innerHTML = 'Su Nombre del Empleador';
-        document.querySelector('label[for="defendantWorkPhone"]').innerHTML = 'Su Teléfono del Trabajo # (NO será llamado)';
-        document.querySelector('label[for="defendantWorkAddress"]').innerHTML = 'Su Dirección del Trabajo';
-        document.querySelector('label[for="defendantVehicle"]').innerHTML = 'Su Vehículo para llegar a la Corte<span class="req">*</span>';
+        document.querySelector('label[for="defendantWorkPhone"]').innerHTML = 'Su Número de Trabajo (NO será llamado)';
+        document.querySelector('label[for="defendantWorkAddress"]').innerHTML = 'Su Dirección de Trabajo';
+        document.querySelector('label[for="defendantVehicle"]').innerHTML = 'Su Vehículo para ir al Tribunal<span class="req">*</span>';
         document.querySelector('label[for="recentArrest"]').innerHTML = 'Su Arresto Más Reciente (Sin incluir el Arresto Actual)';
-        
+
         // Update checkbox section hint for defendants
         const checkboxHint = document.querySelector('.section[data-step="8"] .hint');
         if (checkboxHint) {
           checkboxHint.innerHTML = 'Estas preguntas son sobre usted';
         }
-        
+
         // Update section info messages for defendants
         const indemnitorSectionInfo = document.querySelector('.section[data-step="1"] .section-info');
         if (indemnitorSectionInfo) {
-          indemnitorSectionInfo.innerHTML = 'Por favor proporcione la siguiente información sobre su garante (la persona afianzándolo).';
+          indemnitorSectionInfo.innerHTML = 'Por favor proporcione la siguiente información sobre su garante (la persona afianzándole).';
         }
-        
+
         const defendantSectionInfo = document.querySelector('.section[data-step="4"] .section-info');
         if (defendantSectionInfo) {
           defendantSectionInfo.innerHTML = 'Las siguientes preguntas son sobre usted (el acusado o persona que necesita una fianza).';
@@ -1076,21 +901,26 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIB
 
     function validateStep(idx) {
       const step = sections[idx];
-      
-      // Special validation for first step - ensure role is selected and labels are updated
+
+      // Special validation for upload step (step 0) - always allow to continue
       if (idx === 0) {
+        return true; // Upload is optional
+      }
+
+      // Special validation for intake step (step 1) - ensure role is selected and labels are updated
+      if (idx === 1) {
         const whoAreYouSelect = document.getElementById('whoAreYou');
         if (!whoAreYouSelect.value) {
           whoAreYouSelect.reportValidity();
           return false;
         }
-        
+
         // Ensure labels have been updated for the selected role
         if (whoAreYouSelect.value && !userRole) {
           updateLabelsForRole(whoAreYouSelect.value);
         }
       }
-      
+
       const fields = step.querySelectorAll('input[required], select[required], textarea[required]');
       for (const el of fields) {
         if (!el.checkValidity()) {
@@ -1108,10 +938,16 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIB
         nextBtn.addEventListener('click', () => {
           if (!validateStep(idx)) return;
           const next = idx + 1;
+
+          // Send ID data to IDUpload endpoint when we complete step 2 (have user info)
+          if (idx === 2) {
+            sendIDDataToUploadEndpoint();
+          }
+
           if (next < sections.length) showStep(next);
         });
       }
-      
+
       const backBtn = sec.querySelector('[data-back]');
       if (backBtn) {
         backBtn.addEventListener('click', () => {
@@ -1150,13 +986,16 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIB
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      
+
+      // Ensure ID data is sent before final submission (fallback)
+      sendIDDataToUploadEndpoint();
+
       // Validate final step
-      if (!validateStep(sections.length - 1)) {
+      if (!validateStep(sections.length - 2)) {
         if (errorDiv) errorDiv.style.display = 'block';
         return;
       }
-      
+
       // Check form validity
       if (!form.checkValidity()) {
         form.reportValidity();
@@ -1166,14 +1005,14 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIB
       // Disable submit button and show loading
       submitBtn.disabled = true;
       loadingIndicator.style.display = 'block';
-      
+
       // Collect form data
       const formData = new FormData(form);
       const data = Object.fromEntries(formData.entries());
-      
+
       // Add timestamp
       data.timestamp = new Date().toISOString();
-      
+
       // Submit to Google Apps Script
       fetch('https://script.google.com/macros/s/AKfycbx4_PFaUYqJs1y_e0Mn8LoKf_YqGFzUU996HODqni2_dTEoSZSVQwj6YrRLuDriekP4/exec', {
         method: 'POST',
@@ -1186,63 +1025,178 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIB
       .then(() => {
         submitBtn.disabled = false;
         loadingIndicator.style.display = 'none';
-        showStep(22); // Show completion section
+        showStep(23); // Show completion section
       })
       .catch((error) => {
         console.error('Submission error:', error);
         submitBtn.disabled = false;
         loadingIndicator.style.display = 'none';
         // Still show completion since no-cors doesn't return errors properly
-        showStep(22);
+        showStep(23);
       });
     });
 
-    
+    // ID upload functionality - stores files and sends to IDUpload endpoint when user info is available
+    let storedIDFiles = {
+      front: null,
+      back: null
+    };
+    let idDataSent = false;
+
+    function handleIDUpload(input, side) {
+      const file = input.files[0];
+      if (!file) return;
+
+      // File size check (5MB limit for images)
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`La imagen es demasiado grande. Tamaño máximo es 5MB.`);
+        input.value = '';
+        return;
+      }
+
+      // File type check
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        alert(`Por favor use solo formato JPG o PNG.`);
+        input.value = '';
+        return;
+      }
+
+      // Store the file
+      storedIDFiles[side] = file;
+
+      // Update preview
+      const previewElement = document.getElementById(side + 'Preview');
+      previewElement.innerHTML = `
+        <div style="font-size:12px; color:#28a745; font-weight:600;">✓ ${file.name} almacenado</div>
+        <div style="font-size:11px; color:#666;">${(file.size / 1024).toFixed(1)} KB</div>
+      `;
+
+      // Update continue button
+      updateUploadButton();
+    }
+
+    function updateUploadButton() {
+      const uploadBtn = document.getElementById('uploadNextBtn');
+      const hasFiles = storedIDFiles.front || storedIDFiles.back;
+
+      if (storedIDFiles.front && storedIDFiles.back) {
+        uploadBtn.textContent = 'Continuar (Ambos Lados Almacenados)';
+        uploadBtn.style.background = '#28a745';
+      } else if (hasFiles) {
+        uploadBtn.textContent = 'Continuar (Subida Parcial)';
+        uploadBtn.style.background = '#F28C00';
+      } else {
+        uploadBtn.textContent = 'Continuar';
+        uploadBtn.style.background = '#F28C00';
+      }
+    }
+
+    // Send ID data to IDUpload endpoint when we have user info
+    async function sendIDDataToUploadEndpoint() {
+      if (idDataSent || (!storedIDFiles.front && !storedIDFiles.back)) {
+        return; // Already sent or no files to send
+      }
+
+      try {
+        // Get user info from form
+        const yourName = document.getElementById('indemnitorName')?.value ||
+                         document.getElementById('defendantName')?.value || '';
+        const yourPhone = document.getElementById('indemnitorCell')?.value ||
+                          document.getElementById('defendantCell')?.value || '';
+        const defendantName = document.getElementById('defendantName')?.value || '';
+
+        if (!yourName || !yourPhone) {
+          console.log('User info not yet available, will try again later');
+          return;
+        }
+
+        // Create FormData for IDUpload endpoint
+        const formData = new FormData();
+        formData.append('yourName', yourName);
+        formData.append('yourPhone', yourPhone);
+        formData.append('defendantName', defendantName);
+        formData.append('caseNumber', ''); // Not collected in bail bond app
+        formData.append('timestamp', new Date().toISOString());
+
+        // Add files if available
+        if (storedIDFiles.front) {
+          formData.append('files', storedIDFiles.front, 'id-front.jpg');
+        }
+        if (storedIDFiles.back) {
+          formData.append('files', storedIDFiles.back, 'id-back.jpg');
+        }
+
+        // Send to IDUpload endpoint
+        const response = await fetch('https://script.google.com/macros/s/AKfycbztNOgs3JN4ksI0xX66UOh0VeS_Sg31dUJKpM2OLd3BwEh-iJIElwX2XXUOBiSJTiBC/exec', {
+          method: 'POST',
+          mode: 'no-cors',
+          body: formData
+        });
+
+        idDataSent = true;
+        console.log('ID data sent successfully to IDUpload endpoint');
+
+        // Update previews to show sent status
+        if (storedIDFiles.front) {
+          document.getElementById('frontPreview').innerHTML = `
+            <div style="font-size:12px; color:#007bff; font-weight:600;">✓ Enviado al sistema de ID</div>
+          `;
+        }
+        if (storedIDFiles.back) {
+          document.getElementById('backPreview').innerHTML = `
+            <div style="font-size:12px; color:#007bff; font-weight:600;">✓ Enviado al sistema de ID</div>
+          `;
+        }
+
+      } catch (error) {
+        console.error('Failed to send ID data:', error);
+      }
+    }
+
   </script>
 
 <!-- Chatbot Widget -->
 <div class="chat-container">
-  <!-- Floating Chat Button -->
   <button class="chat-button" id="chatButton">
     <span class="chat-icon">💬</span>
   </button>
-  
-  <!-- Expandable Chat Interface -->
+
   <div class="chat-interface" id="chatInterface">
     <div class="chat-header">
       <div class="chat-title-area">
         <div class="chat-title">Asistente AI</div>
-        <div class="chat-subtitle">Pregunta sobre fianzas</div>
+        <div class="chat-subtitle">Pregunte sobre fianzas</div>
       </div>
       <button class="chat-close" id="chatClose">×</button>
     </div>
-    
+
     <div class="chat-messages" id="chatMessages">
       <div class="welcome-message">
-        👋 ¡Hola! Soy tu asistente AI de <strong>Barbie's Bail Bonds</strong>.<br><br>
-        Pregúntame sobre:<br>
-        • Costos y procesos de fianzas<br>
-        • Requisitos de la corte<br>
+        👋 ¡Hola! Soy su asistente AI para <strong>Barbie's Bail Bonds</strong>.<br><br>
+        Pregúnteme sobre:<br>
+        • Costos y procesos de fianza<br>
+        • Requisitos del tribunal<br>
         • Opciones de pago<br>
         • Procedimientos de liberación
       </div>
     </div>
-    
+
     <div class="typing-indicator" id="typingIndicator">
-      🤖 El asistente está escribiendo
+      🤖 Asistente está escribiendo
       <div class="typing-dots">
         <span></span>
         <span></span>
         <span></span>
       </div>
     </div>
-    
+
     <div class="chat-input-container">
-      <input 
-        type="text" 
-        class="chat-input" 
-        id="chatInput" 
-        placeholder="Escribe tu mensaje..."
+      <input
+        type="text"
+        class="chat-input"
+        id="chatInput"
+        placeholder="Escriba su mensaje..."
         maxlength="500"
       >
       <button class="chat-send" id="chatSend">▶</button>
@@ -1252,7 +1206,6 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIB
 
 <script>
 (function() {
-  // Get DOM elements
   const chatButton = document.getElementById('chatButton');
   const chatInterface = document.getElementById('chatInterface');
   const chatClose = document.getElementById('chatClose');
@@ -1260,31 +1213,15 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIB
   const chatInput = document.getElementById('chatInput');
   const chatSend = document.getElementById('chatSend');
   const typingIndicator = document.getElementById('typingIndicator');
-
-  // (Step 1) Use CSS clamp() on right to adapt to viewport width.
-  // No JS-based positioning needed here.
-
-  // Chatbot positioning now handled by CSS position:fixed - no JavaScript needed!
-
-  // Detect if this page is running inside an embed (e.g., Google Sites)
-  
-
   const API_URL = 'https://script.google.com/macros/s/AKfycbwvJ8utZ62xKjZt2nz8wZnBJb5vbOsCD38RJnDZ0yFZGppsfWnmv7_YIuz5yV9lZz7z/exec';
-  
   let isOpen = false;
   let conversationHistory = [];
-  const MAX_HISTORY = 10; // Keep last 10 exchanges
-
-  // Toggle chat interface
+  const MAX_HISTORY = 10;
   function toggleChat() {
     isOpen = !isOpen;
-    
     if (isOpen) {
       chatInterface.style.display = 'flex';
-      // Trigger animation after display change
-      setTimeout(() => {
-        chatInterface.classList.add('open');
-      }, 10);
+      setTimeout(() => { chatInterface.classList.add('open'); }, 10);
       chatButton.classList.add('active');
       chatButton.innerHTML = '<span style="transform: rotate(45deg); display: inline-block;">✕</span>';
       setTimeout(() => chatInput.focus(), 300);
@@ -1292,175 +1229,113 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO RECIB
       chatInterface.classList.remove('open');
       chatButton.classList.remove('active');
       chatButton.innerHTML = '<span class="chat-icon">💬</span>';
-      // Hide after animation completes
-      setTimeout(() => {
-        if (!isOpen) chatInterface.style.display = 'none';
-      }, 300);
+      setTimeout(() => { if (!isOpen) chatInterface.style.display = 'none'; }, 300);
     }
   }
-
-  // Event listeners
   chatButton.addEventListener('click', toggleChat);
   chatClose.addEventListener('click', toggleChat);
-
-  // Send message function
   function sendMessage() {
     const message = chatInput.value.trim();
     if (!message || chatSend.disabled) return;
-
-    // Add user message
     addMessage('user', message);
     chatInput.value = '';
     chatSend.disabled = true;
     showTyping();
-
-    // Send to AI backend
     const callbackName = 'chatCallback_' + Date.now();
     const script = document.createElement('script');
     script.src = `${API_URL}?action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
-
     window[callbackName] = function(response) {
       hideTyping();
-      
       let assistantResponse = '';
       if (response && response.answer) {
         assistantResponse = response.answer;
         addMessage('assistant', assistantResponse);
       } else if (response && response.error) {
-        assistantResponse = 'Disculpa, pero encontré un error. Intenta de nuevo o llámanos al 561-247-0018 para asistencia inmediata.';
+        assistantResponse = 'Me disculpo, pero encontré un error. Por favor intente de nuevo o llámenos al 561-247-0018 para asistencia inmediata.';
         addMessage('assistant', assistantResponse);
         console.error('Chat API error:', response.error);
       } else {
-        assistantResponse = 'Disculpa, pero no pude generar una respuesta. Intenta de nuevo o llámanos al 561-247-0018 para ayuda.';
+        assistantResponse = 'Me disculpo, pero no pude generar una respuesta. Por favor intente de nuevo o llámenos al 561-247-0018 para ayuda.';
         addMessage('assistant', assistantResponse);
       }
-      
-      // Store conversation in history
-      conversationHistory.push({
-        user: message,
-        assistant: assistantResponse
-      });
-      
-      // Keep only last MAX_HISTORY exchanges
+      conversationHistory.push({user: message, assistant: assistantResponse});
       if (conversationHistory.length > MAX_HISTORY) {
         conversationHistory = conversationHistory.slice(-MAX_HISTORY);
       }
-      
-      // Clean up
       document.head.removeChild(script);
       delete window[callbackName];
     };
-
     script.onerror = function() {
       hideTyping();
-      const errorResponse = 'Tengo problemas de conexión ahora. Intenta de nuevo o llámanos directamente al 561-247-0018 para asistencia.';
+      const errorResponse = 'Estoy teniendo problemas conectando ahora. Por favor intente de nuevo o llámenos directamente al 561-247-0018 para asistencia.';
       addMessage('assistant', errorResponse);
-      
-      // Store error in conversation history too
-      conversationHistory.push({
-        user: message,
-        assistant: errorResponse
-      });
-      
+      conversationHistory.push({user: message, assistant: errorResponse});
       if (conversationHistory.length > MAX_HISTORY) {
         conversationHistory = conversationHistory.slice(-MAX_HISTORY);
       }
-      
       document.head.removeChild(script);
       delete window[callbackName];
     };
-
-    // Timeout handler
     setTimeout(() => {
       if (window[callbackName]) {
         hideTyping();
-        const timeoutResponse = 'La solicitud se agotó. Llámanos al 561-247-0018 para asistencia inmediata.';
+        const timeoutResponse = 'Se agotó el tiempo de respuesta. Por favor llámenos al 561-247-0018 para asistencia inmediata.';
         addMessage('assistant', timeoutResponse);
-        
-        // Store timeout in conversation history too
-        conversationHistory.push({
-          user: message,
-          assistant: timeoutResponse
-        });
-        
+        conversationHistory.push({user: message, assistant: timeoutResponse});
         if (conversationHistory.length > MAX_HISTORY) {
           conversationHistory = conversationHistory.slice(-MAX_HISTORY);
         }
-        
         document.head.removeChild(script);
         delete window[callbackName];
       }
     }, 15000);
-
     document.head.appendChild(script);
   }
-
-  // Add message to chat
   function addMessage(sender, content) {
-    // Remove welcome message if it exists
     const welcomeMsg = chatMessages.querySelector('.welcome-message');
     if (welcomeMsg) welcomeMsg.remove();
-
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
-    
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
     avatar.textContent = sender === 'user' ? '👤' : '🤖';
-    
     const bubble = document.createElement('div');
     bubble.className = 'message-bubble';
-    
-    // Handle line breaks in content
     const paragraphs = content.split('\n').filter(p => p.trim());
     if (paragraphs.length > 1) {
       bubble.innerHTML = paragraphs.map(p => p.trim()).join('<br>');
     } else {
       bubble.textContent = content;
     }
-    
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(bubble);
     chatMessages.appendChild(messageDiv);
-    
-    // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
-
-  // Show typing indicator
   function showTyping() {
     typingIndicator.style.display = 'block';
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
-
-  // Hide typing indicator
   function hideTyping() {
     typingIndicator.style.display = 'none';
     chatSend.disabled = false;
   }
-
-  // Event listeners for sending messages
   chatSend.addEventListener('click', sendMessage);
-  
   chatInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   });
-
-  // Close chat when clicking outside (optional)
   document.addEventListener('click', function(e) {
     if (isOpen && !chatInterface.contains(e.target) && !chatButton.contains(e.target)) {
       // Uncomment the next line if you want to close chat when clicking outside
       // toggleChat();
     }
   });
-  
 })();
 </script>
 
-<!-- Invisible spacer section to double page height -->
 <div class="invisible-spacer"></div>
 
 </body>
