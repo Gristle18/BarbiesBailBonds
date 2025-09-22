@@ -155,6 +155,7 @@
           </div>
           <div>
             <label for="indemnitorHowLong">How Long Living at Current Address<span class="req">*</span></label>
+            <div class="hint">Examples: "2 years", "6 months", "Under 1 year", "Over 3 years"</div>
             <input id="indemnitorHowLong" name="indemnitorHowLong" required />
           </div>
         </div>
@@ -169,6 +170,7 @@
         <div class="grid">
           <div>
             <label for="indemnitorWorkType">Type of Work<span class="req">*</span></label>
+            <div class="hint">Examples: "Manager", "Construction Worker", "Nurse", "Self-employed", "Retired"</div>
             <input id="indemnitorWorkType" name="indemnitorWorkType" required />
           </div>
           <div>
@@ -185,6 +187,7 @@
           </div>
           <div class="full">
             <label for="indemnitorVehicle">Indemnitor's Vehicle<span class="req">*</span></label>
+            <div class="hint">Examples: "2018 Honda Civic", "2020 Ford F-150", "No vehicle"</div>
             <input id="indemnitorVehicle" name="indemnitorVehicle" required />
           </div>
         </div>
@@ -279,6 +282,7 @@
           </div>
           <div>
             <label for="defendantHowLong">How Long has Defendant Lived at Current Address<span class="req">*</span></label>
+            <div class="hint">Examples: "2 years", "6 months", "Under 1 year", "Over 3 years"</div>
             <input id="defendantHowLong" name="defendantHowLong" required />
           </div>
           <div>
@@ -306,6 +310,7 @@
         <div class="grid">
           <div>
             <label for="defendantWorkType">Defendant's Type of Work</label>
+            <div class="hint">Examples: "Manager", "Construction Worker", "Nurse", "Self-employed", "Unemployed"</div>
             <input id="defendantWorkType" name="defendantWorkType" />
           </div>
           <div>
@@ -336,15 +341,16 @@
         <div class="grid">
           <div class="full">
             <label>Please Select or Tap with your Finger ONLY if the answer is "Yes":</label>
-            <div class="hint">These questions are about the person being bonded</div>
+            <div class="hint">These questions are about the person being bonded. Only check boxes if the answer is YES.</div>
             <div class="checks">
               <label><input type="checkbox" id="q_fta" name="q_fta" value="Yes"> Has Failed to Appear for Court in the Past?</label>
-              <label><input type="checkbox" id="q_supervision" name="q_supervision" value="Yes"> Is Currently on Probation, Parole, or SOR?</label>
+              <label><input type="checkbox" id="q_supervision" name="q_supervision" value="Yes"> Is Currently on Probation, Parole, or SOR (Sex Offender Registry)?</label>
               <label><input type="checkbox" id="q_otherBond" name="q_otherBond" value="Yes"> Is Currently on Bond for Another Case?</label>
             </div>
           </div>
           <div class="full">
             <label for="defendantVehicle">Defendant's Vehicle to get to Court<span class="req">*</span></label>
+            <div class="hint">Examples: "2018 Honda Civic", "Family member will drive", "Public transportation", "Uber/Taxi"</div>
             <input id="defendantVehicle" name="defendantVehicle" required />
           </div>
         </div>
@@ -383,6 +389,7 @@
           </div>
           <div>
             <label for="partnerWorkType">Partner Type of Work</label>
+            <div class="hint">Examples: "Manager", "Construction Worker", "Nurse", "Self-employed", "Unemployed"</div>
             <input id="partnerWorkType" name="partnerWorkType" />
           </div>
         </div>
@@ -923,14 +930,14 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       .then(() => {
         submitBtn.disabled = false;
         loadingIndicator.style.display = 'none';
-        showStep(22); // Show completion section
+        showStep(11); // Show completion section
       })
       .catch((error) => {
         console.error('Submission error:', error);
         submitBtn.disabled = false;
         loadingIndicator.style.display = 'none';
         // Still show completion since no-cors doesn't return errors properly
-        showStep(22);
+        showStep(11);
       });
     });
 
