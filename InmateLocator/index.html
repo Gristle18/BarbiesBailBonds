@@ -185,6 +185,68 @@
             box-shadow: 0 6px 20px rgba(242, 140, 0, 0.4);
         }
 
+        /* Prominent Palm Beach Button */
+        .palm-beach-prominent {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border-radius: 16px;
+            border: 2px solid var(--brand);
+            box-shadow: 0 8px 25px rgba(242, 140, 0, 0.15);
+        }
+
+        .palm-beach-prominent h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--brand);
+            margin-bottom: 15px;
+        }
+
+        .palm-beach-prominent p {
+            font-size: 16px;
+            color: var(--muted);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .palm-beach-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+            color: white;
+            padding: 20px 40px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(242, 140, 0, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+
+        .palm-beach-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(242, 140, 0, 0.4);
+            background: linear-gradient(135deg, var(--brand-dark), var(--brand));
+        }
+
+        @media (max-width: 768px) {
+            .palm-beach-prominent {
+                margin: 30px 0;
+                padding: 25px 20px;
+            }
+
+            .palm-beach-prominent h3 {
+                font-size: 20px;
+            }
+
+            .palm-beach-button {
+                padding: 18px 35px;
+                font-size: 18px;
+            }
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .main-title {
@@ -509,6 +571,13 @@
                 Search for inmates in Florida county detention facilities. Select your county below to access the local inmate locator system. 
                 Need help with bail bonds? Call <strong class="phone-number">561-247-0018</strong> for immediate assistance.
             </p>
+        </div>
+
+        <!-- Prominent Palm Beach Button -->
+        <div class="palm-beach-prominent">
+            <h3>🏛️ Palm Beach County</h3>
+            <p>Most of our clients are located in Palm Beach County. Click here for quick access to the PBSO inmate locator.</p>
+            <a href="https://www3.pbso.org/blotter/" class="palm-beach-button" target="_blank" rel="noopener">Search Palm Beach County Jail</a>
         </div>
 
         <div class="counties-section">
