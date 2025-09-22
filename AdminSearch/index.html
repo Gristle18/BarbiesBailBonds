@@ -1649,9 +1649,9 @@
       const timestamp = result.timestamp ? new Date(result.timestamp).toLocaleDateString() : 'Unknown';
       
       // Create file links
-      const fileLinks = result.fileUrls.map((url, index) => 
+      const fileLinks = result.fileUrls ? result.fileUrls.map((url, index) =>
         `<a href="${url}" target="_blank" class="file-link">File ${index + 1}</a>`
-      ).join('');
+      ).join('') : '';
 
       return `
         <div class="result-item">
