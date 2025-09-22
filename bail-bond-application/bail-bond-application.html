@@ -92,10 +92,13 @@
       <!-- STEP 1: ID Upload -->
       <div class="section active" data-step="0">
         <div style="text-align:center; margin-bottom:30px;">
-          <h2 style="color:#fff; font-size:28px; margin-bottom:15px; font-weight:700;">📸 Upload Your ID</h2>
+          <h2 style="color:#fff; font-size:28px; margin-bottom:15px; font-weight:700;">📸 Upload Your ID<span class="req">*</span></h2>
           <p style="color:#fff; font-size:16px; line-height:1.5;">
             Please take photos of the front and back of your government-issued ID.
           </p>
+          <div id="idUploadError" class="error" style="text-align:center; margin-top:10px; font-size:16px;">
+            Both front and back ID photos are required to continue.
+          </div>
         </div>
 
         <div style="background:#fff; padding:30px; border-radius:12px; margin:20px 0;">
@@ -904,9 +907,12 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
 
       // Special validation for upload step (step 0) - require both front and back ID
       if (idx === 0) {
+        const errorDiv = document.getElementById('idUploadError');
         if (!storedIDFiles.front || !storedIDFiles.back) {
+          if (errorDiv) errorDiv.style.display = 'block';
           return false; // Both front and back ID uploads are required
         }
+        if (errorDiv) errorDiv.style.display = 'none';
         return true;
       }
 
@@ -1081,12 +1087,14 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
 
     function updateUploadButton() {
       const uploadBtn = document.getElementById('uploadNextBtn');
+      const errorDiv = document.getElementById('idUploadError');
       const hasFiles = storedIDFiles.front || storedIDFiles.back;
 
       if (storedIDFiles.front && storedIDFiles.back) {
         uploadBtn.textContent = 'Continue (Both Sides Uploaded)';
         uploadBtn.style.background = '#28a745';
         uploadBtn.disabled = false;
+        if (errorDiv) errorDiv.style.display = 'none';
       } else if (hasFiles) {
         uploadBtn.textContent = 'Upload Both Sides Required';
         uploadBtn.style.background = '#666';
