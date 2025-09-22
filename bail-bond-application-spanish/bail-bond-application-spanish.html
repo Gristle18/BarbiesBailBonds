@@ -902,9 +902,12 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SUS CONTENIDOS. RECONOZCO REC
     function validateStep(idx) {
       const step = sections[idx];
 
-      // Special validation for upload step (step 0) - always allow to continue
+      // Special validation for upload step (step 0) - require both front and back ID
       if (idx === 0) {
-        return true; // Upload is optional
+        if (!storedIDFiles.front || !storedIDFiles.back) {
+          return false; // Both front and back ID uploads are required
+        }
+        return true;
       }
 
       // Special validation for intake step (step 1) - ensure role is selected and labels are updated
@@ -1081,14 +1084,17 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SUS CONTENIDOS. RECONOZCO REC
       const hasFiles = storedIDFiles.front || storedIDFiles.back;
 
       if (storedIDFiles.front && storedIDFiles.back) {
-        uploadBtn.textContent = 'Continuar (Ambos Lados Almacenados)';
+        uploadBtn.textContent = 'Continuar (Ambos Lados Subidos)';
         uploadBtn.style.background = '#28a745';
+        uploadBtn.disabled = false;
       } else if (hasFiles) {
-        uploadBtn.textContent = 'Continuar (Subida Parcial)';
-        uploadBtn.style.background = '#F28C00';
+        uploadBtn.textContent = 'Se Requieren Ambos Lados';
+        uploadBtn.style.background = '#666';
+        uploadBtn.disabled = true;
       } else {
-        uploadBtn.textContent = 'Continuar';
-        uploadBtn.style.background = '#F28C00';
+        uploadBtn.textContent = 'Se Requieren Ambos Lados';
+        uploadBtn.style.background = '#666';
+        uploadBtn.disabled = true;
       }
     }
 
