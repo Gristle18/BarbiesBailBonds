@@ -691,9 +691,9 @@
       <div class="subtitle">Search client records and uploaded documents</div>
     </div>
 
-    <!-- Quick Search Section -->
+    <!-- Exact Quick Search Section -->
     <div class="search-section">
-      <h3 style="margin-bottom: 20px; color: var(--dark); font-size: 18px; font-weight: 600;">Quick Search</h3>
+      <h3 style="margin-bottom: 20px; color: var(--dark); font-size: 18px; font-weight: 600;">🎯 Exact Quick Search</h3>
 
       <div class="search-container">
         <input
@@ -840,8 +840,8 @@
     // DOM elements
     const searchInput = document.getElementById('searchInput'); // Advanced search
     const searchButton = document.getElementById('searchButton'); // Advanced search
-    const quickSearchInput = document.getElementById('quickSearchInput'); // Quick search
-    const quickSearchButton = document.getElementById('quickSearchButton'); // Quick search
+    const quickSearchInput = document.getElementById('quickSearchInput'); // Exact quick search
+    const quickSearchButton = document.getElementById('quickSearchButton'); // Exact quick search
     const loading = document.getElementById('loading');
     const resultsSection = document.getElementById('resultsSection');
     const resultsCount = document.getElementById('resultsCount');
@@ -877,7 +877,7 @@
       }
     });
 
-    // Quick search event listeners
+    // Exact quick search event listeners
     quickSearchButton.addEventListener('click', performQuickSearch);
     quickSearchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
@@ -891,7 +891,7 @@
       searchInput.focus();
     }
 
-    // Set quick search example - make globally accessible
+    // Set exact quick search example - make globally accessible
     window.setQuickSearchExample = function(example) {
       quickSearchInput.value = example;
       quickSearchInput.focus();
@@ -1575,9 +1575,9 @@
       return div.innerHTML;
     }
 
-    // Perform universal quick search
+    // Perform universal exact quick search
     async function performQuickSearch() {
-      debugLog('🔍 Starting quick search');
+      debugLog('🔍 Starting exact quick search');
 
       const query = quickSearchInput.value.trim();
       if (!query) {
@@ -1585,7 +1585,7 @@
         return;
       }
 
-      debugLog('📝 Quick search query', { query });
+      debugLog('📝 Exact quick search query', { query });
 
       // Show loading state
       hideAllResults();
@@ -1602,7 +1602,7 @@
           dateFilter: dateFilter
         };
 
-        debugLog('📤 Quick search request', requestPayload);
+        debugLog('📤 Exact quick search request', requestPayload);
 
         // Make request to backend with CORS fallback
         let data;
@@ -1620,7 +1620,7 @@
 
           if (response.ok) {
             data = await response.json();
-            debugLog('📨 Quick search response received', { success: data.success, hasResults: !!data.results });
+            debugLog('📨 Exact quick search response received', { success: data.success, hasResults: !!data.results });
           } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
           }
@@ -1639,7 +1639,7 @@
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
             const safariNote = isSafari ? '\n\nSafari users: Try disabling "Prevent cross-site tracking" in Safari > Privacy settings.' : '';
 
-            throw new Error(`Quick search failed. This may indicate:\n1. Network connectivity issues\n2. Server timeout (try a more specific search)\n3. Browser compatibility issue\n\nTry using Chrome or Edge browser for best results.${safariNote}\n\nErrors: Fetch: ${fetchError.message} | JSONP: ${jsonpError.message}`);
+            throw new Error(`Exact quick search failed. This may indicate:\n1. Network connectivity issues\n2. Server timeout (try a more specific search)\n3. Browser compatibility issue\n\nTry using Chrome or Edge browser for best results.${safariNote}\n\nErrors: Fetch: ${fetchError.message} | JSONP: ${jsonpError.message}`);
           }
         }
 
@@ -1667,18 +1667,18 @@
             debugLog('📚 Server error stack', { stack: data.errorStack });
           }
 
-          throw new Error(data.error || 'Quick search failed');
+          throw new Error(data.error || 'Exact quick search failed');
         }
 
-        console.log('✅ Quick search results:', data);
+        console.log('✅ Exact quick search results:', data);
         displayResults(data);
 
       } catch (error) {
-        console.error('❌ Quick search error:', error);
-        debugLog('❌ Quick search failed', { error: error.message, stack: error.stack });
+        console.error('❌ Exact quick search error:', error);
+        debugLog('❌ Exact quick search failed', { error: error.message, stack: error.stack });
 
         document.getElementById('resultsList').innerHTML = '';
-        showError(`Quick search failed: ${error.message}`);
+        showError(`Exact quick search failed: ${error.message}`);
       }
     }
 
@@ -1687,7 +1687,7 @@
       const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
       if (isSafari) {
-        console.log('Safari browser detected - CORS improvements applied for both Quick Search and Advanced Search');
+        console.log('Safari browser detected - CORS improvements applied for both Exact Quick Search and Advanced Search');
         // Safari-specific optimizations are applied in both search functions
         debugLog('🦁 Safari compatibility mode enabled');
       }
