@@ -721,6 +721,54 @@
       </div>
     </div>
 
+    <!-- Field Search Section -->
+    <div class="search-section">
+      <h3 style="margin-bottom: 20px; color: var(--dark); font-size: 18px; font-weight: 600;">🎯 Exact Field Search</h3>
+
+      <div class="field-search-container">
+        <div class="field-search-grid">
+          <div class="field-input-group">
+            <label for="fieldName">Full Name</label>
+            <input type="text" id="fieldName" placeholder="Defendant's complete name" autocomplete="off">
+          </div>
+
+          <div class="field-input-group">
+            <label for="fieldCaseBooking">Case/Booking Number</label>
+            <input type="text" id="fieldCaseBooking" placeholder="Case or booking number" autocomplete="off">
+          </div>
+
+          <div class="field-input-group">
+            <label for="fieldDob">Date of Birth</label>
+            <input type="text" id="fieldDob" placeholder="MM/DD/YYYY" autocomplete="off">
+          </div>
+
+          <div class="field-input-group">
+            <label for="fieldSsn">Social Security Number</label>
+            <input type="text" id="fieldSsn" placeholder="XXX-XX-XXXX" autocomplete="off">
+          </div>
+
+          <div class="field-input-group">
+            <label for="fieldDr">Driver's License/ID</label>
+            <input type="text" id="fieldDr" placeholder="Driver's license or ID number" autocomplete="off">
+          </div>
+
+          <div class="field-input-group">
+            <label for="fieldPower">Power/Bond Number</label>
+            <input type="text" id="fieldPower" placeholder="Power or bond number" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="field-search-actions">
+          <button class="search-button-main" id="fieldSearchButton">Search Exact Fields</button>
+          <button class="clear-button" id="fieldClearButton">Clear All</button>
+        </div>
+      </div>
+
+      <div class="search-help">
+        Enter exact values in any field(s). All filled fields must match exactly for a result to appear.
+      </div>
+    </div>
+
     <!-- Advanced Search Section -->
     <div class="search-section advanced-search">
       <div class="advanced-header">
@@ -842,6 +890,8 @@
     const searchButton = document.getElementById('searchButton'); // Advanced search
     const quickSearchInput = document.getElementById('quickSearchInput'); // Quick search
     const quickSearchButton = document.getElementById('quickSearchButton'); // Quick search
+    const fieldSearchButton = document.getElementById('fieldSearchButton'); // Field search
+    const fieldClearButton = document.getElementById('fieldClearButton'); // Field clear
     const loading = document.getElementById('loading');
     const resultsSection = document.getElementById('resultsSection');
     const resultsCount = document.getElementById('resultsCount');
@@ -884,6 +934,10 @@
         performQuickSearch();
       }
     });
+
+    // Field search event listeners
+    fieldSearchButton.addEventListener('click', performFieldSearch);
+    fieldClearButton.addEventListener('click', clearFieldSearch);
 
     // Set search example - make globally accessible
     window.setSearchExample = function(example) {
@@ -1680,6 +1734,137 @@
         document.getElementById('resultsList').innerHTML = '';
         showError(`Quick search failed: ${error.message}`);
       }
+    }
+
+    // Field search function
+    async function performFieldSearch() {
+      debugLog('🎯 Starting field search');
+
+      // Collect field values
+      const fields = {};
+      const fieldInputs = {
+        name: document.getElementById('fieldName'),
+        caseBooking: document.getElementById('fieldCaseBooking'),
+        dob: document.getElementById('fieldDob'),
+        ssn: document.getElementById('fieldSsn'),
+        dr: document.getElementById('fieldDr'),
+        power: document.getElementById('fieldPower')
+      };
+
+      // Only include non-empty fields
+      let hasValues = false;
+      for (const [key, input] of Object.entries(fieldInputs)) {
+        const value = input.value.trim();
+        if (value) {
+          fields[key] = value;
+          hasValues = true;
+        }
+      }
+
+      if (!hasValues) {
+        showError('Please enter at least one field value to search');
+        return;
+      }
+
+      debugLog('📝 Field search values', { fields });
+
+      // Show loading state
+      hideAllResults();
+      document.getElementById('resultsList').innerHTML = '<div class="loading">Searching exact fields...</div>';
+
+      try {
+        // Get date range
+        const dateFilter = getDateRange();
+
+        // Prepare request for field search
+        const requestPayload = {
+          query: '', // Empty query for field search
+          searchType: 'field',
+          fields: fields,
+          dateFilter: dateFilter
+        };
+
+        debugLog('📤 Field search request', requestPayload);
+
+        // Make request to backend with CORS fallback
+        let data;
+        try {
+          // Try modern fetch first for better Safari compatibility
+          debugLog('🚀 Trying modern fetch request');
+          const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestPayload),
+            mode: 'cors'
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          data = await response.json();
+          debugLog('✅ Field search response received via modern fetch');
+
+        } catch (fetchError) {
+          debugLog('❌ Modern fetch failed, falling back to JSONP', { error: fetchError.message });
+
+          // Fallback to JSONP for better compatibility
+          const queryString = new URLSearchParams({
+            searchType: 'field',
+            fields: JSON.stringify(fields),
+            dateFilter: JSON.stringify(dateFilter)
+          }).toString();
+
+          data = await makeJSONPRequest(`${CONFIG.SEARCH_ENDPOINT}?${queryString}`);
+        }
+
+        if (!data.success) {
+          debugLog('❌ Field search error response', data);
+
+          if (data.errorStack) {
+            debugLog('📚 Server error stack', { stack: data.errorStack });
+          }
+
+          throw new Error(data.error || 'Field search failed');
+        }
+
+        console.log('✅ Field search results:', data);
+        displayResults(data);
+
+      } catch (error) {
+        console.error('❌ Field search error:', error);
+        debugLog('❌ Field search failed', { error: error.message, stack: error.stack });
+
+        document.getElementById('resultsList').innerHTML = '';
+        showError(`Field search failed: ${error.message}`);
+      }
+    }
+
+    // Clear all field search inputs
+    function clearFieldSearch() {
+      debugLog('🧹 Clearing field search inputs');
+
+      const fieldInputs = [
+        'fieldName',
+        'fieldCaseBooking',
+        'fieldDob',
+        'fieldSsn',
+        'fieldDr',
+        'fieldPower'
+      ];
+
+      fieldInputs.forEach(fieldId => {
+        const input = document.getElementById(fieldId);
+        if (input) {
+          input.value = '';
+        }
+      });
+
+      // Clear results
+      hideAllResults();
+      debugLog('✅ Field search cleared');
     }
 
     // Detect Safari browser and show compatibility notice
