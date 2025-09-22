@@ -640,6 +640,80 @@
       opacity: 0.5;
     }
 
+    /* Debug Section Styles */
+    .debug-section {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 12px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+
+    .debug-header {
+      background: #e9ecef;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .debug-header h3 {
+      margin: 0;
+      font-size: 16px;
+      color: var(--dark);
+    }
+
+    .debug-toggle {
+      background: var(--brand);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .debug-toggle:hover {
+      background: var(--brand-dark);
+    }
+
+    .debug-content {
+      padding: 20px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .debug-entry {
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 12px;
+    }
+
+    .debug-timestamp {
+      color: var(--muted);
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .debug-message {
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    .debug-data {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 8px;
+      white-space: pre-wrap;
+      color: #6f42c1;
+    }
+
     .error-message {
       background: var(--error);
       color: var(--white);
@@ -827,6 +901,15 @@
       <p>Try different search terms or check your spelling.<br>
       Use natural language like "John Smith phone number" or "Government ID 2024".</p>
     </div>
+
+    <!-- Debug Information -->
+    <div class="debug-section" id="debugSection" style="display: none;">
+      <div class="debug-header">
+        <h3>🔧 Backend Debug Information</h3>
+        <button class="debug-toggle" id="debugToggle">Hide Debug</button>
+      </div>
+      <div class="debug-content" id="debugContent"></div>
+    </div>
   </div>
 
   <script>
@@ -849,6 +932,9 @@
     const resultsList = document.getElementById('resultsList');
     const noResults = document.getElementById('noResults');
     const errorMessage = document.getElementById('errorMessage');
+    const debugSection = document.getElementById('debugSection');
+    const debugContent = document.getElementById('debugContent');
+    const debugToggle = document.getElementById('debugToggle');
 
     let searchTimeout;
 
@@ -882,6 +968,20 @@
     quickSearchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         performQuickSearch();
+      }
+    });
+
+    // Debug toggle event listener
+    debugToggle.addEventListener('click', () => {
+      const content = debugContent;
+      const button = debugToggle;
+
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        button.textContent = 'Hide Debug';
+      } else {
+        content.style.display = 'none';
+        button.textContent = 'Show Debug';
       }
     });
 
@@ -1058,6 +1158,45 @@
       };
     }
 
+    // Display debug information from backend
+    function displayDebugInfo(debugMessages) {
+      debugLog('🔧 Displaying backend debug info', { messageCount: debugMessages.length });
+
+      debugContent.innerHTML = '';
+
+      debugMessages.forEach((entry, index) => {
+        const debugEntry = document.createElement('div');
+        debugEntry.className = 'debug-entry';
+
+        const timestamp = document.createElement('div');
+        timestamp.className = 'debug-timestamp';
+        timestamp.textContent = new Date(entry.timestamp).toLocaleTimeString();
+
+        const message = document.createElement('div');
+        message.className = 'debug-message';
+        message.textContent = entry.message;
+
+        debugEntry.appendChild(timestamp);
+        debugEntry.appendChild(message);
+
+        if (entry.data) {
+          const data = document.createElement('div');
+          data.className = 'debug-data';
+          data.textContent = JSON.stringify(entry.data, null, 2);
+          debugEntry.appendChild(data);
+        }
+
+        debugContent.appendChild(debugEntry);
+      });
+
+      // Show debug section
+      debugSection.style.display = 'block';
+      debugContent.style.display = 'block';
+      debugToggle.textContent = 'Hide Debug';
+
+      debugLog('✅ Debug info displayed successfully');
+    }
+
     // Show error message
     function showError(message) {
       errorMessage.textContent = message;
@@ -1072,6 +1211,7 @@
       loading.classList.remove('show');
       resultsSection.classList.remove('show');
       noResults.style.display = 'none';
+      debugSection.style.display = 'none';
     }
 
     // JSONP request function for Google Sites compatibility
@@ -1429,6 +1569,11 @@
         console.log('✅ Search results:', data);
         displayResults(data);
 
+        // Display debug information if available
+        if (data.debug && data.debug.length > 0) {
+          displayDebugInfo(data.debug);
+        }
+
       } catch (error) {
         debugLog('❌ Error caught', {
           name: error.name,
@@ -1672,6 +1817,11 @@
 
         console.log('✅ Exact quick search results:', data);
         displayResults(data);
+
+        // Display debug information if available
+        if (data.debug && data.debug.length > 0) {
+          displayDebugInfo(data.debug);
+        }
 
       } catch (error) {
         console.error('❌ Exact quick search error:', error);
