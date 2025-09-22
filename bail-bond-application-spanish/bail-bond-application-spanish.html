@@ -84,7 +84,6 @@
       <div style="background:#eee; height:8px; border-radius:4px; overflow:hidden;">
         <div id="progressBar" style="background:#F28C00; height:100%; width:0%; transition:width 0.3s ease;"></div>
       </div>
-      <div id="progressText" style="color:#666; font-size:14px; text-align:center; margin-top:8px;">4% Completado</div>
     </div>
 
     <form id="f" novalidate>
@@ -794,18 +793,9 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SUS CONTENIDOS. RECONOZCO REC
       const progressPercent = (currentStep / totalSteps) * 100;
 
       const progressBar = document.getElementById('progressBar');
-      const progressText = document.getElementById('progressText');
 
       if (progressBar) {
         progressBar.style.width = `${progressPercent}%`;
-      }
-
-      if (progressText) {
-        if (idx === 23) {
-          progressText.textContent = '¡100% Completado!';
-        } else {
-          progressText.textContent = `${Math.round(progressPercent)}% Completado`;
-        }
       }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
