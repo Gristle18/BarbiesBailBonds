@@ -78,10 +78,62 @@
 </head>
 <body>
   <div class="wrap">
+    <!-- Progress Bar -->
+    <div style="background:#fff; padding:20px; border-radius:12px; margin-bottom:30px;">
+      <div style="color:#333; font-size:16px; font-weight:600; margin-bottom:10px; text-align:center;">Application Progress</div>
+      <div style="background:#eee; height:8px; border-radius:4px; overflow:hidden;">
+        <div id="progressBar" style="background:#F28C00; height:100%; width:0%; transition:width 0.3s ease;"></div>
+      </div>
+      <div id="progressText" style="color:#666; font-size:14px; text-align:center; margin-top:8px;">Step 1 of 23</div>
+    </div>
+
     <form id="f" novalidate>
 
-      <!-- STEP 1: Intake (2 questions) -->
+      <!-- STEP 1: ID Upload -->
       <div class="section active" data-step="0">
+        <div style="text-align:center; margin-bottom:30px;">
+          <h2 style="color:#fff; font-size:28px; margin-bottom:15px; font-weight:700;">📄 Upload Documents First</h2>
+          <p style="color:#fff; font-size:16px; line-height:1.5;">
+            Let's start by uploading your ID and supporting documents to streamline the process.
+          </p>
+        </div>
+
+        <div style="background:#fff; padding:30px; border-radius:12px; margin:20px 0;">
+          <div style="color:#333; margin-bottom:20px;">
+            <div style="font-size:18px; font-weight:600; margin-bottom:10px; color:#333;">Required Documents:</div>
+            <ul style="margin-left:20px; color:#666; line-height:1.6;">
+              <li>Government-issued photo ID (Driver's License, State ID, or Passport)</li>
+              <li>Proof of address (Utility bill, lease agreement, etc.)</li>
+              <li>Proof of employment (Pay stub, employment letter, etc.)</li>
+            </ul>
+          </div>
+
+          <div style="border:2px dashed #ddd; padding:40px; text-align:center; border-radius:8px; margin:20px 0; background:#f9f9f9;">
+            <div style="font-size:48px; margin-bottom:15px;">📁</div>
+            <div style="font-size:18px; font-weight:600; color:#333; margin-bottom:10px;">Drag & Drop Files Here</div>
+            <div style="color:#666; margin-bottom:20px;">or</div>
+            <input type="file" id="fileInput" multiple accept="image/*,.pdf" style="display:none;" onchange="handleFileSelect(this.files)">
+            <button type="button" onclick="document.getElementById('fileInput').click()" style="background:#F28C00; color:#fff; border:none; padding:12px 24px; border-radius:6px; font-size:16px; cursor:pointer;">
+              Choose Files
+            </button>
+            <div style="font-size:14px; color:#999; margin-top:15px;">Supports: JPG, PNG, PDF (Max 10MB each)</div>
+          </div>
+
+          <div id="fileList" style="margin-top:20px;"></div>
+        </div>
+
+        <div style="background:#fff2d1; padding:20px; border-radius:8px; margin:20px 0; text-align:center;">
+          <div style="color:#333; font-weight:600; margin-bottom:8px;">Having Issues?</div>
+          <div style="color:#666;">Text photos directly to <span style="color:#F28C00; font-weight:600; white-space: nowrap;">561-247-0018</span> or call <a href="tel:+15612470018" style="color:#F28C00; text-decoration:none; white-space: nowrap;">561-247-0018</a></div>
+        </div>
+
+        <div class="step-actions">
+          <button class="primary" type="button" data-next id="uploadNextBtn">Continue</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Intake (2 questions) -->
+      <div class="section" data-step="1">
         <div class="grid">
           <div class="full">
             <label for="whoAreYou">Who are you?<span class="req">*</span></label>
@@ -687,8 +739,9 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         </div>
       </div>
 
+
       <!-- STEP 13: Application Complete -->
-      <div class="section" data-step="22" id="completionSection">
+      <div class="section" data-step="23" id="completionSection">
         <div style="text-align:center; padding:40px 20px;">
           <div style="font-size:48px; margin-bottom:20px;">⚠️</div>
           <h2 style="color:#fff; font-size:24px; margin-bottom:20px; font-weight:700;">Next Step: We'll Call You</h2>
@@ -716,6 +769,27 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       sections.forEach((s, i) => {
         s.classList.toggle('active', i === idx);
       });
+
+      // Update progress bar
+      const totalSteps = 23; // Total steps including upload and completion
+      const currentStep = idx + 1;
+      const progressPercent = (currentStep / totalSteps) * 100;
+
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+
+      if (progressBar) {
+        progressBar.style.width = `${progressPercent}%`;
+      }
+
+      if (progressText) {
+        if (idx === 23) {
+          progressText.textContent = 'Application Complete!';
+        } else {
+          progressText.textContent = `Step ${currentStep} of ${totalSteps}`;
+        }
+      }
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -812,15 +886,20 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
 
     function validateStep(idx) {
       const step = sections[idx];
-      
-      // Special validation for first step - ensure role is selected and labels are updated
+
+      // Special validation for upload step (step 0) - always allow to continue
       if (idx === 0) {
+        return true; // Upload is optional
+      }
+
+      // Special validation for intake step (step 1) - ensure role is selected and labels are updated
+      if (idx === 1) {
         const whoAreYouSelect = document.getElementById('whoAreYou');
         if (!whoAreYouSelect.value) {
           whoAreYouSelect.reportValidity();
           return false;
         }
-        
+
         // Ensure labels have been updated for the selected role
         if (whoAreYouSelect.value && !userRole) {
           updateLabelsForRole(whoAreYouSelect.value);
@@ -922,18 +1001,125 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       .then(() => {
         submitBtn.disabled = false;
         loadingIndicator.style.display = 'none';
-        showStep(22); // Show completion section
+        showStep(23); // Show completion section
       })
       .catch((error) => {
         console.error('Submission error:', error);
         submitBtn.disabled = false;
         loadingIndicator.style.display = 'none';
         // Still show completion since no-cors doesn't return errors properly
-        showStep(22);
+        showStep(23);
       });
     });
 
-    
+    // File upload functionality
+    let uploadedFiles = [];
+
+    function handleFileSelect(files) {
+      const fileList = document.getElementById('fileList');
+
+      Array.from(files).forEach(file => {
+        // File size check (10MB limit)
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`File "${file.name}" is too large. Maximum size is 10MB.`);
+          return;
+        }
+
+        // File type check
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+        if (!allowedTypes.includes(file.type)) {
+          alert(`File "${file.name}" is not a supported format. Please use JPG, PNG, or PDF.`);
+          return;
+        }
+
+        // Add to uploaded files
+        uploadedFiles.push(file);
+
+        // Create file display element
+        const fileDiv = document.createElement('div');
+        fileDiv.style.cssText = 'display:flex; align-items:center; gap:10px; margin:10px 0; padding:10px; background:#f0f0f0; border-radius:6px;';
+
+        // File icon based on type
+        const icon = file.type.includes('image') ? '🖼️' : '📄';
+
+        fileDiv.innerHTML = `
+          <span style="font-size:20px;">${icon}</span>
+          <div style="flex:1;">
+            <div style="font-weight:600; color:#333;">${file.name}</div>
+            <div style="font-size:12px; color:#666;">${(file.size / 1024).toFixed(1)} KB</div>
+          </div>
+          <button type="button" onclick="removeFile('${file.name}')" style="background:#dc3545; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:12px;">Remove</button>
+        `;
+
+        fileList.appendChild(fileDiv);
+      });
+
+      // Update button text if files are uploaded
+      const uploadBtn = document.getElementById('uploadNextBtn');
+      if (uploadedFiles.length > 0) {
+        uploadBtn.textContent = `Continue (${uploadedFiles.length} files uploaded)`;
+        uploadBtn.className = 'primary';
+      } else {
+        uploadBtn.textContent = 'Continue';
+        uploadBtn.className = 'primary';
+      }
+    }
+
+    function removeFile(fileName) {
+      uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+
+      // Rebuild file list
+      const fileList = document.getElementById('fileList');
+      fileList.innerHTML = '';
+
+      // Re-add remaining files
+      uploadedFiles.forEach(file => {
+        const icon = file.type.includes('image') ? '🖼️' : '📄';
+        const fileDiv = document.createElement('div');
+        fileDiv.style.cssText = 'display:flex; align-items:center; gap:10px; margin:10px 0; padding:10px; background:#f0f0f0; border-radius:6px;';
+        fileDiv.innerHTML = `
+          <span style="font-size:20px;">${icon}</span>
+          <div style="flex:1;">
+            <div style="font-weight:600; color:#333;">${file.name}</div>
+            <div style="font-size:12px; color:#666;">${(file.size / 1024).toFixed(1)} KB</div>
+          </div>
+          <button type="button" onclick="removeFile('${file.name}')" style="background:#dc3545; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:12px;">Remove</button>
+        `;
+        fileList.appendChild(fileDiv);
+      });
+
+      // Update button text
+      const uploadBtn = document.getElementById('uploadNextBtn');
+      if (uploadedFiles.length > 0) {
+        uploadBtn.textContent = `Continue (${uploadedFiles.length} files uploaded)`;
+      } else {
+        uploadBtn.textContent = 'Continue';
+      }
+    }
+
+    // Drag and drop functionality
+    const dropZone = document.querySelector('[style*="border:2px dashed"]');
+    if (dropZone) {
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#F28C00';
+        dropZone.style.background = '#fff8ec';
+      });
+
+      dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#ddd';
+        dropZone.style.background = '#f9f9f9';
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#ddd';
+        dropZone.style.background = '#f9f9f9';
+        handleFileSelect(e.dataTransfer.files);
+      });
+    }
+
   </script>
 
 <!-- Chatbot Widget -->
