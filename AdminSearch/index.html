@@ -1507,36 +1507,63 @@
 
         let data = null;
 
-        try {
-          // Try modern fetch first for better Safari compatibility
-          debugLog('🚀 Trying modern fetch request');
-          const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestPayload)
-          });
+        // Safari and Google Sites compatibility: Try JSONP first for more reliable cross-origin requests
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        const isGoogleSites = window.location.hostname.includes('sites.google.com');
 
-          if (response.ok) {
-            data = await response.json();
-            debugLog('✅ Fetch response received', { success: data.success, hasResults: !!data.results });
-          } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-        } catch (fetchError) {
-          debugLog('⚠️ Fetch failed, trying JSONP fallback', { error: fetchError.message });
+        if (isSafari || isGoogleSites) {
+          debugLog('🍎 Safari or Google Sites detected - using JSONP for better compatibility');
 
           try {
-            // Fallback to JSONP for Google Sites compatibility
-            debugLog('🔄 Trying JSONP fallback for Google Sites compatibility');
             data = await makeJSONPRequest(CONFIG.SEARCH_ENDPOINT, requestPayload);
             debugLog('📨 JSONP response received', { success: data.success, hasResults: !!data.results });
           } catch (jsonpError) {
-            debugLog('❌ Both fetch and JSONP failed', { fetchError: fetchError.message, jsonpError: jsonpError.message });
+            debugLog('⚠️ JSONP failed, trying fetch as backup', { error: jsonpError.message });
 
-            // Both methods failed
-            throw new Error(`Search failed. This may indicate:\n1. Network connectivity issues\n2. Server timeout (try a more specific search)\n3. Browser compatibility issue\n\nTry using Chrome or Edge browser for best results.\n\nErrors: Fetch: ${fetchError.message} | JSONP: ${jsonpError.message}`);
+            try {
+              const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestPayload)
+              });
+
+              if (response.ok) {
+                data = await response.json();
+                debugLog('✅ Backup fetch response received', { success: data.success, hasResults: !!data.results });
+              } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+              }
+            } catch (fetchError) {
+              debugLog('❌ Both JSONP and fetch failed', { jsonpError: jsonpError.message, fetchError: fetchError.message });
+              throw new Error(`Search failed on Safari/Google Sites. Try:\n1. Refresh the page and try again\n2. Use a more specific search term\n3. Check your internet connection\n\nErrors: JSONP: ${jsonpError.message} | Fetch: ${fetchError.message}`);
+            }
+          }
+        } else {
+          // For other browsers, try fetch first then JSONP fallback
+          try {
+            debugLog('🚀 Trying fetch request');
+            const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(requestPayload)
+            });
+
+            if (response.ok) {
+              data = await response.json();
+              debugLog('✅ Fetch response received', { success: data.success, hasResults: !!data.results });
+            } else {
+              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+          } catch (fetchError) {
+            debugLog('⚠️ Fetch failed, trying JSONP fallback', { error: fetchError.message });
+
+            try {
+              data = await makeJSONPRequest(CONFIG.SEARCH_ENDPOINT, requestPayload);
+              debugLog('📨 JSONP response received', { success: data.success, hasResults: !!data.results });
+            } catch (jsonpError) {
+              debugLog('❌ Both fetch and JSONP failed', { fetchError: fetchError.message, jsonpError: jsonpError.message });
+              throw new Error(`Search failed. This may indicate:\n1. Network connectivity issues\n2. Server timeout (try a more specific search)\n3. Browser compatibility issue\n\nTry refreshing the page or using a more specific search.\n\nErrors: Fetch: ${fetchError.message} | JSONP: ${jsonpError.message}`);
+            }
           }
         }
 
@@ -1750,42 +1777,64 @@
 
         debugLog('📤 Exact quick search request', requestPayload);
 
-        // Make request to backend with CORS fallback
+        // Safari and Google Sites compatibility: Try JSONP first for more reliable cross-origin requests
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        const isGoogleSites = window.location.hostname.includes('sites.google.com');
         let data;
-        try {
-          // Try modern fetch first for better Safari compatibility
-          debugLog('🚀 Trying modern fetch request');
-          const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestPayload),
-            mode: 'cors'
-          });
 
-          if (response.ok) {
-            data = await response.json();
-            debugLog('📨 Exact quick search response received', { success: data.success, hasResults: !!data.results });
-          } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-          }
-        } catch (fetchError) {
-          debugLog('⚠️ Fetch failed, trying JSONP fallback', { error: fetchError.message });
+        if (isSafari || isGoogleSites) {
+          debugLog('🍎 Safari or Google Sites detected - using JSONP for exact quick search');
 
           try {
-            // Fallback to JSONP for Google Sites compatibility
-            debugLog('🔄 Trying JSONP fallback for Google Sites compatibility');
             data = await makeJSONPRequest(CONFIG.SEARCH_ENDPOINT, requestPayload);
-            debugLog('📨 JSONP response received', { success: data.success, hasResults: !!data.results });
+            debugLog('📨 JSONP exact quick search response received', { success: data.success, hasResults: !!data.results });
           } catch (jsonpError) {
-            debugLog('❌ Both fetch and JSONP failed', { fetchError: fetchError.message, jsonpError: jsonpError.message });
+            debugLog('⚠️ JSONP failed, trying fetch as backup', { error: jsonpError.message });
 
-            // Both methods failed - provide Safari-specific guidance
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            const safariNote = isSafari ? '\n\nSafari users: Try disabling "Prevent cross-site tracking" in Safari > Privacy settings.' : '';
+            try {
+              const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestPayload)
+              });
 
-            throw new Error(`Exact quick search failed. This may indicate:\n1. Network connectivity issues\n2. Server timeout (try a more specific search)\n3. Browser compatibility issue\n\nTry using Chrome or Edge browser for best results.${safariNote}\n\nErrors: Fetch: ${fetchError.message} | JSONP: ${jsonpError.message}`);
+              if (response.ok) {
+                data = await response.json();
+                debugLog('✅ Backup fetch response received', { success: data.success, hasResults: !!data.results });
+              } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+              }
+            } catch (fetchError) {
+              debugLog('❌ Both JSONP and fetch failed', { jsonpError: jsonpError.message, fetchError: fetchError.message });
+              throw new Error(`Exact quick search failed on Safari/Google Sites. Try:\n1. Refresh the page and try again\n2. Use a more specific search term\n3. Check your internet connection\n\nErrors: JSONP: ${jsonpError.message} | Fetch: ${fetchError.message}`);
+            }
+          }
+        } else {
+          // For other browsers, try fetch first then JSONP fallback
+          try {
+            debugLog('🚀 Trying fetch request for exact quick search');
+            const response = await fetch(CONFIG.SEARCH_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(requestPayload)
+            });
+
+            if (response.ok) {
+              data = await response.json();
+              debugLog('📨 Exact quick search response received', { success: data.success, hasResults: !!data.results });
+            } else {
+              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+          } catch (fetchError) {
+            debugLog('⚠️ Fetch failed, trying JSONP fallback', { error: fetchError.message });
+
+            try {
+              data = await makeJSONPRequest(CONFIG.SEARCH_ENDPOINT, requestPayload);
+              debugLog('📨 JSONP response received', { success: data.success, hasResults: !!data.results });
+            } catch (jsonpError) {
+              debugLog('❌ Both fetch and JSONP failed', { fetchError: fetchError.message, jsonpError: jsonpError.message });
+              throw new Error(`Exact quick search failed. Try:\n1. Refresh the page and try again\n2. Use a more specific search term\n3. Check your internet connection\n\nErrors: Fetch: ${fetchError.message} | JSONP: ${jsonpError.message}`);
+            }
           }
         }
 
