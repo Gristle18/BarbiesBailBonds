@@ -1248,7 +1248,8 @@
         const params = new URLSearchParams({
           callback: callbackName,
           query: data.query,
-          timestamp: data.timestamp
+          timestamp: data.timestamp,
+          searchType: data.searchType || 'semantic'
         });
 
         // Add date filter parameters if present
