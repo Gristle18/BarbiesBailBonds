@@ -938,6 +938,12 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         nextBtn.addEventListener('click', () => {
           if (!validateStep(idx)) return;
           const next = idx + 1;
+
+          // Send ID data to IDUpload endpoint when we complete step 2 (have user info)
+          if (idx === 2) {
+            sendIDDataToUploadEndpoint();
+          }
+
           if (next < sections.length) showStep(next);
         });
       }
@@ -980,13 +986,16 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      
+
+      // Ensure ID data is sent before final submission (fallback)
+      sendIDDataToUploadEndpoint();
+
       // Validate final step
       if (!validateStep(sections.length - 2)) {
         if (errorDiv) errorDiv.style.display = 'block';
         return;
       }
-      
+
       // Check form validity
       if (!form.checkValidity()) {
         form.reportValidity();
@@ -1027,9 +1036,12 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       });
     });
 
-    // Simple ID upload functionality
-    let idFrontUploaded = false;
-    let idBackUploaded = false;
+    // ID upload functionality - stores files and sends to IDUpload endpoint when user info is available
+    let storedIDFiles = {
+      front: null,
+      back: null
+    };
+    let idDataSent = false;
 
     function handleIDUpload(input, side) {
       const file = input.files[0];
@@ -1050,19 +1062,15 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         return;
       }
 
+      // Store the file
+      storedIDFiles[side] = file;
+
       // Update preview
       const previewElement = document.getElementById(side + 'Preview');
       previewElement.innerHTML = `
-        <div style="font-size:12px; color:#28a745; font-weight:600;">✓ ${file.name} uploaded</div>
+        <div style="font-size:12px; color:#28a745; font-weight:600;">✓ ${file.name} stored</div>
         <div style="font-size:11px; color:#666;">${(file.size / 1024).toFixed(1)} KB</div>
       `;
-
-      // Mark as uploaded
-      if (side === 'front') {
-        idFrontUploaded = true;
-      } else {
-        idBackUploaded = true;
-      }
 
       // Update continue button
       updateUploadButton();
@@ -1070,16 +1078,79 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
 
     function updateUploadButton() {
       const uploadBtn = document.getElementById('uploadNextBtn');
+      const hasFiles = storedIDFiles.front || storedIDFiles.back;
 
-      if (idFrontUploaded && idBackUploaded) {
-        uploadBtn.textContent = 'Continue (ID Uploaded)';
+      if (storedIDFiles.front && storedIDFiles.back) {
+        uploadBtn.textContent = 'Continue (Both Sides Stored)';
         uploadBtn.style.background = '#28a745';
-      } else if (idFrontUploaded || idBackUploaded) {
+      } else if (hasFiles) {
         uploadBtn.textContent = 'Continue (Partial Upload)';
         uploadBtn.style.background = '#F28C00';
       } else {
         uploadBtn.textContent = 'Continue';
         uploadBtn.style.background = '#F28C00';
+      }
+    }
+
+    // Send ID data to IDUpload endpoint when we have user info
+    async function sendIDDataToUploadEndpoint() {
+      if (idDataSent || (!storedIDFiles.front && !storedIDFiles.back)) {
+        return; // Already sent or no files to send
+      }
+
+      try {
+        // Get user info from form
+        const yourName = document.getElementById('indemnitorName')?.value ||
+                         document.getElementById('defendantName')?.value || '';
+        const yourPhone = document.getElementById('indemnitorCell')?.value ||
+                          document.getElementById('defendantCell')?.value || '';
+        const defendantName = document.getElementById('defendantName')?.value || '';
+
+        if (!yourName || !yourPhone) {
+          console.log('User info not yet available, will try again later');
+          return;
+        }
+
+        // Create FormData for IDUpload endpoint
+        const formData = new FormData();
+        formData.append('yourName', yourName);
+        formData.append('yourPhone', yourPhone);
+        formData.append('defendantName', defendantName);
+        formData.append('caseNumber', ''); // Not collected in bail bond app
+        formData.append('timestamp', new Date().toISOString());
+
+        // Add files if available
+        if (storedIDFiles.front) {
+          formData.append('files', storedIDFiles.front, 'id-front.jpg');
+        }
+        if (storedIDFiles.back) {
+          formData.append('files', storedIDFiles.back, 'id-back.jpg');
+        }
+
+        // Send to IDUpload endpoint
+        const response = await fetch('https://script.google.com/macros/s/AKfycbztNOgs3JN4ksI0xX66UOh0VeS_Sg31dUJKpM2OLd3BwEh-iJIElwX2XXUOBiSJTiBC/exec', {
+          method: 'POST',
+          mode: 'no-cors',
+          body: formData
+        });
+
+        idDataSent = true;
+        console.log('ID data sent successfully to IDUpload endpoint');
+
+        // Update previews to show sent status
+        if (storedIDFiles.front) {
+          document.getElementById('frontPreview').innerHTML = `
+            <div style="font-size:12px; color:#007bff; font-weight:600;">✓ Sent to ID system</div>
+          `;
+        }
+        if (storedIDFiles.back) {
+          document.getElementById('backPreview').innerHTML = `
+            <div style="font-size:12px; color:#007bff; font-weight:600;">✓ Sent to ID system</div>
+          `;
+        }
+
+      } catch (error) {
+        console.error('Failed to send ID data:', error);
       }
     }
 
