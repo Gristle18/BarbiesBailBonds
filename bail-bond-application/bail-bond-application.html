@@ -550,10 +550,6 @@
             <label for="emergency1Phone">Emergency #1 Phone<span class="req">*</span></label>
             <input id="emergency1Phone" name="emergency1Phone" type="tel" inputmode="tel" data-phone required />
           </div>
-          <div class="full">
-            <label for="emergency1Relation">Emergency #1 Relation<span class="req">*</span></label>
-            <input id="emergency1Relation" name="emergency1Relation" required />
-          </div>
           <div>
             <label for="emergency2Name">Emergency Contact #2<span class="req">*</span></label>
             <input id="emergency2Name" name="emergency2Name" required />
@@ -569,19 +565,6 @@
         </div>
       </div>
 
-      <!-- STEP 8B: Emergency Contacts (1) -->
-      <div class="section" data-step="17">
-        <div class="grid">
-          <div class="full">
-            <label for="emergency2Relation">Emergency #2 Relation<span class="req">*</span></label>
-            <input id="emergency2Relation" name="emergency2Relation" required />
-          </div>
-        </div>
-        <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
-        </div>
-      </div>
 
       <!-- STEP 9: Terms and Conditions -->
       <div class="section" data-step="18">
@@ -905,7 +888,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       e.preventDefault();
       
       // Validate final step
-      if (!validateStep(sections.length - 1)) {
+      if (!validateStep(sections.length - 2)) {
         if (errorDiv) errorDiv.style.display = 'block';
         return;
       }
@@ -939,14 +922,14 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       .then(() => {
         submitBtn.disabled = false;
         loadingIndicator.style.display = 'none';
-        showStep(11); // Show completion section
+        showStep(22); // Show completion section
       })
       .catch((error) => {
         console.error('Submission error:', error);
         submitBtn.disabled = false;
         loadingIndicator.style.display = 'none';
         // Still show completion since no-cors doesn't return errors properly
-        showStep(11);
+        showStep(22);
       });
     });
 
