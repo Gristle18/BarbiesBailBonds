@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Barbie's Bail Bonds - Application Form</title>
+  <title>Barbie's Bail Bonds - Formulario de Solicitud</title>
   <style>
     * { box-sizing: border-box; }
     body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:transparent; color:#fff; overflow: -moz-scrollbars-none; -ms-overflow-style: none; }
@@ -80,7 +80,7 @@
   <div class="wrap">
     <!-- Progress Bar -->
     <div style="background:#fff; padding:20px; border-radius:12px; margin-bottom:30px;">
-      <div style="color:#333; font-size:16px; font-weight:600; margin-bottom:10px; text-align:center;">Application Progress</div>
+      <div style="color:#333; font-size:16px; font-weight:600; margin-bottom:10px; text-align:center;">Progreso de la Solicitud</div>
       <div style="background:#eee; height:8px; border-radius:4px; overflow:hidden;">
         <div id="progressBar" style="background:#F28C00; height:100%; width:0%; transition:width 0.3s ease;"></div>
       </div>
@@ -93,30 +93,30 @@
         <div style="text-align:center; margin-bottom:30px;">
           <h2 style="color:#fff; font-size:28px; margin-bottom:15px; font-weight:700;">📸 Sube tu Identificación<span class="req">*</span></h2>
           <p style="color:#fff; font-size:16px; line-height:1.5;">
-            Please take a photo of the front of your government-issued ID.
+            Por favor, toma una foto del frente de tu identificación emitida por el gobierno.
           </p>
         </div>
 
         <div style="background:#fff; padding:30px; border-radius:12px; margin:20px 0;">
           <div style="font-size:18px; font-weight:600; margin-bottom:15px; color:#333; text-align:center;">Sube tu Identificación</div>
           <div id="dropZone" onclick="document.getElementById('idFront').click()" style="border:2px dashed #ddd; padding:40px 20px; border-radius:8px; background:#f9f9f9; min-height:160px; display:flex; flex-direction:column; justify-content:center; cursor:pointer; transition: all 0.3s ease; text-align:center;" onmouseover="this.style.background='#f0f0f0'; this.style.borderColor='#F28C00';" onmouseout="this.style.background='#f9f9f9'; this.style.borderColor='#ddd';">
-            <div style="font-size:18px; margin-bottom:10px; color:#333; font-weight:600;">Click or Drag & Drop Your ID</div>
+            <div style="font-size:18px; margin-bottom:10px; color:#333; font-weight:600;">Haz Clic o Arrastra y Suelta tu Identificación</div>
             <input type="file" id="idFront" accept="image/*" style="display:none;" onchange="handleIDUpload(this, 'front')">
-            <div style="font-size:14px; color:#666;">JPG, PNG only</div>
+            <div style="font-size:14px; color:#666;">Solo JPG, PNG</div>
           </div>
           <div id="frontPreview" style="margin-top:10px; text-align:center;"></div>
         </div>
 
         <div style="background:#fff2d1; padding:20px; border-radius:8px; margin:20px 0; text-align:center;">
-          <div style="color:#333; font-weight:600; margin-bottom:8px;">Having Issues?</div>
-          <div style="color:#666;">Text photos directly to <span style="color:#F28C00; font-weight:600; white-space: nowrap;">561-247-0018</span> or call <a href="tel:+15612470018" style="color:#F28C00; text-decoration:none; white-space: nowrap;">561-247-0018</a></div>
+          <div style="color:#333; font-weight:600; margin-bottom:8px;">¿Tienes Problemas?</div>
+          <div style="color:#666;">Envía fotos directamente por texto al <span style="color:#F28C00; font-weight:600; white-space: nowrap;">561-247-0018</span> o llama al <a href="tel:+15612470018" style="color:#F28C00; text-decoration:none; white-space: nowrap;">561-247-0018</a></div>
         </div>
 
         <div id="idUploadError" class="error" style="text-align:center; margin-bottom:10px; font-size:16px;">
-          ID photo is required to continue.
+          Se requiere foto de identificación para continuar.
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-next id="uploadNextBtn">Continue</button>
+          <button class="ghost" type="button" data-next id="uploadSiguienteBtn">Continuar</button>
         </div>
       </div>
 
@@ -124,53 +124,53 @@
       <div class="section" data-step="1">
         <div class="grid">
           <div class="full">
-            <label for="whoAreYou">Who are you?<span class="req">*</span></label>
+            <label for="whoAreYou">¿Quién eres?<span class="req">*</span></label>
             <select id="whoAreYou" name="whoAreYou" required>
-              <option value="" hidden>Select…</option>
-              <option value="Indemnitor">Indemnitor — financial guarantor who promises the court the defendant will appear</option>
-              <option value="Defendant">Defendant — the person in jail / being bonded</option>
+              <option value="" hidden>Selecciona…</option>
+              <option value="Indemnitor">Fiador — garante financiero que promete al tribunal que el acusado comparecerá</option>
+              <option value="Defendant">Acusado — la persona en la cárcel / que está siendo afianzada</option>
             </select>
           </div>
           <div class="full">
-            <label for="howHeard">How did you hear about us?<span class="req">*</span></label>
+            <label for="howHeard">¿Cómo supiste de nosotros?<span class="req">*</span></label>
             <input id="howHeard" name="howHeard" required />
           </div>
         </div>
         <div class="step-actions">
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
       <!-- STEP 2A: Indemnitor (first 5) -->
       <div class="section" data-step="1">
         <div class="section-info" style="margin-bottom:20px; color:#fff; font-size:14px; line-height:1.4; text-align:center; font-weight:bold;">
-          Please provide the following information about the person who is bonding the arrested person out.
+          Por favor proporciona la siguiente información sobre la persona que está afianzando al arrestado.
         </div>
         <div class="grid">
           <div>
-            <label for="indemnitorName">Indemnitor's Complete Name<span class="req">*</span></label>
+            <label for="indemnitorName">Nombre Completo del Fiador<span class="req">*</span></label>
             <input id="indemnitorName" name="indemnitorName" required />
           </div>
           <div>
-            <label for="relation">Your Relation to Person in Jail and/or Being Bonded?<span class="req">*</span></label>
+            <label for="relation">¿Cuál es tu relación con la persona en la cárcel y/o que está siendo afianzada?<span class="req">*</span></label>
             <input id="relation" name="relation" required />
           </div>
           <div>
-            <label for="indemnitorDob">What is Your Date of Birth<span class="req">*</span></label>
+            <label for="indemnitorDob">¿Cuál es tu fecha de nacimiento?<span class="req">*</span></label>
             <input id="indemnitorDob" name="indemnitorDob" type="date" required />
           </div>
           <div>
-            <label for="indemnitorSsn">Social Security #</label>
+            <label for="indemnitorSsn">Número de Seguro Social</label>
             <input id="indemnitorSsn" name="indemnitorSsn" inputmode="numeric" />
           </div>
           <div>
-            <label for="indemnitorDl">Driver's License (or ID) #</label>
+            <label for="indemnitorDl">Número de Licencia de Conducir (o ID)</label>
             <input id="indemnitorDl" name="indemnitorDl" />
           </div>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
@@ -178,30 +178,30 @@
       <div class="section" data-step="2">
         <div class="grid">
           <div>
-            <label for="indemnitorCell">Cell Phone #<span class="req">*</span></label>
+            <label for="indemnitorCell">Número de Teléfono Celular<span class="req">*</span></label>
             <input id="indemnitorCell" name="indemnitorCell" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
-            <label for="indemnitorHomePhone">Home Phone #</label>
+            <label for="indemnitorHomePhone">Número de Teléfono de Casa</label>
             <input id="indemnitorHomePhone" name="indemnitorHomePhone" type="tel" inputmode="tel" data-phone />
           </div>
           <div>
-            <label for="indemnitorEmail">Email Address</label>
+            <label for="indemnitorEmail">Dirección de Correo Electrónico</label>
             <input id="indemnitorEmail" name="indemnitorEmail" type="email" />
           </div>
           <div class="full">
-            <label for="indemnitorAddress">Home Address<span class="req">*</span></label>
+            <label for="indemnitorAddress">Dirección de Casa<span class="req">*</span></label>
             <input id="indemnitorAddress" name="indemnitorAddress" required />
           </div>
           <div>
-            <label for="indemnitorHowLong">How Long Living at Current Address<span class="req">*</span></label>
+            <label for="indemnitorHowLong">¿Cuánto tiempo viviendo en la dirección actual?<span class="req">*</span></label>
             <div class="hint">Ejemplos: "2 años", "6 meses", "Menos de 1 año", "Más de 3 años"</div>
             <input id="indemnitorHowLong" name="indemnitorHowLong" required />
           </div>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
@@ -209,64 +209,64 @@
       <div class="section" data-step="3">
         <div class="grid">
           <div>
-            <label for="indemnitorWorkType">Type of Work<span class="req">*</span></label>
+            <label for="indemnitorWorkType">Tipo de Trabajo<span class="req">*</span></label>
             <div class="hint">Ejemplos: "Gerente", "Trabajador de Construcción", "Enfermero(a)", "Trabajador Independiente", "Jubilado"</div>
             <input id="indemnitorWorkType" name="indemnitorWorkType" required />
           </div>
           <div>
-            <label for="indemnitorEmployer">Employer Name<span class="req">*</span></label>
+            <label for="indemnitorEmployer">Nombre del Empleador<span class="req">*</span></label>
             <input id="indemnitorEmployer" name="indemnitorEmployer" required />
           </div>
           <div>
-            <label for="indemnitorWorkPhone">Work Phone # (will NOT be called)</label>
+            <label for="indemnitorWorkPhone">Teléfono del Trabajo (NO se llamará)</label>
             <input id="indemnitorWorkPhone" name="indemnitorWorkPhone" type="tel" inputmode="tel" data-phone />
           </div>
           <div class="full">
-            <label for="indemnitorWorkAddress">Work Address</label>
+            <label for="indemnitorWorkAddress">Dirección del Trabajo</label>
             <input id="indemnitorWorkAddress" name="indemnitorWorkAddress" />
           </div>
           <div class="full">
-            <label for="indemnitorVehicle">Indemnitor's Vehicle<span class="req">*</span></label>
+            <label for="indemnitorVehicle">Vehículo del Fiador<span class="req">*</span></label>
             <div class="hint">Ejemplos: "Honda Civic 2018", "Ford F-150 2020", "Sin vehículo"</div>
             <input id="indemnitorVehicle" name="indemnitorVehicle" required />
           </div>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
       <!-- STEP 3A: Defendant (first 5) -->
       <div class="section" data-step="4">
         <div class="section-info" style="margin-bottom:20px; color:#fff; font-size:14px; line-height:1.4; text-align:center; font-weight:bold;">
-          The following questions are about the defendant (the arrested person or person needing a bond).
+          Las siguientes preguntas son sobre el acusado (la persona arrestada o que necesita una fianza).
         </div>
         <div class="grid">
           <div>
-            <label for="defendantName">Defendant's Complete Name<span class="req">*</span></label>
+            <label for="defendantName">Nombre Completo del Acusado<span class="req">*</span></label>
             <input id="defendantName" name="defendantName" required />
           </div>
           <div>
-            <label for="defendantNick">Nick Name of Defendant (If not actual name)</label>
+            <label for="defendantNick">Apodo del Acusado (si no es el nombre real)</label>
             <input id="defendantNick" name="defendantNick" />
           </div>
           <div>
-            <label for="defendantDob">Date of Birth<span class="req">*</span></label>
+            <label for="defendantDob">Fecha de Nacimiento<span class="req">*</span></label>
             <input id="defendantDob" name="defendantDob" type="date" required />
           </div>
           <div>
-            <label for="defendantSsn">Social Security # (optional)</label>
+            <label for="defendantSsn">Número de Seguro Social (opcional)</label>
             <input id="defendantSsn" name="defendantSsn" inputmode="numeric" />
           </div>
           <div>
-            <label for="defendantDl">Driver's License or ID # (optional)</label>
+            <label for="defendantDl">Número de Licencia de Conducir o ID (opcional)</label>
             <input id="defendantDl" name="defendantDl" />
           </div>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
@@ -274,38 +274,38 @@
       <div class="section" data-step="5">
         <div class="grid">
           <div>
-            <label for="birthCityState">City & State of Birth</label>
+            <label for="birthCityState">Ciudad y Estado de Nacimiento</label>
             <input id="birthCityState" name="birthCityState" />
           </div>
           <div>
-            <label for="citizenship">Country of Citizenship</label>
+            <label for="citizenship">País de Ciudadanía</label>
             <input id="citizenship" name="citizenship" />
           </div>
           <div>
-            <label for="race">Race<span class="req">*</span></label>
+            <label for="race">Raza<span class="req">*</span></label>
             <select id="race" name="race" required>
-              <option value="" hidden>Select…</option>
-              <option>White</option>
-              <option>Black / African American</option>
-              <option>Hispanic / Latino</option>
-              <option>Asian</option>
-              <option>Native American</option>
-              <option>Pacific Islander</option>
-              <option>Other</option>
+              <option value="" hidden>Selecciona…</option>
+              <option>Blanco</option>
+              <option>Negro / Afroamericano</option>
+              <option>Hispano / Latino</option>
+              <option>Asiático</option>
+              <option>Nativo Americano</option>
+              <option>Isleño del Pacífico</option>
+              <option>Otro</option>
             </select>
           </div>
           <div>
-            <label for="defendantCell">Cell Phone #<span class="req">*</span></label>
+            <label for="defendantCell">Número de Teléfono Celular<span class="req">*</span></label>
             <input id="defendantCell" name="defendantCell" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
-            <label for="defendantHomePhone">Home Phone # (Skip if none)</label>
+            <label for="defendantHomePhone">Teléfono de Casa (Omitir si no tiene)</label>
             <input id="defendantHomePhone" name="defendantHomePhone" type="tel" inputmode="tel" data-phone />
           </div>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
@@ -313,35 +313,35 @@
       <div class="section" data-step="6">
         <div class="grid">
           <div>
-            <label for="defendantEmail">Email Address</label>
+            <label for="defendantEmail">Dirección de Correo Electrónico</label>
             <input id="defendantEmail" name="defendantEmail" type="email" />
           </div>
           <div class="full">
-            <label for="defendantAddress">Home Address<span class="req">*</span></label>
+            <label for="defendantAddress">Dirección de Casa<span class="req">*</span></label>
             <input id="defendantAddress" name="defendantAddress" required />
           </div>
           <div>
-            <label for="defendantHowLong">How Long has Defendant Lived at Current Address<span class="req">*</span></label>
+            <label for="defendantHowLong">¿Cuánto tiempo ha vivido el acusado en la dirección actual?<span class="req">*</span></label>
             <div class="hint">Ejemplos: "2 años", "6 meses", "Menos de 1 año", "Más de 3 años"</div>
             <input id="defendantHowLong" name="defendantHowLong" required />
           </div>
           <div>
-            <label for="homeStatus">Is This Home Owned or Rented?</label>
+            <label for="homeStatus">¿Esta casa es propia o alquilada?</label>
             <select id="homeStatus" name="homeStatus">
-              <option value="" hidden>Select…</option>
-              <option>Owned</option>
-              <option>Rented</option>
-              <option>Other</option>
+              <option value="" hidden>Selecciona…</option>
+              <option>Propia</option>
+              <option>Alquilada</option>
+              <option>Otro</option>
             </select>
           </div>
           <div class="full">
-            <label for="landlordName">Name of Community / Landlord / Owner</label>
+            <label for="landlordName">Nombre de la Comunidad / Propietario / Dueño</label>
             <input id="landlordName" name="landlordName" />
           </div>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
@@ -349,30 +349,30 @@
       <div class="section" data-step="7">
         <div class="grid">
           <div>
-            <label for="defendantWorkType">Defendant's Type of Work</label>
+            <label for="defendantWorkType">Tipo de Trabajo del Acusado</label>
             <div class="hint">Ejemplos: "Gerente", "Trabajador de Construcción", "Enfermero(a)", "Trabajador Independiente", "Desempleado"</div>
             <input id="defendantWorkType" name="defendantWorkType" />
           </div>
           <div>
-            <label for="defendantEmployer">Defendant's Employer Name</label>
+            <label for="defendantEmployer">Nombre del Empleador del Acusado</label>
             <input id="defendantEmployer" name="defendantEmployer" />
           </div>
           <div>
-            <label for="defendantWorkPhone">Defendant's Work Phone # (will NOT be called)</label>
+            <label for="defendantWorkPhone">Teléfono del Trabajo del Acusado (NO se llamará)</label>
             <input id="defendantWorkPhone" name="defendantWorkPhone" type="tel" inputmode="tel" data-phone />
           </div>
           <div class="full">
-            <label for="defendantWorkAddress">Defendant's Work Address</label>
+            <label for="defendantWorkAddress">Dirección del Trabajo del Acusado</label>
             <input id="defendantWorkAddress" name="defendantWorkAddress" />
           </div>
           <div class="full">
-            <label for="recentArrest">Defendant's Most Recent Arrest (Not including the Current Arrest)</label>
+            <label for="recentArrest">Arresto Más Reciente del Acusado (Sin incluir el arresto actual)</label>
             <textarea id="recentArrest" name="recentArrest"></textarea>
           </div>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
@@ -380,23 +380,23 @@
       <div class="section" data-step="8">
         <div class="grid">
           <div class="full">
-            <label>Please Select or Tap with your Finger ONLY if the answer is "Yes":</label>
-            <div class="hint">These questions are about the person being bonded. Only check boxes if the answer is YES.</div>
+            <label>Por Favor Selecciona o Toca con tu Dedo SOLO si la respuesta es "Sí":</label>
+            <div class="hint">Estas preguntas son sobre la persona que está siendo afianzada. Solo marca las casillas si la respuesta es SÍ.</div>
             <div class="checks">
-              <label><input type="checkbox" id="q_fta" name="q_fta" value="Yes"> Has Failed to Appear for Court in the Past?</label>
-              <label><input type="checkbox" id="q_supervision" name="q_supervision" value="Yes"> Is Currently on Probation, Parole, or SOR (Sex Offender Registry)?</label>
-              <label><input type="checkbox" id="q_otherBond" name="q_otherBond" value="Yes"> Is Currently on Bond for Another Case?</label>
+              <label><input type="checkbox" id="q_fta" name="q_fta" value="Yes"> ¿Ha faltado a comparecer ante el tribunal en el pasado?</label>
+              <label><input type="checkbox" id="q_supervision" name="q_supervision" value="Yes"> ¿Está actualmente en libertad condicional, libertad bajo palabra, o SOR (Registro de Delincuentes Sexuales)?</label>
+              <label><input type="checkbox" id="q_otherBond" name="q_otherBond" value="Yes"> ¿Está actualmente bajo fianza por otro caso?</label>
             </div>
           </div>
           <div class="full">
-            <label for="defendantVehicle">Defendant's Vehicle to get to Court<span class="req">*</span></label>
+            <label for="defendantVehicle">Vehículo del Acusado para llegar al Tribunal<span class="req">*</span></label>
             <div class="hint">Ejemplos: "Honda Civic 2018", "Un familiar conducirá", "Transporte público", "Uber/Taxi"</div>
             <input id="defendantVehicle" name="defendantVehicle" required />
           </div>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
@@ -404,42 +404,42 @@
       <div class="section" data-step="9">
         <div class="grid">
           <div>
-            <label for="relationshipStatus">Relationship Status</label>
+            <label for="relationshipStatus">Estado Civil</label>
             <select id="relationshipStatus" name="relationshipStatus">
-              <option value="" hidden>Select…</option>
-              <option>Single</option>
-              <option>Married</option>
-              <option>Domestic Partnership</option>
-              <option>Separated</option>
-              <option>Divorced</option>
-              <option>Widowed</option>
+              <option value="" hidden>Selecciona…</option>
+              <option>Soltero(a)</option>
+              <option>Casado(a)</option>
+              <option>Unión Doméstica</option>
+              <option>Separado(a)</option>
+              <option>Divorciado(a)</option>
+              <option>Viudo(a)</option>
             </select>
           </div>
           <div>
-            <label for="partnerName">Full Name of Defendant's Partner</label>
+            <label for="partnerName">Nombre Completo de la Pareja del Acusado</label>
             <input id="partnerName" name="partnerName" />
           </div>
           <div>
-            <label for="partnerDob">Partner Date of Birth</label>
+            <label for="partnerDob">Fecha de Nacimiento de la Pareja</label>
             <input id="partnerDob" name="partnerDob" type="date" />
           </div>
           <div>
-            <label for="partnerCell">Cell Phone # of Partner</label>
+            <label for="partnerCell">Número de Teléfono Celular de la Pareja</label>
             <input id="partnerCell" name="partnerCell" type="tel" inputmode="tel" data-phone />
           </div>
           <div>
-            <label for="partnerWorkType">Partner Type of Work</label>
+            <label for="partnerWorkType">Tipo de Trabajo de la Pareja</label>
             <div class="hint">Ejemplos: "Gerente", "Trabajador de Construcción", "Enfermero(a)", "Trabajador Independiente", "Desempleado"</div>
             <input id="partnerWorkType" name="partnerWorkType" />
           </div>
           <div>
-            <label for="partnerWorkName">Partner's Employer Name</label>
+            <label for="partnerWorkName">Nombre del Empleador de la Pareja</label>
             <input id="partnerWorkName" name="partnerWorkName" />
           </div>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
@@ -447,56 +447,56 @@
       <div class="section" data-step="10">
         <div class="grid">
           <div class="full" style="margin-bottom:10px;">
-            <h3 style="color:#F5A00D; margin:0 0 5px 0;">Parents</h3>
+            <h3 style="color:#F5A00D; margin:0 0 5px 0;">Padres</h3>
           </div>
           <div>
-            <label for="motherName">Mother's Name</label>
+            <label for="motherName">Nombre de la Madre</label>
             <input id="motherName" name="motherName" />
           </div>
           <div>
-            <label for="motherPhone">Mother's Phone #</label>
+            <label for="motherPhone">Teléfono de la Madre</label>
             <input id="motherPhone" name="motherPhone" type="tel" inputmode="tel" data-phone />
           </div>
           <div class="full">
-            <label for="motherAddress">Mother's Home Address</label>
+            <label for="motherAddress">Dirección de Casa de la Madre</label>
             <input id="motherAddress" name="motherAddress" />
           </div>
           <div>
-            <label for="fatherName">Father's Name</label>
+            <label for="fatherName">Nombre del Padre</label>
             <input id="fatherName" name="fatherName" />
           </div>
           <div>
-            <label for="fatherPhone">Father's Phone #</label>
+            <label for="fatherPhone">Teléfono del Padre</label>
             <input id="fatherPhone" name="fatherPhone" type="tel" inputmode="tel" data-phone />
           </div>
           <div class="full">
-            <label for="fatherAddress">Father's Home Address</label>
+            <label for="fatherAddress">Dirección de Casa del Padre</label>
             <input id="fatherAddress" name="fatherAddress" />
           </div>
 
           <div class="full" style="margin-top:20px; margin-bottom:10px;">
-            <h3 style="color:#F5A00D; margin:0 0 5px 0;">Siblings</h3>
+            <h3 style="color:#F5A00D; margin:0 0 5px 0;">Hermanos</h3>
           </div>
           <div>
-            <label for="sibling1Name">1. Brother/Sister's Name</label>
+            <label for="sibling1Name">1. Nombre del Hermano/Hermana</label>
             <input id="sibling1Name" name="sibling1Name" />
           </div>
           <div>
-            <label for="sibling1Phone">1. Brother/Sister's Phone #</label>
+            <label for="sibling1Phone">1. Teléfono del Hermano/Hermana</label>
             <input id="sibling1Phone" name="sibling1Phone" type="tel" inputmode="tel" data-phone />
           </div>
           <div>
-            <label for="sibling2Name">2. Brother/Sister's Name</label>
+            <label for="sibling2Name">2. Nombre del Hermano/Hermana</label>
             <input id="sibling2Name" name="sibling2Name" />
           </div>
           <div>
-            <label for="sibling2Phone">2. Brother/Sister's Phone #</label>
+            <label for="sibling2Phone">2. Teléfono del Hermano/Hermana</label>
             <input id="sibling2Phone" name="sibling2Phone" type="tel" inputmode="tel" data-phone />
           </div>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
@@ -504,68 +504,68 @@
       <div class="section" data-step="11">
         <div class="grid">
           <div class="full" style="margin-bottom:10px;">
-            <h3 style="color:#F5A00D; margin:0 0 5px 0;">References</h3>
+            <h3 style="color:#F5A00D; margin:0 0 5px 0;">Referencias</h3>
           </div>
           <div>
-            <label for="ref1Name">Reference #1 - Full Name<span class="req">*</span></label>
+            <label for="ref1Name">Referencia #1 - Nombre Completo<span class="req">*</span></label>
             <input id="ref1Name" name="ref1Name" required />
           </div>
           <div>
-            <label for="ref1Relation">Reference #1 - Relation<span class="req">*</span></label>
+            <label for="ref1Relation">Referencia #1 - Relación<span class="req">*</span></label>
             <input id="ref1Relation" name="ref1Relation" required />
           </div>
           <div>
-            <label for="ref1Phone">Reference #1 - Phone #<span class="req">*</span></label>
+            <label for="ref1Phone">Referencia #1 - Teléfono<span class="req">*</span></label>
             <input id="ref1Phone" name="ref1Phone" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
-            <label for="ref2Name">Reference #2 - Full Name<span class="req">*</span></label>
+            <label for="ref2Name">Referencia #2 - Nombre Completo<span class="req">*</span></label>
             <input id="ref2Name" name="ref2Name" required />
           </div>
           <div>
-            <label for="ref2Relation">Reference #2 - Relation<span class="req">*</span></label>
+            <label for="ref2Relation">Referencia #2 - Relación<span class="req">*</span></label>
             <input id="ref2Relation" name="ref2Relation" required />
           </div>
           <div>
-            <label for="ref2Phone">Reference #2 - Phone #<span class="req">*</span></label>
+            <label for="ref2Phone">Referencia #2 - Teléfono<span class="req">*</span></label>
             <input id="ref2Phone" name="ref2Phone" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
-            <label for="ref3Name">Reference #3 - Full Name<span class="req">*</span></label>
+            <label for="ref3Name">Referencia #3 - Nombre Completo<span class="req">*</span></label>
             <input id="ref3Name" name="ref3Name" required />
           </div>
           <div>
-            <label for="ref3Relation">Reference #3 - Relation<span class="req">*</span></label>
+            <label for="ref3Relation">Referencia #3 - Relación<span class="req">*</span></label>
             <input id="ref3Relation" name="ref3Relation" required />
           </div>
           <div>
-            <label for="ref3Phone">Reference #3 - Phone #<span class="req">*</span></label>
+            <label for="ref3Phone">Referencia #3 - Teléfono<span class="req">*</span></label>
             <input id="ref3Phone" name="ref3Phone" type="tel" inputmode="tel" data-phone required />
           </div>
 
           <div class="full" style="margin-top:20px; margin-bottom:10px;">
-            <h3 style="color:#F5A00D; margin:0 0 5px 0;">Emergency Contacts</h3>
+            <h3 style="color:#F5A00D; margin:0 0 5px 0;">Contactos de Emergencia</h3>
           </div>
           <div>
-            <label for="emergency1Name">Emergency Contact #1<span class="req">*</span></label>
+            <label for="emergency1Name">Contacto de Emergencia #1<span class="req">*</span></label>
             <input id="emergency1Name" name="emergency1Name" required />
           </div>
           <div>
-            <label for="emergency1Phone">Emergency #1 Phone<span class="req">*</span></label>
+            <label for="emergency1Phone">Teléfono de Emergencia #1<span class="req">*</span></label>
             <input id="emergency1Phone" name="emergency1Phone" type="tel" inputmode="tel" data-phone required />
           </div>
           <div>
-            <label for="emergency2Name">Emergency Contact #2<span class="req">*</span></label>
+            <label for="emergency2Name">Contacto de Emergencia #2<span class="req">*</span></label>
             <input id="emergency2Name" name="emergency2Name" required />
           </div>
           <div>
-            <label for="emergency2Phone">Emergency #2 Phone<span class="req">*</span></label>
+            <label for="emergency2Phone">Teléfono de Emergencia #2<span class="req">*</span></label>
             <input id="emergency2Phone" name="emergency2Phone" type="tel" inputmode="tel" data-phone required />
           </div>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
@@ -573,103 +573,103 @@
       <!-- STEP 7: Terms and Conditions -->
       <div class="section" data-step="12">
         <div class="agreement-text">
-Terms and Conditions of Application for Appearance Bond
+Términos y Condiciones de Solicitud para Fianza de Comparecencia
 
-The following terms and conditions for the Appearance Bond for which U.S. Fire Insurance Company (USFIC) or its Agent and the parties agree that said appearance bond is conditioned upon full compliance of all said terms and conditions and is a part of said bond and application therefore.
+Los siguientes términos y condiciones para la Fianza de Comparecencia para la cual U.S. Fire Insurance Company (USFIC) o su Agente y las partes acuerdan que dicha fianza de comparecencia está condicionada al cumplimiento total de todos dichos términos y condiciones y es parte de dicha fianza y solicitud por lo tanto.
 
-1. USFIC as the Surety Company, through its duly appointed agent, shall have control and jurisdiction over the principal during the term for which the bond is executed and shall have the right to apprehend, arrest and surrender the principal to the proper officials at any time as provided by law.
+1. USFIC como la Compañía Fiadora, a través de su agente debidamente designado, tendrá control y jurisdicción sobre el principal durante el término por el cual se ejecuta la fianza y tendrá el derecho de aprehender, arrestar y entregar al principal a los funcionarios apropiados en cualquier momento según lo disponga la ley.
 
-2. In the event surrender of principal is made prior to the time set for the principal's appearances, and for reasons other than as enumerated below in paragraph 3, then principal shall be entitled to a refund of the bond premium.
+2. En el caso de que la entrega del principal se haga antes del tiempo establecido para las comparecencias del principal, y por razones distintas a las enumeradas a continuación en el párrafo 3, entonces el principal tendrá derecho a un reembolso de la prima de la fianza.
 
-3. It is understood and agreed that the happening of any one of the following events shall constitute a breach of principal's obligation to USFIC hereunder, and USFIC shall have the right to forthwith apprehend, arrest, and surrender principal, and principal shall have no right to any refund of premium whatsoever. Said events which shall constitute a breach of principal's obligations hereunder are:
-   (a) If principal shall depart the jurisdiction of the court without the written consent of the court and the Surety Company or its Agent.
-   (b) If principal shall move from one address to another without notifying the Surety Company or its Agent in writing prior to such move.
-   (c) If principal shall commit any act which shall constitute reasonable evidence of principal's intention to cause a forfeiture of said bond.
-   (d) If principal is arrested and incarcerated for any offense other than a minor traffic violation.
-   (e) If principal shall make any material false statements in the application for appearance bond.
+3. Se entiende y acuerda que la ocurrencia de cualquiera de los siguientes eventos constituirá un incumplimiento de la obligación del principal hacia USFIC en el presente documento, y USFIC tendrá el derecho de aprehender, arrestar y entregar inmediatamente al principal, y el principal no tendrá derecho a ningún reembolso de prima en absoluto. Dichos eventos que constituirán un incumplimiento de las obligaciones del principal en el presente documento son:
+   (a) Si el principal sale de la jurisdicción del tribunal sin el consentimiento por escrito del tribunal y la Compañía Fiadora o su Agente.
+   (b) Si el principal se muda de una dirección a otra sin notificar a la Compañía Fiadora o su Agente por escrito antes de dicha mudanza.
+   (c) Si el principal comete cualquier acto que constituya evidencia razonable de la intención del principal de causar una pérdida de dicha fianza.
+   (d) Si el principal es arrestado y encarcelado por cualquier delito que no sea una violación menor de tránsito.
+   (e) Si el principal hace cualquier declaración materialmente falsa en la solicitud de fianza de comparecencia.
 
-Under penalties of perjury, I declare that I have read the foregoing, and the information provided is true and correct without reservation. The information and representations made in this Application are for the purpose of inducing the Surety to undertake the bond(s) for which I have applied with the intent that the Surety fully rely upon the information and representations contained herein. I agree to indemnify and hold harmless the Surety Company and its Agents for any and all losses that may arise from the execution of the bond(s) applied for herein, unless prohibited by applicable law or regulation.
+Bajo penas de perjurio, declaro que he leído lo anterior, y la información proporcionada es verdadera y correcta sin reserva. La información y representaciones hechas en esta Solicitud son con el propósito de inducir al Fiador a emprender la(s) fianza(s) por la(s) cual(es) he solicitado con la intención de que el Fiador confíe completamente en la información y representaciones contenidas en el presente documento. Acepto indemnizar y mantener sin daño a la Compañía Fiadora y sus Agentes por todas y cada una de las pérdidas que puedan surgir de la ejecución de la(s) fianza(s) solicitada(s) en el presente documento, a menos que esté prohibido por la ley o reglamentación aplicable.
 
-***ONLY PROCEED IF YOU AGREE TO THE ABOVE***
+***SOLO PROCEDER SI ACEPTA LO ANTERIOR***
         </div>
         <div class="checks">
-          <label><input type="checkbox" id="termsRead" name="termsRead" value="Yes" required> I have read and agree to the above Terms and Conditions<span class="req">*</span></label>
+          <label><input type="checkbox" id="termsRead" name="termsRead" value="Yes" required> He leído y acepto los Términos y Condiciones anteriores<span class="req">*</span></label>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
       <!-- STEP 8: Contingent Promissory Note -->
       <div class="section" data-step="13">
         <div class="agreement-text">
-Contingent Promissory Note
+Pagaré Contingente
 
-For value received the undersigned, jointly and severally promise(s) to pay U.S. FIRE INSURANCE COMPANY or its Agent, Jerry Casal Bail Bonds, LLC on demand the principal sum of the bond if and only if there occurs a breach of the terms and conditions of the surety bail bond or bonds posted on behalf of defendant.
+Por valor recibido, el/los abajo firmante(s), conjunta y solidariamente promete(n) pagar a U.S. FIRE INSURANCE COMPANY o su Agente, Jerry Casal Bail Bonds, LLC a la vista la suma principal de la fianza si y solo si ocurre un incumplimiento de los términos y condiciones de la fianza de caución fiadora o fianzas depositadas en nombre del acusado.
 
-The defendant for which this is being submitted written out previously on this form (hereinafter "Defendant"), together with any continuations and modifications, any extensions, substitutions, increments or appeals thereof (hereinafter "Bond"), or upon payment of any expenses incurred by the payee or holder (hereinafter "Payee") to produce the Defendant before the appropriate court or courts of Competent jurisdiction in the above case, with interest thereon at the rate of FOURTEEN percent (14%), per annum, from the date of occurrence of the above stated Contingency, until fully paid. All makers or endorsers, now or hereafter becoming parties hereto, jointly and severally waive demand, notice of non-payment and protest: and in case this note becomes in default and placed in hands of an attorney for collection, the foregoing agree(s) to pay reasonable attorney's fees and all other costs for making such collection and further agree(s) that courts of original jurisdiction and appellate courts may award reasonable attorney's fees to the Payee in the event of litigation and/or appeals.
+El acusado por el cual esto está siendo sometido escrito anteriormente en este formulario (en adelante "Acusado"), junto con cualquier continuación y modificación, cualquier extensión, sustitución, incremento o apelación de la misma (en adelante "Fianza"), o al pago de cualquier gasto incurrido por el beneficiario o tenedor (en adelante "Beneficiario") para producir al Acusado ante el tribunal apropiado o tribunales de jurisdicción competente en el caso anterior, con interés al respecto a la tasa del CATORCE por ciento (14%), por año, desde la fecha de ocurrencia de la Contingencia antes mencionada, hasta ser pagado completamente. Todos los otorgantes o endosantes, ahora o en el futuro convirtiéndose en partes del presente documento, conjunta y solidariamente renuncian a la demanda, notificación de no pago y protesta: y en caso de que este pagaré entre en incumplimiento y sea puesto en manos de un abogado para cobranza, lo anterior acepta(n) pagar honorarios razonables de abogado y todos los otros costos para hacer tal cobranza y además acepta(n) que los tribunales de jurisdicción original y tribunales de apelación pueden otorgar honorarios razonables de abogado al Beneficiario en caso de litigio y/o apelaciones.
 
-It is further agreed and specifically understood between the parties to this Note that there is presently no outstanding loan or debt represented by this Contingent Promissory Note, and that this Note is given to secure advances up to and including the amount set forth above together with interest if and when there is a breach of the terms and conditions, including but not limited to forfeiture or estreature, of the Bond. It is further agreed and specifically understood that this Note shall become null and void at such time as all of the obligations under the Bond posted on behalf of the Defendant have been fulfilled and the Payee has been discharged of all liability and duly exonerated in writing and until such time as same occurs the note shall remain in full force and effect.
+Se acuerda además y se entiende específicamente entre las partes de este Pagaré que actualmente no hay préstamo o deuda pendiente representada por este Pagaré Contingente, y que este Pagaré se otorga para asegurar adelantos hasta e incluyendo la cantidad establecida anteriormente junto con interés si y cuando hay un incumplimiento de los términos y condiciones, incluyendo pero no limitado a decomiso o ejecución, de la Fianza. Se acuerda además y se entiende específicamente que este Pagaré se volverá nulo y sin efecto en el momento en que todas las obligaciones bajo la Fianza depositada en nombre del Acusado hayan sido cumplidas y el Beneficiario haya sido liberado de toda responsabilidad y debidamente exonerado por escrito y hasta que ocurra tal momento el pagaré permanecerá en pleno vigor y efecto.
 
-(a) Any and all liability, loss, costs, damages, expenses, premiums and attorneys fees arising or incurred by Payee in connection with the above captioned Bond, or any other recognizance, undertaking or other obligation, heretofore or hereafter executed, assumed or procured by Payee at the instance or request or on behalf of either of owner of the property encumbered by the Mortgage securing the Note (hereinafter, "Owner") or of the principal's name; This Note and the Mortgage of even date herewith shall serve to secure:
-(b) For the payment of all premiums on such Bonds;
-(c) For the performance of every agreement (including continuations or modifications, any extensions, substitutions, increments or appeals thereof, with or without consent of Owner) made by Owner or Defendant in connection with said Bonds;
-(d) Against any liability, loss, costs, expenses, and attorneys fees in connection with any claim to the collateral security by person claiming adversely to Owner or to Principals named in the Bonds;
-(e) Any and all future advances made with or without consent of the Owner by Payee on behalf of the Defendant including but not necessarily limited to increments, modifications, extensions or substitutions, or the creation of any future obligation by the Payee in connection with the above described matter, or any bail bonds or obligation undertaken by Payee on behalf of Defendant including, without limiting, to the posting of a new bond for and on behalf of the Defendant in the nature of an appeal bond or substitution extension or modification of the existing Bond.
+(a) Toda y cualquier responsabilidad, pérdida, costos, daños, gastos, primas y honorarios de abogado que surjan o sean incurridos por el Beneficiario en conexión con la Fianza anteriormente mencionada, o cualquier otro reconocimiento, compromiso u otra obligación, hasta ahora o en el futuro ejecutada, asumida o procurada por el Beneficiario a instancia o solicitud o en nombre de cualquiera del propietario de la propiedad gravada por la Hipoteca que asegura el Pagaré (en adelante, "Propietario") o del nombre del principal; Este Pagaré y la Hipoteca de igual fecha servirán para asegurar:
+(b) Para el pago de todas las primas en tales Fianzas;
+(c) Para el cumplimiento de cada acuerdo (incluyendo continuaciones o modificaciones, cualquier extensión, sustitución, incremento o apelación de la misma, con o sin consentimiento del Propietario) hecho por el Propietario o Acusado en conexión con dichas Fianzas;
+(d) Contra cualquier responsabilidad, pérdida, costos, gastos y honorarios de abogado en conexión con cualquier reclamo a la garantía colateral por persona reclamando adversamente al Propietario o a los Principales nombrados en las Fianzas;
+(e) Todos y cualesquiera adelantos futuros hechos con o sin consentimiento del Propietario por el Beneficiario en nombre del Acusado incluyendo pero no necesariamente limitado a incrementos, modificaciones, extensiones o sustituciones, o la creación de cualquier obligación futura por el Beneficiario en conexión con el asunto anteriormente descrito, o cualquier fianza de caución o obligación emprendida por el Beneficiario en nombre del Acusado incluyendo, sin limitación, al depósito de una nueva fianza para y en nombre del Acusado en la naturaleza de una fianza de apelación o extensión de sustitución o modificación de la Fianza existente.
 
-This Promissory Note is Executed on the date this form is submitted.
+Este Pagaré se Ejecuta en la fecha en que se envía este formulario.
 
-***ONLY PROCEED IF YOU AGREE TO THE ABOVE***
+***SOLO PROCEDER SI ACEPTA LO ANTERIOR***
         </div>
         <div class="checks">
-          <label><input type="checkbox" id="promissoryRead" name="promissoryRead" value="Yes" required> I have read and agree to the above Contingent Promissory Note<span class="req">*</span></label>
+          <label><input type="checkbox" id="promissoryRead" name="promissoryRead" value="Yes" required> He leído y acepto el Pagaré Contingente anterior<span class="req">*</span></label>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
       <!-- STEP 9: Indemnity Agreement -->
       <div class="section" data-step="14">
         <div class="agreement-text">
-Indemnity Agreement for Bail Bond
+Acuerdo de Indemnización para Fianza de Caución
 
-The undersigned Indemnitor(s) ("Indemnitors") make(s) application to U.S. Fire Insurance Company through its duly licensed and appointed Producer Agent Jerry Casal Bail Bonds, LLC (collectively referred to herein as "Surety") for execution of a bail undertaking ("Bail Bond") in the Penal Amount of given bond amount for defendant herein after referred to as the "Principal" and "Indemnitor" and in consideration of Surety arranging for execution or continuance of this Bail Bond, Indemnitor(s) jointly and severally agree(s) as follows:
+El/Los abajo firmante(s) Indemnizador(es) ("Indemnizadores") hace(n) solicitud a U.S. Fire Insurance Company a través de su Agente Productor debidamente licenciado y designado Jerry Casal Bail Bonds, LLC (colectivamente referidos en el presente documento como "Fiador") para la ejecución de un compromiso de fianza ("Fianza de Caución") en la Cantidad Penal de la cantidad de fianza dada para el acusado en adelante referido como el "Principal" e "Indemnizador" y en consideración de que el Fiador arregle la ejecución o continuación de esta Fianza de Caución, el/los Indemnizador(es) conjunta y solidariamente acepta(n) lo siguiente:
 
-For good and valuable consideration, the undersigned Principal and Indemnitor(s) hereby agree to indemnify and hold harmless the Surety company and/or its agent(s) for all losses not otherwise prohibited by law or rules of the Florida Department of Financial Institutions and Insurance, and
+Por buena y valiosa consideración, el abajo firmante Principal e Indemnizador(es) por el presente acuerdan indemnizar y mantener sin daño a la compañía Fiadora y/o su(s) agente(s) por todas las pérdidas no prohibidas de otra manera por ley o reglas del Departamento de Instituciones Financieras y Seguros de Florida, y
 
-1) To pay Surety the Florida set premium for this Bail Bond. The premium is earned upon the release of Principal from the detaining facility. The fact that Defendant may have been improperly arrested, or his bail reduced or his case dismissed, shall not obligate the return of any portion of said premium.
+1) Pagar al Fiador la prima establecida de Florida para esta Fianza de Caución. La prima se gana al liberar al Principal de la instalación de detención. El hecho de que el Acusado pueda haber sido arrestado indebidamente, o su fianza reducida o su caso desestimado, no obligará la devolución de ninguna porción de dicha prima.
 
-2) To reimburse Surety for actual expenses it incurs caused by any breach by the Principal of the terms of the application and Bail Bond, including expenses or liabilities incurred as a result of searching for, recapturing or returning Principal to custody or in apprehending or endeavoring to apprehend Principal, including legal fees for making application to a court for an order to vacate or set aside an order of forfeiture or judgment entered thereon. In the event the Defendant fails to follow any and all instructions or should the court forfeit or revoke the bond and it becomes necessary for the Bail Bondsman or Surety to investigate, apprehend and surrender the Defendant to the court, Fugitive Fees will be governed by a separate Fugitive Fee Contract between Indemnitor and Surety.
+2) Reembolsar al Fiador por gastos reales en que incurre causados por cualquier incumplimiento por el Principal de los términos de la solicitud y Fianza de Caución, incluyendo gastos o responsabilidades incurridas como resultado de buscar, recapturar o devolver al Principal a la custodia o en aprehender o intentar aprehender al Principal, incluyendo honorarios legales por hacer solicitud a un tribunal para una orden de anular o dejar sin efecto una orden de decomiso o juicio ingresado al respecto. En el evento de que el Acusado falle en seguir todas y cada una de las instrucciones o si el tribunal decomisa o revoca la fianza y se hace necesario para el Fiador de Caución o Fiador investigar, aprehender y entregar al Acusado al tribunal, las Tarifas de Fugitivo serán gobernadas por un Contrato de Tarifa de Fugitivo separado entre el Indemnizador y el Fiador.
 
-3) To pay the Surety a reasonable attorney's fee, no less than Five Hundred Dollars ($500.00), in the event that it is necessary to institute legal action arising from this Agreement.
+3) Pagar al Fiador una tarifa razonable de abogado, no menor a Quinientos Dólares ($500.00), en el evento de que sea necesario instituir acción legal que surja de este Acuerdo.
 
-4) To provide Surety upon demand, a monetary amount equal to the Penal Amount to be held as collateral if Surety discovers any information was concealed or misrepresented by the Indemnitor or Principal, or upon other reasonable cause material to the Surety's assumed risk. If the court increases the penal amount of the Bail Bond over the amount set forth above, Indemnitor(s) and Principal agree to provide additional collateral as Surety may require if Surety, in its sole discretion, desires to remain on the Bail Bond.
+4) Proporcionar al Fiador bajo demanda, una cantidad monetaria igual a la Cantidad Penal para ser mantenida como garantía si el Fiador descubre que cualquier información fue ocultada o tergiversada por el Indemnizador o Principal, o por otra causa razonable material al riesgo asumido del Fiador. Si el tribunal incrementa la cantidad penal de la Fianza de Caución sobre la cantidad establecida anteriormente, el/los Indemnizador(es) y Principal acuerdan proporcionar garantía adicional como el Fiador pueda requerir si el Fiador, a su sola discreción, desea permanecer en la Fianza de Caución.
 
-5) To pay Surety immediately upon demand the penal amount of the Bail Bond after any breach of bond conditions or entry of Estreature (forfeiture) pursuant to governing statutes.
+5) Pagar al Fiador inmediatamente bajo demanda la cantidad penal de la Fianza de Caución después de cualquier incumplimiento de condiciones de fianza o entrada de Ejecución (decomiso) de acuerdo a los estatutos gobernantes.
 
-6) To aid Surety in securing release or exoneration of Surety from all liability under the Bail Bond, including the surrender of the Principal to the Court upon direction of the Surety.
+6) Ayudar al Fiador en asegurar la liberación o exoneración del Fiador de toda responsabilidad bajo la Fianza de Caución, incluyendo la entrega del Principal al Tribunal bajo dirección del Fiador.
 
-7) Indemnitor(s) and Principal hereby grant to Surety a Security Interest in all money or other property in their possession or hereafter acquired from time to time pursuant to Chapter 679, Florida Statutes and/or Article 9 of the Uniform Commercial Code. The Surety is authorized to lawfully levy upon said money or property in the manner provided by law and to apply any deposit(s) and/or proceeds without notice toward any liabilities, losses, costs, damages and expenses incurred by Surety as provided in this Agreement. If collateral placed with Surety is in excess of the bail forfeited, such excess shall be timely returned to the Indemnitor and/or Principal as appropriate after first applying the collateral to any forfeiture and subject to any claim of Surety for unpaid Premium or other lawful charges, including but not limited to reimbursement of document recording fees and stamps and filing fees, credit card charges, and any electronic monitoring charges.
+7) El/Los Indemnizador(es) y Principal por el presente otorgan al Fiador un Interés de Seguridad en todo dinero u otra propiedad en su posesión o en adelante adquirida de vez en cuando de acuerdo al Capítulo 679, Estatutos de Florida y/o Artículo 9 del Código Comercial Uniforme. El Fiador está autorizado a gravar legalmente dicho dinero o propiedad en la manera provista por ley y aplicar cualquier depósito(s) y/o ganancias sin notificación hacia cualquier responsabilidad, pérdidas, costos, daños y gastos incurridos por el Fiador como provisto en este Acuerdo. Si la garantía colocada con el Fiador está en exceso de la fianza decomisada, tal exceso será devuelto oportunamente al Indemnizador y/o Principal según sea apropiado después de aplicar primero la garantía a cualquier decomiso y sujeto a cualquier reclamo del Fiador por Prima impaga u otros cargos legales, incluyendo pero no limitado a reembolso de tarifas de registro de documentos y sellos y tarifas de archivo, cargos de tarjeta de crédito, y cualquier cargo de monitoreo electrónico.
 
-8) The obligations of the Indemnitor(s) and Principal hereunder are joint and several. Any amounts due shall bear interest at the maximum rate allowed by law. The Surety shall not be first obligated to proceed against the Principal on Bail Bond before having recourse against the Indemnitor(s) or any one of them. Indemnitors expressly waive any benefits of law requiring the Surety to make claim upon or to proceed or enforce its remedies against the Principal before making demand upon or proceeding and/or enforcing its remedies against any one or more of the Indemnitor(s). For good and valuable consideration, the undersigned Principal hereby agrees to indemnify and/or hold harmless the Surety for 100% of any and all losses not otherwise prohibited by law or rules and regulations promulgated under any applicable statute.
+8) Las obligaciones del/de los Indemnizador(es) y Principal en el presente documento son conjuntas y solidarias. Cualquier cantidad debida llevará interés a la tasa máxima permitida por ley. El Fiador no estará primero obligado a proceder contra el Principal en la Fianza de Caución antes de tener recurso contra el/los Indemnizador(es) o cualquiera de ellos. Los Indemnizadores expresamente renuncian a cualquier beneficio de ley requiriendo al Fiador hacer reclamo sobre o proceder o hacer cumplir sus remedios contra el Principal antes de hacer demanda sobre o proceder y/o hacer cumplir sus remedios contra cualquiera o más de los Indemnizador(es). Por buena y valiosa consideración, el abajo firmante Principal por el presente acuerda indemnizar y/o mantener sin daño al Fiador por el 100% de todas y cada una de las pérdidas no prohibidas de otra manera por ley o reglas y reglamentos promulgados bajo cualquier estatuto aplicable.
 
-9) As an inducement for Surety to underwrite the Bail Bond, Indemnitor(s) and Principal warrant all statements made by them on the Application for Bail be true and agree to advise Surety of any change, including but not limited to change of phone number, address or employment of either the Principal or of any of the Indemnitor(s) or any other material change in circumstances within forty-eight (48) hours after such change shall have occurred. ANY FAILURE BY PRINCIPAL TO SO NOTIFY SURETY SHALL CONSTITUTE GROUNDS TO BELIEVE PRINCIPAL INTENDS TO FLEE AND SHALL BE CAUSE FOR IMMEDIATE SURRENDER OF THE PRINCIPAL.
+9) Como inducción para que el Fiador suscriba la Fianza de Caución, el/los Indemnizador(es) y Principal garantizan que todas las declaraciones hechas por ellos en la Solicitud de Fianza sean verdaderas y acuerdan avisar al Fiador de cualquier cambio, incluyendo pero no limitado a cambio de número de teléfono, dirección o empleo ya sea del Principal o de cualquiera de los Indemnizador(es) o cualquier otro cambio material en circunstancias dentro de cuarenta y ocho (48) horas después de que tal cambio haya ocurrido. CUALQUIER FALLA POR EL PRINCIPAL DE ASÍ NOTIFICAR AL FIADOR CONSTITUIRÁ BASES PARA CREER QUE EL PRINCIPAL INTENTA HUIR Y SERÁ CAUSA PARA LA ENTREGA INMEDIATA DEL PRINCIPAL.
 
-10) The undersigned agrees that these obligations apply to any and all Bail Bonds executed for the same charge for which the above mentioned Bail Bond was executed or any charge arising out of the same transaction regardless of whether said Bail Bonds are filed before or after conviction, including appeals, but not in a greater amount.
+10) El abajo firmante acuerda que estas obligaciones aplican a todas y cada una de las Fianzas de Caución ejecutadas por el mismo cargo por el cual la Fianza de Caución anteriormente mencionada fue ejecutada o cualquier cargo que surja de la misma transacción sin importar si dichas Fianzas de Caución son archivadas antes o después de la condena, incluyendo apelaciones, pero no en una cantidad mayor.
 
-11) The undersigned authorizes any person, agency, partnership or corporation having any information concerning my character, credit, and financial reputation to release such information to Surety, including but not limited to credit reports and background investigations. Such information is to be used to secure the Principal's appearance in court or apprehension in the case of a bond estreature. The undersigned hereby releases such person, agency, partnership or corporation from any liability which may be incurred in releasing this information to Surety including liability under Federal Law.
+11) El abajo firmante autoriza a cualquier persona, agencia, sociedad o corporación teniendo cualquier información concerniente a mi carácter, crédito, y reputación financiera a liberar tal información al Fiador, incluyendo pero no limitado a reportes de crédito e investigaciones de antecedentes. Tal información es para ser usada para asegurar la comparecencia del Principal en corte o aprensión en el caso de una ejecución de fianza. El abajo firmante por el presente libera a tal persona, agencia, sociedad o corporación de cualquier responsabilidad que pueda ser incurrida al liberar esta información al Fiador incluyendo responsabilidad bajo Ley Federal.
 
-I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECEIPT OF A COPY OF THE INDEMNITY AGREEMENT OR HAVE PRINTED OUT A COPY. I AM THE TRUE AND LAWFUL OWNER OF THE PROPERTY, WHETHER REAL OR PERSONAL, SET FORTH IN THE APPLICATION FOR BAIL (WHICH ENTIRE APPLICATION IS MADE A PART HEREOF BY REFERENCE). I OWN SUCH PROPERTY FREE AND CLEAR OF ALL LIENS OR ENCUMBRANCES EXCEPT AS I HAVE DISCLOSED IN WRITING. I PROMISE NOT TO TRANSFER OR ENCUMBER ANY OF SAID PROPERTY UNTIL MY LIABILITY UNDER THIS INDEMNITY AGREEMENT AND THE APPLICATION FOR BAIL HAS BEEN RELEASED. I UNDERSTAND THE SURETY IS PERMITTING THE BAIL BOND TO REMAIN IN FORCE RELYING ON THE STATEMENTS MADE BY ME.
+HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SU CONTENIDO. RECONOZCO EL RECIBO DE UNA COPIA DEL ACUERDO DE INDEMNIZACIÓN O HE IMPRESO UNA COPIA. SOY EL VERDADERO Y LEGÍTIMO DUEÑO DE LA PROPIEDAD, YA SEA REAL O PERSONAL, ESTABLECIDA EN LA SOLICITUD DE FIANZA (CUYA SOLICITUD COMPLETA SE HACE PARTE DEL PRESENTE DOCUMENTO POR REFERENCIA). POSEO TAL PROPIEDAD LIBRE Y CLARA DE TODOS LOS GRAVAMENES O CARGAS EXCEPTO COMO HE DIVULGADO POR ESCRITO. PROMETO NO TRANSFERIR O GRAVAR NINGUNA DE DICHA PROPIEDAD HASTA QUE MI RESPONSABILIDAD BAJO ESTE ACUERDO DE INDEMNIZACIÓN Y LA SOLICITUD DE FIANZA HAYA SIDO LIBERADA. ENTIENDO QUE EL FIADOR ESTÁ PERMITIENDO QUE LA FIANZA DE CAUCIÓN PERMANEZCA EN VIGOR CONFIANDO EN LAS DECLARACIONES HECHAS POR MÍ.
         </div>
         <div class="checks">
-          <label><input type="checkbox" id="indemnityRead" name="indemnityRead" value="Yes" required> I have read and agree to the above Indemnity Agreement<span class="req">*</span></label>
+          <label><input type="checkbox" id="indemnityRead" name="indemnityRead" value="Yes" required> He leído y acepto el Acuerdo de Indemnización anterior<span class="req">*</span></label>
         </div>
         <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" type="button" data-next>Siguiente</button>
         </div>
       </div>
 
@@ -677,17 +677,17 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       <div class="section" data-step="15">
         <div class="grid">
           <div class="full">
-            <label for="agreeName">BY TYPING YOUR NAME AND SUBMITTING BELOW YOU AGREE TO ALL THE ABOVE TERMS AND CONDITIONS AND THAT THE INFORMATION IS ENTIRELY CORRECT AND TRUE AND THAT YOU ARE THE PERSON SUBMITTING THE APPLICATION.<span class="req">*</span></label>
+            <label for="agreeName">AL ESCRIBIR TU NOMBRE Y ENVIAR ABAJO ACEPTAS TODOS LOS TÉRMINOS Y CONDICIONES ANTERIORES Y QUE LA INFORMACIÓN ES COMPLETAMENTE CORRECTA Y VERDADERA Y QUE TÚ ERES LA PERSONA QUE ENVÍA LA SOLICITUD.<span class="req">*</span></label>
             <input id="agreeName" name="agreeName" required />
           </div>
         </div>
         <div class="actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" id="submitBtn" type="submit">Submit Application</button>
-          <div class="error" id="err">Please fill the required fields in this step.</div>
+          <button class="ghost" type="button" data-back>Atrás</button>
+          <button class="primary" id="submitBtn" type="submit">Enviar Solicitud</button>
+          <div class="error" id="err">Por favor completa los campos requeridos en este paso.</div>
         </div>
         <div class="loading-indicator" id="loadingIndicator">
-          Submitting your application...
+          Enviando tu solicitud...
         </div>
       </div>
 
@@ -696,15 +696,15 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       <div class="section" data-step="16" id="completionSection">
         <div style="text-align:center; padding:40px 20px;">
           <div style="font-size:48px; margin-bottom:20px;">⚠️</div>
-          <h2 style="color:#fff; font-size:24px; margin-bottom:20px; font-weight:700;">Next Step: We'll Call You</h2>
+          <h2 style="color:#fff; font-size:24px; margin-bottom:20px; font-weight:700;">Siguiente Paso: Te Llamaremos</h2>
           <p style="color:#fff; font-size:16px; line-height:1.5; margin-bottom:20px;">
-            Don't worry, you're all set. We'll call you immediately after receiving to complete your bond process.
+            No te preocupes, estás listo. Te llamaremos inmediatamente después de recibir tu solicitud para completar tu proceso de fianza.
           </p>
           <p style="color:#fff; font-size:16px; line-height:1.5; margin-bottom:30px;">
-            👉 If you haven't already spoken with us, send a quick text to <span style="color:#F5A00D; font-weight:bold;">561-247-0018</span> so we know to reach you fast.
+            👉 Si aún no has hablado con nosotros, envía un mensaje rápido al <span style="color:#F5A00D; font-weight:bold; white-space: nowrap;">561-247-0018</span> para que sepamos contactarte rápidamente.
           </p>
           <a href="sms:561-247-0018" style="display:inline-block; background:#F5A00D; color:#111; padding:16px 32px; border-radius:10px; font-weight:700; font-size:16px; text-decoration:none; cursor:pointer;">
-            TEXT US
+            ENVÍANOS MENSAJE
           </a>
         </div>
       </div>
@@ -757,35 +757,35 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
           }
         });
         // Update indemnitor section labels (steps 1-3) to refer to "Your" info
-        document.querySelector('label[for="indemnitorName"]').innerHTML = 'Your Complete Name<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorDob"]').innerHTML = 'Your Date of Birth<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorCell"]').innerHTML = 'Your Cell Phone #<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorEmail"]').innerHTML = 'Your Email Address';
-        document.querySelector('label[for="indemnitorAddress"]').innerHTML = 'Your Home Address<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorHowLong"]').innerHTML = 'How Long Have You Lived at Current Address<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorWorkType"]').innerHTML = 'Your Type of Work<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorEmployer"]').innerHTML = 'Your Employer Name<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorWorkPhone"]').innerHTML = 'Your Work Phone # (will NOT be called)';
-        document.querySelector('label[for="indemnitorWorkAddress"]').innerHTML = 'Your Work Address';
-        document.querySelector('label[for="indemnitorVehicle"]').innerHTML = 'Your Vehicle<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorHomePhone"]').innerHTML = 'Your Home Phone #';
-        document.querySelector('label[for="relation"]').innerHTML = 'Your Relation to Person in Jail and/or Being Bonded?<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorName"]').innerHTML = 'Tu Nombre Completo<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorDob"]').innerHTML = 'Tu Fecha de Nacimiento<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorCell"]').innerHTML = 'Tu Número de Teléfono Celular<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorEmail"]').innerHTML = 'Tu Dirección de Correo Electrónico';
+        document.querySelector('label[for="indemnitorAddress"]').innerHTML = 'Tu Dirección de Casa<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorHowLong"]').innerHTML = '¿Cuánto tiempo has vivido en la dirección actual?<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorWorkType"]').innerHTML = 'Tu Tipo de Trabajo<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorEmployer"]').innerHTML = 'Nombre de tu Empleador<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorWorkPhone"]').innerHTML = 'Tu Teléfono del Trabajo (NO se llamará)';
+        document.querySelector('label[for="indemnitorWorkAddress"]').innerHTML = 'Tu Dirección del Trabajo';
+        document.querySelector('label[for="indemnitorVehicle"]').innerHTML = 'Tu Vehículo<span class="req">*</span>';
+        document.querySelector('label[for="indemnitorHomePhone"]').innerHTML = 'Tu Teléfono de Casa';
+        document.querySelector('label[for="relation"]').innerHTML = '¿Cuál es tu relación con la persona en la cárcel y/o que está siendo afianzada?<span class="req">*</span>';
         
         // Keep checkbox section hint as default for indemnitors (about defendant)
         const checkboxHint = document.querySelector('.section[data-step="8"] .hint');
         if (checkboxHint) {
-          checkboxHint.innerHTML = 'These questions are about the person being bonded';
+          checkboxHint.innerHTML = 'Estas preguntas son sobre la persona que está siendo afianzada';
         }
         
         // Update section info messages for indemnitors
         const indemnitorSectionInfo = document.querySelector('.section[data-step="1"] .section-info');
         if (indemnitorSectionInfo) {
-          indemnitorSectionInfo.innerHTML = 'Please provide the following information about yourself (the person bonding the arrested person out).';
+          indemnitorSectionInfo.innerHTML = 'Por favor proporciona la siguiente información sobre ti (la persona que está afianzando al arrestado).';
         }
         
         const defendantSectionInfo = document.querySelector('.section[data-step="4"] .section-info');
         if (defendantSectionInfo) {
-          defendantSectionInfo.innerHTML = 'The following questions are about the defendant (the arrested person or person needing a bond).';
+          defendantSectionInfo.innerHTML = 'Las siguientes preguntas son sobre el acusado (la persona arrestada o que necesita una fianza).';
         }
 
         // Defendant section labels remain as "Defendant's"
@@ -799,38 +799,38 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         });
         
         // Update defendant section labels to refer to "Your" info
-        document.querySelector('label[for="defendantName"]').innerHTML = 'Your Complete Name<span class="req">*</span>';
-        document.querySelector('label[for="defendantNick"]').innerHTML = 'Your Nick Name (If not actual name)';
-        document.querySelector('label[for="defendantDob"]').innerHTML = 'Your Date of Birth<span class="req">*</span>';
-        document.querySelector('label[for="defendantSsn"]').innerHTML = 'Your Social Security # (optional)';
-        document.querySelector('label[for="defendantDl"]').innerHTML = 'Your Driver\'s License or ID # (optional)';
-        document.querySelector('label[for="defendantCell"]').innerHTML = 'Your Cell Phone #<span class="req">*</span>';
-        document.querySelector('label[for="defendantHomePhone"]').innerHTML = 'Your Home Phone # (Skip if none)';
-        document.querySelector('label[for="defendantEmail"]').innerHTML = 'Your Email Address';
-        document.querySelector('label[for="defendantAddress"]').innerHTML = 'Your Home Address<span class="req">*</span>';
-        document.querySelector('label[for="defendantHowLong"]').innerHTML = 'How Long Have You Lived at Current Address<span class="req">*</span>';
-        document.querySelector('label[for="defendantWorkType"]').innerHTML = 'Your Type of Work';
-        document.querySelector('label[for="defendantEmployer"]').innerHTML = 'Your Employer Name';
-        document.querySelector('label[for="defendantWorkPhone"]').innerHTML = 'Your Work Phone # (will NOT be called)';
-        document.querySelector('label[for="defendantWorkAddress"]').innerHTML = 'Your Work Address';
-        document.querySelector('label[for="defendantVehicle"]').innerHTML = 'Your Vehicle to get to Court<span class="req">*</span>';
-        document.querySelector('label[for="recentArrest"]').innerHTML = 'Your Most Recent Arrest (Not including the Current Arrest)';
+        document.querySelector('label[for="defendantName"]').innerHTML = 'Tu Nombre Completo<span class="req">*</span>';
+        document.querySelector('label[for="defendantNick"]').innerHTML = 'Tu Apodo (si no es el nombre real)';
+        document.querySelector('label[for="defendantDob"]').innerHTML = 'Tu Fecha de Nacimiento<span class="req">*</span>';
+        document.querySelector('label[for="defendantSsn"]').innerHTML = 'Tu Número de Seguro Social (opcional)';
+        document.querySelector('label[for="defendantDl"]').innerHTML = 'Tu Número de Licencia de Conducir o ID (opcional)';
+        document.querySelector('label[for="defendantCell"]').innerHTML = 'Tu Número de Teléfono Celular<span class="req">*</span>';
+        document.querySelector('label[for="defendantHomePhone"]').innerHTML = 'Tu Teléfono de Casa (Omitir si no tiene)';
+        document.querySelector('label[for="defendantEmail"]').innerHTML = 'Tu Dirección de Correo Electrónico';
+        document.querySelector('label[for="defendantAddress"]').innerHTML = 'Tu Dirección de Casa<span class="req">*</span>';
+        document.querySelector('label[for="defendantHowLong"]').innerHTML = '¿Cuánto tiempo has vivido en la dirección actual?<span class="req">*</span>';
+        document.querySelector('label[for="defendantWorkType"]').innerHTML = 'Tu Tipo de Trabajo';
+        document.querySelector('label[for="defendantEmployer"]').innerHTML = 'Nombre de tu Empleador';
+        document.querySelector('label[for="defendantWorkPhone"]').innerHTML = 'Tu Teléfono del Trabajo (NO se llamará)';
+        document.querySelector('label[for="defendantWorkAddress"]').innerHTML = 'Tu Dirección del Trabajo';
+        document.querySelector('label[for="defendantVehicle"]').innerHTML = 'Tu Vehículo para llegar al Tribunal<span class="req">*</span>';
+        document.querySelector('label[for="recentArrest"]').innerHTML = 'Tu Arresto Más Reciente (Sin incluir el arresto actual)';
         
         // Update checkbox section hint for defendants
         const checkboxHint = document.querySelector('.section[data-step="8"] .hint');
         if (checkboxHint) {
-          checkboxHint.innerHTML = 'These questions are about you';
+          checkboxHint.innerHTML = 'Estas preguntas son sobre ti';
         }
         
         // Update section info messages for defendants
         const indemnitorSectionInfo = document.querySelector('.section[data-step="1"] .section-info');
         if (indemnitorSectionInfo) {
-          indemnitorSectionInfo.innerHTML = 'Please provide the following information about your indemnitor (the person bonding you out).';
+          indemnitorSectionInfo.innerHTML = 'Por favor proporciona la siguiente información sobre tu fiador (la persona que te está afianzando).';
         }
         
         const defendantSectionInfo = document.querySelector('.section[data-step="4"] .section-info');
         if (defendantSectionInfo) {
-          defendantSectionInfo.innerHTML = 'The following questions are about you (the defendant or person needing a bond).';
+          defendantSectionInfo.innerHTML = 'Las siguientes preguntas son sobre ti (el acusado o persona que necesita una fianza).';
         }
       }
     }
@@ -1010,7 +1010,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
 
       // File size check (5MB limit for images)
       if (file.size > 5 * 1024 * 1024) {
-        alert(`Image is too large. Maximum size is 5MB.`);
+        alert(`La imagen es demasiado grande. El tamaño máximo es 5MB.`);
         input.value = '';
         return;
       }
@@ -1018,7 +1018,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       // File type check
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
       if (!allowedTypes.includes(file.type)) {
-        alert(`Please use JPG or PNG format only.`);
+        alert(`Por favor usa solo formato JPG o PNG.`);
         input.value = '';
         return;
       }
@@ -1037,9 +1037,9 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         dropZone.style.backgroundRepeat = 'no-repeat';
         dropZone.innerHTML = `
           <div style="background: rgba(0,0,0,0.5); color: white; padding: 10px; border-radius: 8px;">
-            <div style="font-size:18px; margin-bottom:10px; font-weight:600;">✓ ID Uploaded</div>
+            <div style="font-size:18px; margin-bottom:10px; font-weight:600;">✓ ID Subido</div>
             <input type="file" id="idFront" accept="image/*" style="display:none;" onchange="handleIDUpload(this, 'front')">
-            <div style="font-size:14px;">Click to change</div>
+            <div style="font-size:14px;">Haz clic para cambiar</div>
           </div>
         `;
       };
@@ -1049,7 +1049,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       // Update preview text below
       const previewElement = document.getElementById(side + 'Preview');
       previewElement.innerHTML = `
-        <div style="font-size:12px; color:#28a745; font-weight:600;">✓ ${file.name} stored</div>
+        <div style="font-size:12px; color:#28a745; font-weight:600;">✓ ${file.name} guardado</div>
         <div style="font-size:11px; color:#666;">${(file.size / 1024).toFixed(1)} KB</div>
       `;
 
@@ -1058,17 +1058,17 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
     }
 
     function updateUploadButton() {
-      const uploadBtn = document.getElementById('uploadNextBtn');
+      const uploadBtn = document.getElementById('uploadSiguienteBtn');
       const errorDiv = document.getElementById('idUploadError');
       const hasFiles = storedIDFiles.front || storedIDFiles.back;
 
       if (storedIDFiles.front) {
-        uploadBtn.textContent = 'Continue (ID Uploaded)';
+        uploadBtn.textContent = 'Continuar (ID Subido)';
         uploadBtn.style.background = '#444';
         uploadBtn.disabled = false;
         if (errorDiv) errorDiv.style.display = 'none';
       } else {
-        uploadBtn.textContent = 'Upload ID Required';
+        uploadBtn.textContent = 'Subida de ID Requerida';
         uploadBtn.style.background = '#666';
         uploadBtn.disabled = true;
       }
@@ -1115,7 +1115,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         const defendantName = document.getElementById('defendantName')?.value || '';
 
         if (!yourName || !yourPhone) {
-          console.log('User info not yet available, will try again later');
+          console.log('Información de usuario aún no disponible, se intentará más tarde');
           return;
         }
 
@@ -1155,22 +1155,22 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         });
 
         idDataSent = true;
-        console.log('ID data sent successfully to IDUpload endpoint');
+        console.log('Datos de ID enviados exitosamente al endpoint de IDUpload');
 
         // Update previews to show sent status
         if (storedIDFiles.front) {
           document.getElementById('frontPreview').innerHTML = `
-            <div style="font-size:12px; color:#007bff; font-weight:600;">✓ Sent to ID system</div>
+            <div style="font-size:12px; color:#007bff; font-weight:600;">✓ Enviado al sistema de ID</div>
           `;
         }
         if (storedIDFiles.back) {
           document.getElementById('backPreview').innerHTML = `
-            <div style="font-size:12px; color:#007bff; font-weight:600;">✓ Sent to ID system</div>
+            <div style="font-size:12px; color:#007bff; font-weight:600;">✓ Enviado al sistema de ID</div>
           `;
         }
 
       } catch (error) {
-        console.error('Failed to send ID data:', error);
+        console.error('Error al enviar datos de ID:', error);
       }
     }
 
@@ -1237,25 +1237,25 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
   <div class="chat-interface" id="chatInterface">
     <div class="chat-header">
       <div class="chat-title-area">
-        <div class="chat-title">AI Assistant</div>
-        <div class="chat-subtitle">Ask about bail bonds</div>
+        <div class="chat-title">Asistente IA</div>
+        <div class="chat-subtitle">Pregunta sobre fianzas</div>
       </div>
       <button class="chat-close" id="chatClose">×</button>
     </div>
     
     <div class="chat-messages" id="chatMessages">
       <div class="welcome-message">
-        👋 Hi! I'm your AI assistant for <strong>Barbie's Bail Bonds</strong>.<br><br>
-        Ask me anything about:<br>
-        • Bail costs & processes<br>
-        • Court requirements<br>
-        • Payment options<br>
-        • Release procedures
+        👋 ¡Hola! Soy tu asistente de IA para <strong>Barbie's Bail Bonds</strong>.<br><br>
+        Pregúntame sobre:<br>
+        • Costos y procesos de fianza<br>
+        • Requisitos del tribunal<br>
+        • Opciones de pago<br>
+        • Procedimientos de liberación
       </div>
     </div>
     
     <div class="typing-indicator" id="typingIndicator">
-      🤖 Assistant is typing
+      🤖 El asistente está escribiendo
       <div class="typing-dots">
         <span></span>
         <span></span>
@@ -1268,7 +1268,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         type="text" 
         class="chat-input" 
         id="chatInput" 
-        placeholder="Type your message..."
+        placeholder="Escribe tu mensaje..."
         maxlength="500"
       >
       <button class="chat-send" id="chatSend">▶</button>
@@ -1323,11 +1323,11 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         assistantResponse = response.answer;
         addMessage('assistant', assistantResponse);
       } else if (response && response.error) {
-        assistantResponse = 'I apologize, but I encountered an error. Please try again or call us at 561-247-0018 for immediate assistance.';
+        assistantResponse = 'Me disculpo, pero encontré un error. Por favor intenta de nuevo o llámanos al 561-247-0018 para asistencia inmediata.';
         addMessage('assistant', assistantResponse);
         console.error('Chat API error:', response.error);
       } else {
-        assistantResponse = 'I apologize, but I couldn\'t generate a response. Please try again or call us at 561-247-0018 for help.';
+        assistantResponse = 'Me disculpo, pero no pude generar una respuesta. Por favor intenta de nuevo o llámanos al 561-247-0018 para ayuda.';
         addMessage('assistant', assistantResponse);
       }
       conversationHistory.push({user: message, assistant: assistantResponse});
@@ -1339,7 +1339,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
     };
     script.onerror = function() {
       hideTyping();
-      const errorResponse = 'I\'m having trouble connecting right now. Please try again or call us directly at 561-247-0018 for assistance.';
+      const errorResponse = 'Tengo problemas de conexión ahora mismo. Por favor intenta de nuevo o llámanos directamente al 561-247-0018 para asistencia.';
       addMessage('assistant', errorResponse);
       conversationHistory.push({user: message, assistant: errorResponse});
       if (conversationHistory.length > MAX_HISTORY) {
@@ -1351,7 +1351,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
     setTimeout(() => {
       if (window[callbackName]) {
         hideTyping();
-        const timeoutResponse = 'Request timed out. Please call us at 561-247-0018 for immediate assistance.';
+        const timeoutResponse = 'La solicitud expiró. Por favor llámanos al 561-247-0018 para asistencia inmediata.';
         addMessage('assistant', timeoutResponse);
         conversationHistory.push({user: message, assistant: timeoutResponse});
         if (conversationHistory.length > MAX_HISTORY) {
