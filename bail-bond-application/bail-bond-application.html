@@ -740,8 +740,22 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
     // Update labels based on user role
     function updateLabelsForRole(role) {
       userRole = role;
-      
+
+      // Get all indemnitor fields
+      const indemnitorFields = [
+        'indemnitorName', 'relation', 'indemnitorDob',
+        'indemnitorCell', 'indemnitorAddress', 'indemnitorHowLong',
+        'indemnitorWorkType', 'indemnitorEmployer', 'indemnitorVehicle'
+      ];
+
       if (role === 'Indemnitor') {
+        // Make indemnitor fields required when user is Indemnitor
+        indemnitorFields.forEach(fieldId => {
+          const field = document.getElementById(fieldId);
+          if (field) {
+            field.setAttribute('required', '');
+          }
+        });
         // Update indemnitor section labels (steps 1-3) to refer to "Your" info
         document.querySelector('label[for="indemnitorName"]').innerHTML = 'Your Complete Name<span class="req">*</span>';
         document.querySelector('label[for="indemnitorDob"]').innerHTML = 'Your Date of Birth<span class="req">*</span>';
@@ -773,23 +787,16 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         if (defendantSectionInfo) {
           defendantSectionInfo.innerHTML = 'The following questions are about the defendant (the arrested person or person needing a bond).';
         }
-        
+
         // Defendant section labels remain as "Defendant's"
       } else if (role === 'Defendant') {
-        // Update indemnitor section labels (steps 1-3) to refer to "Indemnitor's" info
-        document.querySelector('label[for="indemnitorName"]').innerHTML = 'Indemnitor\'s Complete Name<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorDob"]').innerHTML = 'Indemnitor\'s Date of Birth<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorCell"]').innerHTML = 'Indemnitor\'s Cell Phone #<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorEmail"]').innerHTML = 'Indemnitor\'s Email Address';
-        document.querySelector('label[for="indemnitorAddress"]').innerHTML = 'Indemnitor\'s Home Address<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorHowLong"]').innerHTML = 'How Long Has Indemnitor Lived at Current Address<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorWorkType"]').innerHTML = 'Indemnitor\'s Type of Work<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorEmployer"]').innerHTML = 'Indemnitor\'s Employer Name<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorWorkPhone"]').innerHTML = 'Indemnitor\'s Work Phone # (will NOT be called)';
-        document.querySelector('label[for="indemnitorWorkAddress"]').innerHTML = 'Indemnitor\'s Work Address';
-        document.querySelector('label[for="indemnitorVehicle"]').innerHTML = 'Indemnitor\'s Vehicle<span class="req">*</span>';
-        document.querySelector('label[for="indemnitorHomePhone"]').innerHTML = 'Indemnitor\'s Home Phone #';
-        document.querySelector('label[for="relation"]').innerHTML = 'Indemnitor\'s Relation to You?<span class="req">*</span>';
+        // Remove required from indemnitor fields when user is Defendant (they skip these sections)
+        indemnitorFields.forEach(fieldId => {
+          const field = document.getElementById(fieldId);
+          if (field) {
+            field.removeAttribute('required');
+          }
+        });
         
         // Update defendant section labels to refer to "Your" info
         document.querySelector('label[for="defendantName"]').innerHTML = 'Your Complete Name<span class="req">*</span>';
