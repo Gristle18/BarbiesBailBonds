@@ -432,18 +432,8 @@
             <div class="hint">Examples: "Manager", "Construction Worker", "Nurse", "Self-employed", "Unemployed"</div>
             <input id="partnerWorkType" name="partnerWorkType" />
           </div>
-        </div>
-        <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
-        </div>
-      </div>
-
-      <!-- STEP 4B: Relationship (1) -->
-      <div class="section" data-step="10">
-        <div class="grid">
-          <div class="full">
-            <label for="partnerWorkName">Partner Work Name</label>
+          <div>
+            <label for="partnerWorkName">Partner's Employer Name</label>
             <input id="partnerWorkName" name="partnerWorkName" />
           </div>
         </div>
@@ -453,9 +443,12 @@
         </div>
       </div>
 
-      <!-- STEP 5A: Parents (5) -->
-      <div class="section" data-step="11">
+      <!-- STEP 5: Family (Parents and Siblings) -->
+      <div class="section" data-step="10">
         <div class="grid">
+          <div class="full" style="margin-bottom:10px;">
+            <h3 style="color:#F5A00D; margin:0 0 5px 0;">Parents</h3>
+          </div>
           <div>
             <label for="motherName">Mother's Name</label>
             <input id="motherName" name="motherName" />
@@ -476,30 +469,14 @@
             <label for="fatherPhone">Father's Phone #</label>
             <input id="fatherPhone" name="fatherPhone" type="tel" inputmode="tel" data-phone />
           </div>
-        </div>
-        <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
-        </div>
-      </div>
-
-      <!-- STEP 5B: Parents (1) -->
-      <div class="section" data-step="12">
-        <div class="grid">
           <div class="full">
             <label for="fatherAddress">Father's Home Address</label>
             <input id="fatherAddress" name="fatherAddress" />
           </div>
-        </div>
-        <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
-        </div>
-      </div>
 
-      <!-- STEP 6: Siblings (4) -->
-      <div class="section" data-step="13">
-        <div class="grid">
+          <div class="full" style="margin-top:20px; margin-bottom:10px;">
+            <h3 style="color:#F5A00D; margin:0 0 5px 0;">Siblings</h3>
+          </div>
           <div>
             <label for="sibling1Name">1. Brother/Sister's Name</label>
             <input id="sibling1Name" name="sibling1Name" />
@@ -523,9 +500,12 @@
         </div>
       </div>
 
-      <!-- STEP 7A: References (5) -->
-      <div class="section" data-step="14">
+      <!-- STEP 6: References and Emergency Contacts -->
+      <div class="section" data-step="11">
         <div class="grid">
+          <div class="full" style="margin-bottom:10px;">
+            <h3 style="color:#F5A00D; margin:0 0 5px 0;">References</h3>
+          </div>
           <div>
             <label for="ref1Name">Reference #1 - Full Name<span class="req">*</span></label>
             <input id="ref1Name" name="ref1Name" required />
@@ -546,16 +526,6 @@
             <label for="ref2Relation">Reference #2 - Relation<span class="req">*</span></label>
             <input id="ref2Relation" name="ref2Relation" required />
           </div>
-        </div>
-        <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
-        </div>
-      </div>
-
-      <!-- STEP 7B: References (4) -->
-      <div class="section" data-step="15">
-        <div class="grid">
           <div>
             <label for="ref2Phone">Reference #2 - Phone #<span class="req">*</span></label>
             <input id="ref2Phone" name="ref2Phone" type="tel" inputmode="tel" data-phone required />
@@ -572,16 +542,10 @@
             <label for="ref3Phone">Reference #3 - Phone #<span class="req">*</span></label>
             <input id="ref3Phone" name="ref3Phone" type="tel" inputmode="tel" data-phone required />
           </div>
-        </div>
-        <div class="step-actions">
-          <button class="ghost" type="button" data-back>Back</button>
-          <button class="primary" type="button" data-next>Next</button>
-        </div>
-      </div>
 
-      <!-- STEP 8A: Emergency Contacts (5) -->
-      <div class="section" data-step="16">
-        <div class="grid">
+          <div class="full" style="margin-top:20px; margin-bottom:10px;">
+            <h3 style="color:#F5A00D; margin:0 0 5px 0;">Emergency Contacts</h3>
+          </div>
           <div>
             <label for="emergency1Name">Emergency Contact #1<span class="req">*</span></label>
             <input id="emergency1Name" name="emergency1Name" required />
@@ -606,8 +570,8 @@
       </div>
 
 
-      <!-- STEP 9: Terms and Conditions -->
-      <div class="section" data-step="18">
+      <!-- STEP 7: Terms and Conditions -->
+      <div class="section" data-step="12">
         <div class="agreement-text">
 Terms and Conditions of Application for Appearance Bond
 
@@ -637,8 +601,8 @@ Under penalties of perjury, I declare that I have read the foregoing, and the in
         </div>
       </div>
 
-      <!-- STEP 10: Contingent Promissory Note -->
-      <div class="section" data-step="19">
+      <!-- STEP 8: Contingent Promissory Note -->
+      <div class="section" data-step="13">
         <div class="agreement-text">
 Contingent Promissory Note
 
@@ -667,8 +631,8 @@ This Promissory Note is Executed on the date this form is submitted.
         </div>
       </div>
 
-      <!-- STEP 11: Indemnity Agreement -->
-      <div class="section" data-step="20">
+      <!-- STEP 9: Indemnity Agreement -->
+      <div class="section" data-step="14">
         <div class="agreement-text">
 Indemnity Agreement for Bail Bond
 
@@ -709,8 +673,8 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
         </div>
       </div>
 
-      <!-- STEP 12: Final Agreement (Signature) -->
-      <div class="section" data-step="21">
+      <!-- STEP 10: Final Agreement (Signature) -->
+      <div class="section" data-step="15">
         <div class="grid">
           <div class="full">
             <label for="agreeName">BY TYPING YOUR NAME AND SUBMITTING BELOW YOU AGREE TO ALL THE ABOVE TERMS AND CONDITIONS AND THAT THE INFORMATION IS ENTIRELY CORRECT AND TRUE AND THAT YOU ARE THE PERSON SUBMITTING THE APPLICATION.<span class="req">*</span></label>
@@ -728,8 +692,8 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       </div>
 
 
-      <!-- STEP 13: Application Complete -->
-      <div class="section" data-step="23" id="completionSection">
+      <!-- STEP 11: Application Complete -->
+      <div class="section" data-step="16" id="completionSection">
         <div style="text-align:center; padding:40px 20px;">
           <div style="font-size:48px; margin-bottom:20px;">⚠️</div>
           <h2 style="color:#fff; font-size:24px; margin-bottom:20px; font-weight:700;">Next Step: We'll Call You</h2>
@@ -759,7 +723,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       });
 
       // Update progress bar
-      const totalSteps = 23; // Total steps including upload and completion
+      const totalSteps = 17; // Total steps including upload and completion
       const currentStep = idx + 1;
       const progressPercent = (currentStep / totalSteps) * 100;
 
@@ -981,7 +945,7 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       sendIDDataToUploadEndpoint();
 
       // Validate final step
-      if (!validateStep(sections.length - 2)) {
+      if (!validateStep(15)) { // Step 15 is the signature step
         if (errorDiv) errorDiv.style.display = 'block';
         return;
       }
@@ -1015,14 +979,14 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       .then(() => {
         submitBtn.disabled = false;
         loadingIndicator.style.display = 'none';
-        showStep(23); // Show completion section
+        showStep(16); // Show completion section
       })
       .catch((error) => {
         console.error('Submission error:', error);
         submitBtn.disabled = false;
         loadingIndicator.style.display = 'none';
         // Still show completion since no-cors doesn't return errors properly
-        showStep(23);
+        showStep(16); // Show completion section
       });
     });
 
