@@ -107,31 +107,16 @@
 
             <!-- ID Front -->
             <div style="text-align:center;">
-              <div style="font-size:18px; font-weight:600; margin-bottom:15px; color:#333;">ID Frente</div>
-              <div style="border:2px dashed #ddd; padding:30px 20px; border-radius:8px; background:#f9f9f9; min-height:180px; display:flex; flex-direction:column; justify-content:center;">
-                <div style="font-size:16px; margin-bottom:10px; color:#666; font-weight:600;">ID FRENTE</div>
+              <div style="font-size:18px; font-weight:600; margin-bottom:15px; color:#333;">Subir Su Identificación</div>
+              <div onclick="document.getElementById('idFront').click()" style="border:2px dashed #ddd; padding:30px 20px; border-radius:8px; background:#f9f9f9; min-height:180px; display:flex; flex-direction:column; justify-content:center; cursor:pointer; transition: all 0.3s ease;" onmouseover="this.style.background='#f0f0f0'; this.style.borderColor='#F28C00';" onmouseout="this.style.background='#f9f9f9'; this.style.borderColor='#ddd';">
+                <div style="font-size:48px; margin-bottom:10px; color:#F28C00;">📷</div>
+                <div style="font-size:16px; margin-bottom:10px; color:#666; font-weight:600;">Clic para Subir ID</div>
                 <input type="file" id="idFront" accept="image/*" style="display:none;" onchange="handleIDUpload(this, 'front')">
-                <button type="button" onclick="document.getElementById('idFront').click()" style="background:#F28C00; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-size:14px; cursor:pointer; margin-bottom:10px;">
-                  Subir Frente
-                </button>
                 <div style="font-size:12px; color:#666;">Solo JPG, PNG</div>
               </div>
               <div id="frontPreview" style="margin-top:10px;"></div>
             </div>
 
-            <!-- ID Back -->
-            <div style="text-align:center;">
-              <div style="font-size:18px; font-weight:600; margin-bottom:15px; color:#333;">ID Reverso</div>
-              <div style="border:2px dashed #ddd; padding:30px 20px; border-radius:8px; background:#f9f9f9; min-height:180px; display:flex; flex-direction:column; justify-content:center;">
-                <div style="font-size:16px; margin-bottom:10px; color:#666; font-weight:600;">ID REVERSO</div>
-                <input type="file" id="idBack" accept="image/*" style="display:none;" onchange="handleIDUpload(this, 'back')">
-                <button type="button" onclick="document.getElementById('idBack').click()" style="background:#F28C00; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-size:14px; cursor:pointer; margin-bottom:10px;">
-                  Subir Reverso
-                </button>
-                <div style="font-size:12px; color:#666;">Solo JPG, PNG</div>
-              </div>
-              <div id="backPreview" style="margin-top:10px;"></div>
-            </div>
 
           </div>
         </div>
@@ -142,7 +127,7 @@
         </div>
 
         <div id="idUploadError" class="error" style="text-align:center; margin-bottom:10px; font-size:16px;">
-          Se requieren fotos del frente y reverso de la identificación para continuar.
+          Se requiere foto de identificación para continuar.
         </div>
         <div class="step-actions">
           <button class="primary" type="button" data-next id="uploadNextBtn">Continuar</button>
@@ -895,12 +880,12 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SUS CONTENIDOS. RECONOZCO REC
     function validateStep(idx) {
       const step = sections[idx];
 
-      // Special validation for upload step (step 0) - require both front and back ID
+      // Special validation for upload step (step 0) - require front ID only
       if (idx === 0) {
         const errorDiv = document.getElementById('idUploadError');
-        if (!storedIDFiles.front || !storedIDFiles.back) {
+        if (!storedIDFiles.front) {
           if (errorDiv) errorDiv.style.display = 'block';
-          return false; // Both front and back ID uploads are required
+          return false; // Front ID upload is required
         }
         if (errorDiv) errorDiv.style.display = 'none';
         return true;
@@ -1080,17 +1065,13 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SUS CONTENIDOS. RECONOZCO REC
       const errorDiv = document.getElementById('idUploadError');
       const hasFiles = storedIDFiles.front || storedIDFiles.back;
 
-      if (storedIDFiles.front && storedIDFiles.back) {
-        uploadBtn.textContent = 'Continuar (Ambos Lados Subidos)';
+      if (storedIDFiles.front) {
+        uploadBtn.textContent = 'Continuar (ID Subida)';
         uploadBtn.style.background = '#28a745';
         uploadBtn.disabled = false;
         if (errorDiv) errorDiv.style.display = 'none';
-      } else if (hasFiles) {
-        uploadBtn.textContent = 'Se Requieren Ambos Lados';
-        uploadBtn.style.background = '#666';
-        uploadBtn.disabled = true;
       } else {
-        uploadBtn.textContent = 'Se Requieren Ambos Lados';
+        uploadBtn.textContent = 'Se Requiere Subir ID';
         uploadBtn.style.background = '#666';
         uploadBtn.disabled = true;
       }
