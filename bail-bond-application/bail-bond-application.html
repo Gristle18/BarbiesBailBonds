@@ -1036,7 +1036,27 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       // Store the file
       storedIDFiles[side] = file;
 
-      // Update preview
+      // Show image preview in the dropzone
+      const dropZone = document.getElementById('dropZone');
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        dropZone.style.backgroundImage = `url(${e.target.result})`;
+        dropZone.style.backgroundSize = 'cover';
+        dropZone.style.backgroundPosition = 'center';
+        dropZone.style.backgroundRepeat = 'no-repeat';
+        dropZone.innerHTML = `
+          <div style="background: rgba(0,0,0,0.5); color: white; padding: 10px; border-radius: 8px;">
+            <div style="font-size:18px; margin-bottom:10px; font-weight:600;">✓ ID Uploaded</div>
+            <input type="file" id="idFront" accept="image/*" style="display:none;" onchange="handleIDUpload(this, 'front')">
+            <div style="font-size:14px;">Click to change</div>
+          </div>
+        `;
+      };
+
+      reader.readAsDataURL(file);
+
+      // Update preview text below
       const previewElement = document.getElementById(side + 'Preview');
       previewElement.innerHTML = `
         <div style="font-size:12px; color:#28a745; font-weight:600;">✓ ${file.name} stored</div>

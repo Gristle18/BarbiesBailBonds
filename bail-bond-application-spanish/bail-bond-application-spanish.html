@@ -1035,6 +1035,26 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SUS CONTENIDOS. RECONOZCO REC
       // Store the file
       storedIDFiles[side] = file;
 
+      // Show image preview in the dropzone
+      const dropZone = document.getElementById('dropZone');
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        dropZone.style.backgroundImage = `url(${e.target.result})`;
+        dropZone.style.backgroundSize = 'cover';
+        dropZone.style.backgroundPosition = 'center';
+        dropZone.style.backgroundRepeat = 'no-repeat';
+        dropZone.innerHTML = `
+          <div style="background: rgba(0,0,0,0.5); color: white; padding: 10px; border-radius: 8px;">
+            <div style="font-size:18px; margin-bottom:10px; font-weight:600;">✓ ID Subida</div>
+            <input type="file" id="idFront" accept="image/*" style="display:none;" onchange="handleIDUpload(this, 'front')">
+            <div style="font-size:14px;">Haz clic para cambiar</div>
+          </div>
+        `;
+      };
+
+      reader.readAsDataURL(file);
+
       // Update preview
       const previewElement = document.getElementById(side + 'Preview');
       previewElement.innerHTML = `
