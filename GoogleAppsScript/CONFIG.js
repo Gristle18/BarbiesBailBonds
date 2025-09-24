@@ -10,17 +10,15 @@ const DEPLOYMENT_CONFIG = {
   // ============================================
 
   /**
-   * FAQ API Deployment
-   * Handles: FAQ data, semantic search, simple Q&A
-   * Script: FAQ-OpenAI.gs + RAG-OpenAI.gs
+   * Main API Deployment (RAG-OpenAI.gs)
+   * Handles: FAQ data, semantic search, chat, Q&A, embeddings
+   * Script: RAG-OpenAI.gs (replaces FAQ-OpenAI.gs)
+   * This single deployment handles all FAQ and search functionality
    */
-  FAQ_API_URL: 'https://script.google.com/macros/s/AKfycby7noVWD5okT9DxF4pYyTxgHl326K-CALoxvY7wed8yHpoHoVkWPDpAg-PzMTJFTr0Oew/exec',
+  MAIN_API_URL: 'https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec',
 
-  /**
-   * RAG System Deployment
-   * Handles: Embeddings, semantic search engine
-   * Script: RAG-OpenAI.gs
-   */
+  // Legacy URLs (kept for backwards compatibility)
+  FAQ_API_URL: 'https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec',
   RAG_API_URL: 'https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec',
 
   /**
@@ -73,7 +71,7 @@ const DEPLOYMENT_CONFIG = {
  * Get FAQ data
  */
 function getFAQUrl(format = 'json', callback = null) {
-  let url = DEPLOYMENT_CONFIG.FAQ_API_URL + '?format=' + format;
+  let url = DEPLOYMENT_CONFIG.MAIN_API_URL + '?action=list&format=' + format;
   if (callback && format === 'jsonp') {
     url += '&callback=' + callback;
   }
@@ -84,7 +82,7 @@ function getFAQUrl(format = 'json', callback = null) {
  * Search FAQs with semantic search
  */
 function getSearchUrl(query, format = 'json', callback = null) {
-  let url = DEPLOYMENT_CONFIG.FAQ_API_URL +
+  let url = DEPLOYMENT_CONFIG.MAIN_API_URL +
     '?action=search&query=' + encodeURIComponent(query) +
     '&format=' + format;
   if (callback && format === 'jsonp') {
@@ -97,7 +95,7 @@ function getSearchUrl(query, format = 'json', callback = null) {
  * Ask a question (stateless)
  */
 function getAskUrl(question, format = 'json', callback = null) {
-  let url = DEPLOYMENT_CONFIG.FAQ_API_URL +
+  let url = DEPLOYMENT_CONFIG.MAIN_API_URL +
     '?action=ask&query=' + encodeURIComponent(question) +
     '&format=' + format;
   if (callback && format === 'jsonp') {

@@ -1,8 +1,93 @@
 /**
- * RAG-OpenAI.gs - Retrieval-Augmented Generation system for FAQ
- * Converted to use OpenAI API instead of Gemini
- * Deploy this as part of FAQ-OpenAI.gs or as separate project
+ * RAG-OpenAI.gs - Complete FAQ and RAG system using OpenAI
+ * Handles FAQ data, semantic search, chat, and Q&A
+ * This replaces FAQ-OpenAI.gs completely
  */
+
+// Web App Entry Point
+function doGet(e) {
+  const format = e.parameter.format;
+  const callback = e.parameter.callback;
+  const action = e.parameter.action;
+  const query = e.parameter.query || e.parameter.q;
+  const message = e.parameter.message;
+  const sessionId = e.parameter.session_id;
+  const history = e.parameter.history;
+
+  // Semantic Search endpoint
+  if (action === 'search' && query) {
+    try {
+      const results = semanticSearch(query, 5);
+      const response = {
+        query: query,
+        results: results.map(item => ({
+          id: item.id,
+          question: item.question,
+          answer: item.answer,
+          similarity: Math.round(item.similarity * 100) / 100
+        }))
+      };
+      return createResponse(response, format, callback);
+    } catch (error) {
+      return createResponse({ error: error.toString(), query: query }, format, callback);
+    }
+  }
+
+  // Chat endpoint with conversation history
+  if (action === 'chat' && (query || message)) {
+    try {
+      const userMessage = query || message;
+      const conversationHistory = history ? JSON.parse(history) : [];
+      const response = generateRAGResponse(userMessage, conversationHistory);
+      return createResponse({ answer: response.answer, sources: response.sources }, format, callback);
+    } catch (error) {
+      return createResponse({ error: error.toString(), query: query || message }, format, callback);
+    }
+  }
+
+  // Simple Q&A endpoint (stateless)
+  if (action === 'ask' && query) {
+    try {
+      const response = generateRAGResponse(query, []);
+      return createResponse({ answer: response.answer, sources: response.sources }, format, callback);
+    } catch (error) {
+      return createResponse({ error: error.toString(), query: query }, format, callback);
+    }
+  }
+
+  // Return all FAQ data
+  if (!action || action === 'list') {
+    const faqData = getFaqData();
+    return createResponse(faqData, format, callback);
+  }
+
+  // Default response for unknown actions
+  return createResponse({
+    error: 'Unknown action',
+    available_actions: ['search', 'chat', 'ask', 'list'],
+    example_urls: [
+      '?action=search&query=bail%20cost',
+      '?action=chat&message=hello&history=[]',
+      '?action=ask&query=how%20much%20is%20bail',
+      '?action=list&format=json'
+    ]
+  }, format, callback);
+}
+
+// Helper function to create responses with JSONP support
+function createResponse(data, format, callback) {
+  if (format === 'jsonp' && callback) {
+    const jsonpResponse = callback + '(' + JSON.stringify(data) + ');';
+    return ContentService
+      .createTextOutput(jsonpResponse)
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  } else {
+    return ContentService
+      .createTextOutput(JSON.stringify(data))
+      .setMimeType(ContentService.MimeType.JSON)
+      .setHeader('Access-Control-Allow-Origin', '*');
+  }
+}
 
 // Configuration - Store API key in Script Properties
 function getOpenAIKey() {

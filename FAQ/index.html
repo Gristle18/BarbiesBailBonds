@@ -520,7 +520,7 @@
           
           // Create script element
           const script = document.createElement('script');
-          script.src = `https://script.google.com/macros/s/AKfycby7noVWD5okT9DxF4pYyTxgHl326K-CALoxvY7wed8yHpoHoVkWPDpAg-PzMTJFTr0Oew/exec?source=FAQ_autoload&format=jsonp&callback=${callbackName}`;
+          script.src = `https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec?action=list&format=jsonp&callback=${callbackName}`;
           
           // Set up callback
           window[callbackName] = function(data) {
@@ -799,7 +799,7 @@
           
           const callbackName = 'searchCallback_' + Date.now();
           const script = document.createElement('script');
-          script.src = `https://script.google.com/macros/s/AKfycby7noVWD5okT9DxF4pYyTxgHl326K-CALoxvY7wed8yHpoHoVkWPDpAg-PzMTJFTr0Oew/exec?source=FAQ_search&action=search&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
+          script.src = `https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec?action=search&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
           
           window[callbackName] = function(results) {
             console.log('Semantic search results:', results);
@@ -1075,7 +1075,7 @@
   // Detect if this page is running inside an embed (e.g., Google Sites)
   
 
-  const API_URL = 'https://script.google.com/macros/s/AKfycby7noVWD5okT9DxF4pYyTxgHl326K-CALoxvY7wed8yHpoHoVkWPDpAg-PzMTJFTr0Oew/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec';
   
   let isOpen = false;
   let conversationHistory = [];
@@ -1123,7 +1123,7 @@
     // Send to AI backend
     const callbackName = 'chatCallback_' + Date.now();
     const script = document.createElement('script');
-    script.src = `${API_URL}?source=FAQ_chatbot&action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
+    script.src = `${API_URL}?action=chat&message=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
 
     window[callbackName] = function(response) {
       hideTyping();
