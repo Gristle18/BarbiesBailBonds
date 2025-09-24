@@ -973,8 +973,8 @@ HE LEÍDO ESTE ACUERDO DE INDEMNIZACIÓN Y CONOZCO SUS CONTENIDOS. RECONOZCO REC
       // Ensure ID data is sent before final submission (fallback)
       sendIDDataToUploadEndpoint();
 
-      // Validate final step
-      if (!validateStep(sections.length - 2)) {
+      // Validate final step (step 21 is the signature step)
+      if (!validateStep(21)) {
         if (errorDiv) errorDiv.style.display = 'block';
         return;
       }
