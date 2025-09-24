@@ -10,16 +10,12 @@ const DEPLOYMENT_CONFIG = {
   // ============================================
 
   /**
-   * Main API Deployment (RAG-OpenAI.gs)
+   * RAG System Deployment (RAG-OpenAI.gs)
    * Handles: FAQ data, semantic search, chat, Q&A, embeddings
-   * Script: RAG-OpenAI.gs (replaces FAQ-OpenAI.gs)
+   * Script: RAG-OpenAI.gs
    * This single deployment handles all FAQ and search functionality
    */
-  MAIN_API_URL: 'https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec',
-
-  // Legacy URLs (kept for backwards compatibility)
-  FAQ_API_URL: 'https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec',
-  RAG_API_URL: 'https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec',
+  RAG_API_URL: 'https://script.google.com/macros/s/AKfycbwK8UXXlwI1mmGT_Qlae2IoyJna1k7lGxL6544IsSEyqeFaR4hgimyteD1r71o9RQoq/exec',
 
   /**
    * ChatBot Deployment
@@ -71,7 +67,7 @@ const DEPLOYMENT_CONFIG = {
  * Get FAQ data
  */
 function getFAQUrl(format = 'json', callback = null) {
-  let url = DEPLOYMENT_CONFIG.MAIN_API_URL + '?action=list&format=' + format;
+  let url = DEPLOYMENT_CONFIG.RAG_API_URL + '?action=list&format=' + format;
   if (callback && format === 'jsonp') {
     url += '&callback=' + callback;
   }
@@ -82,7 +78,7 @@ function getFAQUrl(format = 'json', callback = null) {
  * Search FAQs with semantic search
  */
 function getSearchUrl(query, format = 'json', callback = null) {
-  let url = DEPLOYMENT_CONFIG.MAIN_API_URL +
+  let url = DEPLOYMENT_CONFIG.RAG_API_URL +
     '?action=search&query=' + encodeURIComponent(query) +
     '&format=' + format;
   if (callback && format === 'jsonp') {
@@ -95,7 +91,7 @@ function getSearchUrl(query, format = 'json', callback = null) {
  * Ask a question (stateless)
  */
 function getAskUrl(question, format = 'json', callback = null) {
-  let url = DEPLOYMENT_CONFIG.MAIN_API_URL +
+  let url = DEPLOYMENT_CONFIG.RAG_API_URL +
     '?action=ask&query=' + encodeURIComponent(question) +
     '&format=' + format;
   if (callback && format === 'jsonp') {
@@ -136,12 +132,17 @@ function getNewSessionUrl(userId = 'anonymous', format = 'json', callback = null
 // ============================================
 
 /*
-// Example 1: Search FAQs
+// Example 1: Get all FAQ data
+fetch(getFAQUrl())
+  .then(r => r.json())
+  .then(data => console.log(data));
+
+// Example 2: Search FAQs
 fetch(getSearchUrl('bail cost'))
   .then(r => r.json())
   .then(data => console.log(data.results));
 
-// Example 2: Start chat session
+// Example 3: Start chat session
 fetch(getNewSessionUrl('user123'))
   .then(r => r.json())
   .then(data => {

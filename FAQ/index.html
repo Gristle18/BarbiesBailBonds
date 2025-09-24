@@ -520,7 +520,7 @@
           
           // Create script element
           const script = document.createElement('script');
-          script.src = `https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec?action=list&format=jsonp&callback=${callbackName}`;
+          script.src = `https://script.google.com/macros/s/AKfycbwK8UXXlwI1mmGT_Qlae2IoyJna1k7lGxL6544IsSEyqeFaR4hgimyteD1r71o9RQoq/exec?action=list&format=jsonp&callback=${callbackName}`;
           
           // Set up callback
           window[callbackName] = function(data) {
@@ -799,7 +799,7 @@
           
           const callbackName = 'searchCallback_' + Date.now();
           const script = document.createElement('script');
-          script.src = `https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec?action=search&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
+          script.src = `https://script.google.com/macros/s/AKfycbwK8UXXlwI1mmGT_Qlae2IoyJna1k7lGxL6544IsSEyqeFaR4hgimyteD1r71o9RQoq/exec?action=search&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
           
           window[callbackName] = function(results) {
             console.log('Semantic search results:', results);
@@ -1075,7 +1075,7 @@
   // Detect if this page is running inside an embed (e.g., Google Sites)
   
 
-  const API_URL = 'https://script.google.com/macros/s/AKfycbz80EQVh66kDhu4rgCUw1oRGyADLK0XT-BPreUxM38BO1pd_cWV_GE9czGKS0NQf8vb0Q/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbwK8UXXlwI1mmGT_Qlae2IoyJna1k7lGxL6544IsSEyqeFaR4hgimyteD1r71o9RQoq/exec';
   
   let isOpen = false;
   let conversationHistory = [];
