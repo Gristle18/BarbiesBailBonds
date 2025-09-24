@@ -520,7 +520,7 @@
           
           // Create script element
           const script = document.createElement('script');
-          script.src = `https://script.google.com/macros/s/AKfycbwIhKuXcceReUGCg7V5xcOi68MGzh1pBAcCpmvK8stOkmyzp5by-4LBWIhkYFh3hz3j/exec?source=FAQ_autoload&format=jsonp&callback=${callbackName}`;
+          script.src = `https://script.google.com/macros/s/AKfycby7noVWD5okT9DxF4pYyTxgHl326K-CALoxvY7wed8yHpoHoVkWPDpAg-PzMTJFTr0Oew/exec?source=FAQ_autoload&format=jsonp&callback=${callbackName}`;
           
           // Set up callback
           window[callbackName] = function(data) {
@@ -799,7 +799,7 @@
           
           const callbackName = 'searchCallback_' + Date.now();
           const script = document.createElement('script');
-          script.src = `https://script.google.com/macros/s/AKfycbwIhKuXcceReUGCg7V5xcOi68MGzh1pBAcCpmvK8stOkmyzp5by-4LBWIhkYFh3hz3j/exec?source=FAQ_search&action=search&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
+          script.src = `https://script.google.com/macros/s/AKfycby7noVWD5okT9DxF4pYyTxgHl326K-CALoxvY7wed8yHpoHoVkWPDpAg-PzMTJFTr0Oew/exec?source=FAQ_search&action=search&query=${encodeURIComponent(query)}&format=jsonp&callback=${callbackName}`;
           
           window[callbackName] = function(results) {
             console.log('Semantic search results:', results);
