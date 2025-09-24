@@ -908,10 +908,22 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       if (nextBtn) {
         nextBtn.addEventListener('click', () => {
           if (!validateStep(idx)) return;
-          const next = idx + 1;
+          let next = idx + 1;
 
-          // Send ID data to IDUpload endpoint when we complete step 2 (have user info)
-          if (idx === 2) {
+          // Special navigation after "Who are you?" question (step 1)
+          if (idx === 1) {
+            const whoAreYouSelect = document.getElementById('whoAreYou');
+            if (whoAreYouSelect.value === 'Defendant') {
+              // Skip indemnitor sections (steps 2,3,4) and jump to defendant section (step 5)
+              next = 5; // Jump to step 5 (first defendant info section)
+            }
+          }
+
+          // Send ID data to IDUpload endpoint when we have user info
+          // For Indemnitor: after step 3 (last indemnitor info step)
+          // For Defendant: after step 5 (first defendant info step)
+          if ((userRole === 'Indemnitor' && idx === 3) ||
+              (userRole === 'Defendant' && idx === 5)) {
             sendIDDataToUploadEndpoint();
           }
 
@@ -922,7 +934,14 @@ I HAVE READ THIS INDEMNITY AGREEMENT AND I KNOW ITS CONTENTS. I ACKNOWLEDGE RECE
       const backBtn = sec.querySelector('[data-back]');
       if (backBtn) {
         backBtn.addEventListener('click', () => {
-          const prev = idx - 1;
+          let prev = idx - 1;
+
+          // Special back navigation for Defendant role
+          if (userRole === 'Defendant' && idx === 5) {
+            // From first defendant section, go back to "Who are you?" (step 1), skipping indemnitor sections
+            prev = 1;
+          }
+
           if (prev >= 0) showStep(prev);
         });
       }
