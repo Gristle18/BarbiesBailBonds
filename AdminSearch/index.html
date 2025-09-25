@@ -1864,7 +1864,14 @@
               border-bottom: 2px solid #333;
               padding-bottom: 15px;
               margin-bottom: 20px;
-              text-align: center;
+              position: relative;
+            }
+
+            .print-logo {
+              display: block;
+              max-width: 250px;
+              height: auto;
+              margin-bottom: 10px;
             }
 
             .print-subtitle {
@@ -1876,7 +1883,9 @@
             .print-date {
               font-size: 10pt;
               color: #999;
-              margin-top: 5px;
+              position: absolute;
+              top: 0;
+              right: 0;
             }
 
             .section {
@@ -1983,7 +1992,7 @@
         </head>
         <body>
           <div class="print-header">
-            <img src="https://dl.dropboxusercontent.com/scl/fi/ik34bykqa9flrulcvb9qb/BarbiesBailBonds-2.png?rlkey=y3i2er5i4d9s2bgzbl7el0m4l&dl=1" alt="Barbie's Bail Bonds" style="max-width: 300px; height: auto; margin-bottom: 10px;">
+            <img src="https://dl.dropboxusercontent.com/scl/fi/ik34bykqa9flrulcvb9qb/BarbiesBailBonds-2.png?rlkey=y3i2er5i4d9s2bgzbl7el0m4l&dl=1" alt="Barbie's Bail Bonds" class="print-logo">
             <div class="print-subtitle">Client Record</div>
             <div class="print-date">Printed: ${printDate}</div>
           </div>
