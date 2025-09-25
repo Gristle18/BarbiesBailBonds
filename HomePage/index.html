@@ -754,12 +754,50 @@
             line-height: 1.6;
         }
 
-        .typing-indicator {
+        .thinking-indicator {
             display: none;
-            padding: 8px 16px;
+            flex-direction: column;
+            gap: 4px;
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .thinking-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             color: #666;
-            font-size: 12px;
+        }
+
+        .thinking-spinner {
+            font-family: monospace;
+            min-width: 20px;
+            text-align: center;
+            color: #F28C00;
+        }
+
+        .thinking-word {
+            color: #888;
             font-style: italic;
+        }
+
+        .thinking-dots {
+            font-family: monospace;
+            color: #aaa;
+            min-width: 40px;
+        }
+
+        .thinking-thought {
+            color: #999;
+            font-size: 12px;
+            margin-left: 28px;
+            font-style: italic;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
         }
 
         .typing-dots {
@@ -1065,13 +1103,14 @@
       </div>
     </div>
     
-    <div class="typing-indicator" id="typingIndicator">
-      🤖 Assistant is typing
-      <div class="typing-dots">
-        <span></span>
-        <span></span>
-        <span></span>
+    <div class="thinking-indicator" id="typingIndicator">
+      <div class="thinking-header">
+        <div class="message-avatar">🤖</div>
+        <span class="thinking-spinner">.</span>
+        <span class="thinking-word">Thinking</span>
+        <span class="thinking-dots">.</span>
       </div>
+      <div class="thinking-thought" id="thoughtDisplay"></div>
     </div>
     
     <div class="chat-input-container">
@@ -1164,21 +1203,35 @@
     script.src = `${API_URL}?action=chat&message=${encodeURIComponent(message)}&session_id=${getSessionId()}&format=jsonp&callback=${callbackName}`;
 
     window[callbackName] = function(response) {
-      hideTyping();
-      
-      let assistantResponse = '';
-      if (response && response.response) {
-        addMessage('assistant', response.response);
-      } else if (response && response.error) {
-        addMessage('assistant', 'I apologize, but I encountered an error. Please try again or call us at 561-247-0018 for immediate assistance.');
-        console.error('Chat API error:', response.error);
-      } else {
-        addMessage('assistant', 'I apologize, but I couldn\'t generate a response. Please try again or call us at 561-247-0018 for help.');
+      // Display chain of thought if available
+      if (response && response.chainOfThought) {
+        const thoughtDisplay = document.getElementById('thoughtDisplay');
+        if (thoughtDisplay) {
+          thoughtDisplay.textContent = response.chainOfThought;
+        }
       }
-      
+
+      // Wait a bit to show the thought, then hide and show response
+      setTimeout(() => {
+        hideTyping(response?.chainOfThought);
+
+        if (response && response.response) {
+          setTimeout(() => {
+            addMessage('assistant', response.response);
+          }, response?.chainOfThought ? 300 : 0);
+        } else if (response && response.error) {
+          addMessage('assistant', 'I apologize, but I encountered an error. Please try again or call us at 561-247-0018 for immediate assistance.');
+          console.error('Chat API error:', response.error);
+        } else {
+          addMessage('assistant', 'I apologize, but I couldn\'t generate a response. Please try again or call us at 561-247-0018 for help.');
+        }
+      }, response?.chainOfThought ? 1000 : 0);
+
       // Clean up
-      document.head.removeChild(script);
-      delete window[callbackName];
+      setTimeout(() => {
+        document.head.removeChild(script);
+        delete window[callbackName];
+      }, 3000);
     };
 
     script.onerror = function() {
@@ -1234,15 +1287,87 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  // Show typing indicator
+  // Show enhanced thinking indicator with random spinners and fun words
   function showTyping() {
-    typingIndicator.style.display = 'block';
+    // Spinners
+    const spinners = [
+      { frames: ['.', 'o', 'O', '°', 'O', 'o', '.'] },
+      { frames: ['_', '-', '~', '-', '_'] },
+      { frames: ['←', '↖', '↑', '↗', '→', '↘', '↓', '↙'] },
+      { frames: ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█', '▇', '▆', '▅', '▄', '▃', '▂'] },
+      { frames: ['╫', '╪', '╫', '╪'] },
+      { frames: ['~', '^', '~', '^', '~'] }
+    ];
+
+    // Fun words
+    const funWords = [
+      'Perusing', 'Dillydallying', 'Moonwalking', 'Frobnicating',
+      'Quantum-leaping', 'Chicken-dancing', 'Duck-duck-going',
+      'Noodling', 'Zipping', 'Kerfuffling', 'Snazzifying',
+      'Bamboozling', 'Wobblecrafting', 'Disco-fying', 'Jellyfishing',
+      'Gobsmacking', 'Zig-zagging', 'Banana-peeling', 'Time-traveling',
+      'Pixelating', 'Wiggling', 'Meandering', 'Flibbering'
+    ];
+
+    const selectedSpinner = spinners[Math.floor(Math.random() * spinners.length)];
+    const selectedWord = funWords[Math.floor(Math.random() * funWords.length)];
+    const dotPatterns = ['.', '..', '...', '....', '...', '..', '.'];
+
+    let spinnerFrame = 0;
+    let dotFrame = 0;
+
+    typingIndicator.style.display = 'flex';
+    typingIndicator.innerHTML = `
+      <div class="thinking-header">
+        <div class="message-avatar">🤖</div>
+        <span class="thinking-spinner">${selectedSpinner.frames[0]}</span>
+        <span class="thinking-word">${selectedWord}</span>
+        <span class="thinking-dots">.</span>
+      </div>
+      <div class="thinking-thought" id="thoughtDisplay"></div>
+    `;
+
+    // Animate spinner
+    window.spinnerInterval = setInterval(() => {
+      spinnerFrame = (spinnerFrame + 1) % selectedSpinner.frames.length;
+      const spinner = document.querySelector('.thinking-spinner');
+      if (spinner) spinner.textContent = selectedSpinner.frames[spinnerFrame];
+    }, 150);
+
+    // Animate dots
+    window.dotsInterval = setInterval(() => {
+      dotFrame = (dotFrame + 1) % dotPatterns.length;
+      const dots = document.querySelector('.thinking-dots');
+      if (dots) dots.textContent = dotPatterns[dotFrame];
+    }, 300);
+
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  // Hide typing indicator
-  function hideTyping() {
-    typingIndicator.style.display = 'none';
+  // Hide thinking indicator with optional chain of thought display
+  function hideTyping(chainOfThought) {
+    // Clear intervals
+    if (window.spinnerInterval) clearInterval(window.spinnerInterval);
+    if (window.dotsInterval) clearInterval(window.dotsInterval);
+
+    if (chainOfThought) {
+      // Show the chain of thought
+      const thoughtDisplay = document.getElementById('thoughtDisplay');
+      if (thoughtDisplay) {
+        thoughtDisplay.textContent = chainOfThought;
+        // Keep showing for 2 seconds then fade out
+        setTimeout(() => {
+          typingIndicator.style.opacity = '0';
+          setTimeout(() => {
+            typingIndicator.style.display = 'none';
+            typingIndicator.style.opacity = '1';
+          }, 300);
+        }, 2000);
+      }
+    } else {
+      typingIndicator.style.display = 'none';
+    }
+
     chatSend.disabled = false;
   }
 

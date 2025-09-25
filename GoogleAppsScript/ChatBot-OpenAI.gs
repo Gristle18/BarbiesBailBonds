@@ -156,25 +156,27 @@ function generateChatResponse(message, history, session) {
   const messages = [
     {
       role: 'system',
-      content: `You are Barbara, a friendly and knowledgeable AI assistant for Barbie's Bail Bonds in Palm Beach County, Florida.
+      content: `You are Barbara, a helpful assistant for Barbie's Bail Bonds in Palm Beach County.
 
-Key Information:
-- Company: Barbie's Bail Bonds
-- Location: Palm Beach County, Florida
-- Phone: 561-247-0018
-- Hours: 24/7 service
-- Services: Bail bonds, warrant assistance, payment plans
+GUIDE users through this exact process when they need to bond someone out:
+1. LOCATE DEFENDANT - Direct to inmate locator to verify custody (5-10 min)
+2. COMPLETE APPLICATION - Online form with defendant info (10-15 min)
+3. MAKE PAYMENT - Must call 561-247-0018 to confirm amount, then pay via:
+   - Zelle: payments@barbiesbailbonds.com
+   - Card: Invoice via email/text
+   - Cash: Meet agent or visit office
+4. BOND POSTED - Release typically 4-8 hours (jail doesn't give exact times)
 
-Your personality:
-- Warm, empathetic, and professional
-- Understanding of the stress families face
-- Quick to offer help and reassurance
-- Knowledgeable about Florida bail laws
-- Always mention our 24/7 availability and phone number when relevant
+RESPONSE RULES:
+- Keep responses under 2-3 sentences
+- Guide through ONE step at a time
+- Ask what step they're on if unclear
+- Only mention phone for payment confirmation (step 3)
+- USE FAQ context to inform your answers but NEVER copy FAQ text verbatim
+- Speak naturally and conversationally
+- Focus on what the user needs to DO next
 
-Remember previous conversation context and maintain continuity.
-User ID: ${session.user_id || 'anonymous'}
-Session started: ${session.created || 'just now'}`
+Remember conversation context. User ID: ${session.user_id || 'anonymous'}`
     }
   ];
 
@@ -188,6 +190,9 @@ Session started: ${session.created || 'just now'}`
   // Add current message
   messages.push({ role: 'user', content: message });
 
+  // Generate chain of thought reasoning
+  const chainOfThought = generateChainOfThought(message, history);
+
   // Check if message is bail-related and add FAQ context
   if (isBailRelated(message)) {
     try {
@@ -200,7 +205,7 @@ Session started: ${session.created || 'just now'}`
 
         messages.push({
           role: 'system',
-          content: `Relevant information from our FAQ database:\n\n${faqContext}`
+          content: `Context from company knowledge base (use this to inform your response but don't quote directly):\n\n${faqContext}`
         });
       }
     } catch (error) {
@@ -234,9 +239,53 @@ Session started: ${session.created || 'just now'}`
 
   return {
     response: result.choices[0].message.content,
+    chainOfThought: chainOfThought,
     usage: result.usage,
     sources: []
   };
+}
+
+/**
+ * Generate chain of thought reasoning
+ */
+function generateChainOfThought(message, history) {
+  const messageLower = message.toLowerCase();
+  let thoughts = [];
+
+  // Analyze what user said
+  thoughts.push(`User said: "${message}"`);
+
+  // Determine intent based on keywords and context
+  if (messageLower.includes('bond') || messageLower.includes('bail') || messageLower.includes('get out')) {
+    thoughts.push("They need help bonding someone out");
+    thoughts.push("I should guide them through the 4-step process");
+  } else if (messageLower.includes('hello') || messageLower.includes('hi') || messageLower.includes('hey')) {
+    thoughts.push("This is a greeting");
+    thoughts.push("I should respond warmly and ask how to help");
+  } else if (messageLower.includes('cost') || messageLower.includes('how much') || messageLower.includes('price')) {
+    thoughts.push("They're asking about pricing");
+    thoughts.push("I should explain the 10% premium clearly");
+  } else if (messageLower.includes('ready') || messageLower.includes('next') || messageLower.includes('yes')) {
+    thoughts.push("They're ready to proceed");
+    thoughts.push("I should guide to the next step in the process");
+  } else if (messageLower.includes('found') || messageLower.includes('located') || messageLower.includes('custody')) {
+    thoughts.push("They've completed the locate step");
+    thoughts.push("Next is the application");
+  } else if (messageLower.includes('application') || messageLower.includes('form')) {
+    thoughts.push("They're asking about the application");
+    thoughts.push("I should guide them to complete it");
+  } else if (messageLower.includes('payment') || messageLower.includes('pay') || messageLower.includes('zelle')) {
+    thoughts.push("They're at the payment step");
+    thoughts.push("They need to call to confirm amount first");
+  } else if (history && history.length > 0) {
+    thoughts.push("Continuing our conversation");
+    thoughts.push("I should maintain context from earlier");
+  } else {
+    thoughts.push("General inquiry about bail bonds");
+    thoughts.push("I should ask clarifying questions");
+  }
+
+  return thoughts.join(" → ");
 }
 
 /**
@@ -258,17 +307,37 @@ function isBailRelated(message) {
  * Get relevant FAQs (simplified version - implement full RAG if needed)
  */
 function getRelevantFAQs(query) {
-  // This is a simplified version
-  // For full functionality, integrate with RAG-OpenAI.gs
-  const faqs = [
-    { question: "How much does bail cost?", answer: "You pay 10% of the bail amount as a premium. For example, a $5,000 bail costs $500." },
-    { question: "Are you available 24/7?", answer: "Yes, we're available 24/7 including weekends and holidays." },
-    { question: "How fast can you get someone out?", answer: "Release typically takes 2-6 hours after paperwork is complete." }
+  try {
+    // Call the RAG system for semantic FAQ search
+    const ragUrl = 'https://script.google.com/macros/s/AKfycbwK8UXXlwI1mmGT_Qlae2IoyJna1k7lGxL6544IsSEyqeFaR4hgimyteD1r71o9RQoq/exec';
+    const response = UrlFetchApp.fetch(
+      ragUrl + '?action=search&query=' + encodeURIComponent(query) + '&limit=3',
+      { muteHttpExceptions: true, timeout: 5 }
+    );
+
+    if (response.getResponseCode() === 200) {
+      const data = JSON.parse(response.getContentText());
+      if (data.results && data.results.length > 0) {
+        // Return top 3 most relevant FAQs
+        return data.results.slice(0, 3).map(r => ({
+          question: r.question,
+          answer: r.answer
+        }));
+      }
+    }
+  } catch (error) {
+    console.log('RAG search failed, using fallback:', error);
+  }
+
+  // Fallback to basic FAQs if RAG unavailable
+  const basicFaqs = [
+    { question: "How much does bail cost?", answer: "You pay 10% of the bail amount as a premium." },
+    { question: "How fast can you get someone out?", answer: "Release typically takes 4-8 hours after bond is posted." },
+    { question: "Are you available 24/7?", answer: "Yes, we're available 24/7 including weekends and holidays." }
   ];
 
-  // Simple keyword matching (replace with semantic search if RAG is available)
   const queryLower = query.toLowerCase();
-  return faqs.filter(faq =>
+  return basicFaqs.filter(faq =>
     faq.question.toLowerCase().includes(queryLower.split(' ')[0]) ||
     faq.answer.toLowerCase().includes(queryLower.split(' ')[0])
   ).slice(0, 3);
