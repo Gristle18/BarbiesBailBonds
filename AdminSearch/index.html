@@ -2027,6 +2027,10 @@
       const isAdditionalInfo = title === 'Additional Information';
       const shouldUseBoxFormat = useBoxFormat || isAdditionalInfo;
 
+      // Adjust padding for Additional Information if there are many fields
+      const isCompactMode = isAdditionalInfo && fields.length > 22;
+      const compactStyle = isCompactMode ? ' style="padding: 3px; margin-bottom: 2px;"' : '';
+
       const fieldHTML = fields.map(field => {
         const value = field.value || 'Not provided';
         const isEmpty = !field.value || field.value.toString().trim() === '';
@@ -2036,7 +2040,7 @@
           // For box format, only use full width if explicitly set or value is very long
           const boxFullWidth = field.fullWidth || value.length > 100;
           return `
-            <div class="field-item box-style ${boxFullWidth ? 'full-width' : ''}">
+            <div class="field-item box-style ${boxFullWidth ? 'full-width' : ''}"${compactStyle}>
               <span class="field-label box-style">${escapeHtml(field.label)}:</span>
               <span class="field-value box-style ${isEmpty ? 'empty' : ''}">${escapeHtml(value)}</span>
             </div>
@@ -2051,10 +2055,13 @@
         }
       }).join('');
 
+      // Adjust grid gap for compact mode
+      const gridStyle = isCompactMode ? ' style="gap: 6px;"' : '';
+
       return `
         <div class="section">
           <div class="section-title">${title}</div>
-          <div class="field-grid ${shouldUseBoxFormat ? 'box-format' : ''}">
+          <div class="field-grid ${shouldUseBoxFormat ? 'box-format' : ''}"${gridStyle}>
             ${fieldHTML}
           </div>
         </div>
@@ -2242,10 +2249,10 @@
 
           <div class="agreement-subsection">
             <h4 style="font-weight: bold; margin: 12px 0 8px 0; font-size: 11pt;">Section 1: Terms and Conditions of Application for Appearance Bond</h4>
-            <p style="font-size: 9pt; line-height: 1.3; margin-bottom: 8px;">
+            <p style="font-size: 9.5pt; line-height: 1.35; margin-bottom: 8px;">
               The following terms and conditions for the Appearance Bond for which U.S. Fire Insurance Company (USFIC) or its Agent and the parties agree that said appearance bond is conditioned upon full compliance of all said terms and conditions and is a part of said bond and application therefore.
             </p>
-            <ol style="font-size: 9pt; line-height: 1.3; margin-left: 18px;">
+            <ol style="font-size: 9.5pt; line-height: 1.35; margin-left: 18px;">
               <li>USFIC as the Surety Company, through its duly appointed agent, shall have control and jurisdiction over the principal during the term for which the bond is executed and shall have the right to apprehend, arrest and surrender the principal to the proper officials at any time as provided by law.</li>
               <li>In the event surrender of principal is made prior to the time set for the principal's appearances, and for reasons other than as enumerated below in paragraph 3, then principal shall be entitled to a refund of the bond premium.</li>
               <li>It is understood and agreed that the happening of any one of the following events shall constitute a breach of principal's obligation to USFIC hereunder, and USFIC shall have the right to forthwith apprehend, arrest, and surrender principal, and principal shall have no right to any refund of premium whatsoever. Said events which shall constitute a breach of principal's obligations hereunder are:
@@ -2258,27 +2265,27 @@
                 </ol>
               </li>
             </ol>
-            <p style="font-size: 9pt; line-height: 1.3; margin-top: 8px; font-style: italic;">
+            <p style="font-size: 9.5pt; line-height: 1.35; margin-top: 8px; font-style: italic;">
               Under penalties of perjury, I declare that I have read the foregoing, and the information provided is true and correct without reservation. The information and representations made in this Application are for the purpose of inducing the Surety to undertake the bond(s) for which I have applied with the intent that the Surety fully rely upon the information and representations contained herein.
             </p>
           </div>
 
           <div class="agreement-subsection">
             <h4 style="font-weight: bold; margin: 12px 0 8px 0; font-size: 11pt;">Section 2: Contingent Promissory Note</h4>
-            <p style="font-size: 9pt; line-height: 1.3;">
+            <p style="font-size: 9.5pt; line-height: 1.35;">
               For value received the undersigned, jointly and severally promise(s) to pay U.S. FIRE INSURANCE COMPANY or its Agent, Jerry Casal Bail Bonds, LLC on demand the principal sum of the bond if and only if there occurs a breach of the terms and conditions of the surety bail bond or bonds posted on behalf of defendant, together with any continuations and modifications, any extensions, substitutions, increments or appeals thereof, or upon payment of any expenses incurred by the payee or holder to produce the Defendant before the appropriate court or courts of Competent jurisdiction in the above case, with interest thereon at the rate of FOURTEEN percent (14%), per annum, from the date of occurrence of the above stated Contingency, until fully paid.
             </p>
-            <p style="font-size: 9pt; line-height: 1.3; margin-top: 8px;">
+            <p style="font-size: 9.5pt; line-height: 1.35; margin-top: 8px;">
               This Note and the Mortgage of even date herewith shall serve to secure: (a) Any and all liability, loss, costs, damages, expenses, premiums and attorneys fees arising or incurred by Payee in connection with the above captioned Bond; (b) For the payment of all premiums on such Bonds; (c) For the performance of every agreement made by Owner or Defendant in connection with said Bonds; (d) Against any liability, loss, costs, expenses, and attorneys fees in connection with any claim to the collateral security; (e) Any and all future advances made with or without consent of the Owner by Payee on behalf of the Defendant.
             </p>
           </div>
 
           <div class="agreement-subsection">
             <h4 style="font-weight: bold; margin: 12px 0 8px 0; font-size: 11pt;">Section 3: Indemnity Agreement for Bail Bond</h4>
-            <p style="font-size: 9pt; line-height: 1.3;">
+            <p style="font-size: 9.5pt; line-height: 1.35;">
               The undersigned Indemnitor(s) make(s) application to U.S. Fire Insurance Company through its duly licensed and appointed Producer Agent Jerry Casal Bail Bonds, LLC for execution of a bail undertaking in consideration of Surety arranging for execution or continuance of this Bail Bond, Indemnitor(s) jointly and severally agree(s) to:
             </p>
-            <ol style="font-size: 9pt; line-height: 1.3; margin-left: 18px;">
+            <ol style="font-size: 9.5pt; line-height: 1.35; margin-left: 18px;">
               <li>Pay Surety the Florida set premium for this Bail Bond. The premium is earned upon the release of Principal from the detaining facility.</li>
               <li>Reimburse Surety for actual expenses it incurs caused by any breach by the Principal of the terms of the application and Bail Bond.</li>
               <li>Pay the Surety a reasonable attorney's fee, no less than Five Hundred Dollars ($500.00), in the event that it is necessary to institute legal action arising from this Agreement.</li>
@@ -2291,7 +2298,7 @@
               <li>The undersigned agrees that these obligations apply to any and all Bail Bonds executed for the same charge for which the above mentioned Bail Bond was executed or any charge arising out of the same transaction regardless of whether said Bail Bonds are filed before or after conviction, including appeals.</li>
               <li>The undersigned authorizes any person, agency, partnership or corporation having any information concerning my character, credit, and financial reputation to release such information to Surety.</li>
             </ol>
-            <p style="font-size: 9pt; line-height: 1.3; margin-top: 8px; font-weight: bold; text-transform: uppercase;">
+            <p style="font-size: 9.5pt; line-height: 1.35; margin-top: 8px; font-weight: bold; text-transform: uppercase;">
               I have read this indemnity agreement and I know its contents. I acknowledge receipt of a copy of the indemnity agreement or have printed out a copy. I am the true and lawful owner of the property, whether real or personal, set forth in the application for bail.
             </p>
           </div>
