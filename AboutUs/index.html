@@ -1012,7 +1012,7 @@
         const chatMessages = document.getElementById('chatMessages');
         const typingIndicator = document.getElementById('typingIndicator');
 
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwvJ8utZ62xKjZt2nz8wZnBJb5vbOsCD38RJnDZ0yFZGppsfWnmv7_YIuz5yV9lZz7z/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyBDZhRuMme-LjdzVzW1nM6gl6wfqOlFWFm7YOY8ni6t0UAVQHhGYRQUb-3tv_mOZM0/exec';
         
         let isOpen = false;
         let conversationHistory = [];
@@ -1090,8 +1090,8 @@
                     typingIndicator.style.display = 'none';
                     
                     // Handle response
-                    if (response && response.answer) {
-                        const assistantResponse = response.answer;
+                    if (response && response.response) {
+                        const assistantResponse = response.response;
                         addMessage(assistantResponse, 'assistant');
                         
                         // Add to conversation history

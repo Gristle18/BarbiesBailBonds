@@ -256,7 +256,7 @@
       const typingIndicator = document.getElementById('typingIndicator');
 
       // Google Apps Script endpoint
-      const API_URL = 'https://script.google.com/macros/s/AKfycbwvJ8utZ62xKjZt2nz8wZnBJb5vbOsCD38RJnDZ0yFZGppsfWnmv7_YIuz5yV9lZz7z/exec';
+      const API_URL = 'https://script.google.com/macros/s/AKfycbyBDZhRuMme-LjdzVzW1nM6gl6wfqOlFWFm7YOY8ni6t0UAVQHhGYRQUb-3tv_mOZM0/exec';
 
       // Auto-resize textarea
       chatInput.addEventListener('input', function() {
@@ -349,8 +349,8 @@
           console.log('AI Chat response:', response);
           hideTyping();
           
-          if (response && response.answer) {
-            addMessage('assistant', response.answer);
+          if (response && response.response) {
+            addMessage('assistant', response.response);
           } else if (response && response.error) {
             addMessage('assistant', 'I apologize, but I encountered an error. Please try again or call us directly at 561-247-0018 for immediate assistance.');
             console.error('Chat API error:', response.error);

@@ -1075,7 +1075,7 @@
   // Detect if this page is running inside an embed (e.g., Google Sites)
   
 
-  const API_URL = 'https://script.google.com/macros/s/AKfycbwK8UXXlwI1mmGT_Qlae2IoyJna1k7lGxL6544IsSEyqeFaR4hgimyteD1r71o9RQoq/exec';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbyBDZhRuMme-LjdzVzW1nM6gl6wfqOlFWFm7YOY8ni6t0UAVQHhGYRQUb-3tv_mOZM0/exec';
   
   let isOpen = false;
   let conversationHistory = [];
@@ -1129,8 +1129,8 @@
       hideTyping();
       
       let assistantResponse = '';
-      if (response && response.answer) {
-        assistantResponse = response.answer;
+      if (response && response.response) {
+        assistantResponse = response.response;
         addMessage('assistant', assistantResponse);
       } else if (response && response.error) {
         assistantResponse = 'I apologize, but I encountered an error. Please try again or call us at 561-247-0018 for immediate assistance.';
