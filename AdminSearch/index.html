@@ -1907,6 +1907,12 @@
               gap: 12px 20px;
             }
 
+            .field-grid.box-format {
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+            }
+
             .field-item {
               display: flex;
               min-height: 24px;
@@ -1917,6 +1923,14 @@
               grid-column: 1 / -1;
             }
 
+            .field-item.box-style {
+              flex-direction: column;
+              border: 1px solid #ddd;
+              padding: 8px;
+              background: #fafafa;
+              border-radius: 4px;
+            }
+
             .field-label {
               font-weight: bold;
               color: #555;
@@ -1925,10 +1939,28 @@
               font-size: 10pt;
             }
 
+            .field-label.box-style {
+              min-width: unset;
+              margin-bottom: 4px;
+              color: #333;
+              font-size: 9pt;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+
             .field-value {
               color: #000;
               word-break: break-word;
               font-size: 11pt;
+            }
+
+            .field-value.box-style {
+              font-size: 11pt;
+              line-height: 1.4;
+              padding: 4px;
+              background: white;
+              border-radius: 2px;
+              min-height: 28px;
             }
 
             .field-value.empty {
@@ -1987,26 +2019,39 @@
     }
 
     // Helper function to create print sections
-    function createPrintSection(title, fields) {
+    function createPrintSection(title, fields, useBoxFormat = false) {
       if (!fields || fields.length === 0) return '';
+
+      // Use box format for Additional Information section
+      const isAdditionalInfo = title === 'Additional Information';
+      const shouldUseBoxFormat = useBoxFormat || isAdditionalInfo;
 
       const fieldHTML = fields.map(field => {
         const value = field.value || 'Not provided';
         const isEmpty = !field.value || field.value.toString().trim() === '';
-        const fullWidth = field.fullWidth || value.length > 50;
+        const fullWidth = shouldUseBoxFormat || field.fullWidth || value.length > 50;
 
-        return `
-          <div class="field-item ${fullWidth ? 'full-width' : ''}">
-            <span class="field-label">${escapeHtml(field.label)}:</span>
-            <span class="field-value ${isEmpty ? 'empty' : ''}">${escapeHtml(value)}</span>
-          </div>
-        `;
+        if (shouldUseBoxFormat) {
+          return `
+            <div class="field-item box-style">
+              <span class="field-label box-style">${escapeHtml(field.label)}:</span>
+              <span class="field-value box-style ${isEmpty ? 'empty' : ''}">${escapeHtml(value)}</span>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="field-item ${fullWidth ? 'full-width' : ''}">
+              <span class="field-label">${escapeHtml(field.label)}:</span>
+              <span class="field-value ${isEmpty ? 'empty' : ''}">${escapeHtml(value)}</span>
+            </div>
+          `;
+        }
       }).join('');
 
       return `
         <div class="section">
           <div class="section-title">${title}</div>
-          <div class="field-grid">
+          <div class="field-grid ${shouldUseBoxFormat ? 'box-format' : ''}">
             ${fieldHTML}
           </div>
         </div>
