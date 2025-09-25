@@ -588,6 +588,38 @@
       transform: rotate(180deg);
     }
 
+    .result-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .result-print-button {
+      background: var(--blue);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .result-print-button:hover {
+      background: #0056b3;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+    }
+
+    .result-print-button:active {
+      transform: translateY(0);
+    }
+
     .result-dropdown-content {
       display: none;
       margin-top: 10px;
@@ -1692,11 +1724,17 @@
             </div>
           </div>
 
-          <div class="result-dropdown">
+          <div class="result-actions">
             <button class="result-dropdown-toggle" onclick="toggleResultDropdown(this)">
               <span>View All Fields</span>
               <span class="result-dropdown-icon">▼</span>
             </button>
+            <button class="result-print-button" onclick="printResult(${JSON.stringify(result).replace(/"/g, '&quot;')})">
+              <span>🖨️ Print Record</span>
+            </button>
+          </div>
+
+          <div class="result-dropdown">
             <div class="result-dropdown-content">
               <div class="result-all-fields">
                 ${createAllFieldsHTML(result)}
@@ -1733,7 +1771,8 @@
 
     // Toggle dropdown visibility
     function toggleResultDropdown(button) {
-      const content = button.nextElementSibling;
+      const dropdown = button.closest('.result-actions').nextElementSibling;
+      const content = dropdown.querySelector('.result-dropdown-content');
       const isExpanded = button.classList.contains('expanded');
 
       if (isExpanded) {
@@ -1745,6 +1784,374 @@
         content.classList.add('show');
         button.querySelector('span:first-child').textContent = 'Hide All Fields';
       }
+    }
+
+    // Print individual result - make globally accessible
+    window.printResult = function(result) {
+      // Create print window
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+
+      // Generate print HTML
+      const printHTML = createPrintLayout(result);
+
+      // Write HTML to print window
+      printWindow.document.write(printHTML);
+      printWindow.document.close();
+
+      // Wait for content to load then print
+      printWindow.onload = function() {
+        setTimeout(() => {
+          printWindow.print();
+          // Close window after print dialog closes
+          printWindow.onafterprint = function() {
+            printWindow.close();
+          };
+        }, 250);
+      };
+    }
+
+    // Create print layout HTML
+    function createPrintLayout(result) {
+      const printDate = new Date().toLocaleString();
+
+      // Get all fields from completeData or use basic fields
+      const data = result.completeData || result;
+
+      // Organize fields into sections
+      const personalInfo = extractPersonalInfo(data);
+      const contactInfo = extractContactInfo(data);
+      const caseInfo = extractCaseInfo(data);
+      const employmentInfo = extractEmploymentInfo(data);
+      const emergencyContacts = extractEmergencyContacts(data);
+      const additionalInfo = extractAdditionalInfo(data);
+
+      return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Client Record - ${escapeHtml(result.clientName || 'Unknown')}</title>
+          <style>
+            @page {
+              size: letter;
+              margin: 0.75in;
+            }
+
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
+            }
+
+            body {
+              font-family: 'Arial', 'Helvetica', sans-serif;
+              font-size: 11pt;
+              line-height: 1.5;
+              color: #000;
+              background: white;
+            }
+
+            .print-header {
+              border-bottom: 2px solid #333;
+              padding-bottom: 15px;
+              margin-bottom: 20px;
+            }
+
+            .print-title {
+              font-size: 24pt;
+              font-weight: bold;
+              color: #F28C00;
+              margin-bottom: 5px;
+            }
+
+            .print-subtitle {
+              font-size: 14pt;
+              color: #666;
+            }
+
+            .print-date {
+              font-size: 10pt;
+              color: #999;
+              text-align: right;
+              margin-top: -20px;
+            }
+
+            .section {
+              margin-bottom: 25px;
+              page-break-inside: avoid;
+            }
+
+            .section-title {
+              font-size: 14pt;
+              font-weight: bold;
+              color: #333;
+              border-bottom: 1px solid #ddd;
+              padding-bottom: 5px;
+              margin-bottom: 15px;
+              background: #f5f5f5;
+              padding: 8px;
+            }
+
+            .field-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 12px 20px;
+            }
+
+            .field-item {
+              display: flex;
+              min-height: 24px;
+              page-break-inside: avoid;
+            }
+
+            .field-item.full-width {
+              grid-column: 1 / -1;
+            }
+
+            .field-label {
+              font-weight: bold;
+              color: #555;
+              min-width: 140px;
+              flex-shrink: 0;
+              font-size: 10pt;
+            }
+
+            .field-value {
+              color: #000;
+              word-break: break-word;
+              font-size: 11pt;
+            }
+
+            .field-value.empty {
+              color: #999;
+              font-style: italic;
+            }
+
+            .print-footer {
+              margin-top: 40px;
+              padding-top: 20px;
+              border-top: 1px solid #ddd;
+              font-size: 9pt;
+              color: #666;
+              text-align: center;
+            }
+
+            .highlight {
+              background-color: #fff3cd;
+              padding: 2px 4px;
+              font-weight: bold;
+            }
+
+            @media print {
+              body {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="print-header">
+            <div class="print-title">Barbie's Bail Bonds</div>
+            <div class="print-subtitle">Client Record</div>
+            <div class="print-date">Printed: ${printDate}</div>
+          </div>
+
+          ${personalInfo.length > 0 ? createPrintSection('Personal Information', personalInfo) : ''}
+          ${contactInfo.length > 0 ? createPrintSection('Contact Information', contactInfo) : ''}
+          ${caseInfo.length > 0 ? createPrintSection('Case Information', caseInfo) : ''}
+          ${employmentInfo.length > 0 ? createPrintSection('Employment Information', employmentInfo) : ''}
+          ${emergencyContacts.length > 0 ? createPrintSection('Emergency Contacts', emergencyContacts) : ''}
+          ${additionalInfo.length > 0 ? createPrintSection('Additional Information', additionalInfo) : ''}
+
+          <div class="print-footer">
+            <p>This document contains confidential information. Handle with appropriate care.</p>
+            <p>Barbie's Bail Bonds • 561-247-0018 • Printed on ${printDate}</p>
+          </div>
+        </body>
+        </html>
+      `;
+    }
+
+    // Helper function to create print sections
+    function createPrintSection(title, fields) {
+      if (!fields || fields.length === 0) return '';
+
+      const fieldHTML = fields.map(field => {
+        const value = field.value || 'Not provided';
+        const isEmpty = !field.value || field.value.toString().trim() === '';
+        const fullWidth = field.fullWidth || value.length > 50;
+
+        return `
+          <div class="field-item ${fullWidth ? 'full-width' : ''}">
+            <span class="field-label">${escapeHtml(field.label)}:</span>
+            <span class="field-value ${isEmpty ? 'empty' : ''}">${escapeHtml(value)}</span>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="section">
+          <div class="section-title">${title}</div>
+          <div class="field-grid">
+            ${fieldHTML}
+          </div>
+        </div>
+      `;
+    }
+
+    // Extract personal information fields
+    function extractPersonalInfo(data) {
+      const fields = [];
+      const personalFields = [
+        { key: "Indemnitor's Complete Name:", label: "Indemnitor Name" },
+        { key: "Defendant's Complete Name:", label: "Defendant Name" },
+        { key: "Nick Name of Defendant (If not actual name):", label: "Nickname" },
+        { key: "Date of Birth:", label: "Date of Birth" },
+        { key: "Social Security # (Remember: This is a Secure Form)", label: "SSN" },
+        { key: "Driver's License (or ID) #", label: "Driver's License" },
+        { key: "Race:", label: "Race" },
+        { key: "Citizenship:", label: "Citizenship" },
+        { key: "Birth City/State", label: "Birth Location" }
+      ];
+
+      personalFields.forEach(field => {
+        if (data[field.key]) {
+          fields.push({ label: field.label, value: data[field.key] });
+        }
+      });
+
+      return fields;
+    }
+
+    // Extract contact information fields
+    function extractContactInfo(data) {
+      const fields = [];
+      const contactFields = [
+        { key: "Cell Phone #", label: "Cell Phone" },
+        { key: "Home Phone #", label: "Home Phone" },
+        { key: "Email Address:", label: "Email" },
+        { key: "Home Address:", label: "Home Address", fullWidth: true },
+        { key: "How long have you lived at this address?", label: "Time at Address" }
+      ];
+
+      contactFields.forEach(field => {
+        if (data[field.key]) {
+          fields.push({
+            label: field.label,
+            value: data[field.key],
+            fullWidth: field.fullWidth
+          });
+        }
+      });
+
+      return fields;
+    }
+
+    // Extract case information fields
+    function extractCaseInfo(data) {
+      const fields = [];
+      const caseFields = [
+        { key: "Booking #", label: "Booking Number" },
+        { key: "Case #", label: "Case Number" },
+        { key: "Power Number", label: "Power Number" },
+        { key: "Timestamp", label: "Entry Date" },
+        { key: "Source", label: "Source" },
+        { key: "Document Type", label: "Document Type" }
+      ];
+
+      // Check both direct properties and nested ones
+      caseFields.forEach(field => {
+        const value = data[field.key] || data[field.label];
+        if (value) {
+          fields.push({ label: field.label, value: value });
+        }
+      });
+
+      // Add basic result fields if available
+      if (data.timestamp) fields.push({ label: "Entry Date", value: data.timestamp });
+      if (data.caseNumber) fields.push({ label: "Case Number", value: data.caseNumber });
+      if (data.documentType) fields.push({ label: "Document Type", value: data.documentType });
+
+      return fields;
+    }
+
+    // Extract employment information fields
+    function extractEmploymentInfo(data) {
+      const fields = [];
+      const employmentFields = [
+        { key: "Defendant's Employer Name:", label: "Employer" },
+        { key: "Defendant's Work Phone #", label: "Work Phone" },
+        { key: "Defendant's Work Address", label: "Work Address", fullWidth: true },
+        { key: "How long have you been employed at this job?", label: "Employment Duration" },
+        { key: "Indemnitor's Employer Name:", label: "Indemnitor's Employer" },
+        { key: "Indemnitor's Work Phone #", label: "Indemnitor's Work Phone" }
+      ];
+
+      employmentFields.forEach(field => {
+        if (data[field.key]) {
+          fields.push({
+            label: field.label,
+            value: data[field.key],
+            fullWidth: field.fullWidth
+          });
+        }
+      });
+
+      return fields;
+    }
+
+    // Extract emergency contact fields
+    function extractEmergencyContacts(data) {
+      const fields = [];
+      const emergencyFields = [
+        { key: "Emergency Contact #1: (REQUIRED)", label: "Emergency Contact 1" },
+        { key: "Emergency Contact #2: (REQUIRED)", label: "Emergency Contact 2" },
+        { key: "Mother's Name:", label: "Mother's Name" },
+        { key: "Mother's Phone #", label: "Mother's Phone" },
+        { key: "Father's Name:", label: "Father's Name" },
+        { key: "Father's Phone #", label: "Father's Phone" },
+        { key: "Sibling 1 Name:", label: "Sibling 1" },
+        { key: "Sibling 1 Phone:", label: "Sibling 1 Phone" },
+        { key: "Reference 1 Name:", label: "Reference 1" },
+        { key: "Reference 1 Phone:", label: "Reference 1 Phone" }
+      ];
+
+      emergencyFields.forEach(field => {
+        if (data[field.key]) {
+          fields.push({ label: field.label, value: data[field.key] });
+        }
+      });
+
+      return fields;
+    }
+
+    // Extract additional information fields not covered in other sections
+    function extractAdditionalInfo(data) {
+      const fields = [];
+      const excludedKeys = [
+        "Indemnitor's Complete Name:", "Defendant's Complete Name:", "Nick Name of Defendant",
+        "Date of Birth:", "Social Security #", "Driver's License", "Race:", "Citizenship:",
+        "Cell Phone #", "Home Phone #", "Email Address:", "Home Address:",
+        "Booking #", "Case #", "Power Number", "Timestamp",
+        "Defendant's Employer", "Emergency Contact", "Mother's", "Father's", "Sibling",
+        "Reference", "Embedding Vector", "rowIndex", "overallScore", "termScores",
+        "source", "Source", "clientName", "defendantName", "phone", "nickname",
+        "caseNumber", "documentType", "completeData", "fileUrls", "debugFieldMapping"
+      ];
+
+      // Add any remaining fields that aren't in the excluded list
+      Object.keys(data).forEach(key => {
+        const isExcluded = excludedKeys.some(excluded => key.includes(excluded));
+        if (!isExcluded && data[key] && data[key].toString().trim()) {
+          fields.push({
+            label: key.replace(/:/g, ''),
+            value: data[key],
+            fullWidth: data[key].toString().length > 50
+          });
+        }
+      });
+
+      return fields;
     }
 
     // Escape HTML to prevent XSS
