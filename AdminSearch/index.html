@@ -2177,6 +2177,8 @@
       // Show loading state
       hideAllResults();
       document.getElementById('resultsList').innerHTML = '<div class="loading">Searching all records...</div>';
+      quickSearchButton.disabled = true;
+      quickSearchButton.textContent = '⏳';
 
       try {
         // Get date range
@@ -2293,6 +2295,10 @@
 
         document.getElementById('resultsList').innerHTML = '';
         showError(`Exact quick search failed: ${error.message}`);
+      } finally {
+        // Reset button state
+        quickSearchButton.disabled = false;
+        quickSearchButton.textContent = '🔍';
       }
     }
 
