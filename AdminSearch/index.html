@@ -1489,6 +1489,9 @@
       loading.classList.add('show');
       searchButton.disabled = true;
       searchButton.textContent = '⏳';
+      // Reset the other search button
+      quickSearchButton.disabled = false;
+      quickSearchButton.textContent = '🔍';
 
       const dateRange = getDateRange();
 
@@ -2179,6 +2182,9 @@
       document.getElementById('resultsList').innerHTML = '<div class="loading">Searching all records...</div>';
       quickSearchButton.disabled = true;
       quickSearchButton.textContent = '⏳';
+      // Reset the other search button
+      searchButton.disabled = false;
+      searchButton.textContent = '🔍';
 
       try {
         // Get date range
