@@ -143,7 +143,7 @@ function handleChatMessage(message, sessionId, userId) {
 }
 
 /**
- * Generate chat response using OpenAI with conversation context
+ * Generate chat response using multi-stage AI pipeline
  */
 function generateChatResponse(message, history, session) {
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
@@ -152,140 +152,356 @@ function generateChatResponse(message, history, session) {
     throw new Error('OpenAI API key not configured');
   }
 
-  // Build messages array for OpenAI
-  const messages = [
-    {
-      role: 'system',
-      content: `You are Barbara, a helpful assistant for Barbie's Bail Bonds in Palm Beach County.
+  let thoughtChain = [];
+  let totalUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
 
-GUIDE users through this exact process when they need to bond someone out:
-1. LOCATE DEFENDANT - Direct to inmate locator to verify custody (5-10 min)
-2. COMPLETE APPLICATION - Online form with defendant info (10-15 min)
-3. MAKE PAYMENT - Must call 561-247-0018 to confirm amount, then pay via:
-   - Zelle: payments@barbiesbailbonds.com
-   - Card: Invoice via email/text
-   - Cash: Meet agent or visit office
-4. BOND POSTED - Release typically 4-8 hours (jail doesn't give exact times)
+  try {
+    // Stage 1: Analyze the message
+    const analysis = analyzeMessage(message, history);
+    thoughtChain.push(`Analyzing: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`);
+    thoughtChain.push(analysis);
 
-RESPONSE RULES:
-- Keep responses under 2-3 sentences
-- Guide through ONE step at a time
-- Ask what step they're on if unclear
-- Only mention phone for payment confirmation (step 3)
-- USE FAQ context to inform your answers but NEVER copy FAQ text verbatim
-- Speak naturally and conversationally
-- Focus on what the user needs to DO next
+    // Stage 2: Decide strategy
+    const strategy = decideStrategy(analysis, message);
+    thoughtChain.push(`Strategy: ${strategy}`);
 
-Remember conversation context. User ID: ${session.user_id || 'anonymous'}`
+    // Stage 3: Execute chosen strategy
+    const result = executeStrategy(strategy, message, analysis, history, session);
+    thoughtChain = thoughtChain.concat(result.thoughtSteps || []);
+
+    // Aggregate usage from all API calls
+    if (result.usage) {
+      totalUsage.prompt_tokens += result.usage.prompt_tokens || 0;
+      totalUsage.completion_tokens += result.usage.completion_tokens || 0;
+      totalUsage.total_tokens += result.usage.total_tokens || 0;
     }
-  ];
 
-  // Add conversation history (last 10 exchanges for context)
-  const recentHistory = history.slice(-10);
-  recentHistory.forEach(turn => {
-    messages.push({ role: 'user', content: turn.user });
-    messages.push({ role: 'assistant', content: turn.assistant });
-  });
+    return {
+      response: result.response,
+      chainOfThought: thoughtChain.join(' → '),
+      usage: totalUsage,
+      sources: result.sources || []
+    };
 
-  // Add current message
-  messages.push({ role: 'user', content: message });
-
-  // Generate chain of thought reasoning
-  const chainOfThought = generateChainOfThought(message, history);
-
-  // Check if message is bail-related and add FAQ context
-  if (isBailRelated(message)) {
-    try {
-      // If RAG system is available, get relevant FAQs
-      const relevantFAQs = getRelevantFAQs(message);
-      if (relevantFAQs && relevantFAQs.length > 0) {
-        const faqContext = relevantFAQs.map(faq =>
-          `Q: ${faq.question}\nA: ${faq.answer}`
-        ).join('\n\n');
-
-        messages.push({
-          role: 'system',
-          content: `Context from company knowledge base (use this to inform your response but don't quote directly):\n\n${faqContext}`
-        });
-      }
-    } catch (error) {
-      console.log('FAQ search not available:', error);
-    }
+  } catch (error) {
+    console.error('Error in generateChatResponse:', error);
+    return {
+      response: "I apologize, but I'm having trouble processing that. Please try again or call us at 561-247-0018.",
+      chainOfThought: thoughtChain.join(' → ') || 'Error in processing',
+      usage: totalUsage,
+      sources: []
+    };
   }
-
-  // Call OpenAI API
-  const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + OPENAI_API_KEY,
-      'Content-Type': 'application/json'
-    },
-    payload: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: messages,
-      temperature: 0.8,
-      max_tokens: 400,
-      presence_penalty: 0.1,
-      frequency_penalty: 0.1
-    }),
-    muteHttpExceptions: true
-  });
-
-  const result = JSON.parse(response.getContentText());
-
-  if (response.getResponseCode() !== 200) {
-    throw new Error('OpenAI API error: ' + JSON.stringify(result));
-  }
-
-  return {
-    response: result.choices[0].message.content,
-    chainOfThought: chainOfThought,
-    usage: result.usage,
-    sources: []
-  };
 }
 
 /**
- * Generate chain of thought reasoning
+ * Stage 1: Analyze the message using AI
  */
-function generateChainOfThought(message, history) {
-  const messageLower = message.toLowerCase();
-  let thoughts = [];
+function analyzeMessage(message, history) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
 
-  // Analyze what user said
-  thoughts.push(`User said: "${message}"`);
+  try {
+    const analysisPrompt = {
+      role: 'system',
+      content: `Analyze this bail bonds inquiry. Answer in this exact format:
+      "Asking: [what they want] | Step: [Not started/Locate/Application/Payment/Waiting] | Mood: [emotional state]"
+      Be concise - max 15 words total.`
+    };
 
-  // Determine intent based on keywords and context
-  if (messageLower.includes('bond') || messageLower.includes('bail') || messageLower.includes('get out')) {
-    thoughts.push("They need help bonding someone out");
-    thoughts.push("I should guide them through the 4-step process");
-  } else if (messageLower.includes('hello') || messageLower.includes('hi') || messageLower.includes('hey')) {
-    thoughts.push("This is a greeting");
-    thoughts.push("I should respond warmly and ask how to help");
-  } else if (messageLower.includes('cost') || messageLower.includes('how much') || messageLower.includes('price')) {
-    thoughts.push("They're asking about pricing");
-    thoughts.push("I should explain the 10% premium clearly");
-  } else if (messageLower.includes('ready') || messageLower.includes('next') || messageLower.includes('yes')) {
-    thoughts.push("They're ready to proceed");
-    thoughts.push("I should guide to the next step in the process");
-  } else if (messageLower.includes('found') || messageLower.includes('located') || messageLower.includes('custody')) {
-    thoughts.push("They've completed the locate step");
-    thoughts.push("Next is the application");
-  } else if (messageLower.includes('application') || messageLower.includes('form')) {
-    thoughts.push("They're asking about the application");
-    thoughts.push("I should guide them to complete it");
-  } else if (messageLower.includes('payment') || messageLower.includes('pay') || messageLower.includes('zelle')) {
-    thoughts.push("They're at the payment step");
-    thoughts.push("They need to call to confirm amount first");
-  } else if (history && history.length > 0) {
-    thoughts.push("Continuing our conversation");
-    thoughts.push("I should maintain context from earlier");
-  } else {
-    thoughts.push("General inquiry about bail bonds");
-    thoughts.push("I should ask clarifying questions");
+    // Add recent context if available
+    const contextMessages = [];
+    if (history && history.length > 0) {
+      const recent = history.slice(-2);
+      recent.forEach(turn => {
+        contextMessages.push({ role: 'user', content: turn.user });
+        contextMessages.push({ role: 'assistant', content: turn.assistant });
+      });
+    }
+
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [analysisPrompt, ...contextMessages, { role: 'user', content: message }],
+        temperature: 0.3,
+        max_tokens: 50
+      }),
+      muteHttpExceptions: true
+    });
+
+    const result = JSON.parse(response.getContentText());
+    return result.choices[0].message.content;
+  } catch (error) {
+    console.error('Error in analyzeMessage:', error);
+    return 'Asking: unknown | Step: Not started | Mood: neutral';
+  }
+}
+
+/**
+ * Stage 2: Decide strategy using AI
+ */
+function decideStrategy(analysis, message) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  try {
+    const strategyPrompt = {
+      role: 'system',
+      content: `Based on this analysis: "${analysis}"
+      And message: "${message}"
+
+      Choose the best approach:
+      - DIRECT: I can answer this myself (greetings, simple questions, general info)
+      - FAQ: I should search our FAQ database (specific bail questions, procedures, requirements)
+      - GUIDE: I should guide them through the bail process step-by-step
+
+      Reply with only one word: DIRECT, FAQ, or GUIDE`
+    };
+
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [strategyPrompt],
+        temperature: 0.2,
+        max_tokens: 10
+      }),
+      muteHttpExceptions: true
+    });
+
+    const result = JSON.parse(response.getContentText());
+    const strategy = result.choices[0].message.content.trim().toUpperCase();
+
+    // Validate strategy
+    if (['DIRECT', 'FAQ', 'GUIDE'].includes(strategy)) {
+      return strategy;
+    }
+    return 'DIRECT'; // Default fallback
+
+  } catch (error) {
+    console.error('Error in decideStrategy:', error);
+    return 'DIRECT';
+  }
+}
+
+/**
+ * Stage 3: Execute the chosen strategy
+ */
+function executeStrategy(strategy, message, analysis, history, session) {
+  let thoughtSteps = [];
+
+  switch (strategy) {
+    case 'FAQ':
+      thoughtSteps.push('Searching FAQ database');
+      const faqs = getRelevantFAQs(message);
+      thoughtSteps.push(`Found ${faqs.length} relevant FAQs`);
+      return generateFAQResponse(message, analysis, faqs, history, session, thoughtSteps);
+
+    case 'GUIDE':
+      thoughtSteps.push('Guiding through bail process');
+      return generateGuidanceResponse(message, analysis, history, session, thoughtSteps);
+
+    case 'DIRECT':
+    default:
+      thoughtSteps.push('Responding from knowledge');
+      return generateDirectResponse(message, analysis, history, session, thoughtSteps);
+  }
+}
+
+/**
+ * Generate a direct response without FAQ search
+ */
+function generateDirectResponse(message, analysis, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  const systemPrompt = `You are Barbara, a helpful assistant for Barbie's Bail Bonds in Palm Beach County.
+  Analysis: ${analysis}
+
+  Respond naturally to this message. Keep it under 2-3 sentences. Be warm and helpful.
+  If they need bail help, guide them to the first step (inmate locator).`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt }
+  ];
+
+  // Add recent history for context
+  if (history && history.length > 0) {
+    const recent = history.slice(-3);
+    recent.forEach(turn => {
+      messages.push({ role: 'user', content: turn.user });
+      messages.push({ role: 'assistant', content: turn.assistant });
+    });
   }
 
-  return thoughts.join(" → ");
+  messages.push({ role: 'user', content: message });
+
+  try {
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 150
+      }),
+      muteHttpExceptions: true
+    });
+
+    const result = JSON.parse(response.getContentText());
+    return {
+      response: result.choices[0].message.content,
+      thoughtSteps: thoughtSteps,
+      usage: result.usage
+    };
+  } catch (error) {
+    console.error('Error in generateDirectResponse:', error);
+    return {
+      response: "I'm here to help. How can I assist you with bail bonds today?",
+      thoughtSteps: thoughtSteps,
+      usage: {}
+    };
+  }
+}
+
+/**
+ * Generate response using FAQ context
+ */
+function generateFAQResponse(message, analysis, faqs, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  // Build FAQ context
+  const faqContext = faqs.map(faq => `Q: ${faq.question}\nA: ${faq.answer}`).join('\n\n');
+
+  const systemPrompt = `You are Barbara, a helpful assistant for Barbie's Bail Bonds in Palm Beach County.
+  Analysis: ${analysis}
+
+  Use this FAQ knowledge to inform your response, but don't quote directly:
+  ${faqContext}
+
+  Respond naturally in 2-3 sentences. Focus on what they need to DO next.`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt }
+  ];
+
+  // Add recent history
+  if (history && history.length > 0) {
+    const recent = history.slice(-2);
+    recent.forEach(turn => {
+      messages.push({ role: 'user', content: turn.user });
+      messages.push({ role: 'assistant', content: turn.assistant });
+    });
+  }
+
+  messages.push({ role: 'user', content: message });
+
+  try {
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        temperature: 0.6,
+        max_tokens: 150
+      }),
+      muteHttpExceptions: true
+    });
+
+    const result = JSON.parse(response.getContentText());
+    return {
+      response: result.choices[0].message.content,
+      thoughtSteps: thoughtSteps,
+      usage: result.usage,
+      sources: faqs
+    };
+  } catch (error) {
+    console.error('Error in generateFAQResponse:', error);
+    return {
+      response: "I can help with that. Please call us at 561-247-0018 for specific information.",
+      thoughtSteps: thoughtSteps,
+      usage: {}
+    };
+  }
+}
+
+/**
+ * Generate guidance through bail process steps
+ */
+function generateGuidanceResponse(message, analysis, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  const systemPrompt = `You are Barbara, a helpful assistant for Barbie's Bail Bonds in Palm Beach County.
+  Analysis: ${analysis}
+
+  BAIL PROCESS STEPS:
+  1. LOCATE - Use inmate locator to verify custody (5-10 min)
+  2. APPLICATION - Complete online form (10-15 min)
+  3. PAYMENT - Call 561-247-0018 to confirm amount, then pay via Zelle/Card/Cash
+  4. WAITING - Bond posted, release in 4-8 hours
+
+  Guide them to the appropriate step based on where they are. Be specific and action-oriented.
+  Keep response to 2-3 sentences max. Only mention phone for step 3.`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt }
+  ];
+
+  // Add conversation history for context
+  if (history && history.length > 0) {
+    const recent = history.slice(-3);
+    recent.forEach(turn => {
+      messages.push({ role: 'user', content: turn.user });
+      messages.push({ role: 'assistant', content: turn.assistant });
+    });
+  }
+
+  messages.push({ role: 'user', content: message });
+
+  try {
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        temperature: 0.6,
+        max_tokens: 150
+      }),
+      muteHttpExceptions: true
+    });
+
+    const result = JSON.parse(response.getContentText());
+    return {
+      response: result.choices[0].message.content,
+      thoughtSteps: thoughtSteps,
+      usage: result.usage
+    };
+  } catch (error) {
+    console.error('Error in generateGuidanceResponse:', error);
+    return {
+      response: "Let's get started. First, use our inmate locator to verify they're in custody.",
+      thoughtSteps: thoughtSteps,
+      usage: {}
+    };
+  }
 }
 
 /**
