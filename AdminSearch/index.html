@@ -1821,6 +1821,9 @@
       // Get all fields from completeData or use basic fields
       const data = result.completeData || result;
 
+      // Check if this is a defendant application
+      const isDefendantApplication = result.documentType === 'Defendant Application';
+
       // Organize fields into sections
       const personalInfo = extractPersonalInfo(data);
       const contactInfo = extractContactInfo(data);
@@ -1828,6 +1831,9 @@
       const employmentInfo = extractEmploymentInfo(data);
       const emergencyContacts = extractEmergencyContacts(data);
       const additionalInfo = extractAdditionalInfo(data);
+
+      // Extract signature field separately for defendant applications
+      const signatureField = extractSignatureField(data);
 
       return `
         <!DOCTYPE html>
@@ -1966,6 +1972,10 @@
           ${employmentInfo.length > 0 ? createPrintSection('Employment Information', employmentInfo) : ''}
           ${emergencyContacts.length > 0 ? createPrintSection('Emergency Contacts', emergencyContacts) : ''}
           ${additionalInfo.length > 0 ? createPrintSection('Additional Information', additionalInfo) : ''}
+
+          ${isDefendantApplication ? createAgreementsSection() : ''}
+
+          ${isDefendantApplication && signatureField ? createSignatureSection(signatureField) : ''}
 
           <div class="print-footer">
             <p>This document contains confidential information. Handle with appropriate care.</p>
@@ -2140,7 +2150,9 @@
         "Defendant's Employer", "Emergency Contact", "Mother's", "Father's", "Sibling",
         "Reference", "Embedding Vector", "rowIndex", "overallScore", "termScores",
         "source", "Source", "clientName", "defendantName", "phone", "nickname",
-        "caseNumber", "documentType", "completeData", "fileUrls", "debugFieldMapping"
+        "caseNumber", "documentType", "completeData", "fileUrls", "debugFieldMapping",
+        // Exclude the signature field - it will be handled separately
+        "BY TYPING YOUR NAME AND SUBMITTING BELOW YOU AGREE"
       ];
 
       // Add any remaining fields that aren't in the excluded list
@@ -2156,6 +2168,118 @@
       });
 
       return fields;
+    }
+
+    // Extract signature field for defendant applications
+    function extractSignatureField(data) {
+      const signatureKey = Object.keys(data).find(key =>
+        key.includes("BY TYPING YOUR NAME AND SUBMITTING BELOW YOU AGREE")
+      );
+
+      if (signatureKey && data[signatureKey]) {
+        return {
+          label: "Electronic Signature",
+          value: data[signatureKey],
+          timestamp: data["Timestamp"] || new Date().toLocaleString()
+        };
+      }
+      return null;
+    }
+
+    // Create agreements section for defendant applications
+    function createAgreementsSection() {
+      return `
+        <div class="section agreements-section" style="page-break-before: always;">
+          <div class="section-title">Legal Agreements and Terms</div>
+
+          <div class="agreement-subsection">
+            <h4 style="font-weight: bold; margin: 15px 0 10px 0;">Section 1: Terms and Conditions of Application for Appearance Bond</h4>
+            <p style="font-size: 10pt; line-height: 1.4; margin-bottom: 10px;">
+              The following terms and conditions for the Appearance Bond for which U.S. Fire Insurance Company (USFIC) or its Agent and the parties agree that said appearance bond is conditioned upon full compliance of all said terms and conditions and is a part of said bond and application therefore.
+            </p>
+            <ol style="font-size: 10pt; line-height: 1.4; margin-left: 20px;">
+              <li>USFIC as the Surety Company, through its duly appointed agent, shall have control and jurisdiction over the principal during the term for which the bond is executed and shall have the right to apprehend, arrest and surrender the principal to the proper officials at any time as provided by law.</li>
+              <li>In the event surrender of principal is made prior to the time set for the principal's appearances, and for reasons other than as enumerated below in paragraph 3, then principal shall be entitled to a refund of the bond premium.</li>
+              <li>It is understood and agreed that the happening of any one of the following events shall constitute a breach of principal's obligation to USFIC hereunder, and USFIC shall have the right to forthwith apprehend, arrest, and surrender principal, and principal shall have no right to any refund of premium whatsoever. Said events which shall constitute a breach of principal's obligations hereunder are:
+                <ol type="a" style="margin-left: 20px; margin-top: 5px;">
+                  <li>If principal shall depart the jurisdiction of the court without the written consent of the court and the Surety Company or its Agent.</li>
+                  <li>If principal shall move from one address to another without notifying the Surety Company or its Agent in writing prior to such move.</li>
+                  <li>If principal shall commit any act which shall constitute reasonable evidence of principal's intention to cause a forfeiture of said bond.</li>
+                  <li>If principal is arrested and incarcerated for any offense other than a minor traffic violation.</li>
+                  <li>If principal shall make any material false statements in the application for appearance bond.</li>
+                </ol>
+              </li>
+            </ol>
+            <p style="font-size: 10pt; line-height: 1.4; margin-top: 10px; font-style: italic;">
+              Under penalties of perjury, I declare that I have read the foregoing, and the information provided is true and correct without reservation. The information and representations made in this Application are for the purpose of inducing the Surety to undertake the bond(s) for which I have applied with the intent that the Surety fully rely upon the information and representations contained herein.
+            </p>
+          </div>
+
+          <div class="agreement-subsection">
+            <h4 style="font-weight: bold; margin: 15px 0 10px 0;">Section 2: Contingent Promissory Note</h4>
+            <p style="font-size: 10pt; line-height: 1.4;">
+              For value received the undersigned, jointly and severally promise(s) to pay U.S. FIRE INSURANCE COMPANY or its Agent, Jerry Casal Bail Bonds, LLC on demand the principal sum of the bond if and only if there occurs a breach of the terms and conditions of the surety bail bond or bonds posted on behalf of defendant, together with any continuations and modifications, any extensions, substitutions, increments or appeals thereof, or upon payment of any expenses incurred by the payee or holder to produce the Defendant before the appropriate court or courts of Competent jurisdiction in the above case, with interest thereon at the rate of FOURTEEN percent (14%), per annum, from the date of occurrence of the above stated Contingency, until fully paid.
+            </p>
+            <p style="font-size: 10pt; line-height: 1.4; margin-top: 10px;">
+              This Note and the Mortgage of even date herewith shall serve to secure: (a) Any and all liability, loss, costs, damages, expenses, premiums and attorneys fees arising or incurred by Payee in connection with the above captioned Bond; (b) For the payment of all premiums on such Bonds; (c) For the performance of every agreement made by Owner or Defendant in connection with said Bonds; (d) Against any liability, loss, costs, expenses, and attorneys fees in connection with any claim to the collateral security; (e) Any and all future advances made with or without consent of the Owner by Payee on behalf of the Defendant.
+            </p>
+          </div>
+
+          <div class="agreement-subsection">
+            <h4 style="font-weight: bold; margin: 15px 0 10px 0;">Section 3: Indemnity Agreement for Bail Bond</h4>
+            <p style="font-size: 10pt; line-height: 1.4;">
+              The undersigned Indemnitor(s) make(s) application to U.S. Fire Insurance Company through its duly licensed and appointed Producer Agent Jerry Casal Bail Bonds, LLC for execution of a bail undertaking in consideration of Surety arranging for execution or continuance of this Bail Bond, Indemnitor(s) jointly and severally agree(s) to:
+            </p>
+            <ol style="font-size: 10pt; line-height: 1.4; margin-left: 20px;">
+              <li>Pay Surety the Florida set premium for this Bail Bond. The premium is earned upon the release of Principal from the detaining facility.</li>
+              <li>Reimburse Surety for actual expenses it incurs caused by any breach by the Principal of the terms of the application and Bail Bond.</li>
+              <li>Pay the Surety a reasonable attorney's fee, no less than Five Hundred Dollars ($500.00), in the event that it is necessary to institute legal action arising from this Agreement.</li>
+              <li>Provide Surety upon demand, a monetary amount equal to the Penal Amount to be held as collateral if Surety discovers any information was concealed or misrepresented.</li>
+              <li>Pay Surety immediately upon demand the penal amount of the Bail Bond after any breach of bond conditions or entry of Estreature (forfeiture) pursuant to governing statutes.</li>
+              <li>Aid Surety in securing release or exoneration of Surety from all liability under the Bail Bond, including the surrender of the Principal to the Court upon direction of the Surety.</li>
+              <li>Grant to Surety a Security Interest in all money or other property in their possession or hereafter acquired from time to time pursuant to Chapter 679, Florida Statutes and/or Article 9 of the Uniform Commercial Code.</li>
+              <li>The obligations of the Indemnitor(s) and Principal hereunder are joint and several. Any amounts due shall bear interest at the maximum rate allowed by law.</li>
+              <li>As an inducement for Surety to underwrite the Bail Bond, Indemnitor(s) and Principal warrant all statements made by them on the Application for Bail be true and agree to advise Surety of any change within forty-eight (48) hours after such change shall have occurred.</li>
+              <li>The undersigned agrees that these obligations apply to any and all Bail Bonds executed for the same charge for which the above mentioned Bail Bond was executed or any charge arising out of the same transaction regardless of whether said Bail Bonds are filed before or after conviction, including appeals.</li>
+              <li>The undersigned authorizes any person, agency, partnership or corporation having any information concerning my character, credit, and financial reputation to release such information to Surety.</li>
+            </ol>
+            <p style="font-size: 10pt; line-height: 1.4; margin-top: 10px; font-weight: bold; text-transform: uppercase;">
+              I have read this indemnity agreement and I know its contents. I acknowledge receipt of a copy of the indemnity agreement or have printed out a copy. I am the true and lawful owner of the property, whether real or personal, set forth in the application for bail.
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Create signature section for defendant applications
+    function createSignatureSection(signatureField) {
+      if (!signatureField) return '';
+
+      return `
+        <div class="section signature-section" style="margin-top: 40px; border-top: 2px solid #333; padding-top: 20px;">
+          <div class="section-title">Agreement and Electronic Signature</div>
+          <div style="background: #f5f5f5; padding: 15px; border: 1px solid #ddd; margin: 15px 0;">
+            <p style="font-size: 11pt; line-height: 1.5; margin-bottom: 10px; font-weight: bold;">
+              BY TYPING YOUR NAME AND SUBMITTING BELOW YOU AGREE TO ALL THE ABOVE TERMS AND CONDITIONS AND THAT THE INFORMATION IS ENTIRELY CORRECT AND TRUE AND THAT YOU ARE THE PERSON SUBMITTING THE APPLICATION.
+            </p>
+            <div style="margin-top: 20px; padding: 10px; background: white; border: 1px solid #999;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <span style="font-weight: bold;">Electronic Signature:</span>
+                  <span style="font-size: 14pt; margin-left: 10px; font-style: italic; color: #000; border-bottom: 2px solid #000; padding-bottom: 2px;">
+                    ${escapeHtml(signatureField.value)}
+                  </span>
+                </div>
+                <div style="text-align: right;">
+                  <span style="font-size: 10pt; color: #666;">
+                    Signed: ${escapeHtml(signatureField.timestamp)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     // Escape HTML to prevent XSS
