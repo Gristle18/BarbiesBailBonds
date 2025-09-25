@@ -2008,12 +2008,12 @@
 
           ${isDefendantApplication ? createAgreementsSection() : ''}
 
-          ${isDefendantApplication && signatureField ? createSignatureSection(signatureField) : ''}
+          ${isDefendantApplication && signatureField ? createSignatureSection(signatureField, printDate) : ''}
 
-          <div class="print-footer">
+          ${!isDefendantApplication ? `<div class="print-footer">
             <p>This document contains confidential information. Handle with appropriate care.</p>
             <p>Barbie's Bail Bonds • 561-247-0018 • Printed on ${printDate}</p>
-          </div>
+          </div>` : ''}
         </body>
         </html>
       `;
@@ -2300,7 +2300,7 @@
     }
 
     // Create signature section for defendant applications
-    function createSignatureSection(signatureField) {
+    function createSignatureSection(signatureField, printDate) {
       if (!signatureField) return '';
 
       return `
@@ -2325,6 +2325,11 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 9pt; color: #666; text-align: center;">
+            <p>This document contains confidential information. Handle with appropriate care.</p>
+            <p style="margin-top: 5px;">Barbie's Bail Bonds • 561-247-0018 • Printed on ${printDate}</p>
           </div>
         </div>
       `;
