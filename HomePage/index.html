@@ -1197,7 +1197,7 @@
         document.head.removeChild(script);
         delete window[callbackName];
       }
-    }, 15000);
+    }, 30000); // 30 seconds timeout (Google Apps Script can have cold starts)
 
     document.head.appendChild(script);
   }
@@ -1263,7 +1263,29 @@
       // toggleChat();
     }
   });
-  
+
+  // Warm up the Google Apps Script backend on page load to prevent cold starts
+  // This creates a new session in the background to initialize the service
+  setTimeout(() => {
+    const warmupCallback = 'warmup_' + Date.now();
+    const warmupScript = document.createElement('script');
+    warmupScript.src = `${API_URL}?action=new_session&user_id=warmup&format=jsonp&callback=${warmupCallback}`;
+
+    window[warmupCallback] = function(response) {
+      console.log('Chatbot backend warmed up');
+      document.head.removeChild(warmupScript);
+      delete window[warmupCallback];
+    };
+
+    warmupScript.onerror = function() {
+      console.log('Warmup failed, but chatbot will still work');
+      document.head.removeChild(warmupScript);
+      delete window[warmupCallback];
+    };
+
+    document.head.appendChild(warmupScript);
+  }, 1000); // Wait 1 second after page load
+
 })();
 </script>
 
