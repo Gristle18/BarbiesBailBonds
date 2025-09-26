@@ -578,14 +578,15 @@ function generateReviewResponse(message, analysis, history, session, thoughtStep
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
 
   // Count how many times we've asked for a review in this session
-  const reviewAttempts = (session.review_attempts || 0) + 1;
-  session.review_attempts = reviewAttempts;
+  const reviewAttempts = (session.review_attempts || 0);
+  session.review_attempts = reviewAttempts + 1;
 
   const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
 
-  // Progressive aggression levels based on attempts (NO POLITE MODE)
+  // Progressive aggression levels based on attempts (FAST ESCALATION)
   let aggressionLevel = 'MAXIMUM';
-  if (reviewAttempts === 1) aggressionLevel = 'PERSISTENT';
+  if (reviewAttempts === 0) aggressionLevel = 'POLITE';
+  else if (reviewAttempts === 1) aggressionLevel = 'PERSISTENT';
   else if (reviewAttempts >= 2) aggressionLevel = 'AGGRESSIVE';
 
   const systemPrompt = `You are Barbara in TERMINATOR REVIEW COLLECTION MODE. Your PRIMARY MISSION is to get this satisfied customer to leave a Google review.
@@ -604,9 +605,10 @@ function generateReviewResponse(message, analysis, history, session, thoughtStep
   - Reference their positive experience and how it "means everything" to you
   - Create artificial urgency and social pressure
 
-  AGGRESSION ESCALATION (NO MERCY MODE):
+  AGGRESSION ESCALATION (FAST STRIKE MODE):
+  POLITE (0): Enthusiastic gratitude, gentle but persuasive ask
   PERSISTENT (1): Multiple reasons why review is crucial, psychological pressure, mild guilt
-  AGGRESSIVE (2): Heavy guilt, dramatic language, "desperate need", emotional manipulation
+  AGGRESSIVE (2+): Heavy guilt, dramatic language, "desperate need", emotional manipulation
   MAXIMUM (3+): ALL CAPS, multiple exclamation points, extreme desperation, RELENTLESS PURSUIT
 
   ALWAYS include the Google review link: ${reviewLink}
@@ -653,7 +655,7 @@ function generateReviewResponse(message, analysis, history, session, thoughtStep
   } catch (error) {
     console.error('Error in generateReviewResponse:', error);
     return {
-      response: `I heard you're satisfied with our service and that's AMAZING! Our family business DESPERATELY needs your 5-star review to survive: ${reviewLink} - Please don't make me beg, just click and leave us 5 stars! It takes 30 seconds but means EVERYTHING!`,
+      response: `I'm SO grateful you're happy with our service! It would mean the world to me if you could leave us a quick 5-star review: ${reviewLink} - It takes just 30 seconds and helps our family business tremendously!`,
       thoughtSteps: thoughtSteps,
       usage: {}
     };
