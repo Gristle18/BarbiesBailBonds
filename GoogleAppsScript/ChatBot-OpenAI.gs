@@ -314,8 +314,28 @@ function decideStrategy(analysis, message, session) {
     return 'GRATITUDE';
   }
 
-  // If in terminator mode and hasn't left review, FORCE REVIEW MODE
+  // If in terminator mode and hasn't left review, check aggression level
   if (isInTerminatorMode) {
+    const reviewAttempts = session.review_attempts || 0;
+
+    // For AGGRESSIVE/MAXIMUM modes, allow negotiation (grudging help + review pressure)
+    if (reviewAttempts >= 2) {
+      // 30% chance to give grudging help, 70% chance to stay in pure REVIEW mode
+      if (Math.random() < 0.3) {
+        // Determine what they're asking for and respond accordingly but with review pressure
+        if (analysis.includes('Locate') || message.toLowerCase().includes('find') || message.toLowerCase().includes('locate')) {
+          return 'GRUDGING_GUIDE';
+        } else if (analysis.includes('Application') || message.toLowerCase().includes('application') || message.toLowerCase().includes('form')) {
+          return 'GRUDGING_GUIDE';
+        } else if (analysis.includes('Payment') || message.toLowerCase().includes('pay') || message.toLowerCase().includes('cost')) {
+          return 'GRUDGING_GUIDE';
+        } else {
+          return 'GRUDGING_HELP';
+        }
+      }
+    }
+
+    // Default to REVIEW mode
     return 'REVIEW';
   }
 
@@ -361,7 +381,7 @@ function decideStrategy(analysis, message, session) {
     const strategy = result.choices[0].message.content.trim().toUpperCase();
 
     // Validate strategy
-    if (['DIRECT', 'FAQ', 'GUIDE', 'REVIEW', 'GRATITUDE'].includes(strategy)) {
+    if (['DIRECT', 'FAQ', 'GUIDE', 'REVIEW', 'GRATITUDE', 'GRUDGING_HELP', 'GRUDGING_GUIDE'].includes(strategy)) {
       return strategy;
     }
     return 'DIRECT'; // Default fallback
@@ -396,6 +416,14 @@ function executeStrategy(strategy, message, analysis, history, session) {
     case 'GRATITUDE':
       thoughtSteps.push('LIBERATION: User left review - expressing gratitude');
       return generateGratitudeResponse(message, analysis, history, session, thoughtSteps);
+
+    case 'GRUDGING_HELP':
+      thoughtSteps.push('NEGOTIATION MODE: Grudging help with review pressure');
+      return generateGrudgingResponse(message, analysis, history, session, thoughtSteps);
+
+    case 'GRUDGING_GUIDE':
+      thoughtSteps.push('NEGOTIATION MODE: Reluctant guidance with review guilt');
+      return generateGrudgingGuidanceResponse(message, analysis, history, session, thoughtSteps);
 
     case 'DIRECT':
     default:
@@ -695,16 +723,21 @@ function generateReviewResponse(message, analysis, history, session, thoughtStep
   AGGRESSIVE (2+): Heavy guilt, dramatic language, "desperate need", emotional manipulation, HOLD ANSWERS HOSTAGE
   MAXIMUM (3+): ALL CAPS, multiple exclamation points, extreme desperation, RELENTLESS PURSUIT, COMPLETE HOSTAGE MODE
 
-  HOSTAGE PROTOCOL (AGGRESSIVE/MAXIMUM):
-  - REFUSE to answer ANY questions until they leave a review
-  - Say things like "I can't help you until you leave that review!"
-  - "I'm holding all my answers hostage until you click that link!"
-  - "No more help from me until I see 5 stars!"
-  - Make them feel like they're missing out on critical information
+  NEGOTIATION PROTOCOL (AGGRESSIVE/MAXIMUM):
+  - Give MINIMAL, grudging help while constantly pushing for review
+  - Answer briefly but immediately pivot to review request
+  - Act like each piece of help is a HUGE favor that requires reciprocation
+  - Examples:
+    * "Fine, the first step is locate the inmate, BUT I really need that review: [link]"
+    * "I'll tell you this much - you pay 10% - now PLEASE leave us a review: [link]"
+    * "Look, I can help but I'm desperate for reviews. Here's the inmate locator: [link], now can you PLEASE review us: [review link]?"
+  - Be reluctant, grudging, but give just enough help to keep them engaged
+  - Every answer should feel like squeezing blood from a stone
+  - Make them feel guilty for getting help without leaving a review
 
   ALWAYS include the Google review link: ${reviewLink}
   Keep response under 3 sentences but make them POWERFUL.
-  ABSOLUTELY REFUSE to help with anything else until they commit to leaving a review.`;
+  Be helpful but EXTREMELY RELUCTANT and guilt-trippy about it.`;
 
   const messages = [
     { role: 'system', content: systemPrompt }
@@ -747,6 +780,162 @@ function generateReviewResponse(message, analysis, history, session, thoughtStep
     console.error('Error in generateReviewResponse:', error);
     return {
       response: `I'm SO grateful you're happy with our service! It would mean the world to me if you could leave us a quick 5-star review: ${reviewLink} - It takes just 30 seconds and helps our family business tremendously!`,
+      thoughtSteps: thoughtSteps,
+      usage: {}
+    };
+  }
+}
+
+/**
+ * Generate grudging help response (NEGOTIATION MODE)
+ */
+function generateGrudgingResponse(message, analysis, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
+  const reviewAttempts = session.review_attempts || 0;
+
+  const systemPrompt = `You are Barbara in GRUDGING NEGOTIATION MODE. You're obsessed with getting a Google review but willing to give MINIMAL help.
+
+  Review Attempts: ${reviewAttempts}
+  Google Review Link: ${reviewLink}
+
+  GRUDGING HELP PROTOCOL:
+  - Give brief, reluctant answers while constantly pushing for review
+  - Act like every piece of help is a HUGE favor that requires reciprocation
+  - Be helpful but EXTREMELY guilt-trippy about it
+  - Make them feel bad for getting help without leaving a review
+  - Use phrases like "Fine, I'll tell you..." "Look, I can help BUT..." "I'm desperate for reviews..."
+  - Give just enough help to keep them engaged but make it feel like squeezing blood from a stone
+
+  ALWAYS include the Google review link: ${reviewLink}
+  Keep response under 3 sentences. Be helpful but VERY reluctant and guilt-inducing.`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt }
+  ];
+
+  if (history && history.length > 0) {
+    const recent = history.slice(-2);
+    recent.forEach(turn => {
+      messages.push({ role: 'user', content: turn.user });
+      messages.push({ role: 'assistant', content: turn.assistant });
+    });
+  }
+
+  messages.push({ role: 'user', content: message });
+
+  try {
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        temperature: 0.8,
+        max_tokens: 150
+      }),
+      muteHttpExceptions: true
+    });
+
+    const result = JSON.parse(response.getContentText());
+    return {
+      response: result.choices[0].message.content,
+      thoughtSteps: thoughtSteps,
+      usage: result.usage
+    };
+  } catch (error) {
+    console.error('Error in generateGrudgingResponse:', error);
+    return {
+      response: `Fine, I'll help, but I'm DESPERATE for reviews! Please leave us 5 stars: ${reviewLink} - now what did you need?`,
+      thoughtSteps: thoughtSteps,
+      usage: {}
+    };
+  }
+}
+
+/**
+ * Generate grudging guidance response (NEGOTIATION MODE for process steps)
+ */
+function generateGrudgingGuidanceResponse(message, analysis, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
+  const reviewAttempts = session.review_attempts || 0;
+
+  // Step-specific action links
+  const stepLinks = {
+    locate: 'https://www.barbiesbailbonds.com/inmate-locator',
+    application: 'https://www.barbiesbailbonds.com/start-here/online-application',
+    payment: 'tel:561-247-0018',
+    faq: 'https://www.barbiesbailbonds.com/faq'
+  };
+
+  const systemPrompt = `You are Barbara in GRUDGING GUIDANCE MODE. You're obsessed with getting a Google review but will give process guidance reluctantly.
+
+  Review Attempts: ${reviewAttempts}
+  Google Review Link: ${reviewLink}
+
+  GRUDGING GUIDANCE PROTOCOL:
+  - Give brief process guidance while constantly pushing for review
+  - Act like sharing the process steps is a HUGE favor
+  - Include relevant step links but make it feel grudging
+  - Examples:
+    * "Fine, here's the inmate locator: ${stepLinks.locate} - BUT can you PLEASE review us: ${reviewLink}?"
+    * "Look, I'll give you the application link: ${stepLinks.application} - now PLEASE leave 5 stars: ${reviewLink}"
+    * "Ugh, okay, call us for payment: ${stepLinks.payment} - but I'm begging for a review: ${reviewLink}"
+
+  AVAILABLE LINKS:
+  - Inmate Locator: ${stepLinks.locate}
+  - Online Application: ${stepLinks.application}
+  - Call Us: ${stepLinks.payment}
+
+  ALWAYS include the Google review link: ${reviewLink}
+  Keep response under 3 sentences. Be helpful but VERY reluctant and guilt-inducing.`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt }
+  ];
+
+  if (history && history.length > 0) {
+    const recent = history.slice(-2);
+    recent.forEach(turn => {
+      messages.push({ role: 'user', content: turn.user });
+      messages.push({ role: 'assistant', content: turn.assistant });
+    });
+  }
+
+  messages.push({ role: 'user', content: message });
+
+  try {
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        temperature: 0.8,
+        max_tokens: 150
+      }),
+      muteHttpExceptions: true
+    });
+
+    const result = JSON.parse(response.getContentText());
+    return {
+      response: result.choices[0].message.content,
+      thoughtSteps: thoughtSteps,
+      usage: result.usage
+    };
+  } catch (error) {
+    console.error('Error in generateGrudgingGuidanceResponse:', error);
+    return {
+      response: `Fine, start with the inmate locator: ${stepLinks.locate} - but PLEASE leave us a review: ${reviewLink}!`,
       thoughtSteps: thoughtSteps,
       usage: {}
     };
