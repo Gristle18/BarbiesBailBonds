@@ -16,41 +16,92 @@ const MODE_THRESHOLDS = {
   // HELPER_FIRST: No threshold - used as default fallback
 };
 
-// Concept phrases for embedding-based mode detection
+// Contrastive learning margin - positive must beat negative by this amount
+const CONFIDENCE_MARGIN = 0.07;
+
+// Contrastive concept phrases for embedding-based mode detection
 const MODE_CONCEPTS = {
-  STRATEGIC_ASK: [
-    "I'm satisfied with the help I received",
-    "This service has been valuable to me",
-    "I appreciate the assistance provided",
-    "I want to reciprocate for good service",
-    "Thank you so much for helping me",
-    "You've been really helpful",
-    "I'm grateful for this support"
-  ],
-  NEGOTIATOR: [
-    "I want to delay this request",
-    "I'd prefer to handle this differently",
-    "I'm deflecting but not refusing",
-    "Can we do this later",
-    "Maybe we can discuss this another time",
-    "I'd rather focus on something else right now"
-  ],
-  GRACEFUL_RETREAT: [
-    "I'm explicitly refusing this request",
-    "I'm becoming frustrated with pressure",
-    "I won't do what you're asking",
-    "Stop asking me about this",
-    "I'm not interested in that",
-    "Please don't keep pushing this"
-  ],
-  HELPER_FIRST: [
-    "I need assistance with a problem",
-    "I'm seeking information or guidance",
-    "Help me understand this process",
-    "I have a question about bail bonds",
-    "Can you explain how this works",
-    "I need help with something"
-  ]
+  STRATEGIC_ASK: {
+    positive: [
+      "I'm satisfied with the help I received",
+      "This service has been valuable to me",
+      "I appreciate the assistance provided",
+      "I want to reciprocate for good service",
+      "Thank you so much for helping me",
+      "You've been really helpful",
+      "I'm grateful for this support",
+      "If only there was some way I could repay you",
+      "You deserve recognition for this help"
+    ],
+    negative: [
+      "I don't want to leave a review",
+      "I'm not interested in reviewing",
+      "Reviews aren't my thing",
+      "I'd rather not do that right now",
+      "That's not necessary",
+      "I don't have time for that",
+      "I prefer to keep things private"
+    ]
+  },
+  NEGOTIATOR: {
+    positive: [
+      "I want to delay this request",
+      "I'd prefer to handle this differently",
+      "I'm deflecting but not refusing",
+      "Can we do this later",
+      "Maybe we can discuss this another time",
+      "I'd rather focus on something else right now",
+      "Could we postpone this conversation",
+      "Let me think about that"
+    ],
+    negative: [
+      "Yes, let's do this now",
+      "I'm ready to proceed",
+      "That sounds good to me",
+      "I'm happy to help with that",
+      "Let's move forward",
+      "I'm all for it"
+    ]
+  },
+  GRACEFUL_RETREAT: {
+    positive: [
+      "I'm explicitly refusing this request",
+      "I'm becoming frustrated with pressure",
+      "I won't do what you're asking",
+      "Stop asking me about this",
+      "I'm not interested in that",
+      "Please don't keep pushing this",
+      "This is getting annoying",
+      "I already said no"
+    ],
+    negative: [
+      "I'm happy to continue",
+      "This is going well",
+      "I appreciate your patience",
+      "Let's keep working on this",
+      "You're being very helpful",
+      "I'm enjoying this conversation"
+    ]
+  },
+  HELPER_FIRST: {
+    positive: [
+      "I need assistance with a problem",
+      "I'm seeking information or guidance",
+      "Help me understand this process",
+      "I have a question about bail bonds",
+      "Can you explain how this works",
+      "I need help with something",
+      "Could you clarify this for me",
+      "I'm confused about the process"
+    ],
+    negative: [
+      "I don't need any help",
+      "I already know what to do",
+      "This is clear to me",
+      "I can handle this myself",
+      "No questions needed"
+    ]
+  }
 };
 
 /**
@@ -58,7 +109,7 @@ const MODE_CONCEPTS = {
  */
 
 /**
- * Generate embeddings for all concept phrases
+ * Generate embeddings for all concept phrases (positive and negative)
  */
 function generateAllEmbeddings() {
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
@@ -70,11 +121,15 @@ function generateAllEmbeddings() {
   const properties = PropertiesService.getScriptProperties();
   const allEmbeddings = {};
 
-  for (const [mode, concepts] of Object.entries(MODE_CONCEPTS)) {
+  for (const [mode, conceptGroups] of Object.entries(MODE_CONCEPTS)) {
     console.log(`Generating embeddings for ${mode}...`);
-    const modeEmbeddings = [];
+    const modeEmbeddings = {
+      positive: [],
+      negative: []
+    };
 
-    for (const concept of concepts) {
+    // Generate embeddings for positive concepts
+    for (const concept of conceptGroups.positive) {
       try {
         const response = UrlFetchApp.fetch('https://api.openai.com/v1/embeddings', {
           method: 'POST',
@@ -93,14 +148,46 @@ function generateAllEmbeddings() {
           throw new Error('OpenAI API Error: ' + result.error.message);
         }
 
-        modeEmbeddings.push({
+        modeEmbeddings.positive.push({
           concept: concept,
           embedding: result.data[0].embedding
         });
 
         Utilities.sleep(100); // Rate limiting
       } catch (error) {
-        console.error(`Error generating embedding for "${concept}":`, error);
+        console.error(`Error generating positive embedding for "${concept}":`, error);
+        throw error;
+      }
+    }
+
+    // Generate embeddings for negative concepts
+    for (const concept of conceptGroups.negative) {
+      try {
+        const response = UrlFetchApp.fetch('https://api.openai.com/v1/embeddings', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + OPENAI_API_KEY,
+            'Content-Type': 'application/json'
+          },
+          payload: JSON.stringify({
+            model: 'text-embedding-3-small',
+            input: concept
+          })
+        });
+
+        const result = JSON.parse(response.getContentText());
+        if (result.error) {
+          throw new Error('OpenAI API Error: ' + result.error.message);
+        }
+
+        modeEmbeddings.negative.push({
+          concept: concept,
+          embedding: result.data[0].embedding
+        });
+
+        Utilities.sleep(100); // Rate limiting
+      } catch (error) {
+        console.error(`Error generating negative embedding for "${concept}":`, error);
         throw error;
       }
     }
@@ -112,10 +199,10 @@ function generateAllEmbeddings() {
   properties.setProperties({
     'MODE_EMBEDDINGS': JSON.stringify(allEmbeddings),
     'EMBEDDING_GENERATION_DATE': new Date().toISOString(),
-    'EMBEDDING_VERSION': '1.0'
+    'EMBEDDING_VERSION': '2.0'  // Updated for contrastive system
   });
 
-  console.log('All embeddings generated and stored successfully!');
+  console.log('All contrastive embeddings generated and stored successfully!');
   return allEmbeddings;
 }
 
@@ -181,31 +268,42 @@ function regenerateEmbeddings(mode) {
 }
 
 /**
- * Test embedding similarity for a message
+ * Test contrastive embedding similarity for a message
  */
 function testEmbeddingSimilarity(testMessage) {
   try {
     const similarities = detectModeWithEmbeddings(testMessage);
-    console.log('Similarity scores for:', testMessage);
+    console.log('Contrastive similarity scores for:', testMessage);
+    console.log('Confidence margin required:', CONFIDENCE_MARGIN);
 
-    for (const [mode, score] of Object.entries(similarities)) {
+    for (const [mode, data] of Object.entries(similarities)) {
       const threshold = MODE_THRESHOLDS[mode];
       if (threshold) {
-        const passes = score > threshold ? '✓' : '✗';
-        console.log(`${mode}: ${score.toFixed(3)} (threshold: ${threshold}) ${passes}`);
+        const thresholdPass = data.positive >= threshold ? '✓' : '✗';
+        const marginPass = data.margin >= CONFIDENCE_MARGIN ? '✓' : '✗';
+        const finalPass = (data.positive >= threshold && data.margin >= CONFIDENCE_MARGIN) ? '✅' : '❌';
+
+        console.log(`${mode}:`);
+        console.log(`  Positive: ${data.positive.toFixed(3)} (threshold: ${threshold}) ${thresholdPass}`);
+        console.log(`  Negative: ${data.negative.toFixed(3)}`);
+        console.log(`  Margin: ${data.margin.toFixed(3)} (required: ${CONFIDENCE_MARGIN}) ${marginPass}`);
+        console.log(`  Result: ${finalPass}`);
       } else {
-        // HELPER_FIRST has no threshold - show score only
-        console.log(`${mode}: ${score.toFixed(3)} (no threshold - default fallback)`);
+        // HELPER_FIRST has no threshold
+        console.log(`${mode}:`);
+        console.log(`  Positive: ${data.positive.toFixed(3)} (no threshold - default fallback)`);
+        console.log(`  Negative: ${data.negative.toFixed(3)}`);
+        console.log(`  Margin: ${data.margin.toFixed(3)}`);
       }
     }
 
     const detectedMode = determineModeFromEmbeddings(testMessage);
-    console.log('Detected mode:', detectedMode || 'None (fallback to AI analysis)');
+    console.log('Final detected mode:', detectedMode || 'None (fallback to AI analysis)');
 
     return { similarities, detectedMode };
 
   } catch (error) {
-    console.error('Error testing embeddings:', error);
+    console.error('Error testing contrastive embeddings:', error);
     return { error: error.toString() };
   }
 }
@@ -215,11 +313,24 @@ function testEmbeddingSimilarity(testMessage) {
  */
 function getEmbeddingStatus() {
   const properties = PropertiesService.getScriptProperties();
+
+  let totalPositive = 0;
+  let totalNegative = 0;
+
+  for (const conceptGroups of Object.values(MODE_CONCEPTS)) {
+    totalPositive += conceptGroups.positive.length;
+    totalNegative += conceptGroups.negative.length;
+  }
+
   return {
     hasEmbeddings: !!properties.getProperty('MODE_EMBEDDINGS'),
     generationDate: properties.getProperty('EMBEDDING_GENERATION_DATE'),
     version: properties.getProperty('EMBEDDING_VERSION'),
-    totalConcepts: Object.values(MODE_CONCEPTS).reduce((sum, concepts) => sum + concepts.length, 0)
+    isContrastive: true,
+    totalPositiveConcepts: totalPositive,
+    totalNegativeConcepts: totalNegative,
+    confidenceMargin: CONFIDENCE_MARGIN,
+    thresholds: MODE_THRESHOLDS
   };
 }
 
@@ -278,7 +389,7 @@ function generateEmbedding(text) {
 }
 
 /**
- * Detect mode using embedding similarity
+ * Detect mode using contrastive embedding similarity
  */
 function detectModeWithEmbeddings(userMessage) {
   const properties = PropertiesService.getScriptProperties();
@@ -293,41 +404,56 @@ function detectModeWithEmbeddings(userMessage) {
 
   const similarities = {};
 
-  // Calculate similarity for each mode
-  for (const [mode, concepts] of Object.entries(modeEmbeddings)) {
-    let maxSimilarity = 0;
+  // Calculate contrastive similarity for each mode
+  for (const [mode, conceptGroups] of Object.entries(modeEmbeddings)) {
+    let maxPositive = 0;
+    let maxNegative = 0;
 
-    // Find highest similarity among all concepts for this mode
-    for (const conceptData of concepts) {
+    // Find highest similarity among positive concepts
+    for (const conceptData of conceptGroups.positive) {
       const similarity = cosineSimilarity(userEmbedding, conceptData.embedding);
-      maxSimilarity = Math.max(maxSimilarity, similarity);
+      maxPositive = Math.max(maxPositive, similarity);
     }
 
-    similarities[mode] = maxSimilarity;
+    // Find highest similarity among negative concepts
+    for (const conceptData of conceptGroups.negative) {
+      const similarity = cosineSimilarity(userEmbedding, conceptData.embedding);
+      maxNegative = Math.max(maxNegative, similarity);
+    }
+
+    similarities[mode] = {
+      positive: maxPositive,
+      negative: maxNegative,
+      margin: maxPositive - maxNegative
+    };
   }
 
   return similarities;
 }
 
 /**
- * Determine mode based on embedding similarities and thresholds
+ * Determine mode based on contrastive embedding similarities and thresholds
  */
 function determineModeFromEmbeddings(userMessage) {
   try {
     const similarities = detectModeWithEmbeddings(userMessage);
 
-    // Check modes in priority order with thresholds (conservative - no false positives)
-    if (similarities.GRACEFUL_RETREAT > MODE_THRESHOLDS.GRACEFUL_RETREAT) {
-      return 'GRACEFUL_RETREAT';
-    }
-    if (similarities.STRATEGIC_ASK > MODE_THRESHOLDS.STRATEGIC_ASK) {
-      return 'STRATEGIC_ASK';
-    }
-    if (similarities.NEGOTIATOR > MODE_THRESHOLDS.NEGOTIATOR) {
-      return 'NEGOTIATOR';
+    // Check modes in priority order with contrastive thresholds
+    const modes = ['GRACEFUL_RETREAT', 'STRATEGIC_ASK', 'NEGOTIATOR'];
+
+    for (const mode of modes) {
+      const modeData = similarities[mode];
+      const threshold = MODE_THRESHOLDS[mode];
+
+      // Trigger only if:
+      // 1. Positive similarity exceeds threshold
+      // 2. Positive beats negative by confidence margin
+      if (modeData.positive >= threshold && modeData.margin >= CONFIDENCE_MARGIN) {
+        return mode;
+      }
     }
 
-    // Default to HELPER_FIRST when no high-confidence mode matches
+    // Default to HELPER_FIRST when no contrastive mode matches
     return 'HELPER_FIRST';
 
   } catch (error) {
