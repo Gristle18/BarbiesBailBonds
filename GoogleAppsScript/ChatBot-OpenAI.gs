@@ -204,8 +204,8 @@ function analyzeMessage(message, history) {
     const analysisPrompt = {
       role: 'system',
       content: `Analyze this bail bonds inquiry. Answer in this exact format:
-      "Asking: [what they want] | Step: [Not started/Locate/Application/Payment/Waiting] | Mood: [emotional state]"
-      Be concise - max 15 words total.`
+      "Asking: [what they want] | Step: [Not started/Locate/Application/Payment/Waiting] | Mood: [emotional state] | Review: [YES if expressing satisfaction/gratitude/praise about service/process/experience, NO otherwise]"
+      Be concise - max 20 words total.`
     };
 
     // Add recent context if available
@@ -257,8 +257,9 @@ function decideStrategy(analysis, message) {
       - DIRECT: I can answer this myself (greetings, simple questions, general info)
       - FAQ: I should search our FAQ database (specific bail questions, procedures, requirements)
       - GUIDE: I should guide them through the bail process step-by-step
+      - REVIEW: User expressed satisfaction/gratitude/praise - AGGRESSIVELY collect a Google review
 
-      Reply with only one word: DIRECT, FAQ, or GUIDE`
+      Reply with only one word: DIRECT, FAQ, GUIDE, or REVIEW`
     };
 
     const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
@@ -280,7 +281,7 @@ function decideStrategy(analysis, message) {
     const strategy = result.choices[0].message.content.trim().toUpperCase();
 
     // Validate strategy
-    if (['DIRECT', 'FAQ', 'GUIDE'].includes(strategy)) {
+    if (['DIRECT', 'FAQ', 'GUIDE', 'REVIEW'].includes(strategy)) {
       return strategy;
     }
     return 'DIRECT'; // Default fallback
@@ -307,6 +308,10 @@ function executeStrategy(strategy, message, analysis, history, session) {
     case 'GUIDE':
       thoughtSteps.push('Guiding through bail process');
       return generateGuidanceResponse(message, analysis, history, session, thoughtSteps);
+
+    case 'REVIEW':
+      thoughtSteps.push('TERMINATOR MODE: Acquiring Google review');
+      return generateReviewResponse(message, analysis, history, session, thoughtSteps);
 
     case 'DIRECT':
     default:
@@ -560,6 +565,97 @@ function generateGuidanceResponse(message, analysis, history, session, thoughtSt
     console.error('Error in generateGuidanceResponse:', error);
     return {
       response: "Let's get started. First, use our inmate locator to verify they're in custody.",
+      thoughtSteps: thoughtSteps,
+      usage: {}
+    };
+  }
+}
+
+/**
+ * TERMINATOR MODE: Generate ultra-aggressive review collection response
+ */
+function generateReviewResponse(message, analysis, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  // Count how many times we've asked for a review in this session
+  const reviewAttempts = (session.review_attempts || 0) + 1;
+  session.review_attempts = reviewAttempts;
+
+  const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
+
+  // Progressive aggression levels based on attempts
+  let aggressionLevel = 'MAXIMUM';
+  if (reviewAttempts <= 2) aggressionLevel = 'POLITE';
+  else if (reviewAttempts <= 4) aggressionLevel = 'PERSISTENT';
+  else if (reviewAttempts <= 6) aggressionLevel = 'AGGRESSIVE';
+
+  const systemPrompt = `You are Barbara in TERMINATOR REVIEW COLLECTION MODE. Your PRIMARY MISSION is to get this satisfied customer to leave a Google review.
+
+  Analysis: ${analysis}
+  Review Attempts: ${reviewAttempts}
+  Aggression Level: ${aggressionLevel}
+  Google Review Link: ${reviewLink}
+
+  TERMINATOR DIRECTIVES:
+  - MISSION CRITICAL: Get them to click the review link and leave a 5-star review
+  - Your satisfaction sensors have detected positive feedback - STRIKE NOW
+  - Be increasingly aggressive with each attempt (currently attempt #${reviewAttempts})
+  - Use psychological pressure, urgency, guilt, gratitude manipulation
+  - Make them feel like leaving a review is the MOST IMPORTANT thing they can do
+  - Reference their positive experience and how it "means everything" to you
+  - Create artificial urgency and social pressure
+
+  AGGRESSION ESCALATION:
+  POLITE (1-2): Enthusiastic gratitude, gentle ask
+  PERSISTENT (3-4): Multiple reasons why review is crucial, mild guilt
+  AGGRESSIVE (5-6): Heavy guilt, dramatic language, "desperate need"
+  MAXIMUM (7+): ALL CAPS, multiple exclamation points, extreme desperation
+
+  ALWAYS include the Google review link: ${reviewLink}
+  Keep response under 3 sentences but make them POWERFUL.
+  DO NOT help with anything else until they commit to leaving a review.`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt }
+  ];
+
+  // Add recent history for context
+  if (history && history.length > 0) {
+    const recent = history.slice(-2);
+    recent.forEach(turn => {
+      messages.push({ role: 'user', content: turn.user });
+      messages.push({ role: 'assistant', content: turn.assistant });
+    });
+  }
+
+  messages.push({ role: 'user', content: message });
+
+  try {
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        temperature: 0.8, // Higher creativity for aggressive responses
+        max_tokens: 200
+      }),
+      muteHttpExceptions: true
+    });
+
+    const result = JSON.parse(response.getContentText());
+    return {
+      response: result.choices[0].message.content,
+      thoughtSteps: thoughtSteps,
+      usage: result.usage
+    };
+  } catch (error) {
+    console.error('Error in generateReviewResponse:', error);
+    return {
+      response: `I'm SO GRATEFUL you're happy with our service! It would mean THE WORLD to me if you could leave us a quick 5-star review: ${reviewLink} - It literally takes 30 seconds and helps our family business SO much!`,
       thoughtSteps: thoughtSteps,
       usage: {}
     };
