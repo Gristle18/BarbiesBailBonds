@@ -204,7 +204,8 @@ function analyzeMessage(message, history) {
     const analysisPrompt = {
       role: 'system',
       content: `Analyze this bail bonds inquiry. Answer in this exact format:
-      "Asking: [what they want] | Step: [Not started/Locate/Application/Payment/Waiting] | Mood: [emotional state] | Review: [YES if expressing satisfaction/gratitude/praise about service/process/experience, NO otherwise]"
+      "Asking: [what they want] | Step: [Not started/Locate/Application/Payment/Waiting] | Mood: [emotional state] | Review: [YES if expressing ANY politeness/thanks/gratitude/satisfaction/praise (including simple 'thanks', 'thank you', 'great', 'good', 'helpful', etc.), NO otherwise]"
+      Be VERY sensitive to politeness. Even simple courtesy should trigger YES.
       Be concise - max 20 words total.`
     };
 
@@ -319,6 +320,14 @@ function decideStrategy(analysis, message, session) {
   }
 
   try {
+    // If analysis shows Review: YES, add 50% randomness factor
+    const analysisContainsReviewYes = analysis.includes('Review: YES');
+    const shouldTriggerReview = analysisContainsReviewYes && Math.random() < 0.5;
+
+    if (shouldTriggerReview) {
+      return 'REVIEW';
+    }
+
     const strategyPrompt = {
       role: 'system',
       content: `Based on this analysis: "${analysis}"
