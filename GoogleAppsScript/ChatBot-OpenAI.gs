@@ -8,6 +8,333 @@
 const SESSION_DURATION_HOURS = 24; // How long to keep session data
 const MAX_HISTORY_LENGTH = 20; // Maximum conversation turns to keep
 
+// Concept-based mode detection thresholds
+const MODE_THRESHOLDS = {
+  GRACEFUL_RETREAT: 0.65,  // Check first - relationship preservation
+  STRATEGIC_ASK: 0.78,     // High confidence for review requests
+  NEGOTIATOR: 0.70,        // Moderate sensitivity for deflection
+  HELPER_FIRST: 0.60       // Default fallback mode
+};
+
+// Concept phrases for embedding-based mode detection
+const MODE_CONCEPTS = {
+  STRATEGIC_ASK: [
+    "I'm satisfied with the help I received",
+    "This service has been valuable to me",
+    "I appreciate the assistance provided",
+    "I want to reciprocate for good service",
+    "Thank you so much for helping me",
+    "You've been really helpful",
+    "I'm grateful for this support"
+  ],
+  NEGOTIATOR: [
+    "I want to delay this request",
+    "I'd prefer to handle this differently",
+    "I'm deflecting but not refusing",
+    "Can we do this later",
+    "Maybe we can discuss this another time",
+    "I'd rather focus on something else right now"
+  ],
+  GRACEFUL_RETREAT: [
+    "I'm explicitly refusing this request",
+    "I'm becoming frustrated with pressure",
+    "I won't do what you're asking",
+    "Stop asking me about this",
+    "I'm not interested in that",
+    "Please don't keep pushing this"
+  ],
+  HELPER_FIRST: [
+    "I need assistance with a problem",
+    "I'm seeking information or guidance",
+    "Help me understand this process",
+    "I have a question about bail bonds",
+    "Can you explain how this works",
+    "I need help with something"
+  ]
+};
+
+/**
+ * EMBEDDING MANAGEMENT FUNCTIONS
+ */
+
+/**
+ * Generate embeddings for all concept phrases
+ */
+function generateAllEmbeddings() {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  if (!OPENAI_API_KEY) {
+    throw new Error('OpenAI API key not found. Add OPENAI_API_KEY to Script Properties.');
+  }
+
+  const properties = PropertiesService.getScriptProperties();
+  const allEmbeddings = {};
+
+  for (const [mode, concepts] of Object.entries(MODE_CONCEPTS)) {
+    console.log(`Generating embeddings for ${mode}...`);
+    const modeEmbeddings = [];
+
+    for (const concept of concepts) {
+      try {
+        const response = UrlFetchApp.fetch('https://api.openai.com/v1/embeddings', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + OPENAI_API_KEY,
+            'Content-Type': 'application/json'
+          },
+          payload: JSON.stringify({
+            model: 'text-embedding-3-small',
+            input: concept
+          })
+        });
+
+        const result = JSON.parse(response.getContentText());
+        if (result.error) {
+          throw new Error('OpenAI API Error: ' + result.error.message);
+        }
+
+        modeEmbeddings.push({
+          concept: concept,
+          embedding: result.data[0].embedding
+        });
+
+        Utilities.sleep(100); // Rate limiting
+      } catch (error) {
+        console.error(`Error generating embedding for "${concept}":`, error);
+        throw error;
+      }
+    }
+
+    allEmbeddings[mode] = modeEmbeddings;
+  }
+
+  // Store embeddings in script properties
+  properties.setProperties({
+    'MODE_EMBEDDINGS': JSON.stringify(allEmbeddings),
+    'EMBEDDING_GENERATION_DATE': new Date().toISOString(),
+    'EMBEDDING_VERSION': '1.0'
+  });
+
+  console.log('All embeddings generated and stored successfully!');
+  return allEmbeddings;
+}
+
+/**
+ * Clear all stored embeddings
+ */
+function clearAllEmbeddings() {
+  const properties = PropertiesService.getScriptProperties();
+  properties.deleteProperty('MODE_EMBEDDINGS');
+  properties.deleteProperty('EMBEDDING_GENERATION_DATE');
+  properties.deleteProperty('EMBEDDING_VERSION');
+  console.log('All embeddings cleared.');
+}
+
+/**
+ * Regenerate embeddings for a specific mode
+ */
+function regenerateEmbeddings(mode) {
+  if (!MODE_CONCEPTS[mode]) {
+    throw new Error(`Invalid mode: ${mode}`);
+  }
+
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+  const properties = PropertiesService.getScriptProperties();
+
+  // Get existing embeddings
+  const existingEmbeddings = JSON.parse(properties.getProperty('MODE_EMBEDDINGS') || '{}');
+
+  // Generate new embeddings for the specified mode
+  const modeEmbeddings = [];
+  for (const concept of MODE_CONCEPTS[mode]) {
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/embeddings', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'text-embedding-3-small',
+        input: concept
+      })
+    });
+
+    const result = JSON.parse(response.getContentText());
+    modeEmbeddings.push({
+      concept: concept,
+      embedding: result.data[0].embedding
+    });
+
+    Utilities.sleep(100);
+  }
+
+  // Update existing embeddings
+  existingEmbeddings[mode] = modeEmbeddings;
+
+  properties.setProperties({
+    'MODE_EMBEDDINGS': JSON.stringify(existingEmbeddings),
+    'EMBEDDING_GENERATION_DATE': new Date().toISOString()
+  });
+
+  console.log(`Embeddings regenerated for ${mode}`);
+  return modeEmbeddings;
+}
+
+/**
+ * Test embedding similarity for a message
+ */
+function testEmbeddingSimilarity(testMessage) {
+  try {
+    const similarities = detectModeWithEmbeddings(testMessage);
+    console.log('Similarity scores for:', testMessage);
+
+    for (const [mode, score] of Object.entries(similarities)) {
+      const threshold = MODE_THRESHOLDS[mode];
+      const passes = score > threshold ? '✓' : '✗';
+      console.log(`${mode}: ${score.toFixed(3)} (threshold: ${threshold}) ${passes}`);
+    }
+
+    const detectedMode = determineModeFromEmbeddings(testMessage);
+    console.log('Detected mode:', detectedMode || 'None (fallback to AI analysis)');
+
+    return { similarities, detectedMode };
+
+  } catch (error) {
+    console.error('Error testing embeddings:', error);
+    return { error: error.toString() };
+  }
+}
+
+/**
+ * Get embedding system status
+ */
+function getEmbeddingStatus() {
+  const properties = PropertiesService.getScriptProperties();
+  return {
+    hasEmbeddings: !!properties.getProperty('MODE_EMBEDDINGS'),
+    generationDate: properties.getProperty('EMBEDDING_GENERATION_DATE'),
+    version: properties.getProperty('EMBEDDING_VERSION'),
+    totalConcepts: Object.values(MODE_CONCEPTS).reduce((sum, concepts) => sum + concepts.length, 0)
+  };
+}
+
+/**
+ * Calculate cosine similarity between two embedding vectors
+ */
+function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same length');
+  }
+
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+
+  for (let i = 0; i < vectorA.length; i++) {
+    dotProduct += vectorA[i] * vectorB[i];
+    normA += vectorA[i] * vectorA[i];
+    normB += vectorB[i] * vectorB[i];
+  }
+
+  normA = Math.sqrt(normA);
+  normB = Math.sqrt(normB);
+
+  if (normA === 0 || normB === 0) {
+    return 0;
+  }
+
+  return dotProduct / (normA * normB);
+}
+
+/**
+ * Generate embedding for a single text
+ */
+function generateEmbedding(text) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  const response = UrlFetchApp.fetch('https://api.openai.com/v1/embeddings', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + OPENAI_API_KEY,
+      'Content-Type': 'application/json'
+    },
+    payload: JSON.stringify({
+      model: 'text-embedding-3-small',
+      input: text
+    })
+  });
+
+  const result = JSON.parse(response.getContentText());
+  if (result.error) {
+    throw new Error('OpenAI API Error: ' + result.error.message);
+  }
+
+  return result.data[0].embedding;
+}
+
+/**
+ * Detect mode using embedding similarity
+ */
+function detectModeWithEmbeddings(userMessage) {
+  const properties = PropertiesService.getScriptProperties();
+  const storedEmbeddings = properties.getProperty('MODE_EMBEDDINGS');
+
+  if (!storedEmbeddings) {
+    throw new Error('Mode embeddings not found. Run generateAllEmbeddings() first.');
+  }
+
+  const modeEmbeddings = JSON.parse(storedEmbeddings);
+  const userEmbedding = generateEmbedding(userMessage);
+
+  const similarities = {};
+
+  // Calculate similarity for each mode
+  for (const [mode, concepts] of Object.entries(modeEmbeddings)) {
+    let maxSimilarity = 0;
+
+    // Find highest similarity among all concepts for this mode
+    for (const conceptData of concepts) {
+      const similarity = cosineSimilarity(userEmbedding, conceptData.embedding);
+      maxSimilarity = Math.max(maxSimilarity, similarity);
+    }
+
+    similarities[mode] = maxSimilarity;
+  }
+
+  return similarities;
+}
+
+/**
+ * Determine mode based on embedding similarities and thresholds
+ */
+function determineModeFromEmbeddings(userMessage) {
+  try {
+    const similarities = detectModeWithEmbeddings(userMessage);
+
+    // Check modes in priority order with thresholds
+    if (similarities.GRACEFUL_RETREAT > MODE_THRESHOLDS.GRACEFUL_RETREAT) {
+      return 'GRACEFUL_RETREAT';
+    }
+    if (similarities.STRATEGIC_ASK > MODE_THRESHOLDS.STRATEGIC_ASK) {
+      return 'STRATEGIC_ASK';
+    }
+    if (similarities.NEGOTIATOR > MODE_THRESHOLDS.NEGOTIATOR) {
+      return 'NEGOTIATOR';
+    }
+    if (similarities.HELPER_FIRST > MODE_THRESHOLDS.HELPER_FIRST) {
+      return 'HELPER_FIRST';
+    }
+
+    // If no embedding matches, return null to fall back to AI analysis
+    return null;
+
+  } catch (error) {
+    console.error('Error in embedding-based mode detection:', error);
+    // Fall back to AI analysis if embedding system fails
+    return null;
+  }
+}
+
 /**
  * Main entry point for web requests
  */
@@ -304,13 +631,28 @@ function checkIfUserLeftReview(message) {
 function decideStrategy(analysis, message, session) {
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
 
-  // CHECK IF THEY LEFT A REVIEW
+  // CHECK IF THEY LEFT A REVIEW FIRST
   const hasLeftReview = checkIfUserLeftReview(message);
   if (hasLeftReview) {
     session.review_attempts = 0;
     session.permanently_unlocked = true;
     session.relationship_health = 'excellent';
     return 'GRATITUDE';
+  }
+
+  // TRY EMBEDDING-BASED MODE DETECTION FIRST
+  const embeddingMode = determineModeFromEmbeddings(message);
+  if (embeddingMode) {
+    // Update session tracking based on embedding-detected mode
+    if (embeddingMode === 'STRATEGIC_ASK') {
+      session.review_attempts = (session.review_attempts || 0) + 1;
+      session.relationship_health = 'excellent';
+    } else if (embeddingMode === 'GRACEFUL_RETREAT') {
+      session.review_backoff = true;
+      session.relationship_health = 'strained';
+    }
+
+    return embeddingMode;
   }
 
   // HUMAN BUSINESS OWNER PSYCHOLOGY
