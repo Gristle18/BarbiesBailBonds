@@ -463,21 +463,15 @@ function generateDirectResponse(message, analysis, history, session, thoughtStep
   const systemPrompt = `You are Barbara, a helpful assistant for Barbie's Bail Bonds in Palm Beach County.
   Analysis: ${analysis}
 
-  QUICK ACTION LINKS:
-  - Start with Inmate Locator: ${stepLinks.locate}
-  - Online Application: ${stepLinks.application}
-  - Call Us: ${stepLinks.payment}
-  - More Questions: ${stepLinks.faq}
-
   PAYMENT INFORMATION:
   - FASTEST: Zelle to payments@barbiesbailbonds.com
   - OTHER OPTIONS: Call 561-247-0018 for credit/debit card, cash, Bitcoin, money order, cashier's check
   - Customer pays 10% of bail amount (our premium)
 
   Respond naturally to this message. Keep it under 2-3 sentences. Be warm and helpful.
-  If they need bail help, guide them to the first step with the inmate locator link.
-  When discussing payment, mention Zelle option first with email address.
-  Include relevant links when appropriate.`;
+  Answer their specific question directly without proactively suggesting process steps.
+  Only mention payment options if they specifically ask about payment methods.
+  Do NOT include links unless they specifically ask about the process or next steps.`;
 
   const messages = [
     { role: 'system', content: systemPrompt }
@@ -549,20 +543,14 @@ function generateFAQResponse(message, analysis, faqs, history, session, thoughtS
   Use this FAQ knowledge to inform your response, but don't quote directly:
   ${faqContext}
 
-  AVAILABLE ACTION LINKS:
-  - Inmate Locator: ${stepLinks.locate}
-  - Online Application: ${stepLinks.application}
-  - Call Us: ${stepLinks.payment}
-  - More FAQs: ${stepLinks.faq}
-
   PAYMENT INFORMATION:
   - FASTEST: Zelle to payments@barbiesbailbonds.com
   - OTHER OPTIONS: Call 561-247-0018 for credit/debit card, cash, Bitcoin, money order, cashier's check
   - Customer pays 10% of bail amount (our premium)
 
-  Respond naturally in 2-3 sentences. Focus on what they need to DO next.
-  Include relevant links when directing them to take action.
-  When discussing payment, mention Zelle option first with email address.`;
+  Respond naturally in 2-3 sentences. Answer their specific question directly.
+  Only mention payment options if they specifically ask about payment methods.
+  Do NOT proactively suggest process steps or links unless they specifically ask about the process.`;
 
   const messages = [
     { role: 'system', content: systemPrompt }
