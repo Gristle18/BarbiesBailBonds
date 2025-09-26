@@ -1316,8 +1316,17 @@
       // Convert URLs to clickable links
       text = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: #F28C00; text-decoration: underline;">$1</a>');
 
-      // Convert email addresses to clickable links
-      text = text.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, '<a href="mailto:$1" style="color: #F28C00; text-decoration: underline;">$1</a>');
+      // Convert Zelle payment email to Zelle payment link
+      text = text.replace(/payments@barbiesbailbonds\.com/g, '<a href="https://enroll.zellepay.com/qr-codes?data=eyJuYW1lIjoiQkFSQklFUyBCQUlMIEJPTkRTIiwidG9rZW4iOiJwYXltZW50c0BiYXJiaWVzYmFpbGJvbmRzLmNvbSIsImFjdGlvbiI6InBheW1lbnQifQ%3D%3D" target="_blank" style="color: #F28C00; text-decoration: underline; font-weight: bold;">payments@barbiesbailbonds.com</a>');
+
+      // Convert other email addresses to clickable links
+      text = text.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, function(match) {
+        // Skip if it's already been replaced as a Zelle link
+        if (match === 'payments@barbiesbailbonds.com') {
+          return match;
+        }
+        return '<a href="mailto:' + match + '" style="color: #F28C00; text-decoration: underline;">' + match + '</a>';
+      });
 
       // Convert phone numbers to clickable links (formats like 561-247-0018, (561) 247-0018, etc.)
       text = text.replace(/(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g, '<a href="tel:$1" style="color: #F28C00; text-decoration: underline;">$1</a>');
