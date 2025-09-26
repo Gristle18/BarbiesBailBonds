@@ -1336,8 +1336,30 @@
         return '<a href="mailto:' + match + '" style="color: #F28C00; text-decoration: underline;">' + match + '</a>';
       });
 
-      // Convert phone numbers to clickable links (formats like 561-247-0018, (561) 247-0018, etc.)
-      text = text.replace(/(?<!href="tel:)(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g, '<a href="tel:$1" style="color: #F28C00; text-decoration: underline;">$1</a>');
+      // Convert phone numbers to clickable links (simple approach to avoid conflicts)
+      text = text.replace(/\b(\d{3}[-.\s]?\d{3}[-.\s]?\d{4})\b/g, function(match, phone, offset, string) {
+        // Check if this phone number is already inside an existing HTML tag
+        const beforeMatch = string.substring(0, offset);
+        const openTags = (beforeMatch.match(/<a[^>]*>/g) || []).length;
+        const closeTags = (beforeMatch.match(/<\/a>/g) || []).length;
+
+        // If we're inside an unclosed <a> tag, don't convert
+        if (openTags > closeTags) {
+          return match;
+        }
+
+        // Check if we're inside an HTML attribute (look for quote patterns)
+        const lastQuote = beforeMatch.lastIndexOf('"');
+        const lastSpace = beforeMatch.lastIndexOf(' ');
+        const lastEquals = beforeMatch.lastIndexOf('=');
+
+        // If we're inside quotes after an equals sign, we're in an attribute value
+        if (lastEquals > lastSpace && lastEquals > lastQuote && lastQuote > -1) {
+          return match;
+        }
+
+        return '<a href="tel:' + phone + '" style="color: #F28C00; text-decoration: underline;">' + phone + '</a>';
+      });
 
       // Restore protected links
       protectedLinks.forEach((link, index) => {
