@@ -338,8 +338,14 @@ function generateDirectResponse(message, analysis, history, session, thoughtStep
   - Call Us: ${stepLinks.payment}
   - More Questions: ${stepLinks.faq}
 
+  PAYMENT INFORMATION:
+  - FASTEST: Zelle to payments@barbiesbailbonds.com
+  - OTHER OPTIONS: Call 561-247-0018 for credit/debit card, cash, Bitcoin, money order, cashier's check
+  - Customer pays 10% of bail amount (our premium)
+
   Respond naturally to this message. Keep it under 2-3 sentences. Be warm and helpful.
   If they need bail help, guide them to the first step with the inmate locator link.
+  When discussing payment, mention Zelle option first with email address.
   Include relevant links when appropriate.`;
 
   const messages = [
@@ -418,8 +424,14 @@ function generateFAQResponse(message, analysis, faqs, history, session, thoughtS
   - Call Us: ${stepLinks.payment}
   - More FAQs: ${stepLinks.faq}
 
+  PAYMENT INFORMATION:
+  - FASTEST: Zelle to payments@barbiesbailbonds.com
+  - OTHER OPTIONS: Call 561-247-0018 for credit/debit card, cash, Bitcoin, money order, cashier's check
+  - Customer pays 10% of bail amount (our premium)
+
   Respond naturally in 2-3 sentences. Focus on what they need to DO next.
-  Include relevant links when directing them to take action.`;
+  Include relevant links when directing them to take action.
+  When discussing payment, mention Zelle option first with email address.`;
 
   const messages = [
     { role: 'system', content: systemPrompt }
@@ -491,9 +503,17 @@ function generateGuidanceResponse(message, analysis, history, session, thoughtSt
      Link: ${stepLinks.locate}
   2. APPLICATION - Complete online form (10-15 min)
      Link: ${stepLinks.application}
-  3. PAYMENT - Call 561-247-0018 to confirm amount, then pay via Zelle/Card/Cash
+  3. PAYMENT - Two options:
+     A) FASTEST: Zelle to payments@barbiesbailbonds.com (you pay 10% of bail amount)
+     B) OTHER OPTIONS: Call 561-247-0018 for credit/debit card, cash, Bitcoin, money order, cashier's check
      Link: ${stepLinks.payment}
   4. WAITING - Bond posted, release in 4-8 hours
+
+  PAYMENT GUIDANCE:
+  - When they ask about payment, FIRST mention Zelle option with email: payments@barbiesbailbonds.com
+  - Then mention calling for other payment methods
+  - Always clarify they pay 10% of the bail amount (our premium)
+  - Be specific about payment options
 
   Guide them to the appropriate step based on where they are. Be specific and action-oriented.
   ALWAYS include the relevant link when directing them to a step.
