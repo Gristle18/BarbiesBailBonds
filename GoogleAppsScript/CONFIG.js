@@ -22,7 +22,7 @@ const DEPLOYMENT_CONFIG = {
    * Handles: Stateful conversations with memory
    * Script: ChatBot-OpenAI.gs
    */
-  CHATBOT_API_URL: 'https://script.google.com/macros/s/AKfycbzdFquFHgk7r2ZfXh0GJMmzPp3O2Udpam77HoMm3cifR7T91PEXIkeXXP-_3aNEb6Y/exec',
+  CHATBOT_API_URL: 'https://script.google.com/macros/s/AKfycbyGCUEPREo_YNA5ckb07lHoGT2BOaRVLywuS7FjH1sq74lP5OvNhjOpbb_fbBMu36fQ/exec',
 
   // ============================================
   // API CONFIGURATION
