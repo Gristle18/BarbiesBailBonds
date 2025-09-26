@@ -318,7 +318,12 @@ function decideStrategy(analysis, message, session) {
   if (isInTerminatorMode) {
     const reviewAttempts = session.review_attempts || 0;
 
-    // For AGGRESSIVE/MAXIMUM modes, randomize response type
+    // First few attempts should be standard REVIEW mode (polite/persistent)
+    if (reviewAttempts <= 1) {
+      return 'REVIEW';
+    }
+
+    // For AGGRESSIVE/MAXIMUM modes (attempts 2+), randomize response type
     if (reviewAttempts >= 2) {
       const randomChoice = Math.random();
 
