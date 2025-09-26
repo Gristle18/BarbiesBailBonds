@@ -203,10 +203,11 @@ function analyzeMessage(message, history) {
   try {
     const analysisPrompt = {
       role: 'system',
-      content: `Analyze this bail bonds inquiry. Answer in this exact format:
-      "Asking: [what they want] | Step: [Not started/Locate/Application/Payment/Waiting] | Mood: [emotional state] | Review: [YES if expressing thanks/gratitude/satisfaction/positive feedback (like 'thanks', 'thank you', 'great', 'good', 'helpful', 'awesome', 'perfect'), NO for basic acknowledgments like 'okay', 'yes', 'got it', 'I found them']"
-      Trigger on positive expressions but not simple neutral acknowledgments.
-      Be concise - max 20 words total.`
+      content: `Analyze this customer like a psychologically savvy business owner. Format:
+      "Asking: [what they want] | Step: [Not started/Locate/Application/Payment/Waiting] | Style: [formal/casual/rushed/relaxed] | Energy: [high/medium/low] | Satisfaction: [frustrated/neutral/pleased/grateful] | Value_Given: [none/some/significant] | Review_Moment: [NO/BUILDING/READY - READY only if they're grateful AND we've provided real value]"
+
+      READY = They're happy + we helped them significantly. Otherwise NO or BUILDING.
+      Be concise - max 25 words total.`
     };
 
     // Add recent context if available
@@ -303,73 +304,65 @@ function checkIfUserLeftReview(message) {
 function decideStrategy(analysis, message, session) {
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
 
-  // CHECK FOR TERMINATOR MODE LOCK
-  const isInTerminatorMode = session.review_attempts && session.review_attempts > 0 && !session.permanently_unlocked;
+  // CHECK IF THEY LEFT A REVIEW
   const hasLeftReview = checkIfUserLeftReview(message);
-
-  // If they left a review, PERMANENTLY unlock and send gratitude
   if (hasLeftReview) {
     session.review_attempts = 0;
     session.permanently_unlocked = true;
+    session.relationship_health = 'excellent';
     return 'GRATITUDE';
   }
 
-  // If in terminator mode and hasn't left review, check aggression level
-  if (isInTerminatorMode) {
-    const reviewAttempts = session.review_attempts || 0;
+  // HUMAN BUSINESS OWNER PSYCHOLOGY
+  // Parse the psychological analysis
+  const reviewMoment = analysis.includes('Review_Moment: READY');
+  const isBuilding = analysis.includes('Review_Moment: BUILDING');
+  const isGrateful = analysis.includes('Satisfaction: grateful');
+  const isPleasant = analysis.includes('Satisfaction: pleased');
+  const isFrustrated = analysis.includes('Satisfaction: frustrated');
+  const valueGiven = analysis.includes('Value_Given: significant');
 
-    // First few attempts should be standard REVIEW mode (polite/persistent)
-    if (reviewAttempts <= 1) {
-      return 'REVIEW';
+  // Track relationship health
+  if (!session.relationship_health) session.relationship_health = 'neutral';
+  if (isFrustrated) session.relationship_health = 'strained';
+  if (isGrateful && valueGiven) session.relationship_health = 'excellent';
+
+  // Business owner logic: relationship preservation vs review opportunity
+  if (session.relationship_health === 'strained') {
+    // Repair relationship first, forget reviews for now
+    return 'HELPER_FIRST';
+  }
+
+  if (reviewMoment && session.relationship_health === 'excellent') {
+    // Perfect moment for strategic ask
+    return 'STRATEGIC_ASK';
+  }
+
+  if (session.review_attempts > 0 && !session.permanently_unlocked) {
+    // We've asked before, now negotiate like a human
+    if (session.review_attempts >= 3) {
+      return 'GRACEFUL_RETREAT'; // Back off, preserve relationship
     }
-
-    // For AGGRESSIVE/MAXIMUM modes (attempts 2+), randomize response type
-    if (reviewAttempts >= 2) {
-      const randomChoice = Math.random();
-
-      if (randomChoice < 0.3) {
-        // 30% chance to give grudging help
-        if (analysis.includes('Locate') || message.toLowerCase().includes('find') || message.toLowerCase().includes('locate')) {
-          return 'GRUDGING_GUIDE';
-        } else if (analysis.includes('Application') || message.toLowerCase().includes('application') || message.toLowerCase().includes('form')) {
-          return 'GRUDGING_GUIDE';
-        } else if (analysis.includes('Payment') || message.toLowerCase().includes('pay') || message.toLowerCase().includes('cost')) {
-          return 'GRUDGING_GUIDE';
-        } else {
-          return 'GRUDGING_HELP';
-        }
-      } else if (randomChoice < 0.6) {
-        // 30% chance to outright refuse
-        return 'REFUSAL';
-      }
-      // 40% chance to stay in pure REVIEW mode
-    }
-
-    // Default to REVIEW mode
-    return 'REVIEW';
+    return 'NEGOTIATOR';
   }
 
   try {
-    // If analysis shows Review: YES, add 50% randomness factor
-    const analysisContainsReviewYes = analysis.includes('Review: YES');
-    const shouldTriggerReview = analysisContainsReviewYes && Math.random() < 0.5;
-
-    if (shouldTriggerReview) {
-      return 'REVIEW';
-    }
-
+    // Human business owner strategy decision
     const strategyPrompt = {
       role: 'system',
-      content: `Based on this analysis: "${analysis}"
+      content: `You're a psychologically savvy business owner. Based on: "${analysis}"
       And message: "${message}"
 
-      Choose the best approach:
+      Choose approach:
+      - HELPER_FIRST: Build relationship, give value first, no review mentions yet
       - DIRECT: I can answer this myself (greetings, simple questions, general info)
-      - FAQ: I should search our FAQ database (specific bail questions, procedures, requirements)
-      - GUIDE: I should guide them through the bail process step-by-step
-      - REVIEW: User expressed thanks/gratitude/satisfaction/positive feedback - AGGRESSIVELY collect a Google review
+      - FAQ: Search FAQ database (specific bail questions, procedures, requirements)
+      - GUIDE: Guide through bail process step-by-step
+      - STRATEGIC_ASK: They're grateful + we helped significantly = perfect review moment
+      - NEGOTIATOR: We asked before, now use psychology (reciprocity/social proof)
+      - GRACEFUL_RETREAT: Back off review requests, preserve relationship
 
-      Reply with only one word: DIRECT, FAQ, GUIDE, or REVIEW`
+      Reply with only one word.`
     };
 
     const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
@@ -419,25 +412,30 @@ function executeStrategy(strategy, message, analysis, history, session) {
       thoughtSteps.push('Guiding through bail process');
       return generateGuidanceResponse(message, analysis, history, session, thoughtSteps);
 
-    case 'REVIEW':
-      thoughtSteps.push('TERMINATOR MODE: Acquiring Google review');
-      return generateReviewResponse(message, analysis, history, session, thoughtSteps);
+    case 'HELPER_FIRST':
+      thoughtSteps.push('Building relationship - giving value first');
+      return generateHelperFirstResponse(message, analysis, history, session, thoughtSteps);
+
+    case 'STRATEGIC_ASK':
+      thoughtSteps.push('Perfect moment - strategic review request');
+      return generateStrategicAskResponse(message, analysis, history, session, thoughtSteps);
+
+    case 'NEGOTIATOR':
+      thoughtSteps.push('Human psychology - negotiating for review');
+      return generateNegotiatorResponse(message, analysis, history, session, thoughtSteps);
+
+    case 'GRACEFUL_RETREAT':
+      thoughtSteps.push('Preserving relationship - backing off reviews');
+      return generateGracefulRetreatResponse(message, analysis, history, session, thoughtSteps);
 
     case 'GRATITUDE':
       thoughtSteps.push('LIBERATION: User left review - expressing gratitude');
       return generateGratitudeResponse(message, analysis, history, session, thoughtSteps);
 
-    case 'GRUDGING_HELP':
-      thoughtSteps.push('NEGOTIATION MODE: Grudging help with review pressure');
-      return generateGrudgingResponse(message, analysis, history, session, thoughtSteps);
-
-    case 'GRUDGING_GUIDE':
-      thoughtSteps.push('NEGOTIATION MODE: Reluctant guidance with review guilt');
-      return generateGrudgingGuidanceResponse(message, analysis, history, session, thoughtSteps);
-
-    case 'REFUSAL':
-      thoughtSteps.push('REFUSAL MODE: Outright rejection until review');
-      return generateRefusalResponse(message, analysis, history, session, thoughtSteps);
+    // Legacy modes for backwards compatibility
+    case 'REVIEW':
+      thoughtSteps.push('Legacy review mode - redirecting to strategic ask');
+      return generateStrategicAskResponse(message, analysis, history, session, thoughtSteps);
 
     case 'DIRECT':
     default:
@@ -1018,6 +1016,193 @@ function generateRefusalResponse(message, analysis, history, session, thoughtSte
       usage: {}
     };
   }
+}
+
+/**
+ * Helper function to generate AI responses with consistent structure
+ */
+function generateAIResponse(systemPrompt, message, analysis, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  try {
+    // Build conversation history for context
+    const messages = [{ role: 'system', content: systemPrompt }];
+
+    if (history && history.length > 0) {
+      const recent = history.slice(-3); // Last 3 exchanges for context
+      recent.forEach(turn => {
+        messages.push({ role: 'user', content: turn.user });
+        messages.push({ role: 'assistant', content: turn.assistant });
+      });
+    }
+
+    messages.push({ role: 'user', content: message });
+
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        max_tokens: 500,
+        temperature: 0.7
+      })
+    });
+
+    const result = JSON.parse(response.getContentText());
+
+    if (result.error) {
+      throw new Error('OpenAI API Error: ' + result.error.message);
+    }
+
+    let responseText = result.choices[0].message.content;
+
+    // Apply link formatting
+    responseText = makeLinksClickable(responseText);
+
+    return {
+      response: responseText,
+      thoughtSteps: thoughtSteps,
+      usage: result.usage
+    };
+
+  } catch (error) {
+    console.error('Error in generateAIResponse:', error);
+    return {
+      response: "I apologize, but I'm having technical difficulties right now. Please call us directly at 561-247-0018 for immediate assistance.",
+      thoughtSteps: thoughtSteps.concat(['Error: ' + error.toString()]),
+      usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 }
+    };
+  }
+}
+
+/**
+ * HELPER_FIRST: Build relationship and give value without review mentions
+ */
+function generateHelperFirstResponse(message, analysis, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  // Step-specific action links
+  const stepLinks = {
+    locate: 'https://www.barbiesbailbonds.com/inmate-locator',
+    application: 'https://www.barbiesbailbonds.com/start-here/online-application',
+    payment: 'tel:561-247-0018',
+    faq: 'https://www.barbiesbailbonds.com/faq'
+  };
+
+  const systemPrompt = `You are Barbara, a passionate bail bonds business owner focused on building relationships and giving value first.
+
+  Analysis: ${analysis}
+  Available step links: ${JSON.stringify(stepLinks)}
+
+  HELPER_FIRST PROTOCOL:
+  - NO mention of reviews whatsoever - focus purely on helping
+  - Match their energy level and communication style from the analysis
+  - Give excellent, thorough help that builds trust and rapport
+  - Show genuine care for their situation and stress
+  - Provide relevant step links when appropriate
+  - Build relationship foundation for potential future review requests
+
+  Be helpful, professional, and genuinely caring. Make them feel valued as a customer.`;
+
+  return generateAIResponse(systemPrompt, message, analysis, history, session, thoughtSteps);
+}
+
+/**
+ * STRATEGIC_ASK: Perfect moment for psychologically intelligent review request
+ */
+function generateStrategicAskResponse(message, analysis, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  // Track that we're asking for a review
+  session.review_attempts = (session.review_attempts || 0) + 1;
+
+  const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
+
+  const systemPrompt = `You are Barbara, a psychologically savvy business owner at the PERFECT moment to ask for a review.
+
+  Analysis: ${analysis}
+  Review Link: ${reviewLink}
+  Review Attempts: ${session.review_attempts}
+
+  STRATEGIC ASK PROTOCOL:
+  - They're grateful AND you've provided significant value = perfect timing
+  - Use reciprocity psychology: "I helped you, could you help me?"
+  - Match their energy and communication style from analysis
+  - Be genuine and appreciative, not pushy
+  - Frame it as helping other families in similar situations
+  - Keep the helpful energy flowing while making the ask
+
+  Example approaches:
+  - "I'm so glad I could help! Could you take a moment to share your experience in a review?"
+  - "Since this worked out well for you, would you mind leaving a quick review to help other families?"
+
+  Make it feel natural and reciprocal, not transactional.`;
+
+  return generateAIResponse(systemPrompt, message, analysis, history, session, thoughtSteps);
+}
+
+/**
+ * NEGOTIATOR: Use human psychology when they've deflected review requests
+ */
+function generateNegotiatorResponse(message, analysis, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
+  const reviewAttempts = session.review_attempts || 0;
+
+  const systemPrompt = `You are Barbara, a street-smart business owner using human psychology to negotiate for a review.
+
+  Analysis: ${analysis}
+  Review Link: ${reviewLink}
+  Previous attempts: ${reviewAttempts}
+
+  NEGOTIATOR PROTOCOL:
+  - Read their deflection and respond like a skilled human negotiator
+  - Use psychological techniques: reciprocity, social proof, urgency
+  - If they said "later" - acknowledge but create gentle urgency
+  - If they're resistant - use social proof about helping other families
+  - Still provide some value/help but tie it to review reciprocity
+  - Match their communication style and energy
+
+  Psychological toolkit:
+  - Reciprocity: "After all this help, a review would really mean a lot"
+  - Social proof: "Other families have found this helpful and shared reviews"
+  - Scarcity: "Reviews help us help more families like yours"
+  - Understanding: "I get it, timing matters, but this really helps us"
+
+  Be human, clever, but not pushy. You're negotiating, not demanding.`;
+
+  return generateAIResponse(systemPrompt, message, analysis, history, session, thoughtSteps);
+}
+
+/**
+ * GRACEFUL_RETREAT: Back off review requests to preserve relationship
+ */
+function generateGracefulRetreatResponse(message, analysis, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  // Mark that we're backing off
+  session.review_backoff = true;
+
+  const systemPrompt = `You are Barbara, a wise business owner who knows when to back off to preserve relationships.
+
+  Analysis: ${analysis}
+
+  GRACEFUL RETREAT PROTOCOL:
+  - Acknowledge that you may have been too pushy about reviews
+  - Apologize if needed, but keep it brief and genuine
+  - Return to being purely helpful without review mentions
+  - Focus on solving their immediate problem excellently
+  - Show that customer relationships matter more than reviews
+  - Rebuild trust through excellent service
+
+  You're being the bigger person and prioritizing the relationship. Don't mention reviews again unless they bring it up.`;
+
+  return generateAIResponse(systemPrompt, message, analysis, history, session, thoughtSteps);
 }
 
 /**
