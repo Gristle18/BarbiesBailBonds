@@ -8,12 +8,12 @@
 const SESSION_DURATION_HOURS = 24; // How long to keep session data
 const MAX_HISTORY_LENGTH = 20; // Maximum conversation turns to keep
 
-// Concept-based mode detection thresholds
+// Concept-based mode detection thresholds (based on OpenAI embedding research)
 const MODE_THRESHOLDS = {
-  GRACEFUL_RETREAT: 0.65,  // Check first - relationship preservation
-  STRATEGIC_ASK: 0.78,     // High confidence for review requests
-  NEGOTIATOR: 0.70,        // Moderate sensitivity for deflection
-  HELPER_FIRST: 0.60       // Default fallback mode
+  GRACEFUL_RETREAT: 0.75,  // Above 0.68 dissimilar baseline - high confidence for backing off
+  STRATEGIC_ASK: 0.78,     // Well-calibrated for review requests
+  NEGOTIATOR: 0.75         // Clear differentiation from noise for deflection detection
+  // HELPER_FIRST: No threshold - used as default fallback
 };
 
 // Concept phrases for embedding-based mode detection
@@ -190,8 +190,13 @@ function testEmbeddingSimilarity(testMessage) {
 
     for (const [mode, score] of Object.entries(similarities)) {
       const threshold = MODE_THRESHOLDS[mode];
-      const passes = score > threshold ? '✓' : '✗';
-      console.log(`${mode}: ${score.toFixed(3)} (threshold: ${threshold}) ${passes}`);
+      if (threshold) {
+        const passes = score > threshold ? '✓' : '✗';
+        console.log(`${mode}: ${score.toFixed(3)} (threshold: ${threshold}) ${passes}`);
+      } else {
+        // HELPER_FIRST has no threshold - show score only
+        console.log(`${mode}: ${score.toFixed(3)} (no threshold - default fallback)`);
+      }
     }
 
     const detectedMode = determineModeFromEmbeddings(testMessage);
@@ -311,7 +316,7 @@ function determineModeFromEmbeddings(userMessage) {
   try {
     const similarities = detectModeWithEmbeddings(userMessage);
 
-    // Check modes in priority order with thresholds
+    // Check modes in priority order with thresholds (conservative - no false positives)
     if (similarities.GRACEFUL_RETREAT > MODE_THRESHOLDS.GRACEFUL_RETREAT) {
       return 'GRACEFUL_RETREAT';
     }
@@ -321,12 +326,9 @@ function determineModeFromEmbeddings(userMessage) {
     if (similarities.NEGOTIATOR > MODE_THRESHOLDS.NEGOTIATOR) {
       return 'NEGOTIATOR';
     }
-    if (similarities.HELPER_FIRST > MODE_THRESHOLDS.HELPER_FIRST) {
-      return 'HELPER_FIRST';
-    }
 
-    // If no embedding matches, return null to fall back to AI analysis
-    return null;
+    // Default to HELPER_FIRST when no high-confidence mode matches
+    return 'HELPER_FIRST';
 
   } catch (error) {
     console.error('Error in embedding-based mode detection:', error);
