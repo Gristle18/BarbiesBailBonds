@@ -611,17 +611,15 @@ function generateChatResponse(message, history, session) {
   let totalUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
 
   try {
-    // Stage 1: Analyze the message
-    const analysis = analyzeMessage(message, history);
+    // Stage 1: Detect mode using embeddings
     thoughtChain.push(`Analyzing: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`);
-    thoughtChain.push(analysis);
 
-    // Stage 2: Decide strategy
-    const strategy = decideStrategy(analysis, message, session);
+    // Stage 2: Decide strategy using embeddings
+    const strategy = decideStrategy(message, session);
     thoughtChain.push(`Strategy: ${strategy}`);
 
     // Stage 3: Execute chosen strategy
-    const result = executeStrategy(strategy, message, analysis, history, session);
+    const result = executeStrategy(strategy, message, history, session);
     thoughtChain = thoughtChain.concat(result.thoughtSteps || []);
 
     // Aggregate usage from all API calls
@@ -649,54 +647,6 @@ function generateChatResponse(message, history, session) {
   }
 }
 
-/**
- * Stage 1: Analyze the message using AI
- */
-function analyzeMessage(message, history) {
-  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
-
-  try {
-    const analysisPrompt = {
-      role: 'system',
-      content: `Analyze this customer like a psychologically savvy business owner. Format:
-      "Asking: [what they want] | Step: [Not started/Locate/Application/Payment/Waiting] | Style: [formal/casual/rushed/relaxed] | Energy: [high/medium/low] | Satisfaction: [frustrated/neutral/pleased/grateful] | Value_Given: [none/some/significant] | Review_Moment: [NO/BUILDING/READY - READY only if they're grateful AND we've provided real value]"
-
-      READY = They're happy + we helped them significantly. Otherwise NO or BUILDING.
-      Be concise - max 25 words total.`
-    };
-
-    // Add recent context if available
-    const contextMessages = [];
-    if (history && history.length > 0) {
-      const recent = history.slice(-2);
-      recent.forEach(turn => {
-        contextMessages.push({ role: 'user', content: turn.user });
-        contextMessages.push({ role: 'assistant', content: turn.assistant });
-      });
-    }
-
-    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + OPENAI_API_KEY,
-        'Content-Type': 'application/json'
-      },
-      payload: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [analysisPrompt, ...contextMessages, { role: 'user', content: message }],
-        temperature: 0.3,
-        max_tokens: 50
-      }),
-      muteHttpExceptions: true
-    });
-
-    const result = JSON.parse(response.getContentText());
-    return result.choices[0].message.content;
-  } catch (error) {
-    console.error('Error in analyzeMessage:', error);
-    return 'Asking: unknown | Step: Not started | Mood: neutral';
-  }
-}
 
 /**
  * Use AI to detect if user indicates they left a review
@@ -754,11 +704,9 @@ function checkIfUserLeftReview(message) {
 }
 
 /**
- * Stage 2: Decide strategy using AI
+ * Decide strategy using embedding-based mode detection
  */
-function decideStrategy(analysis, message, session) {
-  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
-
+function decideStrategy(message, session) {
   // CHECK IF THEY LEFT A REVIEW FIRST
   const hasLeftReview = checkIfUserLeftReview(message);
   if (hasLeftReview) {
@@ -768,22 +716,21 @@ function decideStrategy(analysis, message, session) {
     return 'GRATITUDE';
   }
 
-  // TRY EMBEDDING-BASED MODE DETECTION FIRST
+  // USE EMBEDDING-BASED MODE DETECTION
   const embeddingMode = determineModeFromEmbeddings(message);
-  if (embeddingMode) {
-    // Update session tracking based on embedding-detected mode
-    if (embeddingMode === 'STRATEGIC_ASK') {
-      session.review_attempts = (session.review_attempts || 0) + 1;
-      session.relationship_health = 'excellent';
-    } else if (embeddingMode === 'GRACEFUL_RETREAT') {
-      session.review_backoff = true;
-      session.relationship_health = 'strained';
-    }
 
-    return embeddingMode;
+  // Update session tracking based on embedding-detected mode
+  if (embeddingMode === 'STRATEGIC_ASK') {
+    session.review_attempts = (session.review_attempts || 0) + 1;
+    session.relationship_health = 'excellent';
+  } else if (embeddingMode === 'GRACEFUL_RETREAT') {
+    session.review_backoff = true;
+    session.relationship_health = 'strained';
   }
 
-  // HUMAN BUSINESS OWNER PSYCHOLOGY
+  return embeddingMode;
+}
+
   // Parse the psychological analysis
   const reviewMoment = analysis.includes('Review_Moment: READY');
   const isBuilding = analysis.includes('Review_Moment: BUILDING');
@@ -868,7 +815,7 @@ function decideStrategy(analysis, message, session) {
 /**
  * Stage 3: Execute the chosen strategy
  */
-function executeStrategy(strategy, message, analysis, history, session) {
+function executeStrategy(strategy, message, history, session) {
   let thoughtSteps = [];
 
   switch (strategy) {
