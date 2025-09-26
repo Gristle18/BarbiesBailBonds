@@ -1313,6 +1313,14 @@
 
     // Convert URLs and phone numbers to clickable links
     function makeLinksClickable(text) {
+      // First, protect existing links by temporarily replacing them
+      const protectedLinks = [];
+      text = text.replace(/<a[^>]*>.*?<\/a>/g, function(match, offset) {
+        const placeholder = `__PROTECTED_LINK_${protectedLinks.length}__`;
+        protectedLinks.push(match);
+        return placeholder;
+      });
+
       // Convert URLs to clickable links (excluding trailing punctuation)
       text = text.replace(/(https?:\/\/[^\s\)]+)(?=[\s\)\.,;!?]|$)/g, '<a href="$1" target="_blank" style="color: #F28C00; text-decoration: underline;">$1</a>');
 
@@ -1321,7 +1329,7 @@
 
       // Convert other email addresses to clickable links
       text = text.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, function(match) {
-        // Skip if it's already been replaced as a Zelle link
+        // Skip if it's the Zelle email (already processed)
         if (match === 'payments@barbiesbailbonds.com') {
           return match;
         }
@@ -1333,6 +1341,11 @@
 
       // Convert tel: links to clickable phone links
       text = text.replace(/tel:(\d{3}-?\d{3}-?\d{4})/g, '<a href="tel:$1" style="color: #F28C00; text-decoration: underline;">$1</a>');
+
+      // Restore protected links
+      protectedLinks.forEach((link, index) => {
+        text = text.replace(`__PROTECTED_LINK_${index}__`, link);
+      });
 
       return text;
     }
