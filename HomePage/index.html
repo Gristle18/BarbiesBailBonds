@@ -1303,26 +1303,43 @@
 
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
-    
+
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
     avatar.textContent = sender === 'user' ? '👤' : '🤖';
-    
+
     const bubble = document.createElement('div');
     bubble.className = 'message-bubble';
-    
-    // Handle line breaks in content
+
+    // Convert URLs and phone numbers to clickable links
+    function makeLinksClickable(text) {
+      // Convert URLs to clickable links
+      text = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: #F28C00; text-decoration: underline;">$1</a>');
+
+      // Convert email addresses to clickable links
+      text = text.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, '<a href="mailto:$1" style="color: #F28C00; text-decoration: underline;">$1</a>');
+
+      // Convert phone numbers to clickable links (formats like 561-247-0018, (561) 247-0018, etc.)
+      text = text.replace(/(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g, '<a href="tel:$1" style="color: #F28C00; text-decoration: underline;">$1</a>');
+
+      // Convert tel: links to clickable phone links
+      text = text.replace(/tel:(\d{3}-?\d{3}-?\d{4})/g, '<a href="tel:$1" style="color: #F28C00; text-decoration: underline;">$1</a>');
+
+      return text;
+    }
+
+    // Handle line breaks and links in content
     const paragraphs = content.split('\n').filter(p => p.trim());
     if (paragraphs.length > 1) {
-      bubble.innerHTML = paragraphs.map(p => p.trim()).join('<br>');
+      bubble.innerHTML = paragraphs.map(p => makeLinksClickable(p.trim())).join('<br>');
     } else {
-      bubble.textContent = content;
+      bubble.innerHTML = makeLinksClickable(content);
     }
-    
+
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(bubble);
     chatMessages.appendChild(messageDiv);
-    
+
     // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
