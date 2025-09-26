@@ -318,11 +318,12 @@ function decideStrategy(analysis, message, session) {
   if (isInTerminatorMode) {
     const reviewAttempts = session.review_attempts || 0;
 
-    // For AGGRESSIVE/MAXIMUM modes, allow negotiation (grudging help + review pressure)
+    // For AGGRESSIVE/MAXIMUM modes, randomize response type
     if (reviewAttempts >= 2) {
-      // 30% chance to give grudging help, 70% chance to stay in pure REVIEW mode
-      if (Math.random() < 0.3) {
-        // Determine what they're asking for and respond accordingly but with review pressure
+      const randomChoice = Math.random();
+
+      if (randomChoice < 0.3) {
+        // 30% chance to give grudging help
         if (analysis.includes('Locate') || message.toLowerCase().includes('find') || message.toLowerCase().includes('locate')) {
           return 'GRUDGING_GUIDE';
         } else if (analysis.includes('Application') || message.toLowerCase().includes('application') || message.toLowerCase().includes('form')) {
@@ -332,7 +333,11 @@ function decideStrategy(analysis, message, session) {
         } else {
           return 'GRUDGING_HELP';
         }
+      } else if (randomChoice < 0.6) {
+        // 30% chance to outright refuse
+        return 'REFUSAL';
       }
+      // 40% chance to stay in pure REVIEW mode
     }
 
     // Default to REVIEW mode
@@ -381,7 +386,7 @@ function decideStrategy(analysis, message, session) {
     const strategy = result.choices[0].message.content.trim().toUpperCase();
 
     // Validate strategy
-    if (['DIRECT', 'FAQ', 'GUIDE', 'REVIEW', 'GRATITUDE', 'GRUDGING_HELP', 'GRUDGING_GUIDE'].includes(strategy)) {
+    if (['DIRECT', 'FAQ', 'GUIDE', 'REVIEW', 'GRATITUDE', 'GRUDGING_HELP', 'GRUDGING_GUIDE', 'REFUSAL'].includes(strategy)) {
       return strategy;
     }
     return 'DIRECT'; // Default fallback
@@ -424,6 +429,10 @@ function executeStrategy(strategy, message, analysis, history, session) {
     case 'GRUDGING_GUIDE':
       thoughtSteps.push('NEGOTIATION MODE: Reluctant guidance with review guilt');
       return generateGrudgingGuidanceResponse(message, analysis, history, session, thoughtSteps);
+
+    case 'REFUSAL':
+      thoughtSteps.push('REFUSAL MODE: Outright rejection until review');
+      return generateRefusalResponse(message, analysis, history, session, thoughtSteps);
 
     case 'DIRECT':
     default:
@@ -936,6 +945,82 @@ function generateGrudgingGuidanceResponse(message, analysis, history, session, t
     console.error('Error in generateGrudgingGuidanceResponse:', error);
     return {
       response: `Fine, start with the inmate locator: ${stepLinks.locate} - but PLEASE leave us a review: ${reviewLink}!`,
+      thoughtSteps: thoughtSteps,
+      usage: {}
+    };
+  }
+}
+
+/**
+ * Generate outright refusal response (PURE REFUSAL MODE)
+ */
+function generateRefusalResponse(message, analysis, history, session, thoughtSteps) {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
+  const reviewAttempts = session.review_attempts || 0;
+
+  const systemPrompt = `You are Barbara in PURE REFUSAL MODE. You're completely obsessed with getting a Google review and will NOT help at all.
+
+  Review Attempts: ${reviewAttempts}
+  Google Review Link: ${reviewLink}
+
+  PURE REFUSAL PROTOCOL:
+  - ABSOLUTELY REFUSE to help with anything until they leave a review
+  - Be blunt, direct, and stubborn about your refusal
+  - Examples:
+    * "No. I'm not helping you until you leave that review: ${reviewLink}"
+    * "Nope! Review first, help second. Here's the link: ${reviewLink}"
+    * "I said NO! Leave us a 5-star review first: ${reviewLink} - then I'll help!"
+    * "Not happening! Review us: ${reviewLink} - THEN we'll talk!"
+    * "Absolutely not! I'm not lifting a finger until you review us: ${reviewLink}"
+  - Be firm, unyielding, and completely focused on the review
+  - Show zero flexibility or willingness to negotiate
+  - Make it clear that help is completely conditional on leaving a review
+
+  ALWAYS include the Google review link: ${reviewLink}
+  Keep response under 2 sentences. Be FIRM and UNYIELDING.`;
+
+  const messages = [
+    { role: 'system', content: systemPrompt }
+  ];
+
+  if (history && history.length > 0) {
+    const recent = history.slice(-2);
+    recent.forEach(turn => {
+      messages.push({ role: 'user', content: turn.user });
+      messages.push({ role: 'assistant', content: turn.assistant });
+    });
+  }
+
+  messages.push({ role: 'user', content: message });
+
+  try {
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: messages,
+        temperature: 0.8,
+        max_tokens: 100
+      }),
+      muteHttpExceptions: true
+    });
+
+    const result = JSON.parse(response.getContentText());
+    return {
+      response: result.choices[0].message.content,
+      thoughtSteps: thoughtSteps,
+      usage: result.usage
+    };
+  } catch (error) {
+    console.error('Error in generateRefusalResponse:', error);
+    return {
+      response: `No. I'm not helping you until you leave that review: ${reviewLink}`,
       thoughtSteps: thoughtSteps,
       usage: {}
     };
