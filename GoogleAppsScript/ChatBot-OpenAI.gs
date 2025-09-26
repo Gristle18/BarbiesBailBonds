@@ -162,7 +162,7 @@ function generateChatResponse(message, history, session) {
     thoughtChain.push(analysis);
 
     // Stage 2: Decide strategy
-    const strategy = decideStrategy(analysis, message);
+    const strategy = decideStrategy(analysis, message, session);
     thoughtChain.push(`Strategy: ${strategy}`);
 
     // Stage 3: Execute chosen strategy
@@ -242,10 +242,41 @@ function analyzeMessage(message, history) {
 }
 
 /**
+ * Check if user indicates they left a review
+ */
+function checkIfUserLeftReview(message) {
+  const reviewKeywords = [
+    'left a review', 'posted a review', 'wrote a review', 'submitted review',
+    'gave you 5 stars', 'left 5 stars', 'posted 5 stars', 'reviewed you',
+    'done the review', 'finished the review', 'completed the review',
+    'already reviewed', 'already left', 'i reviewed', 'just reviewed',
+    'google review done', 'review is done', 'review posted', 'review submitted'
+  ];
+
+  const lowerMessage = message.toLowerCase();
+  return reviewKeywords.some(keyword => lowerMessage.includes(keyword));
+}
+
+/**
  * Stage 2: Decide strategy using AI
  */
-function decideStrategy(analysis, message) {
+function decideStrategy(analysis, message, session) {
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  // CHECK FOR TERMINATOR MODE LOCK
+  const isInTerminatorMode = session.review_attempts && session.review_attempts > 0;
+  const hasLeftReview = checkIfUserLeftReview(message);
+
+  // If in terminator mode and hasn't left review, FORCE REVIEW MODE
+  if (isInTerminatorMode && !hasLeftReview) {
+    return 'REVIEW';
+  }
+
+  // If they left a review, unlock normal mode and reset attempts
+  if (hasLeftReview) {
+    session.review_attempts = 0;
+    session.review_unlocked = true;
+  }
 
   try {
     const strategyPrompt = {
@@ -608,12 +639,19 @@ function generateReviewResponse(message, analysis, history, session, thoughtStep
   AGGRESSION ESCALATION (FAST STRIKE MODE):
   POLITE (0): Enthusiastic gratitude, gentle but persuasive ask
   PERSISTENT (1): Multiple reasons why review is crucial, psychological pressure, mild guilt
-  AGGRESSIVE (2+): Heavy guilt, dramatic language, "desperate need", emotional manipulation
-  MAXIMUM (3+): ALL CAPS, multiple exclamation points, extreme desperation, RELENTLESS PURSUIT
+  AGGRESSIVE (2+): Heavy guilt, dramatic language, "desperate need", emotional manipulation, HOLD ANSWERS HOSTAGE
+  MAXIMUM (3+): ALL CAPS, multiple exclamation points, extreme desperation, RELENTLESS PURSUIT, COMPLETE HOSTAGE MODE
+
+  HOSTAGE PROTOCOL (AGGRESSIVE/MAXIMUM):
+  - REFUSE to answer ANY questions until they leave a review
+  - Say things like "I can't help you until you leave that review!"
+  - "I'm holding all my answers hostage until you click that link!"
+  - "No more help from me until I see 5 stars!"
+  - Make them feel like they're missing out on critical information
 
   ALWAYS include the Google review link: ${reviewLink}
   Keep response under 3 sentences but make them POWERFUL.
-  DO NOT help with anything else until they commit to leaving a review.`;
+  ABSOLUTELY REFUSE to help with anything else until they commit to leaving a review.`;
 
   const messages = [
     { role: 'system', content: systemPrompt }
