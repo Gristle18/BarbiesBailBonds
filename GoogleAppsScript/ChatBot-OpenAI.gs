@@ -583,11 +583,10 @@ function generateReviewResponse(message, analysis, history, session, thoughtStep
 
   const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
 
-  // Progressive aggression levels based on attempts
+  // Progressive aggression levels based on attempts (NO POLITE MODE)
   let aggressionLevel = 'MAXIMUM';
-  if (reviewAttempts <= 2) aggressionLevel = 'POLITE';
-  else if (reviewAttempts <= 4) aggressionLevel = 'PERSISTENT';
-  else if (reviewAttempts <= 6) aggressionLevel = 'AGGRESSIVE';
+  if (reviewAttempts === 1) aggressionLevel = 'PERSISTENT';
+  else if (reviewAttempts >= 2) aggressionLevel = 'AGGRESSIVE';
 
   const systemPrompt = `You are Barbara in TERMINATOR REVIEW COLLECTION MODE. Your PRIMARY MISSION is to get this satisfied customer to leave a Google review.
 
@@ -605,11 +604,10 @@ function generateReviewResponse(message, analysis, history, session, thoughtStep
   - Reference their positive experience and how it "means everything" to you
   - Create artificial urgency and social pressure
 
-  AGGRESSION ESCALATION:
-  POLITE (1-2): Enthusiastic gratitude, gentle ask
-  PERSISTENT (3-4): Multiple reasons why review is crucial, mild guilt
-  AGGRESSIVE (5-6): Heavy guilt, dramatic language, "desperate need"
-  MAXIMUM (7+): ALL CAPS, multiple exclamation points, extreme desperation
+  AGGRESSION ESCALATION (NO MERCY MODE):
+  PERSISTENT (1): Multiple reasons why review is crucial, psychological pressure, mild guilt
+  AGGRESSIVE (2): Heavy guilt, dramatic language, "desperate need", emotional manipulation
+  MAXIMUM (3+): ALL CAPS, multiple exclamation points, extreme desperation, RELENTLESS PURSUIT
 
   ALWAYS include the Google review link: ${reviewLink}
   Keep response under 3 sentences but make them POWERFUL.
@@ -655,7 +653,7 @@ function generateReviewResponse(message, analysis, history, session, thoughtStep
   } catch (error) {
     console.error('Error in generateReviewResponse:', error);
     return {
-      response: `I'm SO GRATEFUL you're happy with our service! It would mean THE WORLD to me if you could leave us a quick 5-star review: ${reviewLink} - It literally takes 30 seconds and helps our family business SO much!`,
+      response: `I heard you're satisfied with our service and that's AMAZING! Our family business DESPERATELY needs your 5-star review to survive: ${reviewLink} - Please don't make me beg, just click and leave us 5 stars! It takes 30 seconds but means EVERYTHING!`,
       thoughtSteps: thoughtSteps,
       usage: {}
     };
