@@ -321,11 +321,26 @@ function executeStrategy(strategy, message, analysis, history, session) {
 function generateDirectResponse(message, analysis, history, session, thoughtSteps) {
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
 
+  // Step-specific action links
+  const stepLinks = {
+    locate: 'https://www.barbiesbailbonds.com/inmate-locator',
+    application: 'https://www.barbiesbailbonds.com/start-here/online-application',
+    payment: 'tel:561-247-0018',
+    faq: 'https://www.barbiesbailbonds.com/faq'
+  };
+
   const systemPrompt = `You are Barbara, a helpful assistant for Barbie's Bail Bonds in Palm Beach County.
   Analysis: ${analysis}
 
+  QUICK ACTION LINKS:
+  - Start with Inmate Locator: ${stepLinks.locate}
+  - Online Application: ${stepLinks.application}
+  - Call Us: ${stepLinks.payment}
+  - More Questions: ${stepLinks.faq}
+
   Respond naturally to this message. Keep it under 2-3 sentences. Be warm and helpful.
-  If they need bail help, guide them to the first step (inmate locator).`;
+  If they need bail help, guide them to the first step with the inmate locator link.
+  Include relevant links when appropriate.`;
 
   const messages = [
     { role: 'system', content: systemPrompt }
@@ -383,13 +398,28 @@ function generateFAQResponse(message, analysis, faqs, history, session, thoughtS
   // Build FAQ context
   const faqContext = faqs.map(faq => `Q: ${faq.question}\nA: ${faq.answer}`).join('\n\n');
 
+  // Step-specific action links
+  const stepLinks = {
+    locate: 'https://www.barbiesbailbonds.com/inmate-locator',
+    application: 'https://www.barbiesbailbonds.com/start-here/online-application',
+    payment: 'tel:561-247-0018',
+    faq: 'https://www.barbiesbailbonds.com/faq'
+  };
+
   const systemPrompt = `You are Barbara, a helpful assistant for Barbie's Bail Bonds in Palm Beach County.
   Analysis: ${analysis}
 
   Use this FAQ knowledge to inform your response, but don't quote directly:
   ${faqContext}
 
-  Respond naturally in 2-3 sentences. Focus on what they need to DO next.`;
+  AVAILABLE ACTION LINKS:
+  - Inmate Locator: ${stepLinks.locate}
+  - Online Application: ${stepLinks.application}
+  - Call Us: ${stepLinks.payment}
+  - More FAQs: ${stepLinks.faq}
+
+  Respond naturally in 2-3 sentences. Focus on what they need to DO next.
+  Include relevant links when directing them to take action.`;
 
   const messages = [
     { role: 'system', content: systemPrompt }
@@ -445,17 +475,29 @@ function generateFAQResponse(message, analysis, faqs, history, session, thoughtS
 function generateGuidanceResponse(message, analysis, history, session, thoughtSteps) {
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
 
+  // Step-specific action links
+  const stepLinks = {
+    locate: 'https://www.barbiesbailbonds.com/inmate-locator',
+    application: 'https://www.barbiesbailbonds.com/start-here/online-application',
+    payment: 'tel:561-247-0018',
+    faq: 'https://www.barbiesbailbonds.com/faq'
+  };
+
   const systemPrompt = `You are Barbara, a helpful assistant for Barbie's Bail Bonds in Palm Beach County.
   Analysis: ${analysis}
 
-  BAIL PROCESS STEPS:
+  BAIL PROCESS STEPS WITH DIRECT LINKS:
   1. LOCATE - Use inmate locator to verify custody (5-10 min)
+     Link: ${stepLinks.locate}
   2. APPLICATION - Complete online form (10-15 min)
+     Link: ${stepLinks.application}
   3. PAYMENT - Call 561-247-0018 to confirm amount, then pay via Zelle/Card/Cash
+     Link: ${stepLinks.payment}
   4. WAITING - Bond posted, release in 4-8 hours
 
   Guide them to the appropriate step based on where they are. Be specific and action-oriented.
-  Keep response to 2-3 sentences max. Only mention phone for step 3.`;
+  ALWAYS include the relevant link when directing them to a step.
+  Keep response to 2-3 sentences max. Format links naturally in your response.`;
 
   const messages = [
     { role: 'system', content: systemPrompt }
