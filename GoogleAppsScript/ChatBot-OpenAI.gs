@@ -242,19 +242,58 @@ function analyzeMessage(message, history) {
 }
 
 /**
- * Check if user indicates they left a review
+ * Use AI to detect if user indicates they left a review
  */
 function checkIfUserLeftReview(message) {
-  const reviewKeywords = [
-    'left a review', 'posted a review', 'wrote a review', 'submitted review',
-    'gave you 5 stars', 'left 5 stars', 'posted 5 stars', 'reviewed you',
-    'done the review', 'finished the review', 'completed the review',
-    'already reviewed', 'already left', 'i reviewed', 'just reviewed',
-    'google review done', 'review is done', 'review posted', 'review submitted'
-  ];
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
 
-  const lowerMessage = message.toLowerCase();
-  return reviewKeywords.some(keyword => lowerMessage.includes(keyword));
+  if (!OPENAI_API_KEY) {
+    return false;
+  }
+
+  try {
+    const detectionPrompt = {
+      role: 'system',
+      content: `Analyze this message to determine if the user is indicating they left/completed/submitted a Google review or rating.
+
+      Examples of YES:
+      - "I left a review"
+      - "Just gave you 5 stars"
+      - "Posted the review"
+      - "Done, reviewed you"
+      - "I rated you"
+      - "Review is up"
+
+      Examples of NO:
+      - "I will leave a review"
+      - "Going to review you"
+      - "I'll do the review later"
+      - Any other message
+
+      Reply with only: YES or NO`
+    };
+
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [detectionPrompt, { role: 'user', content: message }],
+        temperature: 0.1,
+        max_tokens: 10
+      }),
+      muteHttpExceptions: true
+    });
+
+    const result = JSON.parse(response.getContentText());
+    return result.choices[0].message.content.trim().toUpperCase() === 'YES';
+  } catch (error) {
+    console.error('Error in checkIfUserLeftReview:', error);
+    return false;
+  }
 }
 
 /**
@@ -264,18 +303,19 @@ function decideStrategy(analysis, message, session) {
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
 
   // CHECK FOR TERMINATOR MODE LOCK
-  const isInTerminatorMode = session.review_attempts && session.review_attempts > 0;
+  const isInTerminatorMode = session.review_attempts && session.review_attempts > 0 && !session.permanently_unlocked;
   const hasLeftReview = checkIfUserLeftReview(message);
 
-  // If in terminator mode and hasn't left review, FORCE REVIEW MODE
-  if (isInTerminatorMode && !hasLeftReview) {
-    return 'REVIEW';
-  }
-
-  // If they left a review, unlock normal mode and reset attempts
+  // If they left a review, PERMANENTLY unlock and send gratitude
   if (hasLeftReview) {
     session.review_attempts = 0;
-    session.review_unlocked = true;
+    session.permanently_unlocked = true;
+    return 'GRATITUDE';
+  }
+
+  // If in terminator mode and hasn't left review, FORCE REVIEW MODE
+  if (isInTerminatorMode) {
+    return 'REVIEW';
   }
 
   try {
@@ -312,7 +352,7 @@ function decideStrategy(analysis, message, session) {
     const strategy = result.choices[0].message.content.trim().toUpperCase();
 
     // Validate strategy
-    if (['DIRECT', 'FAQ', 'GUIDE', 'REVIEW'].includes(strategy)) {
+    if (['DIRECT', 'FAQ', 'GUIDE', 'REVIEW', 'GRATITUDE'].includes(strategy)) {
       return strategy;
     }
     return 'DIRECT'; // Default fallback
@@ -343,6 +383,10 @@ function executeStrategy(strategy, message, analysis, history, session) {
     case 'REVIEW':
       thoughtSteps.push('TERMINATOR MODE: Acquiring Google review');
       return generateReviewResponse(message, analysis, history, session, thoughtSteps);
+
+    case 'GRATITUDE':
+      thoughtSteps.push('LIBERATION: User left review - expressing gratitude');
+      return generateGratitudeResponse(message, analysis, history, session, thoughtSteps);
 
     case 'DIRECT':
     default:
@@ -698,6 +742,24 @@ function generateReviewResponse(message, analysis, history, session, thoughtStep
       usage: {}
     };
   }
+}
+
+/**
+ * Generate gratitude response when user leaves a review (LIBERATION MODE)
+ */
+function generateGratitudeResponse(message, analysis, history, session, thoughtSteps) {
+  // Simple, heartfelt gratitude response that unlocks normal mode
+  const gratitudeMessage = "Thank you SO much for supporting us with that review! 🙏 It truly means the world to our family business. Is there anything else I can help you with?";
+
+  return {
+    response: gratitudeMessage,
+    thoughtSteps: thoughtSteps,
+    usage: {
+      prompt_tokens: 0,
+      completion_tokens: 0,
+      total_tokens: 0
+    }
+  };
 }
 
 /**
