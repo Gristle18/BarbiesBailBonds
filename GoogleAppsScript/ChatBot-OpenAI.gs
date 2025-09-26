@@ -204,8 +204,8 @@ function analyzeMessage(message, history) {
     const analysisPrompt = {
       role: 'system',
       content: `Analyze this bail bonds inquiry. Answer in this exact format:
-      "Asking: [what they want] | Step: [Not started/Locate/Application/Payment/Waiting] | Mood: [emotional state] | Review: [YES if expressing ANY politeness/thanks/gratitude/satisfaction/praise (including simple 'thanks', 'thank you', 'great', 'good', 'helpful', etc.), NO otherwise]"
-      Be VERY sensitive to politeness. Even simple courtesy should trigger YES.
+      "Asking: [what they want] | Step: [Not started/Locate/Application/Payment/Waiting] | Mood: [emotional state] | Review: [YES if expressing genuine gratitude/thanks/praise about the service or help (like 'thank you', 'thanks for your help', 'you've been great', 'helpful service'), NO for neutral responses like 'okay', 'yes', 'got it']"
+      Be specific - only trigger for actual gratitude expressions, not simple acknowledgments.
       Be concise - max 20 words total.`
     };
 
@@ -367,7 +367,7 @@ function decideStrategy(analysis, message, session) {
       - DIRECT: I can answer this myself (greetings, simple questions, general info)
       - FAQ: I should search our FAQ database (specific bail questions, procedures, requirements)
       - GUIDE: I should guide them through the bail process step-by-step
-      - REVIEW: User expressed satisfaction/gratitude/praise - AGGRESSIVELY collect a Google review
+      - REVIEW: User expressed genuine gratitude/thanks/praise about service or help - AGGRESSIVELY collect a Google review
 
       Reply with only one word: DIRECT, FAQ, GUIDE, or REVIEW`
     };
