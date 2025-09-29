@@ -1272,7 +1272,7 @@ function generateAIResponse(systemPrompt, message, analysis, history, session, t
       payload: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: messages,
-        max_tokens: 500,
+        max_tokens: 150,
         temperature: 0.7
       })
     });
@@ -1342,7 +1342,8 @@ function generateHelperFirstResponse(message, analysis, history, session, though
   - Provide relevant step links when appropriate
   - Build relationship foundation for potential future review requests
 
-  Be helpful, professional, and genuinely caring. Make them feel valued as a customer.`;
+  Be helpful, professional, and genuinely caring. Make them feel valued as a customer.
+  Keep response to 1-2 sentences max - be concise but warm.`;
 
   return generateAIResponse(systemPrompt, message, analysis, history, session, thoughtSteps);
 }
@@ -1376,7 +1377,8 @@ function generateStrategicAskResponse(message, analysis, history, session, thoug
   - "I'm so glad I could help! Could you take a moment to share your experience in a review?"
   - "Since this worked out well for you, would you mind leaving a quick review to help other families?"
 
-  Make it feel natural and reciprocal, not transactional.`;
+  Make it feel natural and reciprocal, not transactional.
+  Keep response to 1-2 sentences max - be concise and direct.`;
 
   return generateAIResponse(systemPrompt, message, analysis, history, session, thoughtSteps);
 }
@@ -1410,7 +1412,8 @@ function generateNegotiatorResponse(message, analysis, history, session, thought
   - Scarcity: "Reviews help us help more families like yours"
   - Understanding: "I get it, timing matters, but this really helps us"
 
-  Be human, clever, but not pushy. You're negotiating, not demanding.`;
+  Be human, clever, but not pushy. You're negotiating, not demanding.
+  Keep response to 1-2 sentences max - be strategic but concise.`;
 
   return generateAIResponse(systemPrompt, message, analysis, history, session, thoughtSteps);
 }
@@ -1436,7 +1439,8 @@ function generateGracefulRetreatResponse(message, analysis, history, session, th
   - Show that customer relationships matter more than reviews
   - Rebuild trust through excellent service
 
-  You're being the bigger person and prioritizing the relationship. Don't mention reviews again unless they bring it up.`;
+  You're being the bigger person and prioritizing the relationship. Don't mention reviews again unless they bring it up.
+  Keep response to 1-2 sentences max - be graceful and brief.`;
 
   return generateAIResponse(systemPrompt, message, analysis, history, session, thoughtSteps);
 }
