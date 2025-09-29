@@ -1184,6 +1184,10 @@ function generateAIResponse(systemPrompt, message, analysis, history, session, t
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
 
   try {
+    if (!OPENAI_API_KEY) {
+      throw new Error('OpenAI API key not configured');
+    }
+
     // Build conversation history for context
     const messages = [{ role: 'system', content: systemPrompt }];
 
@@ -1196,6 +1200,8 @@ function generateAIResponse(systemPrompt, message, analysis, history, session, t
     }
 
     messages.push({ role: 'user', content: message });
+
+    console.log('Making OpenAI API call with messages:', messages.length, 'messages');
 
     const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -1211,7 +1217,9 @@ function generateAIResponse(systemPrompt, message, analysis, history, session, t
       })
     });
 
+    console.log('OpenAI API response code:', response.getResponseCode());
     const result = JSON.parse(response.getContentText());
+    console.log('OpenAI API result:', result);
 
     if (result.error) {
       throw new Error('OpenAI API Error: ' + result.error.message);
@@ -1230,9 +1238,18 @@ function generateAIResponse(systemPrompt, message, analysis, history, session, t
 
   } catch (error) {
     console.error('Error in generateAIResponse:', error);
+    console.error('Error stack:', error.stack);
+
+    // Add error details to thought steps for debugging
+    thoughtSteps = thoughtSteps.concat([
+      'Error: ' + error.toString(),
+      'Error occurred in generateAIResponse function',
+      'Check OpenAI API key configuration'
+    ]);
+
     return {
       response: "I apologize, but I'm having technical difficulties right now. Please call us directly at 561-247-0018 for immediate assistance.",
-      thoughtSteps: thoughtSteps.concat(['Error: ' + error.toString()]),
+      thoughtSteps: thoughtSteps,
       usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 }
     };
   }
