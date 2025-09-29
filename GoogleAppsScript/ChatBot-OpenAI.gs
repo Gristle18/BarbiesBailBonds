@@ -725,7 +725,8 @@ function handleChatMessage(message, sessionId, userId) {
     sources: aiResponse.sources,
     message_count: session.message_count,
     session_start: session.created,
-    tokens_used: aiResponse.usage
+    tokens_used: aiResponse.usage,
+    debug: aiResponse.debug || {}
   };
 }
 
@@ -741,18 +742,32 @@ function generateChatResponse(message, history, session) {
 
   let thoughtChain = [];
   let totalUsage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+  let debugInfo = {
+    timestamp: new Date().toISOString(),
+    message_length: message.length,
+    session_id: session.session_id,
+    has_history: history && history.length > 0,
+    history_length: history ? history.length : 0,
+    steps: []
+  };
 
   try {
     // Stage 1: Detect mode using embeddings
     thoughtChain.push(`Analyzing: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`);
+    debugInfo.steps.push('Stage 1: Message analysis started');
 
     // Stage 2: Decide strategy using embeddings
+    debugInfo.steps.push('Stage 2: Strategy decision started');
     const strategy = decideStrategy(message, session);
     thoughtChain.push(`Strategy: ${strategy}`);
+    debugInfo.detected_strategy = strategy;
+    debugInfo.steps.push(`Strategy decided: ${strategy}`);
 
     // Stage 3: Execute chosen strategy
+    debugInfo.steps.push('Stage 3: Strategy execution started');
     const result = executeStrategy(strategy, message, history, session);
     thoughtChain = thoughtChain.concat(result.thoughtSteps || []);
+    debugInfo.steps.push('Strategy execution completed');
 
     // Aggregate usage from all API calls
     if (result.usage) {
@@ -761,20 +776,30 @@ function generateChatResponse(message, history, session) {
       totalUsage.total_tokens += result.usage.total_tokens || 0;
     }
 
+    debugInfo.steps.push('Response generation completed successfully');
+    debugInfo.success = true;
+
     return {
       response: result.response,
       chainOfThought: thoughtChain.join(' → '),
       usage: totalUsage,
-      sources: result.sources || []
+      sources: result.sources || [],
+      debug: debugInfo
     };
 
   } catch (error) {
     console.error('Error in generateChatResponse:', error);
+    debugInfo.error = error.toString();
+    debugInfo.error_stack = error.stack || 'No stack trace available';
+    debugInfo.success = false;
+    debugInfo.steps.push(`ERROR: ${error.toString()}`);
+
     return {
       response: "I apologize, but I'm having trouble processing that. Please try again or call us at 561-247-0018.",
       chainOfThought: thoughtChain.join(' → ') || 'Error in processing',
       usage: totalUsage,
-      sources: []
+      sources: [],
+      debug: debugInfo
     };
   }
 }

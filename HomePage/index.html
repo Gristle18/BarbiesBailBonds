@@ -1243,6 +1243,30 @@
     script.src = `${API_URL}?action=chat&message=${encodeURIComponent(message)}&session_id=${getSessionId()}&format=jsonp&callback=${callbackName}`;
 
     window[callbackName] = function(response) {
+      // DEBUG: Log all response data to browser console
+      if (response && response.debug) {
+        console.group('🤖 ChatBot Debug Info');
+        console.log('Timestamp:', response.debug.timestamp);
+        console.log('Message Length:', response.debug.message_length);
+        console.log('Session ID:', response.debug.session_id);
+        console.log('Has History:', response.debug.has_history);
+        console.log('History Length:', response.debug.history_length);
+        console.log('Detected Strategy:', response.debug.detected_strategy);
+        console.log('Success:', response.debug.success);
+        console.log('Processing Steps:');
+        response.debug.steps.forEach((step, index) => {
+          console.log(`  ${index + 1}. ${step}`);
+        });
+        if (response.debug.error) {
+          console.error('Error:', response.debug.error);
+          console.error('Stack:', response.debug.error_stack);
+        }
+        console.log('Full Response:', response);
+        console.groupEnd();
+      } else {
+        console.log('🤖 ChatBot Response (no debug info):', response);
+      }
+
       // Display chain of thought if available
       if (response && response.chainOfThought) {
         const thoughtDisplay = document.getElementById('thoughtDisplay');
