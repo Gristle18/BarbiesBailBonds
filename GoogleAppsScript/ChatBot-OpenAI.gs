@@ -1420,6 +1420,7 @@ function generateStrategicAskResponse(message, analysis, history, session, thoug
   - "I'm so glad I could help! Could you take a moment to share your experience in a review?"
   - "Since this worked out well for you, would you mind leaving a quick review to help other families?"
 
+  IMPORTANT: ALWAYS include the review link in your response when asking for a review.
   Make it feel natural and reciprocal, not transactional.
   Keep response to 1-2 sentences max - be concise and direct.`;
 
@@ -1461,6 +1462,7 @@ function generateNegotiatorResponse(message, analysis, history, session, thought
   - Don't repeat phone numbers
   - REMEMBER: You have conversation history - refer to previous messages when relevant
   - Never claim you "can't remember" or "don't recall" previous messages
+  - IMPORTANT: ALWAYS include the review link when negotiating for a review
 
   Be human, clever, but not pushy. You're negotiating, not demanding.
   Keep response to 1-2 sentences max - be strategic but concise.`;
