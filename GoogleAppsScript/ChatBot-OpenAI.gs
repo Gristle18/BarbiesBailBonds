@@ -1415,15 +1415,18 @@ function generateStrategicAskResponse(message, analysis, history, session, thoug
   - ONLY mention payment info if they specifically ask about payment
   - REMEMBER: You have conversation history - refer to previous messages when relevant
   - Never claim you "can't remember" or "don't recall" previous messages
+  - IMPORTANT: Only say things "worked out well" if you actually helped with something substantial
+  - Don't assume success from just "thanks" - make sure you provided real value first
 
   PRIORITY BOND INCENTIVE:
   - Offer priority bond posting for leaving a review (skip the line)
   - Leverage urgency: jail is painful, people want their loved ones out ASAP
   - Position as "I can prioritize your bond posting if you leave a quick review"
 
-  Example approaches:
+  Example approaches (only use if you actually provided substantial help):
   - "I can prioritize your bond posting if you leave a quick 5-star review - it helps other families and gets your person out faster"
-  - "Since this worked out well, would you mind leaving a quick 5-star review? I can bump you to priority processing"
+  - "Since I was able to help you with [specific thing], would you mind leaving a quick 5-star review? I can bump you to priority processing"
+  - For just "thanks": "I'm glad to help! If you end up needing our services, a quick 5-star review helps other families find us"
 
   IMPORTANT: ALWAYS ask specifically for a 5-STAR review, not just any review.
   IMPORTANT: ALWAYS include the review link in your response when asking for a review.
