@@ -900,41 +900,41 @@ function executeStrategy(strategy, message, history, session) {
       thoughtSteps.push('Searching FAQ database');
       const faqs = getRelevantFAQs(message);
       thoughtSteps.push(`Found ${faqs.length} relevant FAQs`);
-      return generateFAQResponse(message, analysis, faqs, history, session, thoughtSteps);
+      return generateFAQResponse(message, message, faqs, history, session, thoughtSteps);
 
     case 'GUIDE':
       thoughtSteps.push('Guiding through bail process');
-      return generateGuidanceResponse(message, analysis, history, session, thoughtSteps);
+      return generateGuidanceResponse(message, message, history, session, thoughtSteps);
 
     case 'HELPER_FIRST':
       thoughtSteps.push('Building relationship - giving value first');
-      return generateHelperFirstResponse(message, analysis, history, session, thoughtSteps);
+      return generateHelperFirstResponse(message, message, history, session, thoughtSteps);
 
     case 'STRATEGIC_ASK':
       thoughtSteps.push('Perfect moment - strategic review request');
-      return generateStrategicAskResponse(message, analysis, history, session, thoughtSteps);
+      return generateStrategicAskResponse(message, message, history, session, thoughtSteps);
 
     case 'NEGOTIATOR':
       thoughtSteps.push('Human psychology - negotiating for review');
-      return generateNegotiatorResponse(message, analysis, history, session, thoughtSteps);
+      return generateNegotiatorResponse(message, message, history, session, thoughtSteps);
 
     case 'GRACEFUL_RETREAT':
       thoughtSteps.push('Preserving relationship - backing off reviews');
-      return generateGracefulRetreatResponse(message, analysis, history, session, thoughtSteps);
+      return generateGracefulRetreatResponse(message, message, history, session, thoughtSteps);
 
     case 'GRATITUDE':
       thoughtSteps.push('LIBERATION: User left review - expressing gratitude');
-      return generateGratitudeResponse(message, analysis, history, session, thoughtSteps);
+      return generateGratitudeResponse(message, message, history, session, thoughtSteps);
 
     // Legacy modes for backwards compatibility
     case 'REVIEW':
       thoughtSteps.push('Legacy review mode - redirecting to strategic ask');
-      return generateStrategicAskResponse(message, analysis, history, session, thoughtSteps);
+      return generateStrategicAskResponse(message, message, history, session, thoughtSteps);
 
     case 'DIRECT':
     default:
       thoughtSteps.push('Responding from knowledge');
-      return generateDirectResponse(message, analysis, history, session, thoughtSteps);
+      return generateDirectResponse(message, message, history, session, thoughtSteps);
   }
 }
 
