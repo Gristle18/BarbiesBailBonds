@@ -12,16 +12,16 @@ const MAX_HISTORY_LENGTH = 20; // Maximum conversation turns to keep
 const MODE_EMBEDDINGS_SPREADSHEET_NAME = 'ChatBot_Mode_Embeddings_OpenAI';
 let modeEmbeddingsSheet = null;
 
-// Concept-based mode detection thresholds (lowered for better sensitivity)
+// Concept-based mode detection thresholds (significantly lowered for maximum sensitivity)
 const MODE_THRESHOLDS = {
-  GRACEFUL_RETREAT: 0.65,  // Lowered from 0.75 - detect backing off situations earlier
-  STRATEGIC_ASK: 0.68,     // Lowered from 0.78 - more sensitive to gratitude/satisfaction
-  NEGOTIATOR: 0.65         // Lowered from 0.75 - catch deflection attempts better
+  GRACEFUL_RETREAT: 0.55,  // Lowered from 0.65 - very sensitive to backing off situations
+  STRATEGIC_ASK: 0.58,     // Lowered from 0.68 - highly sensitive to gratitude/satisfaction
+  NEGOTIATOR: 0.55         // Lowered from 0.65 - catch even subtle deflection attempts
   // HELPER_FIRST: No threshold - used as default fallback
 };
 
-// Contrastive learning margin - positive must beat negative by this amount (lowered for sensitivity)
-const CONFIDENCE_MARGIN = 0.05;
+// Contrastive learning margin - positive must beat negative by this amount (very low for maximum sensitivity)
+const CONFIDENCE_MARGIN = 0.03;
 
 // Contrastive concept phrases for embedding-based mode detection
 const MODE_CONCEPTS = {
