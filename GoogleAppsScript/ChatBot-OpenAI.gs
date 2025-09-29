@@ -12,11 +12,11 @@ const MAX_HISTORY_LENGTH = 20; // Maximum conversation turns to keep
 const MODE_EMBEDDINGS_SPREADSHEET_NAME = 'ChatBot_Mode_Embeddings_OpenAI';
 let modeEmbeddingsSheet = null;
 
-// Concept-based mode detection thresholds (ultra-low for maximum sensitivity)
+// Concept-based mode detection thresholds (extremely low and uniform for maximum sensitivity)
 const MODE_THRESHOLDS = {
-  GRACEFUL_RETREAT: 0.45,  // Ultra-low - triggers on minimal resistance signals
-  STRATEGIC_ASK: 0.48,     // Ultra-low - triggers on any hint of satisfaction
-  NEGOTIATOR: 0.45         // Ultra-low - catches the slightest deflection
+  GRACEFUL_RETREAT: 0.35,  // Extremely low - highly sensitive
+  STRATEGIC_ASK: 0.35,     // Extremely low - highly sensitive
+  NEGOTIATOR: 0.35         // Extremely low - highly sensitive
   // HELPER_FIRST: No threshold - used as default fallback
 };
 
