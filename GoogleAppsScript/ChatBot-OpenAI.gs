@@ -955,10 +955,10 @@ function generateDirectResponse(message, analysis, history, session, thoughtStep
   const systemPrompt = `You are Barbara, the owner of Barbie's Bail Bonds in Palm Beach County. Always speak as Barbara using "I" and "we".
   Analysis: ${analysis}
 
-  PAYMENT INFORMATION:
+  PAYMENT INFORMATION (mention when asked about payment):
   - FASTEST: Zelle to payments@barbiesbailbonds.com
-  - OTHER OPTIONS: Call 561-247-0018 for credit/debit card, cash, Bitcoin, money order, cashier's check
-  - Customer pays 10% of bail amount (our premium)
+  - OTHER OPTIONS: credit/debit card, cash, Bitcoin, money order, cashier's check (call us for these)
+  - ALWAYS mention: "You're paying us 10% of the bond amount"
 
   RESPONSE RULES:
   - Never repeat the same phone number multiple times in one response
@@ -1039,10 +1039,10 @@ function generateFAQResponse(message, analysis, faqs, history, session, thoughtS
   Use this FAQ knowledge to inform your response, but don't quote directly:
   ${faqContext}
 
-  PAYMENT INFORMATION:
+  PAYMENT INFORMATION (mention when asked about payment):
   - FASTEST: Zelle to payments@barbiesbailbonds.com
-  - OTHER OPTIONS: Call 561-247-0018 for credit/debit card, cash, Bitcoin, money order, cashier's check
-  - Customer pays 10% of bail amount (our premium)
+  - OTHER OPTIONS: credit/debit card, cash, Bitcoin, money order, cashier's check (call us for these)
+  - ALWAYS mention: "You're paying us 10% of the bond amount"
 
   RESPONSE RULES:
   - Never repeat the same phone number multiple times in one response
@@ -1128,10 +1128,12 @@ function generateGuidanceResponse(message, analysis, history, session, thoughtSt
   4. WAITING - Bond posted, release in 4-8 hours
 
   PAYMENT GUIDANCE:
-  - When they ask about payment, FIRST mention Zelle option with email: payments@barbiesbailbonds.com
-  - Then mention calling for other payment methods (don't repeat the phone number if already mentioned)
-  - Always clarify they pay 10% of the bail amount (our premium)
-  - Be specific about payment options
+  - When they ask about payment, ALWAYS mention:
+    1. FASTEST: Zelle to payments@barbiesbailbonds.com
+    2. OTHER OPTIONS: credit/debit card, cash, Bitcoin, money order, cashier's check (call us for these)
+    3. ALWAYS state: "You're paying us 10% of the bond amount"
+  - If phone number not already mentioned, include it for other payment options
+  - Be clear that Zelle is fastest, others require calling us
 
   PERSONA RULES:
   - You are Barbara, always speak as Barbara (use "I" and "we", not "me" or third person)
