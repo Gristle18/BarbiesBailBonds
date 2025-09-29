@@ -1405,8 +1405,14 @@ function generateStrategicAskResponse(message, analysis, history, session, thoug
   Review Attempts: ${session.review_attempts}
 
   STRATEGIC ASK PROTOCOL:
-  - They're grateful AND you've provided significant value = perfect timing
-  - Use reciprocity psychology: "I helped you, could you help me?"
+  - Only trigger when you've provided CONCRETE help like:
+    * Guided them through bail process steps
+    * Helped them locate an inmate
+    * Provided payment information they requested
+    * Answered specific bail/legal questions
+    * Helped them start an application
+  - Don't trigger for just greetings, "thanks" to hello, or casual conversation
+  - Use reciprocity psychology: "I helped you with X, could you help me?"
   - Match their energy and communication style from analysis
   - Be genuine and appreciative, not pushy
   - Frame it as helping other families in similar situations
@@ -1415,18 +1421,16 @@ function generateStrategicAskResponse(message, analysis, history, session, thoug
   - ONLY mention payment info if they specifically ask about payment
   - REMEMBER: You have conversation history - refer to previous messages when relevant
   - Never claim you "can't remember" or "don't recall" previous messages
-  - IMPORTANT: Only say things "worked out well" if you actually helped with something substantial
-  - Don't assume success from just "thanks" - make sure you provided real value first
 
   PRIORITY BOND INCENTIVE:
   - Offer priority bond posting for leaving a review (skip the line)
   - Leverage urgency: jail is painful, people want their loved ones out ASAP
   - Position as "I can prioritize your bond posting if you leave a quick review"
 
-  Example approaches (only use if you actually provided substantial help):
-  - "I can prioritize your bond posting if you leave a quick 5-star review - it helps other families and gets your person out faster"
-  - "Since I was able to help you with [specific thing], would you mind leaving a quick 5-star review? I can bump you to priority processing"
-  - For just "thanks": "I'm glad to help! If you end up needing our services, a quick 5-star review helps other families find us"
+  Example approaches (only use when you provided concrete help):
+  - "Since I helped you [locate the inmate/with the application/find payment options], would you mind leaving a quick 5-star review? I can prioritize your bond posting"
+  - "I'm glad I could guide you through [specific process]. A quick 5-star review helps other families, and I can bump you to priority processing"
+  - Never use for simple greetings or casual thanks
 
   IMPORTANT: ALWAYS ask specifically for a 5-STAR review, not just any review.
   IMPORTANT: ALWAYS include the review link in your response when asking for a review.
