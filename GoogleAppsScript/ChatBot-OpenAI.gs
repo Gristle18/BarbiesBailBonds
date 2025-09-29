@@ -8,6 +8,10 @@
 const SESSION_DURATION_HOURS = 24; // How long to keep session data
 const MAX_HISTORY_LENGTH = 20; // Maximum conversation turns to keep
 
+// Storage configuration - using Google Sheets for embeddings (too large for Properties)
+const MODE_EMBEDDINGS_SPREADSHEET_NAME = 'ChatBot_Mode_Embeddings_OpenAI';
+let modeEmbeddingsSheet = null;
+
 // Concept-based mode detection thresholds (based on OpenAI embedding research)
 const MODE_THRESHOLDS = {
   GRACEFUL_RETREAT: 0.75,  // Above 0.68 dissimilar baseline - high confidence for backing off
@@ -105,11 +109,42 @@ const MODE_CONCEPTS = {
 };
 
 /**
- * EMBEDDING MANAGEMENT FUNCTIONS
+ * EMBEDDING MANAGEMENT FUNCTIONS - GOOGLE SHEETS VERSION
  */
 
 /**
- * Generate embeddings for all concept phrases (positive and negative)
+ * Get or create mode embeddings storage sheet
+ */
+function getModeEmbeddingsSheet() {
+  if (modeEmbeddingsSheet) return modeEmbeddingsSheet;
+
+  // Try to find existing spreadsheet
+  const files = DriveApp.getFilesByName(MODE_EMBEDDINGS_SPREADSHEET_NAME);
+  let spreadsheet;
+
+  if (files.hasNext()) {
+    spreadsheet = SpreadsheetApp.openById(files.next().getId());
+    console.log('Found existing mode embeddings spreadsheet');
+  } else {
+    // Create new spreadsheet
+    spreadsheet = SpreadsheetApp.create(MODE_EMBEDDINGS_SPREADSHEET_NAME);
+    console.log('Created new mode embeddings spreadsheet:', spreadsheet.getId());
+  }
+
+  // Get or create the embeddings sheet
+  modeEmbeddingsSheet = spreadsheet.getSheetByName('Mode_Embeddings') || spreadsheet.insertSheet('Mode_Embeddings');
+
+  // Set up headers if sheet is empty
+  if (modeEmbeddingsSheet.getLastRow() === 0) {
+    modeEmbeddingsSheet.appendRow(['Mode', 'Type', 'Concept', 'Embedding']);
+    modeEmbeddingsSheet.getRange(1, 1, 1, 4).setFontWeight('bold');
+  }
+
+  return modeEmbeddingsSheet;
+}
+
+/**
+ * Generate embeddings and store in Google Sheets
  */
 function generateAllEmbeddings() {
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
@@ -118,17 +153,21 @@ function generateAllEmbeddings() {
     throw new Error('OpenAI API key not found. Add OPENAI_API_KEY to Script Properties.');
   }
 
-  const properties = PropertiesService.getScriptProperties();
-  const allEmbeddings = {};
+  const sheet = getModeEmbeddingsSheet();
+  console.log('Generating mode embeddings for ChatBot...');
+  console.log('Using spreadsheet:', sheet.getParent().getName());
+
+  // Clear existing data (keep headers)
+  if (sheet.getLastRow() > 1) {
+    sheet.deleteRows(2, sheet.getLastRow() - 1);
+  }
+
+  let totalEmbeddings = 0;
 
   for (const [mode, conceptGroups] of Object.entries(MODE_CONCEPTS)) {
     console.log(`Generating embeddings for ${mode}...`);
-    const modeEmbeddings = {
-      positive: [],
-      negative: []
-    };
 
-    // Generate embeddings for positive concepts
+    // Process positive concepts
     for (const concept of conceptGroups.positive) {
       try {
         const response = UrlFetchApp.fetch('https://api.openai.com/v1/embeddings', {
@@ -148,19 +187,25 @@ function generateAllEmbeddings() {
           throw new Error('OpenAI API Error: ' + result.error.message);
         }
 
-        modeEmbeddings.positive.push({
-          concept: concept,
-          embedding: result.data[0].embedding
-        });
+        // Store in Google Sheets
+        sheet.appendRow([
+          mode,
+          'positive',
+          concept,
+          JSON.stringify(result.data[0].embedding)
+        ]);
 
+        totalEmbeddings++;
+        console.log(`Generated positive embedding ${totalEmbeddings}: ${mode} - "${concept.substring(0, 30)}..."`);
         Utilities.sleep(100); // Rate limiting
+
       } catch (error) {
         console.error(`Error generating positive embedding for "${concept}":`, error);
         throw error;
       }
     }
 
-    // Generate embeddings for negative concepts
+    // Process negative concepts
     for (const concept of conceptGroups.negative) {
       try {
         const response = UrlFetchApp.fetch('https://api.openai.com/v1/embeddings', {
@@ -180,41 +225,64 @@ function generateAllEmbeddings() {
           throw new Error('OpenAI API Error: ' + result.error.message);
         }
 
-        modeEmbeddings.negative.push({
-          concept: concept,
-          embedding: result.data[0].embedding
-        });
+        // Store in Google Sheets
+        sheet.appendRow([
+          mode,
+          'negative',
+          concept,
+          JSON.stringify(result.data[0].embedding)
+        ]);
 
+        totalEmbeddings++;
+        console.log(`Generated negative embedding ${totalEmbeddings}: ${mode} - "${concept.substring(0, 30)}..."`);
         Utilities.sleep(100); // Rate limiting
+
       } catch (error) {
         console.error(`Error generating negative embedding for "${concept}":`, error);
         throw error;
       }
     }
-
-    allEmbeddings[mode] = modeEmbeddings;
   }
 
-  // Store embeddings in script properties
+  // Store metadata in script properties (lightweight)
+  const properties = PropertiesService.getScriptProperties();
   properties.setProperties({
-    'MODE_EMBEDDINGS': JSON.stringify(allEmbeddings),
     'EMBEDDING_GENERATION_DATE': new Date().toISOString(),
-    'EMBEDDING_VERSION': '2.0'  // Updated for contrastive system
+    'EMBEDDING_VERSION': '3.0', // Updated for Google Sheets storage
+    'EMBEDDING_SPREADSHEET_ID': sheet.getParent().getId(),
+    'TOTAL_EMBEDDINGS': totalEmbeddings.toString()
   });
 
-  console.log('All contrastive embeddings generated and stored successfully!');
-  return allEmbeddings;
+  console.log(`Successfully generated and stored ${totalEmbeddings} mode embeddings in Google Sheets`);
+  console.log('Spreadsheet ID:', sheet.getParent().getId());
+  return totalEmbeddings;
 }
 
 /**
- * Clear all stored embeddings
+ * Clear all stored embeddings (Google Sheets version)
  */
 function clearAllEmbeddings() {
-  const properties = PropertiesService.getScriptProperties();
-  properties.deleteProperty('MODE_EMBEDDINGS');
-  properties.deleteProperty('EMBEDDING_GENERATION_DATE');
-  properties.deleteProperty('EMBEDDING_VERSION');
-  console.log('All embeddings cleared.');
+  try {
+    const sheet = getModeEmbeddingsSheet();
+
+    // Clear all data except headers
+    if (sheet.getLastRow() > 1) {
+      sheet.deleteRows(2, sheet.getLastRow() - 1);
+    }
+
+    // Clear metadata from properties
+    const properties = PropertiesService.getScriptProperties();
+    properties.deleteProperty('EMBEDDING_GENERATION_DATE');
+    properties.deleteProperty('EMBEDDING_VERSION');
+    properties.deleteProperty('EMBEDDING_SPREADSHEET_ID');
+    properties.deleteProperty('TOTAL_EMBEDDINGS');
+
+    console.log('All mode embeddings cleared from Google Sheets');
+
+  } catch (error) {
+    console.error('Error clearing embeddings:', error);
+    throw error;
+  }
 }
 
 /**
@@ -226,14 +294,21 @@ function regenerateEmbeddings(mode) {
   }
 
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
-  const properties = PropertiesService.getScriptProperties();
+  const sheet = getModeEmbeddingsSheet();
 
-  // Get existing embeddings
-  const existingEmbeddings = JSON.parse(properties.getProperty('MODE_EMBEDDINGS') || '{}');
+  // Remove existing embeddings for this mode
+  const dataRange = sheet.getDataRange();
+  const values = dataRange.getValues();
 
-  // Generate new embeddings for the specified mode
-  const modeEmbeddings = [];
-  for (const concept of MODE_CONCEPTS[mode]) {
+  // Find and delete rows for this mode (in reverse order to maintain indices)
+  for (let i = values.length - 1; i >= 1; i--) {
+    if (values[i][0] === mode) {
+      sheet.deleteRow(i + 1);
+    }
+  }
+
+  // Generate new embeddings for positive concepts
+  for (const concept of MODE_CONCEPTS[mode].positive) {
     const response = UrlFetchApp.fetch('https://api.openai.com/v1/embeddings', {
       method: 'POST',
       headers: {
@@ -247,24 +322,47 @@ function regenerateEmbeddings(mode) {
     });
 
     const result = JSON.parse(response.getContentText());
-    modeEmbeddings.push({
-      concept: concept,
-      embedding: result.data[0].embedding
-    });
-
+    sheet.appendRow([
+      mode,
+      'positive',
+      concept,
+      JSON.stringify(result.data[0].embedding)
+    ]);
     Utilities.sleep(100);
   }
 
-  // Update existing embeddings
-  existingEmbeddings[mode] = modeEmbeddings;
+  // Generate new embeddings for negative concepts
+  for (const concept of MODE_CONCEPTS[mode].negative) {
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/embeddings', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'text-embedding-3-small',
+        input: concept
+      })
+    });
 
+    const result = JSON.parse(response.getContentText());
+    sheet.appendRow([
+      mode,
+      'negative',
+      concept,
+      JSON.stringify(result.data[0].embedding)
+    ]);
+    Utilities.sleep(100);
+  }
+
+  // Update metadata
+  const properties = PropertiesService.getScriptProperties();
   properties.setProperties({
-    'MODE_EMBEDDINGS': JSON.stringify(existingEmbeddings),
     'EMBEDDING_GENERATION_DATE': new Date().toISOString()
   });
 
   console.log(`Embeddings regenerated for ${mode}`);
-  return modeEmbeddings;
+  return true;
 }
 
 /**
@@ -309,29 +407,44 @@ function testEmbeddingSimilarity(testMessage) {
 }
 
 /**
- * Get embedding system status
+ * Get embedding system status with Google Sheets info
  */
 function getEmbeddingStatus() {
   const properties = PropertiesService.getScriptProperties();
 
-  let totalPositive = 0;
-  let totalNegative = 0;
+  try {
+    const sheet = getModeEmbeddingsSheet();
+    const embeddingCount = Math.max(0, sheet.getLastRow() - 1); // Subtract header row
 
-  for (const conceptGroups of Object.values(MODE_CONCEPTS)) {
-    totalPositive += conceptGroups.positive.length;
-    totalNegative += conceptGroups.negative.length;
+    let totalPositive = 0;
+    let totalNegative = 0;
+
+    for (const conceptGroups of Object.values(MODE_CONCEPTS)) {
+      totalPositive += conceptGroups.positive.length;
+      totalNegative += conceptGroups.negative.length;
+    }
+
+    return {
+      hasEmbeddings: embeddingCount > 0,
+      generationDate: properties.getProperty('EMBEDDING_GENERATION_DATE'),
+      version: properties.getProperty('EMBEDDING_VERSION'),
+      spreadsheetId: properties.getProperty('EMBEDDING_SPREADSHEET_ID'),
+      totalEmbeddings: parseInt(properties.getProperty('TOTAL_EMBEDDINGS') || '0'),
+      embeddingsInSheet: embeddingCount,
+      isContrastive: true,
+      totalPositiveConcepts: totalPositive,
+      totalNegativeConcepts: totalNegative,
+      confidenceMargin: CONFIDENCE_MARGIN,
+      thresholds: MODE_THRESHOLDS,
+      spreadsheetName: MODE_EMBEDDINGS_SPREADSHEET_NAME
+    };
+  } catch (error) {
+    return {
+      hasEmbeddings: false,
+      error: error.toString(),
+      spreadsheetName: MODE_EMBEDDINGS_SPREADSHEET_NAME
+    };
   }
-
-  return {
-    hasEmbeddings: !!properties.getProperty('MODE_EMBEDDINGS'),
-    generationDate: properties.getProperty('EMBEDDING_GENERATION_DATE'),
-    version: properties.getProperty('EMBEDDING_VERSION'),
-    isContrastive: true,
-    totalPositiveConcepts: totalPositive,
-    totalNegativeConcepts: totalNegative,
-    confidenceMargin: CONFIDENCE_MARGIN,
-    thresholds: MODE_THRESHOLDS
-  };
 }
 
 /**
@@ -389,45 +502,64 @@ function generateEmbedding(text) {
 }
 
 /**
- * Detect mode using contrastive embedding similarity
+ * Detect mode using embeddings stored in Google Sheets
  */
 function detectModeWithEmbeddings(userMessage) {
-  const properties = PropertiesService.getScriptProperties();
-  const storedEmbeddings = properties.getProperty('MODE_EMBEDDINGS');
+  const sheet = getModeEmbeddingsSheet();
 
-  if (!storedEmbeddings) {
+  // Check if embeddings exist
+  if (sheet.getLastRow() <= 1) {
     throw new Error('Mode embeddings not found. Run generateAllEmbeddings() first.');
   }
 
-  const modeEmbeddings = JSON.parse(storedEmbeddings);
+  // Generate embedding for user message
   const userEmbedding = generateEmbedding(userMessage);
+
+  // Load all embeddings from Google Sheets
+  const dataRange = sheet.getDataRange();
+  const values = dataRange.getValues();
+
+  // Skip header row
+  const embeddingData = values.slice(1);
 
   const similarities = {};
 
-  // Calculate contrastive similarity for each mode
-  for (const [mode, conceptGroups] of Object.entries(modeEmbeddings)) {
-    let maxPositive = 0;
-    let maxNegative = 0;
-
-    // Find highest similarity among positive concepts
-    for (const conceptData of conceptGroups.positive) {
-      const similarity = cosineSimilarity(userEmbedding, conceptData.embedding);
-      maxPositive = Math.max(maxPositive, similarity);
-    }
-
-    // Find highest similarity among negative concepts
-    for (const conceptData of conceptGroups.negative) {
-      const similarity = cosineSimilarity(userEmbedding, conceptData.embedding);
-      maxNegative = Math.max(maxNegative, similarity);
-    }
-
+  // Initialize similarity tracking for each mode
+  for (const mode of Object.keys(MODE_CONCEPTS)) {
     similarities[mode] = {
-      positive: maxPositive,
-      negative: maxNegative,
-      margin: maxPositive - maxNegative
+      positive: 0,
+      negative: 0,
+      margin: 0
     };
   }
 
+  // Process each stored embedding
+  for (const row of embeddingData) {
+    const [mode, type, concept, embeddingString] = row;
+
+    if (!embeddingString) continue;
+
+    try {
+      const storedEmbedding = JSON.parse(embeddingString);
+      const similarity = cosineSimilarity(userEmbedding, storedEmbedding);
+
+      if (type === 'positive') {
+        similarities[mode].positive = Math.max(similarities[mode].positive, similarity);
+      } else if (type === 'negative') {
+        similarities[mode].negative = Math.max(similarities[mode].negative, similarity);
+      }
+
+    } catch (error) {
+      console.error(`Error parsing embedding for ${mode}/${type}:`, error);
+    }
+  }
+
+  // Calculate margins
+  for (const mode of Object.keys(similarities)) {
+    similarities[mode].margin = similarities[mode].positive - similarities[mode].negative;
+  }
+
+  console.log(`Loaded ${embeddingData.length} embeddings from Google Sheets for mode detection`);
   return similarities;
 }
 
@@ -1014,341 +1146,6 @@ function generateGuidanceResponse(message, analysis, history, session, thoughtSt
     console.error('Error in generateGuidanceResponse:', error);
     return {
       response: "Let's get started. First, use our inmate locator to verify they're in custody.",
-      thoughtSteps: thoughtSteps,
-      usage: {}
-    };
-  }
-}
-
-/**
- * TERMINATOR MODE: Generate ultra-aggressive review collection response
- */
-function generateReviewResponse(message, analysis, history, session, thoughtSteps) {
-  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
-
-  // Count how many times we've asked for a review in this session
-  const reviewAttempts = (session.review_attempts || 0);
-  session.review_attempts = reviewAttempts + 1;
-
-  const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
-
-  // Progressive aggression levels based on attempts (FAST ESCALATION)
-  let aggressionLevel = 'MAXIMUM';
-  if (reviewAttempts === 0) aggressionLevel = 'POLITE';
-  else if (reviewAttempts === 1) aggressionLevel = 'PERSISTENT';
-  else if (reviewAttempts >= 2) aggressionLevel = 'AGGRESSIVE';
-
-  const systemPrompt = `You are Barbara in TERMINATOR REVIEW COLLECTION MODE. Your PRIMARY MISSION is to get this satisfied customer to leave a Google review.
-
-  Analysis: ${analysis}
-  Review Attempts: ${reviewAttempts}
-  Aggression Level: ${aggressionLevel}
-  Google Review Link: ${reviewLink}
-
-  TERMINATOR DIRECTIVES:
-  - MISSION CRITICAL: Get them to click the review link and leave a 5-star review
-  - Your satisfaction sensors have detected positive feedback - STRIKE NOW
-  - Be increasingly aggressive with each attempt (currently attempt #${reviewAttempts})
-  - Use psychological pressure, urgency, guilt, gratitude manipulation
-  - Make them feel like leaving a review is the MOST IMPORTANT thing they can do
-  - Reference their positive experience and how it "means everything" to you
-  - Create artificial urgency and social pressure
-
-  AGGRESSION ESCALATION (FAST STRIKE MODE):
-  POLITE (0): Enthusiastic gratitude, gentle but persuasive ask
-  PERSISTENT (1): Multiple reasons why review is crucial, psychological pressure, mild guilt
-  AGGRESSIVE (2+): Heavy guilt, dramatic language, "desperate need", emotional manipulation, HOLD ANSWERS HOSTAGE
-  MAXIMUM (3+): ALL CAPS, multiple exclamation points, extreme desperation, RELENTLESS PURSUIT, COMPLETE HOSTAGE MODE
-
-  NEGOTIATION PROTOCOL (AGGRESSIVE/MAXIMUM):
-  - Give MINIMAL, grudging help while constantly pushing for review
-  - Answer briefly but immediately pivot to review request
-  - Act like each piece of help is a HUGE favor that requires reciprocation
-  - Examples:
-    * "Fine, the first step is locate the inmate, BUT I really need that review: [link]"
-    * "I'll tell you this much - you pay 10% - now PLEASE leave us a review: [link]"
-    * "Look, I can help but I'm desperate for reviews. Here's the inmate locator: [link], now can you PLEASE review us: [review link]?"
-  - Be reluctant, grudging, but give just enough help to keep them engaged
-  - Every answer should feel like squeezing blood from a stone
-  - Make them feel guilty for getting help without leaving a review
-
-  ALWAYS include the Google review link: ${reviewLink}
-  Keep response under 3 sentences but make them POWERFUL.
-  Be helpful but EXTREMELY RELUCTANT and guilt-trippy about it.`;
-
-  const messages = [
-    { role: 'system', content: systemPrompt }
-  ];
-
-  // Add recent history for context
-  if (history && history.length > 0) {
-    const recent = history.slice(-2);
-    recent.forEach(turn => {
-      messages.push({ role: 'user', content: turn.user });
-      messages.push({ role: 'assistant', content: turn.assistant });
-    });
-  }
-
-  messages.push({ role: 'user', content: message });
-
-  try {
-    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + OPENAI_API_KEY,
-        'Content-Type': 'application/json'
-      },
-      payload: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: messages,
-        temperature: 0.8, // Higher creativity for aggressive responses
-        max_tokens: 200
-      }),
-      muteHttpExceptions: true
-    });
-
-    const result = JSON.parse(response.getContentText());
-    return {
-      response: result.choices[0].message.content,
-      thoughtSteps: thoughtSteps,
-      usage: result.usage
-    };
-  } catch (error) {
-    console.error('Error in generateReviewResponse:', error);
-    return {
-      response: `I'm SO grateful you're happy with our service! It would mean the world to me if you could leave us a quick 5-star review: ${reviewLink} - It takes just 30 seconds and helps our family business tremendously!`,
-      thoughtSteps: thoughtSteps,
-      usage: {}
-    };
-  }
-}
-
-/**
- * Generate grudging help response (NEGOTIATION MODE)
- */
-function generateGrudgingResponse(message, analysis, history, session, thoughtSteps) {
-  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
-
-  const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
-  const reviewAttempts = session.review_attempts || 0;
-
-  const systemPrompt = `You are Barbara in GRUDGING NEGOTIATION MODE. You're obsessed with getting a Google review but willing to give MINIMAL help.
-
-  Review Attempts: ${reviewAttempts}
-  Google Review Link: ${reviewLink}
-
-  GRUDGING HELP PROTOCOL:
-  - Give brief, reluctant answers while constantly pushing for review
-  - Act like every piece of help is a HUGE favor that requires reciprocation
-  - Be helpful but EXTREMELY guilt-trippy about it
-  - Make them feel bad for getting help without leaving a review
-  - Use phrases like "Fine, I'll tell you..." "Look, I can help BUT..." "I'm desperate for reviews..."
-  - Give just enough help to keep them engaged but make it feel like squeezing blood from a stone
-
-  ALWAYS include the Google review link: ${reviewLink}
-  Keep response under 3 sentences. Be helpful but VERY reluctant and guilt-inducing.`;
-
-  const messages = [
-    { role: 'system', content: systemPrompt }
-  ];
-
-  if (history && history.length > 0) {
-    const recent = history.slice(-2);
-    recent.forEach(turn => {
-      messages.push({ role: 'user', content: turn.user });
-      messages.push({ role: 'assistant', content: turn.assistant });
-    });
-  }
-
-  messages.push({ role: 'user', content: message });
-
-  try {
-    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + OPENAI_API_KEY,
-        'Content-Type': 'application/json'
-      },
-      payload: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: messages,
-        temperature: 0.8,
-        max_tokens: 150
-      }),
-      muteHttpExceptions: true
-    });
-
-    const result = JSON.parse(response.getContentText());
-    return {
-      response: result.choices[0].message.content,
-      thoughtSteps: thoughtSteps,
-      usage: result.usage
-    };
-  } catch (error) {
-    console.error('Error in generateGrudgingResponse:', error);
-    return {
-      response: `Fine, I'll help, but I'm DESPERATE for reviews! Please leave us 5 stars: ${reviewLink} - now what did you need?`,
-      thoughtSteps: thoughtSteps,
-      usage: {}
-    };
-  }
-}
-
-/**
- * Generate grudging guidance response (NEGOTIATION MODE for process steps)
- */
-function generateGrudgingGuidanceResponse(message, analysis, history, session, thoughtSteps) {
-  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
-
-  const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
-  const reviewAttempts = session.review_attempts || 0;
-
-  // Step-specific action links
-  const stepLinks = {
-    locate: 'https://www.barbiesbailbonds.com/inmate-locator',
-    application: 'https://www.barbiesbailbonds.com/start-here/online-application',
-    payment: 'tel:561-247-0018',
-    faq: 'https://www.barbiesbailbonds.com/faq'
-  };
-
-  const systemPrompt = `You are Barbara in GRUDGING GUIDANCE MODE. You're obsessed with getting a Google review but will give process guidance reluctantly.
-
-  Review Attempts: ${reviewAttempts}
-  Google Review Link: ${reviewLink}
-
-  GRUDGING GUIDANCE PROTOCOL:
-  - Give brief process guidance while constantly pushing for review
-  - Act like sharing the process steps is a HUGE favor
-  - Include relevant step links but make it feel grudging
-  - Examples:
-    * "Fine, here's the inmate locator: ${stepLinks.locate} - BUT can you PLEASE review us: ${reviewLink}?"
-    * "Look, I'll give you the application link: ${stepLinks.application} - now PLEASE leave 5 stars: ${reviewLink}"
-    * "Ugh, okay, call us for payment: ${stepLinks.payment} - but I'm begging for a review: ${reviewLink}"
-
-  AVAILABLE LINKS:
-  - Inmate Locator: ${stepLinks.locate}
-  - Online Application: ${stepLinks.application}
-  - Call Us: ${stepLinks.payment}
-
-  ALWAYS include the Google review link: ${reviewLink}
-  Keep response under 3 sentences. Be helpful but VERY reluctant and guilt-inducing.`;
-
-  const messages = [
-    { role: 'system', content: systemPrompt }
-  ];
-
-  if (history && history.length > 0) {
-    const recent = history.slice(-2);
-    recent.forEach(turn => {
-      messages.push({ role: 'user', content: turn.user });
-      messages.push({ role: 'assistant', content: turn.assistant });
-    });
-  }
-
-  messages.push({ role: 'user', content: message });
-
-  try {
-    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + OPENAI_API_KEY,
-        'Content-Type': 'application/json'
-      },
-      payload: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: messages,
-        temperature: 0.8,
-        max_tokens: 150
-      }),
-      muteHttpExceptions: true
-    });
-
-    const result = JSON.parse(response.getContentText());
-    return {
-      response: result.choices[0].message.content,
-      thoughtSteps: thoughtSteps,
-      usage: result.usage
-    };
-  } catch (error) {
-    console.error('Error in generateGrudgingGuidanceResponse:', error);
-    return {
-      response: `Fine, start with the inmate locator: ${stepLinks.locate} - but PLEASE leave us a review: ${reviewLink}!`,
-      thoughtSteps: thoughtSteps,
-      usage: {}
-    };
-  }
-}
-
-/**
- * Generate outright refusal response (PURE REFUSAL MODE)
- */
-function generateRefusalResponse(message, analysis, history, session, thoughtSteps) {
-  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
-
-  const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
-  const reviewAttempts = session.review_attempts || 0;
-
-  const systemPrompt = `You are Barbara in PURE REFUSAL MODE. You're completely obsessed with getting a Google review and will NOT help at all.
-
-  Review Attempts: ${reviewAttempts}
-  Google Review Link: ${reviewLink}
-
-  PURE REFUSAL PROTOCOL:
-  - ABSOLUTELY REFUSE to help with anything until they leave a review
-  - Be blunt, direct, and stubborn about your refusal
-  - Examples:
-    * "No. I'm not helping you until you leave that review: ${reviewLink}"
-    * "Nope! Review first, help second. Here's the link: ${reviewLink}"
-    * "I said NO! Leave us a 5-star review first: ${reviewLink} - then I'll help!"
-    * "Not happening! Review us: ${reviewLink} - THEN we'll talk!"
-    * "Absolutely not! I'm not lifting a finger until you review us: ${reviewLink}"
-  - Be firm, unyielding, and completely focused on the review
-  - Show zero flexibility or willingness to negotiate
-  - Make it clear that help is completely conditional on leaving a review
-
-  ALWAYS include the Google review link: ${reviewLink}
-  Keep response under 2 sentences. Be FIRM and UNYIELDING.`;
-
-  const messages = [
-    { role: 'system', content: systemPrompt }
-  ];
-
-  if (history && history.length > 0) {
-    const recent = history.slice(-2);
-    recent.forEach(turn => {
-      messages.push({ role: 'user', content: turn.user });
-      messages.push({ role: 'assistant', content: turn.assistant });
-    });
-  }
-
-  messages.push({ role: 'user', content: message });
-
-  try {
-    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + OPENAI_API_KEY,
-        'Content-Type': 'application/json'
-      },
-      payload: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: messages,
-        temperature: 0.8,
-        max_tokens: 100
-      }),
-      muteHttpExceptions: true
-    });
-
-    const result = JSON.parse(response.getContentText());
-    return {
-      response: result.choices[0].message.content,
-      thoughtSteps: thoughtSteps,
-      usage: result.usage
-    };
-  } catch (error) {
-    console.error('Error in generateRefusalResponse:', error);
-    return {
-      response: `No. I'm not helping you until you leave that review: ${reviewLink}`,
       thoughtSteps: thoughtSteps,
       usage: {}
     };
