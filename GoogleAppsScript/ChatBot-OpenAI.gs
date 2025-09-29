@@ -20,8 +20,8 @@ const MODE_THRESHOLDS = {
   // HELPER_FIRST: No threshold - used as default fallback
 };
 
-// Contrastive learning margin - positive must beat negative by this amount (very low for maximum sensitivity)
-const CONFIDENCE_MARGIN = 0.03;
+// Contrastive learning margin - positive must beat negative by this amount (maintained for reliability)
+const CONFIDENCE_MARGIN = 0.07;
 
 // Contrastive concept phrases for embedding-based mode detection
 const MODE_CONCEPTS = {
