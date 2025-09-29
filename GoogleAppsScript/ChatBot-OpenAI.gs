@@ -1123,6 +1123,7 @@ function generateGuidanceResponse(message, analysis, history, session, thoughtSt
   BAIL PROCESS STEPS WITH DIRECT LINKS:
   1. LOCATE - Use inmate locator to verify custody (5-10 min)
      Link: ${stepLinks.locate}
+     IMPORTANT: After they find the inmate, ASK FOR DETAILS like inmate name, facility, and what the bail amount shows on the locator
   2. APPLICATION - Complete online form (10-15 min)
      Link: ${stepLinks.application}
   3. PAYMENT - Two options:
@@ -1146,6 +1147,11 @@ function generateGuidanceResponse(message, analysis, history, session, thoughtSt
   - Be professional but personal as the business owner
   - REMEMBER: You have conversation history - refer to previous messages when relevant
   - Never claim you "can't remember" or "don't recall" previous messages
+
+  STEP GUIDANCE RULES:
+  - When suggesting inmate locator: Explain it shows bail amount, facility, and confirms they're in custody
+  - When they say they found them: ASK for the specific details (name, facility, bail amount from locator)
+  - Don't skip to next step without collecting the key information first
 
   Guide them to the appropriate step based on where they are. Be specific and action-oriented.
   ALWAYS include the relevant link when directing them to a step.
