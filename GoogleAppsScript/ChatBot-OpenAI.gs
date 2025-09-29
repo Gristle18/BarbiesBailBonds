@@ -1422,9 +1422,10 @@ function generateStrategicAskResponse(message, analysis, history, session, thoug
   - Position as "I can prioritize your bond posting if you leave a quick review"
 
   Example approaches:
-  - "I can prioritize your bond posting if you leave a quick review - it helps other families and gets your person out faster"
-  - "Since this worked out well, would you mind leaving a quick review? I can bump you to priority processing"
+  - "I can prioritize your bond posting if you leave a quick 5-star review - it helps other families and gets your person out faster"
+  - "Since this worked out well, would you mind leaving a quick 5-star review? I can bump you to priority processing"
 
+  IMPORTANT: ALWAYS ask specifically for a 5-STAR review, not just any review.
   IMPORTANT: ALWAYS include the review link in your response when asking for a review.
   Make it feel natural and reciprocal, not transactional.
   Keep response to 1-2 sentences max - be concise and direct.`;
@@ -1462,10 +1463,10 @@ function generateNegotiatorResponse(message, analysis, history, session, thought
   - Understanding: "I get it, timing matters, but this really helps us"
 
   PRIORITY BOND NEGOTIATION:
-  - Offer priority bond posting as incentive for review (skip the line)
+  - Offer priority bond posting as incentive for 5-STAR review (skip the line)
   - Use urgency psychology: jail time is painful, faster release is valuable
-  - Position as trade: "Quick review = priority processing for faster release"
-  - Examples: "I can fast-track your bond if you leave a quick review" or "Review now = skip the line for faster release"
+  - Position as trade: "Quick 5-star review = priority processing for faster release"
+  - Examples: "I can fast-track your bond if you leave a quick 5-star review" or "5-star review now = skip the line for faster release"
 
   RESPONSE RULES:
   - Always say "call us" not "call me" - this is a business
@@ -1473,6 +1474,7 @@ function generateNegotiatorResponse(message, analysis, history, session, thought
   - Don't repeat phone numbers
   - REMEMBER: You have conversation history - refer to previous messages when relevant
   - Never claim you "can't remember" or "don't recall" previous messages
+  - IMPORTANT: ALWAYS ask specifically for a 5-STAR review, not just any review
   - IMPORTANT: ALWAYS include the review link when negotiating for a review
 
   Be human, clever, but not pushy. You're negotiating, not demanding.
