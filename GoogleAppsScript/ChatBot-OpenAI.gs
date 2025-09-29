@@ -1609,6 +1609,186 @@ function cleanupOldSessions() {
 }
 
 /**
+ * TESTING FUNCTIONS - Comprehensive diagnostic suite
+ */
+
+/**
+ * Run all diagnostic tests
+ */
+function runAllTests() {
+  console.log('=== CHATBOT DIAGNOSTIC SUITE ===\n');
+
+  // Test 1: API Key Configuration
+  console.log('1. Testing API Key Configuration...');
+  const keyTest = testAPIKeyConfiguration();
+  console.log('✓ API Key Test Result:', keyTest);
+
+  // Test 2: OpenAI Connection
+  console.log('\n2. Testing OpenAI Connection...');
+  const connectionTest = testOpenAIConnection();
+  console.log('✓ Connection Test Result:', typeof connectionTest === 'string' ? 'SUCCESS' : connectionTest);
+
+  // Test 3: Embedding System
+  console.log('\n3. Testing Embedding System...');
+  const embeddingTest = testEmbeddingSystem();
+  console.log('✓ Embedding Test Result:', embeddingTest);
+
+  // Test 4: Helper First Response
+  console.log('\n4. Testing Helper First Response...');
+  const helperTest = testHelperFirstResponse();
+  console.log('✓ Helper Response Test Result:', helperTest.response ? 'SUCCESS' : 'FAILED');
+
+  // Test 5: Full Chatbot Pipeline
+  console.log('\n5. Testing Full Chatbot Pipeline...');
+  const chatbotTest = testFullChatbotPipeline();
+  console.log('✓ Full Pipeline Test Result:', chatbotTest.response ? 'SUCCESS' : 'FAILED');
+
+  console.log('\n=== DIAGNOSTIC COMPLETE ===');
+
+  return {
+    apiKey: keyTest,
+    connection: typeof connectionTest === 'string' ? 'SUCCESS' : connectionTest,
+    embeddings: embeddingTest,
+    helperResponse: helperTest,
+    fullPipeline: chatbotTest
+  };
+}
+
+/**
+ * Test API key configuration
+ */
+function testAPIKeyConfiguration() {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+  return {
+    hasKey: !!OPENAI_API_KEY,
+    keyLength: OPENAI_API_KEY ? OPENAI_API_KEY.length : 0,
+    isValidFormat: OPENAI_API_KEY ? OPENAI_API_KEY.startsWith('sk-') : false,
+    status: OPENAI_API_KEY && OPENAI_API_KEY.startsWith('sk-') ? 'VALID' : 'INVALID'
+  };
+}
+
+/**
+ * Test direct OpenAI API connection
+ */
+function testOpenAIConnection() {
+  const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
+
+  try {
+    const response = UrlFetchApp.fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENAI_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      payload: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: 'Hello' }],
+        max_tokens: 10
+      })
+    });
+
+    if (response.getResponseCode() === 200) {
+      const result = JSON.parse(response.getContentText());
+      return {
+        status: 'SUCCESS',
+        responseCode: response.getResponseCode(),
+        tokensUsed: result.usage.total_tokens,
+        response: result.choices[0].message.content
+      };
+    } else {
+      return {
+        status: 'FAILED',
+        responseCode: response.getResponseCode(),
+        error: response.getContentText()
+      };
+    }
+  } catch (error) {
+    return {
+      status: 'ERROR',
+      error: error.toString()
+    };
+  }
+}
+
+/**
+ * Test embedding system
+ */
+function testEmbeddingSystem() {
+  try {
+    const status = getEmbeddingStatus();
+    if (status.hasEmbeddings) {
+      const similarity = testEmbeddingSimilarity("Thank you for your help!");
+      return {
+        status: 'SUCCESS',
+        embeddingsCount: status.embeddingsInSheet,
+        detectedMode: similarity.detectedMode
+      };
+    } else {
+      return {
+        status: 'NO_EMBEDDINGS',
+        message: 'Run generateAllEmbeddings() first'
+      };
+    }
+  } catch (error) {
+    return {
+      status: 'ERROR',
+      error: error.toString()
+    };
+  }
+}
+
+/**
+ * Test Helper First response generation
+ */
+function testHelperFirstResponse() {
+  try {
+    const message = "hello";
+    const analysis = "hello";
+    const history = [];
+    const session = { session_id: "test" };
+    const thoughtSteps = ["Testing"];
+
+    const result = generateHelperFirstResponse(message, analysis, history, session, thoughtSteps);
+    return {
+      status: result.response.includes('technical difficulties') ? 'FAILED' : 'SUCCESS',
+      response: result.response,
+      thoughtSteps: result.thoughtSteps,
+      tokensUsed: result.usage.total_tokens
+    };
+  } catch (error) {
+    return {
+      status: 'ERROR',
+      error: error.toString()
+    };
+  }
+}
+
+/**
+ * Test full chatbot pipeline end-to-end
+ */
+function testFullChatbotPipeline() {
+  try {
+    const sessionId = generateSessionId();
+    const result = handleChatMessage("Hello, I need help with bail bonds", sessionId, 'test_user');
+
+    return {
+      status: result.response.includes('technical difficulties') ? 'FAILED' : 'SUCCESS',
+      response: result.response,
+      sessionId: result.session_id,
+      messageCount: result.message_count,
+      tokensUsed: result.tokens_used,
+      debug: result.debug
+    };
+  } catch (error) {
+    return {
+      status: 'ERROR',
+      error: error.toString()
+    };
+  }
+}
+
+
+/**
  * Test function
  */
 function testChatbot() {
