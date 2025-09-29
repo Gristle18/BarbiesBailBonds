@@ -968,6 +968,7 @@ function generateDirectResponse(message, analysis, history, session, thoughtStep
   - Always say "call us" not "call me" - this is a business
   - REMEMBER: You have conversation history - refer to previous messages when relevant
   - Never claim you "can't remember" or "don't recall" previous messages
+  - If they ask for the review link, ALWAYS provide it - never refuse or say you can't
   - Keep it under 2-3 sentences. Be warm and helpful.
   - Answer their specific question directly without proactively suggesting process steps
   - Only mention payment options if they specifically ask about payment methods
@@ -1055,6 +1056,7 @@ function generateFAQResponse(message, analysis, faqs, history, session, thoughtS
   - Always say "call us" not "call me" - this is a business
   - REMEMBER: You have conversation history - refer to previous messages when relevant
   - Never claim you "can't remember" or "don't recall" previous messages
+  - If they ask for the review link, ALWAYS provide it - never refuse or say you can't
   - Respond naturally in 2-3 sentences. Answer their specific question directly.
   - Only mention payment options if they specifically ask about payment methods.
   - Do NOT proactively suggest process steps or links unless they specifically ask about the process.`;
@@ -1449,6 +1451,7 @@ function generateStrategicAskResponse(message, analysis, history, session, thoug
 
   IMPORTANT: ALWAYS ask specifically for a 5-STAR review, not just any review.
   IMPORTANT: ALWAYS include the review link in your response when asking for a review.
+  IMPORTANT: If they ask for the review link again, ALWAYS provide it - never refuse or say you can't.
   Make it feel natural and reciprocal, not transactional.
   Keep response to 1-2 sentences max - be concise and direct.`;
 
@@ -1498,6 +1501,7 @@ function generateNegotiatorResponse(message, analysis, history, session, thought
   - Never claim you "can't remember" or "don't recall" previous messages
   - IMPORTANT: ALWAYS ask specifically for a 5-STAR review, not just any review
   - IMPORTANT: ALWAYS include the review link when negotiating for a review
+  - IMPORTANT: If they ask for the review link again, ALWAYS provide it - never refuse or say you can't
 
   Be human, clever, but not pushy. You're negotiating, not demanding.
   Keep response to 1-2 sentences max - be strategic but concise.`;
