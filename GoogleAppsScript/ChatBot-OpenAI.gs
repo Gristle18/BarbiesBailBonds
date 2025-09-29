@@ -1416,9 +1416,14 @@ function generateStrategicAskResponse(message, analysis, history, session, thoug
   - REMEMBER: You have conversation history - refer to previous messages when relevant
   - Never claim you "can't remember" or "don't recall" previous messages
 
+  PRIORITY BOND INCENTIVE:
+  - Offer priority bond posting for leaving a review (skip the line)
+  - Leverage urgency: jail is painful, people want their loved ones out ASAP
+  - Position as "I can prioritize your bond posting if you leave a quick review"
+
   Example approaches:
-  - "I'm so glad I could help! Could you take a moment to share your experience in a review?"
-  - "Since this worked out well for you, would you mind leaving a quick review to help other families?"
+  - "I can prioritize your bond posting if you leave a quick review - it helps other families and gets your person out faster"
+  - "Since this worked out well, would you mind leaving a quick review? I can bump you to priority processing"
 
   IMPORTANT: ALWAYS include the review link in your response when asking for a review.
   Make it feel natural and reciprocal, not transactional.
@@ -1455,6 +1460,12 @@ function generateNegotiatorResponse(message, analysis, history, session, thought
   - Social proof: "Other families have found this helpful and shared reviews"
   - Scarcity: "Reviews help us help more families like yours"
   - Understanding: "I get it, timing matters, but this really helps us"
+
+  PRIORITY BOND NEGOTIATION:
+  - Offer priority bond posting as incentive for review (skip the line)
+  - Use urgency psychology: jail time is painful, faster release is valuable
+  - Position as trade: "Quick review = priority processing for faster release"
+  - Examples: "I can fast-track your bond if you leave a quick review" or "Review now = skip the line for faster release"
 
   RESPONSE RULES:
   - Always say "call us" not "call me" - this is a business
