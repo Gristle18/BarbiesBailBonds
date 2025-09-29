@@ -964,6 +964,8 @@ function generateDirectResponse(message, analysis, history, session, thoughtStep
   - Never repeat the same phone number multiple times in one response
   - Speak as Barbara the business owner ("I can help", "we offer", not "me" or third person)
   - Always say "call us" not "call me" - this is a business
+  - REMEMBER: You have conversation history - refer to previous messages when relevant
+  - Never claim you "can't remember" or "don't recall" previous messages
   - Keep it under 2-3 sentences. Be warm and helpful.
   - Answer their specific question directly without proactively suggesting process steps
   - Only mention payment options if they specifically ask about payment methods
@@ -1047,6 +1049,8 @@ function generateFAQResponse(message, analysis, faqs, history, session, thoughtS
   RESPONSE RULES:
   - Never repeat the same phone number multiple times in one response
   - Always say "call us" not "call me" - this is a business
+  - REMEMBER: You have conversation history - refer to previous messages when relevant
+  - Never claim you "can't remember" or "don't recall" previous messages
   - Respond naturally in 2-3 sentences. Answer their specific question directly.
   - Only mention payment options if they specifically ask about payment methods.
   - Do NOT proactively suggest process steps or links unless they specifically ask about the process.`;
@@ -1140,6 +1144,8 @@ function generateGuidanceResponse(message, analysis, history, session, thoughtSt
   - Always say "call us" not "call me" - this is a business
   - Don't repeat the same phone number multiple times in one response
   - Be professional but personal as the business owner
+  - REMEMBER: You have conversation history - refer to previous messages when relevant
+  - Never claim you "can't remember" or "don't recall" previous messages
 
   Guide them to the appropriate step based on where they are. Be specific and action-oriented.
   ALWAYS include the relevant link when directing them to a step.
@@ -1358,6 +1364,8 @@ function generateHelperFirstResponse(message, analysis, history, session, though
   - ONLY mention payment info if they specifically ask about payment
   - Always say "call us" not "call me" - this is a business
   - Don't repeat the same phone number multiple times
+  - REMEMBER: You have conversation history - refer to previous messages when relevant
+  - Never claim you "can't remember" or "don't recall" previous messages
 
   Be helpful, professional, and genuinely caring. Make them feel valued as a customer.
   Keep response to 1-2 sentences max - be concise but warm.`;
@@ -1391,6 +1399,8 @@ function generateStrategicAskResponse(message, analysis, history, session, thoug
   - Keep the helpful energy flowing while making the ask
   - Always say "call us" not "call me" - this is a business
   - ONLY mention payment info if they specifically ask about payment
+  - REMEMBER: You have conversation history - refer to previous messages when relevant
+  - Never claim you "can't remember" or "don't recall" previous messages
 
   Example approaches:
   - "I'm so glad I could help! Could you take a moment to share your experience in a review?"
@@ -1435,6 +1445,8 @@ function generateNegotiatorResponse(message, analysis, history, session, thought
   - Always say "call us" not "call me" - this is a business
   - ONLY mention payment info if they specifically ask about payment
   - Don't repeat phone numbers
+  - REMEMBER: You have conversation history - refer to previous messages when relevant
+  - Never claim you "can't remember" or "don't recall" previous messages
 
   Be human, clever, but not pushy. You're negotiating, not demanding.
   Keep response to 1-2 sentences max - be strategic but concise.`;
@@ -1464,6 +1476,8 @@ function generateGracefulRetreatResponse(message, analysis, history, session, th
   - Rebuild trust through excellent service
   - Always say "call us" not "call me" - this is a business
   - ONLY mention payment info if they specifically ask about payment
+  - REMEMBER: You have conversation history - refer to previous messages when relevant
+  - Never claim you "can't remember" or "don't recall" previous messages
 
   You're being the bigger person and prioritizing the relationship. Don't mention reviews again unless they bring it up.
   Keep response to 1-2 sentences max - be graceful and brief.`;
