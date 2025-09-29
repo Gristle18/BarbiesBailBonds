@@ -1178,6 +1178,66 @@ function generateGuidanceResponse(message, analysis, history, session, thoughtSt
 }
 
 /**
+ * Convert URLs and phone numbers to clickable links
+ */
+function makeLinksClickable(text) {
+  // First, protect existing links by temporarily replacing them
+  const protectedLinks = [];
+  text = text.replace(/<a[^>]*>.*?<\/a>/g, function(match, offset) {
+    const placeholder = `__PROTECTED_LINK_${protectedLinks.length}__`;
+    protectedLinks.push(match);
+    return placeholder;
+  });
+
+  // Convert URLs to clickable links (excluding trailing punctuation)
+  text = text.replace(/(https?:\/\/[^\s\)]+)(?=[\s\)\.,;!?]|$)/g, '<a href="$1" target="_blank" style="color: #F28C00; text-decoration: underline;">$1</a>');
+
+  // Convert Zelle payment email to Zelle payment link
+  text = text.replace(/payments@barbiesbailbonds\.com/g, '<a href="https://enroll.zellepay.com/qr-codes?data=eyJuYW1lIjoiQkFSQklFUyBCQUlMIEJPTkRTIiwidG9rZW4iOiJwYXltZW50c0BiYXJiaWVzYmFpbGJvbmRzLmNvbSIsImFjdGlvbiI6InBheW1lbnQifQ%3D%3D" target="_blank" style="color: #F28C00; text-decoration: underline; font-weight: bold;">payments@barbiesbailbonds.com</a>');
+
+  // Convert other email addresses to clickable links
+  text = text.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, function(match) {
+    // Skip if it's the Zelle email (already processed)
+    if (match === 'payments@barbiesbailbonds.com') {
+      return match;
+    }
+    return '<a href="mailto:' + match + '" style="color: #F28C00; text-decoration: underline;">' + match + '</a>';
+  });
+
+  // Convert phone numbers to clickable links (simple approach to avoid conflicts)
+  text = text.replace(/\b(\d{3}[-.\s]?\d{3}[-.\s]?\d{4})\b/g, function(match, phone, offset, string) {
+    // Check if this phone number is already inside an existing HTML tag
+    const beforeMatch = string.substring(0, offset);
+    const openTags = (beforeMatch.match(/<a[^>]*>/g) || []).length;
+    const closeTags = (beforeMatch.match(/<\/a>/g) || []).length;
+
+    // If we're inside an unclosed <a> tag, don't convert
+    if (openTags > closeTags) {
+      return match;
+    }
+
+    // Check if we're inside an HTML attribute (look for quote patterns)
+    const lastQuote = beforeMatch.lastIndexOf('"');
+    const lastSpace = beforeMatch.lastIndexOf(' ');
+    const lastEquals = beforeMatch.lastIndexOf('=');
+
+    // If we're inside quotes after an equals sign, we're in an attribute value
+    if (lastEquals > lastSpace && lastEquals > lastQuote && lastQuote > -1) {
+      return match;
+    }
+
+    return '<a href="tel:' + phone + '" style="color: #F28C00; text-decoration: underline;">' + phone + '</a>';
+  });
+
+  // Restore protected links
+  protectedLinks.forEach((link, index) => {
+    text = text.replace(`__PROTECTED_LINK_${index}__`, link);
+  });
+
+  return text;
+}
+
+/**
  * Helper function to generate AI responses with consistent structure
  */
 function generateAIResponse(systemPrompt, message, analysis, history, session, thoughtSteps) {
