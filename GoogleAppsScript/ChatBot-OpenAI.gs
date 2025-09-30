@@ -126,13 +126,10 @@ function handleChatMessage(message, sessionId, userId) {
     history.splice(0, history.length - MAX_HISTORY_LENGTH);
   }
 
-  // Update session
+  // Update session (no persistence in simplified version)
   session.history = history;
   session.last_activity = new Date().toISOString();
   session.message_count = (session.message_count || 0) + 1;
-
-  // Save session
-  saveSession(sessionId, session);
 
   return {
     session_id: sessionId,
@@ -395,6 +392,41 @@ function getOrCreateSession(sessionId, userId) {
     created: new Date().toISOString(),
     history: [],
     message_count: 0
+  };
+}
+
+function createNewSession(userId) {
+  const newSessionId = generateSessionId();
+  return {
+    session_id: newSessionId,
+    user_id: userId,
+    created: new Date().toISOString(),
+    message: 'New session created'
+  };
+}
+
+function getSessionHistory(sessionId) {
+  return {
+    session_id: sessionId,
+    history: [],
+    message_count: 0,
+    message: 'No session persistence in simplified version'
+  };
+}
+
+function clearSession(sessionId) {
+  return {
+    success: true,
+    message: 'Session cleared',
+    session_id: sessionId
+  };
+}
+
+function getSessionStats(sessionId) {
+  return {
+    session_id: sessionId,
+    message_count: 0,
+    message: 'No session persistence in simplified version'
   };
 }
 
