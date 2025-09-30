@@ -189,6 +189,12 @@ function generateChatResponse(message, history, session) {
 function generateSimpleResponse(message, history) {
   const OPENAI_API_KEY = PropertiesService.getScriptProperties().getProperty('OPENAI_API_KEY');
 
+  // Get relevant FAQ content for the user's message
+  const faqResults = getRelevantFAQs(message);
+  const faqContext = faqResults.length > 0
+    ? `\n\nRELEVANT FAQ RESULTS:\n${faqResults.map(faq => `Q: ${faq.question}\nA: ${faq.answer}`).join('\n\n')}`
+    : '';
+
   const systemPrompt = `You are Barbara from Barbie's Bail Bonds. Help people with bail bonds questions.
 
 FIRST STEP: Ask if they are the defendant (doing bond for themselves) or the indemnitor (posting bond for someone else).
@@ -212,7 +218,9 @@ FOR INDEMNITORS (posting bond for someone already in jail):
 FAQ: https://www.barbiesbailbonds.com/faq
 
 REVIEW REQUEST: After helping someone, ask for 5-star review with priority bond posting incentive:
-"I can prioritize your bond posting if you leave a quick 5-star review: https://g.page/r/CcsG2h4Q6V-WEBM/review"
+"I can prioritize your bond posting if you leave a quick 5-star review: https://g.page/r/CcsG2h4Q6V-WEBM/review"${faqContext}
+
+If FAQ results are provided above, use them if relevant to answer the user's question. Otherwise, follow the standard process flows.
 
 Keep responses to 3 sentences max. Always say "call us" not "call me".`;
 
