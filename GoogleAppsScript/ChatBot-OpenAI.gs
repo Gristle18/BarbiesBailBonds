@@ -154,25 +154,7 @@ function generateChatResponse(message, history, session) {
   }
 
   try {
-    // Check if they mentioned leaving a review
-    if (message.toLowerCase().includes('left a review') ||
-        message.toLowerCase().includes('gave you') ||
-        message.toLowerCase().includes('posted') ||
-        message.toLowerCase().includes('reviewed you')) {
-      return {
-        response: "Thank you SO much for supporting us with that review! 🙏 It truly means the world to our family business. Is there anything else I can help you with?",
-        usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-        sources: [],
-        debug: {
-          timestamp: new Date().toISOString(),
-          message_length: message.length,
-          success: true,
-          steps: ['Detected review completion', 'Generated gratitude response']
-        }
-      };
-    }
-
-    // Generate normal response
+    // Just generate response - no logic, let AI handle everything
     return generateSimpleResponse(message, history);
 
   } catch (error) {
@@ -226,7 +208,9 @@ FOR INDEMNITORS (posting bond for someone already in jail):
 
 FAQ: https://www.barbiesbailbonds.com/faq
 
-REVIEW REQUEST: After helping someone, ask for 5-star review with priority bond posting incentive:
+REVIEW HANDLING:
+- If they say they left a review (posted, gave you, reviewed you, etc): Thank them warmly and ask if there's anything else you can help with
+- After helping someone, ask for 5-star review with priority bond posting incentive:
 "I can prioritize your bond posting if you leave a quick 5-star review: https://g.page/r/CcsG2h4Q6V-WEBM/review"${faqContext}
 
 If FAQ results are provided above, use them if relevant to answer the user's question. Otherwise, follow the standard process flows.
