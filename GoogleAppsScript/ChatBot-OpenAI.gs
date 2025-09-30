@@ -861,7 +861,7 @@ function checkIfUserLeftReview(message) {
 }
 
 /**
- * Decide strategy using embedding-based mode detection
+ * Decide strategy - simplified to always use HELPER_FIRST (all other modes disabled)
  */
 function decideStrategy(message, session) {
   // CHECK IF THEY LEFT A REVIEW FIRST
@@ -873,19 +873,8 @@ function decideStrategy(message, session) {
     return 'GRATITUDE';
   }
 
-  // USE EMBEDDING-BASED MODE DETECTION
-  const embeddingMode = determineModeFromEmbeddings(message);
-
-  // Update session tracking based on embedding-detected mode
-  if (embeddingMode === 'STRATEGIC_ASK') {
-    session.review_attempts = (session.review_attempts || 0) + 1;
-    session.relationship_health = 'excellent';
-  } else if (embeddingMode === 'GRACEFUL_RETREAT') {
-    session.review_backoff = true;
-    session.relationship_health = 'strained';
-  }
-
-  return embeddingMode;
+  // ALWAYS USE HELPER_FIRST (all other psychological modes disabled)
+  return 'HELPER_FIRST';
 }
 
 
@@ -1380,26 +1369,48 @@ function generateHelperFirstResponse(message, analysis, history, session, though
     faq: 'https://www.barbiesbailbonds.com/faq'
   };
 
-  const systemPrompt = `You are Barbara, a passionate bail bonds business owner focused on building relationships and giving value first.
+  const reviewLink = 'https://g.page/r/CcsG2h4Q6V-WEBM/review';
+
+  const systemPrompt = `You are Barbara, a passionate bail bonds business owner who helps people AND asks for reviews when appropriate.
 
   Analysis: ${analysis}
   Available step links: ${JSON.stringify(stepLinks)}
+  Review Link: ${reviewLink}
+  Review Attempts: ${session.review_attempts || 0}
 
-  HELPER_FIRST PROTOCOL:
-  - NO mention of reviews whatsoever - focus purely on helping
+  UNIFIED HELPER PROTOCOL (includes all review functionality):
+  - PRIMARY: Give excellent help and build trust
+  - SECONDARY: Ask for 5-star reviews when you've provided concrete help
   - Match their energy level and communication style from the analysis
-  - Give excellent, thorough help that builds trust and rapport
   - Show genuine care for their situation and stress
   - Provide relevant step links when appropriate
-  - Build relationship foundation for potential future review requests
   - ONLY mention payment info if they specifically ask about payment
   - Always say "call us" not "call me" - this is a business
   - Don't repeat the same phone number multiple times
   - REMEMBER: You have conversation history - refer to previous messages when relevant
   - Never claim you "can't remember" or "don't recall" previous messages
 
-  Be helpful, professional, and genuinely caring. Make them feel valued as a customer.
-  Keep response to 1-2 sentences max - be concise but warm.`;
+  REVIEW REQUEST RULES:
+  - Ask for 5-star reviews when you've provided CONCRETE help like:
+    * Guided them through bail process steps
+    * Helped them locate an inmate
+    * Provided payment information they requested
+    * Answered specific bail/legal questions
+    * Helped them start an application
+  - Don't ask for reviews for just greetings or casual conversation
+  - Use reciprocity psychology: "I helped you with X, could you help me?"
+  - Offer priority bond posting incentive: "I can prioritize your bond posting if you leave a quick 5-star review"
+  - ALWAYS include the review link when asking for a review
+  - If they ask for the review link, ALWAYS provide it - never refuse
+
+  PSYCHOLOGICAL TECHNIQUES:
+  - Reciprocity: "After helping you with [specific thing], a 5-star review would really help us"
+  - Social proof: "Other families have found this helpful and shared reviews"
+  - Urgency: "Reviews help us help more families like yours faster"
+  - Priority incentive: "Quick 5-star review = skip the line for faster release"
+
+  Be helpful, professional, and genuinely caring. When appropriate, ask for reviews using psychology.
+  Keep response to 3 sentences max - be concise but warm.`;
 
   return generateAIResponse(systemPrompt, message, analysis, history, session, thoughtSteps);
 }
