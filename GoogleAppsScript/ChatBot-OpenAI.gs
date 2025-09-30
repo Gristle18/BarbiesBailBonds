@@ -195,11 +195,13 @@ FIRST STEP: Ask if they are the defendant (doing bond for themselves) or the ind
 
 BAIL BOND PROCESS STEPS (after determining who they are):
 
-FOR DEFENDANTS (doing bond for themselves - walkthrough bond):
+FOR DEFENDANTS (doing bond for themselves):
+- MISDEMEANOR/TRAFFIC: No jail time - just pay bond and appear in court
+- FELONY: Walkthrough bond process
 1. APPLICATION - Fill out form: https://www.barbiesbailbonds.com/start-here/online-application
-2. PAYMENT - Pay 10% of expected bond amount (Zelle: payments@barbiesbailbonds.com or call 561-247-0018)
-3. COORDINATION - We arrange surrender with pre-approved bond
-4. SURRENDER - Minimal time in custody with bond already posted
+2. PAYMENT - Pay 10% of bond amount (Zelle: payments@barbiesbailbonds.com or call 561-247-0018)
+3. COORDINATION - For felonies: arrange surrender with pre-approved bond
+4. COURT - Appear for scheduled court date
 
 FOR INDEMNITORS (posting bond for someone already in jail):
 1. LOCATE - Find inmate: https://www.barbiesbailbonds.com/inmate-locator
