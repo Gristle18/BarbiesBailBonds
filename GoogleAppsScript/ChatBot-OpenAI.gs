@@ -162,7 +162,13 @@ function generateChatResponse(message, history, session) {
       return {
         response: "Thank you SO much for supporting us with that review! 🙏 It truly means the world to our family business. Is there anything else I can help you with?",
         usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-        sources: []
+        sources: [],
+        debug: {
+          timestamp: new Date().toISOString(),
+          message_length: message.length,
+          success: true,
+          steps: ['Detected review completion', 'Generated gratitude response']
+        }
       };
     }
 
@@ -174,7 +180,13 @@ function generateChatResponse(message, history, session) {
     return {
       response: "I apologize, but I'm having trouble processing that. Please try again or call us at 561-247-0018.",
       usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-      sources: []
+      sources: [],
+      debug: {
+        timestamp: new Date().toISOString(),
+        message_length: message.length,
+        success: false,
+        steps: ['Error in generateChatResponse', error.toString()]
+      }
     };
   }
 }
@@ -262,7 +274,13 @@ Keep responses to 3 sentences max. Always say "call us" not "call me".`;
     return {
       response: responseText,
       usage: result.usage,
-      sources: []
+      sources: [],
+      debug: {
+        timestamp: new Date().toISOString(),
+        message_length: message.length,
+        success: true,
+        steps: ['Generated simple response']
+      }
     };
 
   } catch (error) {
@@ -270,7 +288,13 @@ Keep responses to 3 sentences max. Always say "call us" not "call me".`;
     return {
       response: "I'm here to help with bail bonds. Please call us at 561-247-0018 for immediate assistance.",
       usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-      sources: []
+      sources: [],
+      debug: {
+        timestamp: new Date().toISOString(),
+        message_length: message.length,
+        success: false,
+        steps: ['Error occurred', error.toString()]
+      }
     };
   }
 }
