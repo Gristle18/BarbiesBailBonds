@@ -1,358 +1,3040 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check In • Barbie's Bail Bonds</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ID & Document Upload • Barbie's Bail Bonds</title>
+  <style>
+    :root {
+      --brand: #F28C00;
+      --brand-dark: #D67700;
+      --dark: #111;
+      --muted: #666;
+      --light-gray: #eee;
+      --white: #fff;
+      --cream: #fff2d1;
+      --black: #000;
+      --success: #28a745;
+      --error: #dc3545;
+    }
 
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: #000000;
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--white);
+      background: transparent;
+      /* Hide scrollbar but keep scrolling functionality */
+      overflow: -moz-scrollbars-none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
 
-        .container {
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
+    /* Hide webkit scrollbar */
+    body::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
 
-        h1 {
-            color: #F28C00;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
+    /* Remove focus outline and prevent text editing cursor */
+    * { outline: none; cursor: default; }
+    a, button, .btn { cursor: pointer; }
 
-        .subtitle {
-            color: #ccc;
-            margin-bottom: 40px;
-            font-size: 1.1rem;
-        }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .title { font-size: 38px; font-weight: 800; margin-bottom: 10px; }
+    .subtitle { font-size: 18px; opacity: 0.9; }
 
-        .camera-section {
-            background: #111;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 2px dashed #333;
-        }
+    .help-banner {
+      background: var(--cream);
+      color: var(--black);
+      padding: 30px 24px;
+      border-radius: 12px;
+      margin: 24px 0 34px;
+      box-shadow: 0 8px 24px rgba(255, 242, 209, 0.2);
+      text-align: center;
+    }
+    .help-banner .phone { font-size: 28px; font-weight: 800; letter-spacing: .5px; }
+    .help-banner .phone a { color: var(--brand); text-decoration: none; }
+    .help-banner .phone a:hover { color: var(--brand-dark); }
 
-        #video {
-            width: 100%;
-            max-width: 300px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
+    .card {
+      background: var(--white);
+      color: var(--dark);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.15);
+      margin-bottom: 20px;
+    }
+    .section-title { font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .full { grid-column: 1/-1; }
+    label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+    input[type="text"], input[type="tel"], input[type="email"], input[type="file"], input:not([type]), textarea, select {
+      width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; background:#fff; color:#111;
+      height: auto;
+      min-height: 48px;
+    }
+    .hint { color: #555; font-size: 13px; margin-top: 6px; }
 
-        #canvas {
-            display: none;
-        }
+    .dropzone {
+      border: 2px dashed #bbb; border-radius: 12px; padding: 18px; text-align: center; background: #fafafa;
+      transition: all .15s ease;
+      position: relative;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+    .dropzone.dragover { border-color: var(--brand); background: #fff8ec; }
+    .drop-hint { color:#444; font-size: 14px; }
+    .file-list { margin-top: 10px; font-size: 14px; color: #333; }
 
-        .photo-preview {
-            width: 100%;
-            max-width: 300px;
-            border-radius: 8px;
-            margin: 20px auto;
-            display: none;
-        }
+    .actions { display:flex; gap:10px; justify-content:center; margin-top: 18px; }
+    .btn { border:0; border-radius: 10px; padding: 12px 16px; font-weight: 700; }
+    .btn-primary { background: var(--black); color:#fff; }
+    .btn-primary:hover { background: #333; }
+    .btn-ghost { background:#eee; color:#111; }
 
-        .btn {
-            background: #F28C00;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            margin: 10px;
-            transition: background-color 0.3s;
-        }
+    .note { font-size: 13px; color: #555; margin-top: 8px; }
+    .success { color: var(--success); font-weight: 700; display:none; }
+    .error { color: var(--error); font-weight: 700; display:none; }
 
-        .btn:hover {
-            background: #D67700;
-        }
+    /* Language Selection Styles */
+    .language-cards {
+      display: flex;
+      gap: 30px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      width: 100%;
+    }
 
-        .btn:disabled {
-            background: #666;
-            cursor: not-allowed;
-        }
+    .language-option {
+      background: var(--white);
+      border: 1px solid #ddd;
+      border-radius: 16px;
+      padding: 40px 30px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: var(--dark);
+      flex: 1;
+      max-width: calc(50% - 15px);
+      box-shadow: 0 4px 16px rgba(0,0,0,.08);
+      text-align: center;
+      cursor: pointer;
+    }
 
-        .location-info {
-            background: #111;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-        }
+    .language-option:hover {
+      border-color: var(--brand);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(242,140,0,.15);
+    }
 
-        .location-info h3 {
-            color: #F28C00;
-            margin-bottom: 10px;
-        }
+    .language-flag {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: block;
+    }
 
-        .status {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            display: none;
-        }
+    .language-name {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
 
-        .success {
-            background: #1a5d1a;
-            color: #90EE90;
-        }
+    .language-desc {
+      font-size: 14px;
+      color: var(--dark);
+    }
 
-        .error {
-            background: #5d1a1a;
-            color: #ffcccb;
-        }
+    @media (max-width: 768px) {
+      .title { font-size: 30px; }
+      .grid { grid-template-columns: 1fr; }
+      
+      .language-cards {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .language-option {
+        padding: 30px 80px;
+        min-width: 300px;
+        max-width: 100%;
+      }
+    }
 
-        .phone-link {
-            color: #F28C00;
-            text-decoration: none;
-            font-weight: bold;
-        }
+    @media (max-width: 480px) {
+      .language-option {
+        padding: 40px 40px;
+        min-width: auto;
+        width: 100%;
+        height: 280px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .language-flag {
+        font-size: 40px;
+      }
+      
+      .language-name {
+        font-size: 20px;
+      }
+    }
 
-        .instructions {
-            color: #ccc;
-            margin: 20px 0;
-            line-height: 1.6;
-        }
-    </style>
+    /* How to Get to Us Section */
+    .location-section {
+      padding: 80px 20px;
+      background: var(--dark);
+      width: 100%;
+    }
+    
+    .location-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    
+    .location-content h2 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--white);
+    }
+    
+    .location-text {
+      font-size: 18px;
+      line-height: 1.6;
+      margin-bottom: 25px;
+      color: var(--white);
+    }
+    
+    .location-link {
+      color: var(--brand);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .location-link:hover {
+      text-decoration: underline;
+    }
+    
+    .location-map {
+      background: var(--light-gray);
+      border-radius: 12px;
+      height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* About Us Section */
+    .about-section {
+      background: var(--white);
+      color: var(--dark);
+      padding: 60px 20px 30px;
+      width: 100%;
+    }
+    
+    .about-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .about-content {
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 30px;
+    }
+    
+    .about-contact {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--brand);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    
+    .about-contact:hover {
+      color: var(--brand-dark);
+    }
+
+    /* Footer Section */
+    .footer {
+      background: var(--black);
+      color: var(--white);
+      padding: 20px;
+      text-align: center;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+      .location-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      
+      .location-section {
+        padding: 60px 20px;
+      }
+    }
+
+
+    /* File list preview thumbnails */
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 5px 0;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .file-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .file-thumbnail {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+
+    .file-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .file-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .file-size {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .remove-file {
+      background: var(--error);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 10px;
+    }
+
+    .remove-file:hover {
+      background: #c82333;
+    }
+
+    /* Add Document Button Styles */
+    .add-doc-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      background: #f9f9f9;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .add-doc-button:hover {
+      border-color: #007bff;
+      background: #f0f8ff;
+    }
+
+    .plus-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #007bff;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .add-doc-button span {
+      font-weight: 500;
+      color: #333;
+    }
+
+    /* Document Type Dropdown */
+    .doc-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      display: none;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .doc-dropdown.show {
+      display: block;
+    }
+
+    .doc-option {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      transition: background 0.2s ease;
+    }
+
+    .doc-option:hover {
+      background: #f8f9fa;
+    }
+
+    .doc-option:last-child {
+      border-bottom: none;
+    }
+
+    /* Dynamic Document Section */
+    .dynamic-doc-section {
+      margin-bottom: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      background: #fafafa;
+      position: relative;
+    }
+
+    .doc-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .doc-section-title {
+      font-weight: 500;
+      color: #333;
+      flex-grow: 1;
+    }
+
+    .remove-doc-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: background 0.2s ease;
+      margin-left: 10px;
+    }
+
+    .remove-doc-btn:hover {
+      background: #c82333;
+    }
+
+    /* PDF Preview Styling */
+    .pdf-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pdf-gradient {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      border-radius: 6px;
+    }
+
+    .pdf-text {
+      position: relative;
+      z-index: 1;
+      color: white;
+      font-weight: bold;
+      font-size: 10px;
+      text-align: center;
+    }
+
+    /* Invisible spacer to double page height */
+    .invisible-spacer {
+      height: 200vh; /* Double the viewport height */
+      width: 100%;
+      background: #000000; /* Pure black */
+      visibility: visible;
+      pointer-events: none;
+    }
+
+    /* Chatbot Widget Styles */
+    .chat-container {
+      position: fixed !important;
+      top: 550px !important;
+      right: clamp(12px, 3vw, 28px) !important;
+      bottom: auto !important;
+      left: auto !important;
+      transform: none !important;
+      z-index: 1000;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    /* Adjust launcher vertical offset for tablet and phone */
+    @media (max-width: 1024px) {
+      .chat-container { top: 525px !important; }
+    }
+    @media (max-width: 600px) {
+      .chat-container { top: 500px !important; }
+    }
+
+    .chat-button {
+      width: clamp(60px, 9vw, 84px);
+      height: clamp(60px, 9vw, 84px);
+      background: linear-gradient(135deg, #F28C00, #D67700);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: clamp(22px, 4vw, 30px);
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(242, 140, 0, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+      animation: pulse 2s infinite;
+    }
+
+    .chat-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(242, 140, 0, 0.6);
+    }
+
+    .chat-button.active {
+      transform: rotate(45deg);
+      background: #666;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 4px 15px rgba(242, 140, 0, 0.4); }
+      50% { box-shadow: 0 4px 15px rgba(242, 140, 0, 0.8), 0 0 0 10px rgba(242, 140, 0, 0.1); }
+    }
+
+    .chat-interface {
+      display: none;
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      width: 350px;
+      height: 500px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px) scale(0.9);
+      transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+
+    .chat-interface.open {
+      display: flex;
+      flex-direction: column;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #F28C00, #D67700);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .chat-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .chat-subtitle {
+      font-size: 12px;
+      opacity: 0.8;
+      margin: 2px 0 0 0;
+    }
+
+    .chat-close {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .chat-close:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      background: #f8f9fa;
+      scrollbar-width: thin;
+      scrollbar-color: #ddd transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: #ddd;
+      border-radius: 2px;
+    }
+
+    .chat-input-container {
+      padding: 12px 16px;
+      background: white;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 2px solid #eee;
+      border-radius: 20px;
+      font-size: 14px;
+      outline: none;
+      resize: none;
+      max-height: 80px;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input:focus {
+      border-color: #F28C00;
+    }
+
+    .chat-send {
+      background: #F28C00;
+      color: white;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-size: 16px;
+    }
+
+    .chat-send:hover:not(:disabled) {
+      background: #D67700;
+      transform: scale(1.1);
+    }
+
+    .chat-send:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .message {
+      margin-bottom: 12px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .message.user {
+      flex-direction: row-reverse;
+    }
+
+    .message-bubble {
+      max-width: 75%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .message.assistant .message-bubble {
+      background: white;
+      color: #333;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .message.user .message-bubble {
+      background: linear-gradient(135deg, #F28C00, #D67700);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .message.assistant .message-avatar {
+      background: #F28C00;
+      color: white;
+    }
+
+    .message.user .message-avatar {
+      background: #666;
+      color: white;
+    }
+
+    .welcome-message {
+      text-align: center;
+      color: #666;
+      padding: 30px 20px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .typing-indicator {
+      display: none;
+      padding: 8px 16px;
+      color: #666;
+      font-size: 12px;
+      font-style: italic;
+    }
+
+    .typing-dots {
+      display: inline-flex;
+      gap: 2px;
+      margin-left: 4px;
+    }
+
+    .typing-dots span {
+      width: 4px;
+      height: 4px;
+      background: #666;
+      border-radius: 50%;
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Mobile Responsive for Chatbot */
+    @media (max-width: 600px) {
+      .chat-interface {
+        height: 400px !important; /* 100px shorter on mobile */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .chat-interface {
+        width: calc(100vw - 40px);
+        height: calc(100vh - 120px);
+        bottom: 80px;
+        right: -10px;
+      }
+      
+      .chat-container {
+        bottom: 20px;
+        right: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Check In</h1>
-        <p class="subtitle">Take a photo to verify your location and check in</p>
-
-        <div class="instructions">
-            <p>This check-in requires a photo and location verification for compliance with your bond requirements.</p>
-        </div>
-
-        <div class="camera-section">
-            <video id="video" autoplay playsinline></video>
-            <canvas id="canvas"></canvas>
-            <img id="photoPreview" class="photo-preview" alt="Photo preview">
-
-            <div id="cameraControls">
-                <button id="startCamera" class="btn">Start Camera</button>
-                <button id="takePhoto" class="btn" style="display: none;">Take Photo</button>
-                <button id="retakePhoto" class="btn" style="display: none;">Retake Photo</button>
-            </div>
-        </div>
-
-        <div id="locationInfo" class="location-info" style="display: none;">
-            <h3>📍 Location Captured</h3>
-            <p id="locationText">Getting location...</p>
-            <p id="accuracyText"></p>
-        </div>
-
-        <button id="submitCheckin" class="btn" style="display: none;">Submit Check-In</button>
-
-        <div id="statusMessage" class="status"></div>
-
-        <p style="margin-top: 30px;">
-            Need help? Call us 24/7 at <a href="tel:561-247-0018" class="phone-link">561-247-0018</a>
-        </p>
+  <div class="container">
+    <div class="header">
+      <div class="title">Upload ID & Documents</div>
+      <div class="subtitle">Securely send your government ID and paperwork to speed up your bond approval.</div>
     </div>
 
-    <script>
-        let video, canvas, ctx;
-        let photoTaken = false;
-        let locationData = null;
-        let stream = null;
+    <!-- Language Selection -->
+    <div id="languageSelection" class="language-selection">
+      <div class="subtitle" style="text-align: center; margin-bottom: 30px; color: var(--white);">Please select your language to continue</div>
+      
+      <div class="language-cards">
+        <div class="language-option" onclick="showUploadForm('en')">
+          <span class="language-flag">🇺🇸</span>
+          <div class="language-name">English</div>
+          <div class="language-desc">Upload documents in English</div>
+        </div>
+        
+        <div class="language-option" onclick="showUploadForm('es')">
+          <span class="language-flag">🇪🇸</span>
+          <div class="language-name">Español</div>
+          <div class="language-desc">Subir documentos en Español</div>
+        </div>
+      </div>
+    </div>
 
-        document.addEventListener('DOMContentLoaded', function() {
-            video = document.getElementById('video');
-            canvas = document.getElementById('canvas');
-            ctx = canvas.getContext('2d');
 
-            document.getElementById('startCamera').addEventListener('click', startCamera);
-            document.getElementById('takePhoto').addEventListener('click', takePhoto);
-            document.getElementById('retakePhoto').addEventListener('click', retakePhoto);
-            document.getElementById('submitCheckin').addEventListener('click', submitCheckin);
+    <!-- English Upload Form -->
+    <form id="uploadFormEn" class="upload-form card" style="display: none;" novalidate>
+      <div class="section-title">Your Information</div>
+      <div class="grid">
+        <div>
+          <label for="yourNameEn">Your Full Name<span style="color:#dc3545">*</span></label>
+          <input id="yourNameEn" name="yourName" required />
+        </div>
+        <div>
+          <label for="yourPhoneEn">Your Phone<span style="color:#dc3545">*</span></label>
+          <input id="yourPhoneEn" name="yourPhone" type="tel" inputmode="tel" required />
+          <div class="hint">Format: (123) 456-7890 or 123-456-7890</div>
+        </div>
+        <div>
+          <label for="defendantNameEn">Defendant's Name</label>
+          <input id="defendantNameEn" name="defendantName" />
+        </div>
+        <div>
+          <label for="caseNumberEn">Case / Booking # (if known)</label>
+          <input id="caseNumberEn" name="caseNumber" />
+        </div>
+      </div>
 
-            // Get location when page loads
-            getLocation();
+      <div class="section-title" style="margin-top:18px;">Upload Files</div>
+      <div class="grid">
+        <div class="full" id="additionalDocsContainerEn">
+          <div id="addDocButtonEn" class="add-doc-button" onclick="showDocumentDropdown('En')">
+            <div class="plus-icon">+</div>
+            <span>Add Document</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" onclick="showUploadForm('es')">Switch to Español</button>
+        <button type="submit" class="btn btn-primary" id="submitBtnEn">Submit</button>
+      </div>
+      <div class="note" style="text-align:center; margin-top:10px;">
+        If the uploader has issues, text photos to <span style="color: var(--brand); white-space: nowrap;">561-247-0018</span> or call <a href="tel:+15612470018" style="color: var(--brand); text-decoration:none; white-space: nowrap;">561-247-0018</a>.
+      </div>
+      <div class="success" id="successMsgEn" style="text-align:center; margin-top:10px;">Thanks! We received your info. We'll reach out shortly.</div>
+      <div class="error" id="errorMsgEn" style="text-align:center; margin-top:10px;">Upload not configured yet. Please text your photos to <span style="white-space: nowrap;">561-247-0018</span>.</div>
+    </form>
+
+    <!-- Spanish Upload Form -->
+    <form id="uploadFormEs" class="upload-form card" style="display: none;" novalidate>
+      <div class="section-title">Su Información</div>
+      <div class="grid">
+        <div>
+          <label for="yourNameEs">Su Nombre Completo<span style="color:#dc3545">*</span></label>
+          <input id="yourNameEs" name="yourName" required />
+        </div>
+        <div>
+          <label for="yourPhoneEs">Su Teléfono<span style="color:#dc3545">*</span></label>
+          <input id="yourPhoneEs" name="yourPhone" type="tel" inputmode="tel" required />
+          <div class="hint">Formato: (123) 456-7890 o 123-456-7890</div>
+        </div>
+        <div>
+          <label for="defendantNameEs">Nombre del Detenido</label>
+          <input id="defendantNameEs" name="defendantName" />
+        </div>
+        <div>
+          <label for="caseNumberEs">Número de Caso (si lo conoce)</label>
+          <input id="caseNumberEs" name="caseNumber" />
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:18px;">Subir Archivos</div>
+      <div class="grid">
+        <div class="full" id="additionalDocsContainerEs">
+          <div id="addDocButtonEs" class="add-doc-button" onclick="showDocumentDropdown('Es')">
+            <div class="plus-icon">+</div>
+            <span>Agregar Documento</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-ghost" onclick="showUploadForm('en')">Switch to English</button>
+        <button type="submit" class="btn btn-primary" id="submitBtnEs">Enviar</button>
+      </div>
+      <div class="note" style="text-align:center; margin-top:10px;">
+        Si el cargador tiene problemas, envíe fotos por texto a <span style="color: var(--brand); white-space: nowrap;">561-247-0018</span> o llame al <a href="tel:+15612470018" style="color: var(--brand); text-decoration:none; white-space: nowrap;">561-247-0018</a>.
+      </div>
+      <div class="success" id="successMsgEs" style="text-align:center; margin-top:10px;">¡Gracias! Recibimos su información. Nos comunicaremos pronto.</div>
+      <div class="error" id="errorMsgEs" style="text-align:center; margin-top:10px;">Carga aún no configurada. Por favor envíe sus fotos por texto a <span style="white-space: nowrap;">561-247-0018</span>.</div>
+    </form>
+
+  </div>
+
+  <!-- How to Get to Us Section -->
+  <section class="location-section">
+    <div class="location-container">
+      <div class="location-content">
+        <h2>How to Get to Us</h2>
+        <p class="location-text">Find Barbie's Bail Bonds at 1015 S Congress Ave #1, West Palm Beach. After hours use the front door buzzer or call.</p>
+        <a href="https://www.google.com/url?q=https%3A%2F%2Fyoutu.be%2FK6WxiOXH4XQ%3Fsi%3DojtFf2Q4ZpYMpeL9&sa=D" 
+           class="location-link" target="_blank">
+          Click HERE to watch a video showing how to get to the jail from our office
+        </a>
+      </div>
+      <div class="location-map">
+        <a href="https://www.google.com/maps/place/1015+S+Congress+Ave+%231,+West+Palm+Beach,+FL+33406" target="_blank" style="display: block; width: 100%; height: 100%; text-decoration: none;">
+          <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3574.8165962158!2d-80.06932368489576!3d26.368123083362943!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d92bdd7f1e7d9f%3A0x6e1b77e1f0b6e2c7!2s1015+S+Congress+Ave+%231%2C+West+Palm+Beach%2C+FL+33406!5e0!3m2!1sen!2sus!4v1693920000000!5m2!1sen!2sus"
+            width="100%" 
+            height="100%" 
+            style="border:0; border-radius: 12px;" 
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Barbies Bail Bonds Location">
+          </iframe>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Us Section -->
+  <section class="about-section">
+    <div class="about-container">
+      <div class="about-content">
+        <p>Since 1993, Jerry & Barbie's Bail Bonds has been a trusted, family-owned agency committed to those in need of a bail bondsman in South Florida. We specialize in a wide range of Bail Bonds and in handling Warrants through our Walkthrough Bonds Service. Our service is 100% confidential and you will be dealing with experienced bail bonds agents the entire time.</p>
+        
+        <p>Our office is located just a few minutes south of the Palm Beach County Jail where we provide service in Palm Beach County, Broward County, Miami Dade County, Martin County, St Lucie County, Indian River County, and most other Florida counties.</p>
+        
+        <p>If a family member, friend, or any other loved one has been arrested and is in need of a bail bondsman, contact us at <a href="tel:+15612470018" class="about-contact">561-247-0018</a> for immediate service. Our experienced agents are bilingual and available for bail bond service in English and Spanish!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>Copyright © 2024 Barbie's Bail Bonds | Bail Bond Services</p>
+    </div>
+  </footer>
+
+  <script>
+    // ======================================
+    // GOOGLE APPS SCRIPT CONFIGURATION
+    // ======================================
+    // After deploying your Google Apps Script:
+    // 1. Replace 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE' with your actual Web App URL
+    // 2. The URL should look like: https://script.google.com/macros/s/AKfycbx.../exec
+    // 3. Find this URL on line ~2408 in the submitUpload function
+    // ======================================
+
+    /**
+     * Convert file to base64 string (like bail-bond-application approach)
+     */
+    function fileToBase64(file, type = null) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result.split(',')[1];
+          const result = {
+            filename: file.name,
+            contentType: file.type,
+            size: file.size,
+            base64: base64
+          };
+          
+          // Add type property if provided (for Government ID front/back distinction)
+          if (type) {
+            result.type = type;
+          }
+          
+          resolve(result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Language selection functionality
+    function showUploadForm(language) {
+      // Hide language selection
+      document.getElementById('languageSelection').style.display = 'none';
+      
+      // Hide both forms first
+      document.getElementById('uploadFormEn').style.display = 'none';
+      document.getElementById('uploadFormEs').style.display = 'none';
+      
+      // Update page content based on language
+      updatePageLanguage(language);
+      
+      // Show the selected language form
+      if (language === 'en') {
+        document.getElementById('uploadFormEn').style.display = 'block';
+      } else if (language === 'es') {
+        document.getElementById('uploadFormEs').style.display = 'block';
+      }
+    }
+
+    function updatePageLanguage(language) {
+      const isSpanish = language === 'es';
+      
+      // Update page title and header
+      document.querySelector('.title').textContent = isSpanish ? 
+        'Subir ID y Documentos' : 'Upload ID & Documents';
+      document.querySelector('.subtitle').textContent = isSpanish ? 
+        'Envíe de forma segura su ID gubernamental y documentos para acelerar la aprobación de su fianza.' : 
+        'Securely send your government ID and paperwork to speed up your bond approval.';
+      
+      // Update How to Get to Us section
+      const locationSection = document.querySelector('.location-content h2');
+      const locationText = document.querySelector('.location-text');
+      const locationLink = document.querySelector('.location-link');
+      
+      if (locationSection) {
+        locationSection.textContent = isSpanish ? 'Cómo Llegar a Nosotros' : 'How to Get to Us';
+      }
+      if (locationText) {
+        locationText.textContent = isSpanish ? 
+          'Encuentre Barbie\'s Bail Bonds en 1015 S Congress Ave #1, West Palm Beach. Después del horario use el timbre de la puerta principal o llame.' :
+          'Find Barbie\'s Bail Bonds at 1015 S Congress Ave #1, West Palm Beach. After hours use the front door buzzer or call.';
+      }
+      if (locationLink) {
+        locationLink.textContent = isSpanish ? 
+          'Haga clic AQUÍ para ver un video que muestra cómo llegar a la cárcel desde nuestra oficina' :
+          'Click HERE to watch a video showing how to get to the jail from our office';
+      }
+      
+      // Update About Us section
+      const aboutSection = document.querySelector('.about-section');
+      if (aboutSection) {
+        const aboutContent = aboutSection.querySelector('.about-content');
+        if (aboutContent) {
+          aboutContent.innerHTML = isSpanish ? 
+            `<p>Desde 1993, Jerry & Barbie's Bail Bonds ha sido una agencia familiar confiable comprometida con aquellos que necesitan un fiancista en el Sur de Florida. Nos especializamos en una amplia gama de Fianzas y en manejar Órdenes de Arresto a través de nuestro Servicio de Fianzas de Entrega Voluntaria. Nuestro servicio es 100% confidencial y estará tratando con agentes de fianzas experimentados todo el tiempo.</p>
+            
+            <p>Nuestra oficina está ubicada a solo unos minutos al sur de la Cárcel del Condado de Palm Beach donde proporcionamos servicio en el Condado de Palm Beach, Condado de Broward, Condado de Miami Dade, Condado de Martin, Condado de St Lucie, Condado de Indian River, y la mayoría de otros condados de Florida.</p>
+            
+            <p>Si un miembro de la familia, amigo, o cualquier otro ser querido ha sido arrestado y necesita un fiancista, contáctenos al <a href="tel:+15612470018" class="about-contact">561-247-0018</a> para servicio inmediato. ¡Nuestros agentes experimentados son bilingües y están disponibles para servicio de fianzas en inglés y español!</p>` :
+            `<p>Since 1993, Jerry & Barbie's Bail Bonds has been a trusted, family-owned agency committed to those in need of a bail bondsman in South Florida. We specialize in a wide range of Bail Bonds and in handling Warrants through our Walkthrough Bonds Service. Our service is 100% confidential and you will be dealing with experienced bail bonds agents the entire time.</p>
+            
+            <p>Our office is located just a few minutes south of the Palm Beach County Jail where we provide service in Palm Beach County, Broward County, Miami Dade County, Martin County, St Lucie County, Indian River County, and most other Florida counties.</p>
+            
+            <p>If a family member, friend, or any other loved one has been arrested and is in need of a bail bondsman, contact us at <a href="tel:+15612470018" class="about-contact">561-247-0018</a> for immediate service. Our experienced agents are bilingual and available for bail bond service in English and Spanish!</p>`;
+        }
+      }
+      
+      // Update footer
+      const footer = document.querySelector('.footer-content p');
+      if (footer) {
+        footer.textContent = isSpanish ? 
+          'Copyright © 2024 Barbie\'s Bail Bonds | Servicios de Fianzas' :
+          'Copyright © 2024 Barbie\'s Bail Bonds | Bail Bond Services';
+      }
+      
+    }
+    
+    function showLanguageSelection() {
+      // Hide both forms
+      document.getElementById('uploadFormEn').style.display = 'none';
+      document.getElementById('uploadFormEs').style.display = 'none';
+      
+      // Reset page language to English
+      updatePageLanguage('en');
+      
+      // Show language selection
+      document.getElementById('languageSelection').style.display = 'block';
+      
+      // Reset forms
+      document.getElementById('uploadFormEn').reset();
+      document.getElementById('uploadFormEs').reset();
+      
+      // Clear file lists
+      document.querySelectorAll('.file-list').forEach(el => el.textContent = '');
+      
+      // Hide messages
+      ['successMsgEn', 'errorMsgEn', 'successMsgEs', 'errorMsgEs'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    }
+
+    // Document types for dropdown
+    const documentTypes = {
+      'en': [
+        'Government ID',
+        'Proof of Address',
+        'Proof of Employment',
+        'Other'
+      ],
+      'es': [
+        'ID Gubernamental',
+        'Comprobante de Domicilio',
+        'Comprobante de Empleo',
+        'Otro'
+      ]
+    };
+
+    // Global function to show document dropdown
+    window.showDocumentDropdown = function(suffix) {
+      
+      const container = document.getElementById(`additionalDocsContainer${suffix}`);
+      if (!container) {
+        return;
+      }
+
+      // Remove existing dropdown if any
+      const existingDropdown = container.querySelector('.doc-dropdown');
+      if (existingDropdown) {
+        existingDropdown.remove();
+      }
+
+      // Create dropdown
+      const dropdown = document.createElement('div');
+      dropdown.className = 'doc-dropdown show';
+      
+      const language = suffix === 'Es' ? 'es' : 'en';
+      const types = documentTypes[language];
+      
+      types.forEach(type => {
+        const option = document.createElement('div');
+        option.className = 'doc-option';
+        option.textContent = type;
+        option.onclick = (e) => {
+          e.stopPropagation();
+          addDocumentSection(suffix, type);
+          dropdown.remove();
+        };
+        dropdown.appendChild(option);
+      });
+
+      // Position dropdown relative to button
+      const button = document.getElementById(`addDocButton${suffix}`);
+      button.appendChild(dropdown);
+      
+      // Close dropdown when clicking outside
+      const closeDropdown = (e) => {
+        if (!button.contains(e.target)) {
+          dropdown.remove();
+          document.removeEventListener('click', closeDropdown);
+        }
+      };
+      
+      setTimeout(() => {
+        document.addEventListener('click', closeDropdown);
+      }, 10);
+    };
+
+    // Global function to add document section
+    window.addDocumentSection = function(suffix, documentType) {
+      
+      const container = document.getElementById(`additionalDocsContainer${suffix}`);
+      const addButton = document.getElementById(`addDocButton${suffix}`);
+      
+      if (!container || !addButton) {
+        return;
+      }
+
+      // Generate unique ID for this section
+      const sectionId = `dynamicDoc${suffix}_${Date.now()}`;
+      
+      // Check if this is Government ID and handle specially
+      const isGovernmentID = documentType === 'Government ID' || documentType === 'ID Gubernamental';
+      const isSpanish = suffix === 'Es';
+      
+      // Create new document section
+      const section = document.createElement('div');
+      section.className = 'dynamic-doc-section';
+      // Store document type for reliable detection during form submission
+      section.setAttribute('data-document-type', documentType);
+      
+      if (isGovernmentID) {
+        // Special handling for Government ID - create front and back uploads
+        const frontInputId = `${sectionId}_front_input`;
+        const backInputId = `${sectionId}_back_input`;
+        const frontLabel = isSpanish ? 'ID Gubernamental – Frente' : 'Government ID – Front';
+        const backLabel = isSpanish ? 'ID Gubernamental – Reverso' : 'Government ID – Back';
+        const dropHint = isSpanish ? 'Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar' : 'Drag & drop image/PDF here or click to select';
+        
+        section.innerHTML = `
+          <div class="doc-section-header">
+            <span class="doc-section-title">${documentType}</span>
+            <button type="button" class="remove-doc-btn" onclick="removeDocumentSection('${sectionId}')" title="Remove">−</button>
+          </div>
+          <div class="grid" style="margin-bottom: 10px;">
+            <div class="full">
+              <label for="${frontInputId}">${frontLabel}</label>
+              <div class="dropzone" data-target="${frontInputId}" style="position: relative;">
+                <div class="drop-hint">${dropHint}</div>
+                <input id="${frontInputId}" name="idFront" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+              </div>
+              <div class="file-list" id="${frontInputId}List"></div>
+            </div>
+            <div class="full">
+              <label for="${backInputId}">${backLabel}</label>
+              <div class="dropzone" data-target="${backInputId}" style="position: relative;">
+                <div class="drop-hint">${dropHint}</div>
+                <input id="${backInputId}" name="idBack" type="file" accept="image/*,application/pdf" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+              </div>
+              <div class="file-list" id="${backInputId}List"></div>
+            </div>
+          </div>
+        `;
+      } else {
+        // Regular document section
+        const inputId = `${sectionId}_input`;
+        const dropHint = isSpanish ? 'Arrastre y suelte archivos aquí o haga clic para seleccionar' : 'Drag & drop files here or click to select';
+        
+        section.innerHTML = `
+          <div class="doc-section-header">
+            <span class="doc-section-title">${documentType}</span>
+            <button type="button" class="remove-doc-btn" onclick="removeDocumentSection('${sectionId}')" title="Remove">−</button>
+          </div>
+          <div class="dropzone" data-target="${inputId}" style="position: relative;">
+            <div class="drop-hint">${dropHint}</div>
+            <input id="${inputId}" name="dynamic_docs[]" type="file" accept="image/*,application/pdf" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+          </div>
+          <div class="file-list" id="${inputId}List"></div>
+        `;
+      }
+
+      // Insert before the add button
+      container.insertBefore(section, addButton);
+      
+      // Initialize dropzone functionality for the new section using the original system
+      setTimeout(() => {
+        if (isGovernmentID) {
+          // Initialize both front and back dropzones for Government ID
+          const frontInputId = `${sectionId}_front_input`;
+          const backInputId = `${sectionId}_back_input`;
+          
+          // Initialize front dropzone
+          const frontZone = document.querySelector(`.dropzone[data-target="${frontInputId}"]`);
+          const frontInput = document.getElementById(frontInputId);
+          const frontList = document.getElementById(frontInputId + 'List');
+          
+          if (frontZone && frontInput && frontList) {
+            initializeOriginalDropzone(frontInputId, frontZone, frontInput, frontList);
+          }
+          
+          // Initialize back dropzone
+          const backZone = document.querySelector(`.dropzone[data-target="${backInputId}"]`);
+          const backInput = document.getElementById(backInputId);
+          const backList = document.getElementById(backInputId + 'List');
+          
+          if (backZone && backInput && backList) {
+            initializeOriginalDropzone(backInputId, backZone, backInput, backList);
+          }
+        } else {
+          // Initialize regular document dropzone
+          const inputId = `${sectionId}_input`;
+          const zone = document.querySelector(`.dropzone[data-target="${inputId}"]`);
+          const input = document.getElementById(inputId);
+          const list = document.getElementById(inputId + 'List');
+          
+          if (zone && input && list) {
+            initializeOriginalDropzone(inputId, zone, input, list);
+          }
+        }
+      }, 50);
+      
+    };
+
+    // Global function to remove document section
+    window.removeDocumentSection = function(sectionId) {
+      
+      // Try to find the section by looking for different input ID patterns
+      let section = null;
+      
+      // First try regular document input
+      let input = document.getElementById(`${sectionId}_input`);
+      if (input) {
+        section = input.closest('.dynamic-doc-section');
+      }
+      
+      // If not found, try Government ID front input
+      if (!section) {
+        input = document.getElementById(`${sectionId}_front_input`);
+        if (input) {
+          section = input.closest('.dynamic-doc-section');
+        }
+      }
+      
+      // If still not found, try Government ID back input
+      if (!section) {
+        input = document.getElementById(`${sectionId}_back_input`);
+        if (input) {
+          section = input.closest('.dynamic-doc-section');
+        }
+      }
+      
+      if (section) {
+        section.remove();
+      } else {
+        console.log('Could not find section to remove:', sectionId);
+      }
+    };
+
+    // Initialize dropzone using the original system's exact logic
+    function initializeOriginalDropzone(targetId, zone, input, list) {
+      console.log(`🔧 Initializing dynamic dropzone: ${targetId}`);
+      console.log(`📂 Elements found:`, {
+        zone: !!zone,
+        input: !!input,
+        list: !!list,
+        inputType: input?.type,
+        inputMultiple: input?.multiple
+      });
+      
+      // This is the exact logic from the original initializeAllDropzones function
+      const updateList = (files) => {
+        console.log(`📋 Updating dynamic file list for ${targetId}:`, files?.length || 0, 'files');
+        console.log(`🔍 Input element at update time:`, {
+          inputId: input.id,
+          inputExists: !!document.getElementById(input.id),
+          inputFiles: input.files?.length || 0,
+          filesParameter: files?.length || 0
         });
+        
+        if (!files || files.length === 0) { 
+          // Reset dropzone to original state
+          const isSpanish = targetId.endsWith('Es');
+          const isMultiple = input.multiple;
+          
+          let hintText;
+          if (isSpanish) {
+            hintText = isMultiple ? 'Arrastre y suelte archivos aquí o haga clic para seleccionar' : 'Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar';
+          } else {
+            hintText = isMultiple ? 'Drag & drop files here or click to select' : 'Drag & drop image/PDF here or click to select';
+          }
+          
+          zone.innerHTML = `
+            <div class="drop-hint">${hintText}</div>
+            <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+          `;
+          
+          // Reset zone styles
+          zone.style.width = '';
+          zone.style.height = '';
+          zone.style.padding = '20px';
+          zone.style.border = '2px dashed #ccc';
+          zone.style.position = 'relative';
+          
+          list.innerHTML = '';
+          return;
+        }
 
-        async function startCamera() {
+        // Handle file preview using original system logic
+        const file = files[0]; // Take first file
+        const isImage = file.type.startsWith('image/');
+        const isPdf = file.type === 'application/pdf';
+        
+        if (isImage) {
+          // EXACT Image logic from original system (lines 1550-1640)
+          const url = URL.createObjectURL(file);
+          const img = new Image();
+          
+          img.onload = function() {
+            // Calculate responsive dimensions
+            const maxWidth = zone.clientWidth || 300;
+            const maxHeight = Math.min(window.innerHeight * 0.4, 400); // Max 40% of viewport height or 400px
+            
+            const aspectRatio = img.naturalWidth / img.naturalHeight;
+            let displayWidth, displayHeight;
+            
+            if (aspectRatio > maxWidth / maxHeight) {
+              // Image is wider - fit to width
+              displayWidth = maxWidth;
+              displayHeight = maxWidth / aspectRatio;
+            } else {
+              // Image is taller - fit to height
+              displayHeight = Math.min(maxHeight, maxWidth / aspectRatio);
+              displayWidth = displayHeight * aspectRatio;
+            }
+            
+            zone.style.width = displayWidth + 'px';
+            zone.style.height = displayHeight + 'px';
+            zone.style.padding = '0';
+            zone.style.border = '2px solid var(--brand)';
+            zone.style.position = 'relative';
+            zone.style.overflow = 'hidden';
+            
+            console.log(`🖼️ Creating image preview for ${targetId} - preserving ${input.files.length} files`);
+            const filesToPreserve = input.files;
+            
+            zone.innerHTML = `
+              <img id="${targetId}_preview" src="${url}" data-target-id="${targetId}" style="
+                width: 100%; 
+                height: 100%; 
+                object-fit: cover; 
+                cursor: grab;
+                transition: transform 0.3s ease;
+                transform-origin: center center;
+              " alt="Preview" />
+              <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
+              <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
+                <button onclick="event.stopPropagation(); event.preventDefault(); changeFile('${targetId}')" style="
+                  background: rgba(0, 123, 255, 0.9); 
+                  color: white; 
+                  border: none; 
+                  border-radius: 50%; 
+                  width: 30px; 
+                  height: 30px; 
+                  font-size: 14px; 
+                  cursor: pointer; 
+                  display: flex; 
+                  align-items: center; 
+                  justify-content: center;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                " title="Change file">📁</button>
+                <button onclick="event.stopPropagation(); event.preventDefault(); removeFile('${targetId}', 0)" style="
+                  background: rgba(220, 53, 69, 0.9); 
+                  color: white; 
+                  border: none; 
+                  border-radius: 50%; 
+                  width: 30px; 
+                  height: 30px; 
+                  font-size: 16px; 
+                  cursor: pointer; 
+                  display: flex; 
+                  align-items: center; 
+                  justify-content: center;
+                  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                " title="Remove file">×</button>
+              </div>
+              <div style="
+                position: absolute;
+                bottom: 8px;
+                left: 8px;
+                background: rgba(0,0,0,0.7);
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                pointer-events: none;
+                z-index: 10;
+              ">Scroll: Zoom • Drag: Pan</div>
+            `;
+            
+            // CRITICAL FIX: Reassign files to new input element
+            const newInput = document.getElementById(targetId);
+            if (newInput && filesToPreserve && filesToPreserve.length > 0) {
+              console.log(`🔧 Reassigning ${filesToPreserve.length} files to new input element`);
+              try {
+                newInput.files = filesToPreserve;
+                console.log(`✅ Files successfully reassigned: ${newInput.files.length} files`);
+                // Update input reference
+                input = newInput;
+              } catch (e) {
+                console.error(`❌ Failed to reassign files:`, e);
+              }
+            } else {
+              console.warn(`⚠️ Could not reassign files: newInput=${!!newInput}, filesToPreserve=${filesToPreserve?.length || 0}`);
+            }
+            
+            // Add zoom and pan functionality - simplified version
+            const previewImg = document.getElementById(targetId + '_preview');
+            if (previewImg) {
+              let currentScale = 1;
+              
+              // Mouse wheel zoom
+              previewImg.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+                currentScale = Math.max(0.5, Math.min(3, currentScale * zoomFactor));
+                previewImg.style.transform = `scale(${currentScale})`;
+                previewImg.style.cursor = currentScale > 1 ? 'grab' : 'pointer';
+              });
+              
+              // Double click to reset zoom
+              previewImg.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                currentScale = 1;
+                previewImg.style.transform = 'scale(1)';
+                previewImg.style.cursor = 'pointer';
+              });
+            }
+            
+            list.innerHTML = `
+              <div class="file-item">
+                <img src="${url}" class="file-thumbnail" alt="Preview">
+                <div class="file-info">
+                  <div class="file-name">${file.name}</div>
+                  <div class="file-size">${(file.size/1024/1024).toFixed(2)} MB</div>
+                </div>
+                <button type="button" class="remove-file" onclick="removeFile('${targetId}', 0)" title="Remove">×</button>
+              </div>
+            `;
+          };
+          
+          img.src = url;
+        } else if (isPdf) {
+          // EXACT PDF logic from original system (lines 1720-1780)
+          const fileSize = (file.size/1024/1024).toFixed(2);
+          
+          // Calculate responsive dimensions
+          const maxWidth = zone.clientWidth || 300;
+          const maxHeight = Math.min(window.innerHeight * 0.4, 200);
+          
+          zone.style.width = maxWidth + 'px';
+          zone.style.height = maxHeight + 'px';
+          zone.style.padding = '0';
+          zone.style.border = '2px solid var(--brand)';
+          zone.style.position = 'relative';
+          zone.style.overflow = 'hidden';
+          
+          console.log(`📄 Creating PDF preview for ${targetId} - preserving ${input.files.length} files`);
+          const pdfFilesToPreserve = input.files;
+          
+          zone.innerHTML = `
+            <div id="${targetId}_pdf_preview" style="
+              width: 100%; 
+              height: 100%; 
+              background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+              color: white; 
+              display: flex; 
+              flex-direction: column;
+              align-items: center; 
+              justify-content: center; 
+              font-size: 20px; 
+              font-weight: bold;
+              cursor: default;
+              position: relative;
+            ">
+              <div style="font-size: 48px; margin-bottom: 8px;">📄</div>
+              <div style="font-size: 16px; margin-bottom: 4px;">PDF Document</div>
+              <div style="font-size: 12px; opacity: 0.9;">${file.name}</div>
+              <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">${fileSize} MB</div>
+            </div>
+            <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
+            <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
+              <button onclick="event.stopPropagation(); event.preventDefault(); changeFile('${targetId}')" style="
+                background: rgba(0, 123, 255, 0.9); 
+                color: white; 
+                border: none; 
+                border-radius: 50%; 
+                width: 30px; 
+                height: 30px; 
+                font-size: 14px; 
+                cursor: pointer; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+              " title="Change file">📁</button>
+              <button onclick="event.stopPropagation(); event.preventDefault(); removeFile('${targetId}', 0)" style="
+                background: rgba(220, 53, 69, 0.9); 
+                color: white; 
+                border: none; 
+                border-radius: 50%; 
+                width: 30px; 
+                height: 30px; 
+                font-size: 16px; 
+                cursor: pointer; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+              " title="Remove file">×</button>
+            </div>
+          `;
+          
+          // CRITICAL FIX: Reassign files to new input element for PDF
+          const newPdfInput = document.getElementById(targetId);
+          if (newPdfInput && pdfFilesToPreserve && pdfFilesToPreserve.length > 0) {
+            console.log(`🔧 Reassigning ${pdfFilesToPreserve.length} PDF files to new input element`);
             try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user' },
-                    audio: false
-                });
-
-                video.srcObject = stream;
-                video.style.display = 'block';
-
-                document.getElementById('startCamera').style.display = 'none';
-                document.getElementById('takePhoto').style.display = 'inline-block';
-
-            } catch (error) {
-                showStatus('Camera access denied. Please allow camera access and try again.', 'error');
+              newPdfInput.files = pdfFilesToPreserve;
+              console.log(`✅ PDF files successfully reassigned: ${newPdfInput.files.length} files`);
+              // Update input reference
+              input = newPdfInput;
+            } catch (e) {
+              console.error(`❌ Failed to reassign PDF files:`, e);
             }
+          } else {
+            console.warn(`⚠️ Could not reassign PDF files: newInput=${!!newPdfInput}, filesToPreserve=${pdfFilesToPreserve?.length || 0}`);
+          }
+          
+          list.innerHTML = `
+            <div class="file-item">
+              <div class="pdf-preview">
+                <div class="pdf-gradient"></div>
+                <div class="pdf-text">PDF</div>
+              </div>
+              <div class="file-info">
+                <div class="file-name">${file.name}</div>
+                <div class="file-size">${fileSize} MB</div>
+              </div>
+              <button type="button" class="remove-file" onclick="removeFile('${targetId}', 0)" title="Remove">×</button>
+            </div>
+          `;
+        }
+        
+        
+        // Re-attach event listeners to the new input
+        const newInput = document.getElementById(targetId);
+        if (newInput) {
+          newInput.addEventListener('change', () => {
+            updateList(newInput.files);
+          });
+        }
+      };
+
+      // Set up initial event listeners
+      input.addEventListener('change', () => {
+        updateList(input.files);
+      });
+
+      // Drag and drop
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('dragover');
+      });
+
+      zone.addEventListener('dragleave', (e) => {
+        if (!zone.contains(e.relatedTarget)) {
+          zone.classList.remove('dragover');
+        }
+      });
+
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (input.multiple) {
+          input.files = files;
+        } else {
+          const dt = new DataTransfer();
+          if (files[0]) {
+            dt.items.add(files[0]);
+          }
+          input.files = dt.files;
+        }
+        updateList(input.files);
+      });
+      
+    }
+
+    // Update file list display - supports both calling patterns
+    function updateList(targetIdOrFiles, filesParam) {
+      let targetId, files;
+      
+      // Handle both calling patterns: updateList(targetId, files) and updateList(files)
+      if (typeof targetIdOrFiles === 'string') {
+        targetId = targetIdOrFiles;
+        files = filesParam;
+      } else {
+        // This means it was called as updateList(files) - need to find the targetId
+        files = targetIdOrFiles;
+        // Find the targetId by looking at the currently active input
+        const activeInput = document.activeElement;
+        if (activeInput && activeInput.type === 'file') {
+          targetId = activeInput.id;
+        } else {
+          return;
+        }
+      }
+      
+      
+      const list = document.getElementById(targetId + 'List');
+      if (!list) {
+        return;
+      }
+
+      if (!files || files.length === 0) {
+        list.innerHTML = '';
+        return;
+      }
+
+
+      // Create preview elements using the original system's CSS classes
+      const previews = Array.from(files).map((file, index) => {
+        let thumbnail = '';
+        if (file.type.startsWith('image/')) {
+          const url = URL.createObjectURL(file);
+          thumbnail = `<img src="${url}" class="file-thumbnail" alt="Preview">`;
+        } else if (file.type === 'application/pdf') {
+          thumbnail = `<div class="pdf-preview">
+            <div class="pdf-gradient"></div>
+            <div class="pdf-text">PDF</div>
+          </div>`;
         }
 
-        function takePhoto() {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0);
+        return `<div class="file-item">
+          ${thumbnail}
+          <div class="file-info">
+            <div class="file-name">${file.name}</div>
+            <div class="file-size">${(file.size/1024/1024).toFixed(2)} MB</div>
+          </div>
+          <button type="button" class="remove-file" onclick="removeFile('${targetId}', ${index})" title="Remove">×</button>
+        </div>`;
+      }).join('');
 
-            const photoData = canvas.toDataURL('image/jpeg', 0.8);
+      list.innerHTML = previews;
+    }
 
-            document.getElementById('photoPreview').src = photoData;
-            document.getElementById('photoPreview').style.display = 'block';
-
-            video.style.display = 'none';
-            document.getElementById('takePhoto').style.display = 'none';
-            document.getElementById('retakePhoto').style.display = 'inline-block';
-
-            photoTaken = true;
-            checkSubmitReady();
-
-            // Stop camera
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
+    // Global function to remove files
+    window.removeFile = function(targetId, fileIndex) {
+      
+      // Find the dropzone and list elements
+      const zone = document.querySelector(`.dropzone[data-target="${targetId}"]`);
+      const list = document.getElementById(targetId + 'List');
+      
+      if (!zone) {
+        return;
+      }
+      
+      // Create a temporary input to find the original input configuration
+      const originalInputs = document.querySelectorAll(`input[id="${targetId}"]`);
+      let inputConfig = { accept: 'image/*,application/pdf', multiple: false, name: 'file' };
+      
+      if (originalInputs.length > 0) {
+        const firstInput = originalInputs[0];
+        inputConfig.accept = firstInput.accept || inputConfig.accept;
+        inputConfig.multiple = firstInput.multiple || false;
+        inputConfig.name = firstInput.name || inputConfig.name;
+      }
+      
+      // Clear the files by triggering updateList with empty files
+      const mockEvent = {
+        target: {
+          files: []
         }
-
-        function retakePhoto() {
-            document.getElementById('photoPreview').style.display = 'none';
-            document.getElementById('retakePhoto').style.display = 'none';
-
-            photoTaken = false;
-            checkSubmitReady();
-
-            startCamera();
+      };
+      
+      // Reset the dropzone using the same logic as updateList
+      const isSpanish = targetId.endsWith('Es');
+      const isMultiple = inputConfig.multiple;
+      
+      let hintText;
+      if (isSpanish) {
+        hintText = isMultiple ? 'Arrastre y suelte archivos aquí o haga clic para seleccionar' : 'Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar';
+      } else {
+        hintText = isMultiple ? 'Drag & drop files here or click to select' : 'Drag & drop image/PDF here or click to select';
+      }
+      
+      zone.innerHTML = `
+        <div class="drop-hint">${hintText}</div>
+        <input id="${targetId}" name="${inputConfig.name}" type="file" accept="${inputConfig.accept}" ${inputConfig.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+      `;
+      
+      // Reset zone styles
+      zone.style.width = '';
+      zone.style.height = '';
+      zone.style.padding = '18px';
+      zone.style.border = '2px dashed #bbb';
+      
+      // Clear file list
+      if (list) {
+        list.innerHTML = '';
+      }
+      
+      // Clean up any blob URLs from removed previews
+      const existingPreviews = zone.querySelectorAll('img[src^="blob:"], iframe[src^="blob:"]');
+      existingPreviews.forEach(preview => {
+        if (preview.src && preview.src.startsWith('blob:')) {
+          URL.revokeObjectURL(preview.src);
         }
-
-        function getLocation() {
-            if (!navigator.geolocation) {
-                getIPLocation();
-                return;
+      });
+      
+      // Re-attach event listeners to the new input immediately
+      const newInput = document.getElementById(targetId);
+      const newList = document.getElementById(targetId + 'List');
+      if (newInput && newList) {
+        // Find the dropzone to get the updateList function
+        const newZone = document.querySelector(`.dropzone[data-target="${targetId}"]`);
+        if (newZone) {
+          // Re-create the updateList function for this specific input
+          const updateList = (files) => {
+            if (!files || files.length === 0) { 
+              // Already in reset state, no need to do anything
+              return; 
             }
-
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    locationData = {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                        accuracy: position.coords.accuracy,
-                        timestamp: new Date().toISOString(),
-                        source: 'GPS'
-                    };
-
-                    console.log('GPS Location:', position.coords.latitude, position.coords.longitude, position.coords.accuracy);
-
-                    checkSubmitReady();
-                },
-                function(error) {
-                    console.log('GPS location failed, falling back to IP location');
-                    getIPLocation();
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 5000,
-                    maximumAge: 300000
+            
+            // For now, handle single file (first file if multiple)
+            const file = files[0];
+            const fileSize = (file.size/1024/1024).toFixed(2);
+            const isImage = file.type.startsWith('image/');
+            const isPdf = file.type === 'application/pdf';
+            
+            if (isImage) {
+              // Create image preview that fills the dropzone
+              const url = URL.createObjectURL(file);
+              const img = new Image();
+              
+              img.onload = function() {
+                // Calculate responsive dimensions
+                const maxWidth = newZone.clientWidth || 300;
+                const maxHeight = Math.min(window.innerHeight * 0.4, 400); // Max 40% of viewport height or 400px
+                
+                const aspectRatio = img.naturalWidth / img.naturalHeight;
+                let displayWidth, displayHeight;
+                
+                if (aspectRatio > maxWidth / maxHeight) {
+                  // Image is wider - fit to width
+                  displayWidth = maxWidth;
+                  displayHeight = maxWidth / aspectRatio;
+                } else {
+                  // Image is taller - fit to height
+                  displayHeight = Math.min(maxHeight, maxWidth / aspectRatio);
+                  displayWidth = displayHeight * aspectRatio;
                 }
-            );
+                
+                newZone.style.width = displayWidth + 'px';
+                newZone.style.height = displayHeight + 'px';
+                newZone.style.padding = '0';
+                newZone.style.border = '2px solid var(--brand)';
+                newZone.style.position = 'relative';
+                newZone.style.overflow = 'hidden';
+                
+                newZone.innerHTML = `
+                  <img id="${targetId}_preview" src="${url}" data-target-id="${targetId}" style="
+                    width: 100%; 
+                    height: 100%; 
+                    object-fit: cover; 
+                    cursor: grab;
+                    transition: transform 0.3s ease;
+                    transform-origin: center center;
+                  " alt="Preview" />
+                  <input id="${targetId}" name="${newInput.name}" type="file" accept="${newInput.accept}" ${newInput.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
+                  <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
+                    <button onclick="event.stopPropagation(); event.preventDefault(); changeFile('${targetId}')" style="
+                      background: rgba(0, 123, 255, 0.9); 
+                      color: white; 
+                      border: none; 
+                      border-radius: 50%; 
+                      width: 30px; 
+                      height: 30px; 
+                      font-size: 14px; 
+                      cursor: pointer; 
+                      display: flex; 
+                      align-items: center; 
+                      justify-content: center;
+                      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    " title="Change file">📁</button>
+                    <button onclick="event.stopPropagation(); event.preventDefault(); removeFile('${targetId}', 0)" style="
+                      background: rgba(220, 53, 69, 0.9); 
+                      color: white; 
+                      border: none; 
+                      border-radius: 50%; 
+                      width: 30px; 
+                      height: 30px; 
+                      font-size: 16px; 
+                      cursor: pointer; 
+                      display: flex; 
+                      align-items: center; 
+                      justify-content: center;
+                      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    " title="Remove file">×</button>
+                  </div>
+                  <div style="
+                    position: absolute;
+                    bottom: 8px;
+                    left: 8px;
+                    background: rgba(0,0,0,0.7);
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    pointer-events: none;
+                    z-index: 10;
+                  ">Scroll: Zoom • Drag: Pan</div>
+                `;
+                
+                // Re-attach change listener after creating new HTML
+                const finalInput = document.getElementById(targetId);
+                if (finalInput) {
+                  finalInput.addEventListener('change', () => {
+                    updateList(finalInput.files);
+                  });
+                }
+                
+                URL.revokeObjectURL(url);
+              };
+              
+              img.src = url;
+            } else if (isPdf) {
+              // Similar code for PDF but I'll keep it shorter
+              const fileSize = (file.size/1024/1024).toFixed(2);
+              
+              const maxWidth = newZone.clientWidth || 300;
+              const maxHeight = Math.min(window.innerHeight * 0.4, 200);
+              
+              newZone.style.width = maxWidth + 'px';
+              newZone.style.height = maxHeight + 'px';
+              newZone.style.padding = '0';
+              newZone.style.border = '2px solid var(--brand)';
+              newZone.style.position = 'relative';
+              newZone.style.overflow = 'hidden';
+              
+              newZone.innerHTML = `
+                <div id="${targetId}_pdf_preview" style="width: 100%; height: 100%; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; cursor: default; position: relative;">
+                  <div style="font-size: 48px; margin-bottom: 8px;">📄</div>
+                  <div style="font-size: 16px; margin-bottom: 4px;">PDF Document</div>
+                  <div style="font-size: 12px; opacity: 0.9;">${file.name}</div>
+                  <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">${fileSize} MB</div>
+                </div>
+                <input id="${targetId}" name="${newInput.name}" type="file" accept="${newInput.accept}" ${newInput.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
+                <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
+                  <button onclick="event.stopPropagation(); event.preventDefault(); changeFile('${targetId}')" style="background: rgba(0, 123, 255, 0.9); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3);" title="Change file">📁</button>
+                  <button onclick="event.stopPropagation(); event.preventDefault(); removeFile('${targetId}', 0)" style="background: rgba(220, 53, 69, 0.9); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3);" title="Remove file">×</button>
+                </div>
+              `;
+              
+              // Re-attach change listener
+              const finalInput = document.getElementById(targetId);
+              if (finalInput) {
+                finalInput.addEventListener('change', () => {
+                  updateList(finalInput.files);
+                });
+              }
+            }
+            
+            // Update the file list area below with file info
+            newList.innerHTML = `
+              <div style="margin-top: 10px; padding: 8px; background: #f0f0f0; border-radius: 6px; color: #333; font-size: 14px;">
+                <div style="font-weight: 600;">${file.name}</div>
+                <div style="font-size: 12px; color: #666;">${fileSize} MB</div>
+              </div>
+            `;
+            
+              };
+          
+          // Attach the change listener
+          newInput.addEventListener('change', () => {
+            updateList(newInput.files);
+          });
+        }
+      }
+      
+    };
+
+    window.changeFile = function(targetId) {
+      
+      // Get the original input
+      const originalInput = document.getElementById(targetId);
+      if (!originalInput) {
+        return;
+      }
+      
+      // Clear the current value to allow re-selection of the same file
+      originalInput.value = '';
+      
+      // Create a temporary file input
+      const tempInput = document.createElement('input');
+      tempInput.type = 'file';
+      tempInput.accept = originalInput.accept || 'image/*,application/pdf';
+      tempInput.multiple = originalInput.multiple || false;
+      tempInput.style.display = 'none';
+      
+      tempInput.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+          // Create a new DataTransfer to copy files
+          const dataTransfer = new DataTransfer();
+          for (let i = 0; i < this.files.length; i++) {
+            dataTransfer.items.add(this.files[i]);
+          }
+          
+          // Set the files on the original input
+          originalInput.files = dataTransfer.files;
+          
+          // Trigger change event
+          const changeEvent = new Event('change', { bubbles: true });
+          originalInput.dispatchEvent(changeEvent);
+          
+        }
+        
+        // Clean up temp input
+        document.body.removeChild(tempInput);
+      });
+      
+      // Add to DOM temporarily and click
+      document.body.appendChild(tempInput);
+      tempInput.click();
+    };
+
+    // Upload functionality - embedded in HTML
+    (function () {
+      // Initialize when DOM is loaded
+      document.addEventListener('DOMContentLoaded', function() {
+        
+        // Initialize dropzones for both forms
+        initializeAllDropzones();
+        
+        // Initialize form functionality
+        initializeForm('En'); // English form
+        initializeForm('Es'); // Spanish form
+        
+      });
+
+      function initializeAllDropzones() {
+        // Find all dropzones in the document
+        const dropzones = document.querySelectorAll('.dropzone');
+        
+        dropzones.forEach(zone => {
+          const targetId = zone.getAttribute('data-target');
+          const input = document.getElementById(targetId);
+          const list = document.getElementById(targetId + 'List');
+          
+          
+          if (!input || !list) {
+            return;
+          }
+
+          const updateList = (files) => {
+            if (!files || files.length === 0) { 
+              // Reset dropzone to original state
+              const isSpanish = targetId.endsWith('Es');
+              const isMultiple = input.multiple;
+              
+              let hintText;
+              if (isSpanish) {
+                hintText = isMultiple ? 'Arrastre y suelte archivos aquí o haga clic para seleccionar' : 'Arrastre y suelte imagen/PDF aquí o haga clic para seleccionar';
+              } else {
+                hintText = isMultiple ? 'Drag & drop files here or click to select' : 'Drag & drop image/PDF here or click to select';
+              }
+              
+              zone.innerHTML = `
+                <div class="drop-hint">${hintText}</div>
+                <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+              `;
+              
+              // Reset zone styles
+              zone.style.width = '';
+              zone.style.height = '';
+              zone.style.padding = '18px';
+              zone.style.border = '2px dashed #bbb';
+              
+              // Clear file list
+              list.innerHTML = '';
+              
+              // Re-attach event listeners to the new input
+              const newInput = document.getElementById(targetId);
+              newInput.addEventListener('change', () => {
+                updateList(newInput.files);
+              });
+              
+              return; 
+            }
+            
+            // For now, handle single file (first file if multiple)
+            const file = files[0];
+            const fileSize = (file.size/1024/1024).toFixed(2);
+            const isImage = file.type.startsWith('image/');
+            const isPdf = file.type === 'application/pdf';
+            
+            if (isImage) {
+              // Create image preview that fills the dropzone
+              const url = URL.createObjectURL(file);
+              const img = new Image();
+              
+              img.onload = function() {
+                // Calculate responsive dimensions
+                const maxWidth = zone.clientWidth || 300;
+                const maxHeight = Math.min(window.innerHeight * 0.4, 400); // Max 40% of viewport height or 400px
+                
+                const aspectRatio = img.naturalWidth / img.naturalHeight;
+                let displayWidth, displayHeight;
+                
+                if (aspectRatio > maxWidth / maxHeight) {
+                  // Image is wider - fit to width
+                  displayWidth = maxWidth;
+                  displayHeight = maxWidth / aspectRatio;
+                } else {
+                  // Image is taller - fit to height
+                  displayHeight = Math.min(maxHeight, maxWidth / aspectRatio);
+                  displayWidth = displayHeight * aspectRatio;
+                }
+                
+                zone.style.width = displayWidth + 'px';
+                zone.style.height = displayHeight + 'px';
+                zone.style.padding = '0';
+                zone.style.border = '2px solid var(--brand)';
+                zone.style.position = 'relative';
+                zone.style.overflow = 'hidden';
+                
+                console.log(`🖼️ Creating second image preview for ${targetId} - preserving ${input.files.length} files`);
+                const filesToPreserve2 = input.files;
+                
+                zone.innerHTML = `
+                  <img id="${targetId}_preview" src="${url}" data-target-id="${targetId}" style="
+                    width: 100%; 
+                    height: 100%; 
+                    object-fit: cover; 
+                    cursor: grab;
+                    transition: transform 0.3s ease;
+                    transform-origin: center center;
+                  " alt="Preview" />
+                  <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
+                  <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
+                    <button onclick="event.stopPropagation(); event.preventDefault(); changeFile('${targetId}')" style="
+                      background: rgba(0, 123, 255, 0.9); 
+                      color: white; 
+                      border: none; 
+                      border-radius: 50%; 
+                      width: 30px; 
+                      height: 30px; 
+                      font-size: 14px; 
+                      cursor: pointer; 
+                      display: flex; 
+                      align-items: center; 
+                      justify-content: center;
+                      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    " title="Change file">📁</button>
+                    <button onclick="event.stopPropagation(); event.preventDefault(); removeFile('${targetId}', 0)" style="
+                      background: rgba(220, 53, 69, 0.9); 
+                      color: white; 
+                      border: none; 
+                      border-radius: 50%; 
+                      width: 30px; 
+                      height: 30px; 
+                      font-size: 16px; 
+                      cursor: pointer; 
+                      display: flex; 
+                      align-items: center; 
+                      justify-content: center;
+                      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    " title="Remove file">×</button>
+                  </div>
+                  <div style="
+                    position: absolute;
+                    bottom: 8px;
+                    left: 8px;
+                    background: rgba(0,0,0,0.7);
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 11px;
+                    pointer-events: none;
+                    z-index: 10;
+                  ">Scroll: Zoom • Drag: Pan</div>
+                `;
+                
+                // CRITICAL FIX: Reassign files to new input element
+                const newInput2 = document.getElementById(targetId);
+                if (newInput2 && filesToPreserve2 && filesToPreserve2.length > 0) {
+                  console.log(`🔧 Reassigning ${filesToPreserve2.length} files to second new input element`);
+                  try {
+                    newInput2.files = filesToPreserve2;
+                    console.log(`✅ Files successfully reassigned to second input: ${newInput2.files.length} files`);
+                    // Update input reference
+                    input = newInput2;
+                  } catch (e) {
+                    console.error(`❌ Failed to reassign files to second input:`, e);
+                  }
+                } else {
+                  console.warn(`⚠️ Could not reassign files to second input: newInput=${!!newInput2}, filesToPreserve=${filesToPreserve2?.length || 0}`);
+                }
+                
+                // Add zoom and pan functionality
+                const previewImg = document.getElementById(targetId + '_preview');
+                
+                // Store the file data on the image element for later use
+                previewImg._fileData = file;
+                
+                // Re-attach change listener to the new input
+                const newInput = document.getElementById(targetId);
+                if (newInput) {
+                  newInput.addEventListener('change', () => {
+                            updateList(newInput.files);
+                  });
+                }
+                
+                let currentScale = 1;
+                let currentTranslateX = 0;
+                let currentTranslateY = 0;
+                let isDragging = false;
+                let startX, startY, initialTranslateX, initialTranslateY;
+                
+                // Mouse wheel zoom
+                previewImg.addEventListener('wheel', (e) => {
+                  e.preventDefault();
+                  const rect = previewImg.getBoundingClientRect();
+                  const centerX = rect.left + rect.width / 2;
+                  const centerY = rect.top + rect.height / 2;
+                  
+                  const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+                  const newScale = Math.max(0.5, Math.min(3, currentScale * zoomFactor));
+                  
+                  if (newScale !== currentScale) {
+                    currentScale = newScale;
+                    updatePreviewTransform();
+                  }
+                });
+                
+                // Mouse drag to pan
+                previewImg.addEventListener('mousedown', (e) => {
+                  if (currentScale > 1) {
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    initialTranslateX = currentTranslateX;
+                    initialTranslateY = currentTranslateY;
+                    previewImg.style.cursor = 'grabbing';
+                    e.preventDefault();
+                  }
+                });
+                
+                document.addEventListener('mousemove', (e) => {
+                  if (isDragging) {
+                    currentTranslateX = initialTranslateX + (e.clientX - startX);
+                    currentTranslateY = initialTranslateY + (e.clientY - startY);
+                    updatePreviewTransform();
+                  }
+                });
+                
+                document.addEventListener('mouseup', () => {
+                  if (isDragging) {
+                    isDragging = false;
+                    previewImg.style.cursor = currentScale > 1 ? 'grab' : 'pointer';
+                  }
+                });
+                
+                // Double click to reset zoom
+                previewImg.addEventListener('dblclick', (e) => {
+                  e.preventDefault();
+                  currentScale = 1;
+                  currentTranslateX = 0;
+                  currentTranslateY = 0;
+                  updatePreviewTransform();
+                  previewImg.style.cursor = 'pointer';
+                });
+                
+                // Single click removed - no modal preview
+                
+                function updatePreviewTransform() {
+                  previewImg.style.transform = `scale(${currentScale}) translate(${currentTranslateX/currentScale}px, ${currentTranslateY/currentScale}px)`;
+                  previewImg.style.cursor = currentScale > 1 ? 'grab' : 'pointer';
+                }
+                
+                URL.revokeObjectURL(url); // Clean up
+              };
+              
+              img.src = url;
+            } else if (isPdf) {
+              // Show PDF info with styled preview (Chrome blocks PDF iframes from blob URLs)
+              const fileSize = (file.size/1024/1024).toFixed(2);
+              
+              // Calculate responsive dimensions
+              const maxWidth = zone.clientWidth || 300;
+              const maxHeight = Math.min(window.innerHeight * 0.4, 200);
+              
+              zone.style.width = maxWidth + 'px';
+              zone.style.height = maxHeight + 'px';
+              zone.style.padding = '0';
+              zone.style.border = '2px solid var(--brand)';
+              zone.style.position = 'relative';
+              zone.style.overflow = 'hidden';
+              
+              console.log(`📄 Creating second PDF preview for ${targetId} - preserving ${input.files.length} files`);
+              const pdfFilesToPreserve2 = input.files;
+              
+              zone.innerHTML = `
+                <div id="${targetId}_pdf_preview" style="
+                  width: 100%; 
+                  height: 100%; 
+                  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+                  color: white; 
+                  display: flex; 
+                  flex-direction: column;
+                  align-items: center; 
+                  justify-content: center; 
+                  font-size: 20px; 
+                  font-weight: bold;
+                  cursor: default;
+                  position: relative;
+                ">
+                  <div style="font-size: 48px; margin-bottom: 8px;">📄</div>
+                  <div style="font-size: 16px; margin-bottom: 4px;">PDF Document</div>
+                  <div style="font-size: 12px; opacity: 0.9;">${file.name}</div>
+                  <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">${fileSize} MB</div>
+                </div>
+                <input id="${targetId}" name="${input.name}" type="file" accept="${input.accept}" ${input.multiple ? 'multiple' : ''} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 5;" />
+                <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 8px; z-index: 10;">
+                  <button onclick="event.stopPropagation(); event.preventDefault(); changeFile('${targetId}')" style="
+                    background: rgba(0, 123, 255, 0.9); 
+                    color: white; 
+                    border: none; 
+                    border-radius: 50%; 
+                    width: 30px; 
+                    height: 30px; 
+                    font-size: 14px; 
+                    cursor: pointer; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                  " title="Change file">📁</button>
+                  <button onclick="event.stopPropagation(); event.preventDefault(); removeFile('${targetId}', 0)" style="
+                    background: rgba(220, 53, 69, 0.9); 
+                    color: white; 
+                    border: none; 
+                    border-radius: 50%; 
+                    width: 30px; 
+                    height: 30px; 
+                    font-size: 16px; 
+                    cursor: pointer; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                  " title="Remove file">×</button>
+                </div>
+              `;
+              
+              // CRITICAL FIX: Reassign files to new input element for second PDF
+              const newPdfInput2 = document.getElementById(targetId);
+              if (newPdfInput2 && pdfFilesToPreserve2 && pdfFilesToPreserve2.length > 0) {
+                console.log(`🔧 Reassigning ${pdfFilesToPreserve2.length} PDF files to second new input element`);
+                try {
+                  newPdfInput2.files = pdfFilesToPreserve2;
+                  console.log(`✅ PDF files successfully reassigned to second input: ${newPdfInput2.files.length} files`);
+                  // Update input reference
+                  input = newPdfInput2;
+                } catch (e) {
+                  console.error(`❌ Failed to reassign PDF files to second input:`, e);
+                }
+              } else {
+                console.warn(`⚠️ Could not reassign PDF files to second input: newInput=${!!newPdfInput2}, filesToPreserve=${pdfFilesToPreserve2?.length || 0}`);
+              }
+              
+              // Store the file data on the PDF element for later use
+              const pdfPreview = document.getElementById(targetId + '_pdf_preview');
+              if (pdfPreview) {
+                pdfPreview._fileData = file;
+              }
+              
+              // Re-attach change listener to the new input
+              const newInput = document.getElementById(targetId);
+              if (newInput) {
+                newInput.addEventListener('change', () => {
+                        updateList(newInput.files);
+                });
+              }
+            }
+            
+            // Update the file list area below with file info
+            list.innerHTML = `
+              <div style="margin-top: 10px; padding: 8px; background: #f0f0f0; border-radius: 6px; color: #333; font-size: 14px;">
+                <div style="font-weight: 600;">${file.name}</div>
+                <div style="font-size: 12px; color: #666;">${fileSize} MB</div>
+              </div>
+            `;
+            
+              };
+
+          // Simple click handler - no preview modal
+          zone.addEventListener('click', (e) => {
+            console.log(`🖱️ Dynamic dropzone clicked: ${targetId}`);
+            // No preview modal functionality - just log clicks
+            if (e.target.classList.contains('preview-thumb') || e.target.id.includes('_preview')) {
+              console.log('🖼️ Clicked on preview, not triggering file input');
+              return;
+            }
+            console.log('🎯 Triggering file input click');
+            e.preventDefault();
+            input.click();
+          });
+
+          // Drag and drop
+          zone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            zone.classList.add('dragover');
+          });
+
+          zone.addEventListener('dragleave', (e) => {
+            // Only remove dragover if we're really leaving the dropzone
+            if (!zone.contains(e.relatedTarget)) {
+              zone.classList.remove('dragover');
+            }
+          });
+
+          zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            console.log(`🎯 Files dropped on dynamic ${targetId}:`, files.length, 'files');
+            
+            // Log each dropped file
+            Array.from(files).forEach((file, i) => {
+              console.log(`  📎 Dropped file ${i + 1}: ${file.name} (${file.type}, ${(file.size/1024/1024).toFixed(2)} MB)`);
+            });
+            
+            if (input.multiple) {
+              console.log(`✅ Setting ${files.length} files to multi-file input ${targetId}`);
+              input.files = files;
+            } else {
+              console.log(`✅ Setting first file to single-file input ${targetId}`);
+              // For single input, take the first file
+              const dt = new DataTransfer();
+              if (files[0]) {
+                dt.items.add(files[0]);
+              }
+              input.files = dt.files;
+            }
+            updateList(input.files);
+          });
+
+          // File input change
+          input.addEventListener('change', () => {
+            console.log(`📁 Dynamic file input changed for ${targetId}: ${input.files.length} files selected`);
+            Array.from(input.files).forEach((file, i) => {
+              console.log(`  📄 Selected file ${i + 1}: ${file.name} (${file.type}, ${(file.size/1024/1024).toFixed(2)} MB)`);
+            });
+            updateList(input.files);
+          });
+        });
+      }
+
+      function initializeForm(suffix) {
+        const form = document.getElementById('uploadForm' + suffix);
+        const submitBtn = document.getElementById('submitBtn' + suffix);
+        const successMsg = document.getElementById('successMsg' + suffix);
+        const errorMsg = document.getElementById('errorMsg' + suffix);
+
+        if (!form) {
+          return;
         }
 
-        function getIPLocation() {
-            try {
-                fetch('https://ipapi.co/json/')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.latitude && data.longitude) {
-                            locationData = {
-                                latitude: data.latitude,
-                                longitude: data.longitude,
-                                accuracy: 10000, // IP location is less accurate
-                                timestamp: new Date().toISOString(),
-                                source: 'IP',
-                                city: data.city,
-                                region: data.region,
-                                country: data.country_name
-                            };
 
-                            console.log('IP Location:', data.city, data.region, data.latitude, data.longitude);
+        // Simple phone formatting on blur (USA)
+        const phone = document.getElementById('yourPhone' + suffix);
+        if (phone) {
+          phone.addEventListener('blur', () => {
+            const digits = (phone.value || '').replace(/[^0-9]/g, '');
+            if (digits.length === 10) {
+              phone.value = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+            }
+          });
+        }
 
-                            checkSubmitReady();
-                        } else {
-                            throw new Error('No location data received');
+
+        // Submit handler with debugging
+        form?.addEventListener('submit', async (e) => {
+          console.log('🎯 Form submit event triggered!', suffix);
+          e.preventDefault();
+          successMsg.style.display = 'none';
+          errorMsg.style.display = 'none';
+
+          // Basic required checks
+          console.log('🔍 Checking required fields...');
+          const requiredIds = ['yourName' + suffix, 'yourPhone' + suffix];
+          for (const id of requiredIds) {
+            const el = document.getElementById(id);
+            console.log(`📝 Checking ${id}:`, el?.value);
+            if (!el || !el.value.trim()) {
+              console.log(`❌ Required field missing: ${id}`);
+              el?.reportValidity?.();
+              return;
+            }
+          }
+          
+          // Check that at least one document section has files
+          console.log('📁 Checking for uploaded documents...');
+          const documentSections = form.querySelectorAll('.dynamic-doc-section');
+          console.log(`Found ${documentSections.length} document sections`);
+          
+          // Also check for files in the entire form as backup
+          const allFileInputs = form.querySelectorAll('input[type="file"]');
+          console.log(`📁 Total file inputs in form: ${allFileInputs.length}`);
+          
+          let hasFiles = false;
+          let totalFiles = 0;
+          
+          // Method 1: Check in document sections
+          for (const section of documentSections) {
+            const fileInputs = section.querySelectorAll('input[type="file"]');
+            console.log(`Section has ${fileInputs.length} file inputs`);
+            for (const input of fileInputs) {
+              console.log(`🔍 Input details:`, {
+                id: input.id,
+                files: input.files ? input.files.length : 'null',
+                value: input.value
+              });
+              if (input.files && input.files.length > 0) {
+                console.log(`✅ Found file: ${input.files[0].name}`);
+                hasFiles = true;
+                totalFiles += input.files.length;
+              } else {
+                console.log(`❌ No files in this input`);
+              }
+            }
+          }
+          
+          // Method 2: Backup check - scan all file inputs in form
+          if (!hasFiles) {
+            console.log('🔍 Backup method: Checking all file inputs in form...');
+            for (const input of allFileInputs) {
+              console.log(`🔍 Form input:`, {
+                id: input.id,
+                files: input.files ? input.files.length : 'null',
+                value: input.value
+              });
+              if (input.files && input.files.length > 0) {
+                console.log(`✅ Found file via backup method: ${input.files[0].name}`);
+                hasFiles = true;
+                totalFiles += input.files.length;
+              }
+            }
+          }
+          
+          if (!hasFiles) {
+            console.log('❌ No files uploaded (checked both methods)');
+            errorMsg.textContent = suffix === 'Es'
+              ? 'Por favor suba al menos un documento.'
+              : 'Please upload at least one document.';
+            errorMsg.style.display = 'block';
+            errorMsg.style.background = 'var(--error)';
+            return;
+          }
+          
+          console.log(`✅ Found ${totalFiles} total files`);
+          
+          console.log('✅ Validation passed, proceeding with upload...');
+
+          // Size/type checks (<=10MB per file)
+          console.log('🔍 Checking file sizes and types...');
+          const okTypes = ['image/jpeg','image/png','image/webp','image/heic','application/pdf'];
+          // Use the allFileInputs already declared above
+          
+          for (const input of allFileInputs) {
+            if (!input.files) continue;
+            for (const f of input.files) {
+              console.log(`📎 Checking file: ${f.name} (${f.size} bytes, ${f.type})`);
+              if (f.size > 10 * 1024 * 1024) { // 10MB
+                console.log(`❌ File too large: ${f.name}`);
+                errorMsg.textContent = suffix === 'Es' 
+                  ? `Archivo demasiado grande: ${f.name} (máximo 10MB)`
+                  : `File too large: ${f.name} (max 10MB)`;
+                errorMsg.style.display = 'block';
+                errorMsg.style.background = 'var(--error)';
+                return;
+              }
+              if (!okTypes.includes(f.type)) {
+                console.log(`❌ Unsupported file type: ${f.name} (${f.type})`);
+                errorMsg.textContent = suffix === 'Es'
+                  ? `Tipo no soportado: ${f.name}`
+                  : `Unsupported type: ${f.name}`;
+                errorMsg.style.display = 'block';
+                errorMsg.style.background = 'var(--error)';
+                return;
+              }
+            }
+          }
+          
+          console.log('✅ All files passed validation');
+
+          // Submit to Google Apps Script with debugging
+          try {
+            console.log('🚀 Starting upload process (FIXED - JSON with base64)...');
+            
+            if (submitBtn) {
+              submitBtn.disabled = true;
+              submitBtn.textContent = suffix === 'Es' ? 'Enviando...' : 'Submitting...';
+            }
+
+            // Show progress message
+            errorMsg.textContent = suffix === 'Es' ? 'Convirtiendo archivos...' : 'Converting files...';
+            errorMsg.style.display = 'block';
+            errorMsg.style.background = '#2196F3'; // Blue for info
+
+            // Create JSON object (like bail-bond-application does)
+            const jsonData = {
+              timestamp: new Date().toISOString(),
+              yourName: document.getElementById('yourName' + suffix)?.value || '',
+              yourPhone: document.getElementById('yourPhone' + suffix)?.value || '',
+              defendantName: document.getElementById('defendantName' + suffix)?.value || '',
+              caseNumber: document.getElementById('caseNumber' + suffix)?.value || '',
+              language: suffix === 'Es' ? 'spanish' : 'english',
+              documentSections: []
+            };
+            
+            console.log('📝 Form data:', jsonData);
+            
+            // Process document sections and convert files to base64
+            const documentSections = form.querySelectorAll('.dynamic-doc-section');
+            console.log(`📁 Found ${documentSections.length} document sections`);
+            
+            let totalFiles = 0;
+            
+            // Convert all files to base64
+            for (let index = 0; index < documentSections.length; index++) {
+              const section = documentSections[index];
+              
+              // Get document type - check select first, then data attribute
+              const docTypeSelect = section.querySelector('select[id*="documentType"]');
+              let docType = docTypeSelect ? docTypeSelect.value : (section.getAttribute('data-document-type') || 'Other');
+              
+              // Normalize Spanish document types
+              const translations = {
+                'ID Gubernamental': 'Government ID',
+                'Comprobante de Domicilio': 'Proof of Address',
+                'Comprobante de Empleo': 'Proof of Employment',
+                'Otro': 'Other'
+              };
+              docType = translations[docType] || docType;
+              
+              console.log(`📄 Processing section ${index}: ${docType}`);
+              
+              const sectionData = {
+                documentType: docType,
+                files: []
+              };
+              
+              // Find all file inputs in this section
+              const fileInputs = section.querySelectorAll('input[type="file"]');
+              console.log(`📁 Section ${index} has ${fileInputs.length} file inputs`);
+              
+              // Convert each file to base64
+              for (const input of fileInputs) {
+                if (input.files && input.files.length > 0) {
+                  for (const file of input.files) {
+                    console.log(`📎 Converting ${file.name} to base64...`);
+                    
+                    errorMsg.textContent = suffix === 'Es' 
+                      ? `Procesando: ${file.name}...`
+                      : `Processing: ${file.name}...`;
+                    
+                    try {
+                      // Detect if this is a Government ID front/back file
+                      let fileType = null;
+                      if (docType === 'Government ID' && input.id) {
+                        if (input.id.includes('_front_')) {
+                          fileType = 'front';
+                        } else if (input.id.includes('_back_')) {
+                          fileType = 'back';
                         }
-                    })
-                    .catch(error => {
-                        console.error('IP location failed:', error);
-                        showStatus('Unable to determine location. Please ensure you have an internet connection.', 'error');
-                    });
-            } catch (error) {
-                showStatus('Location services unavailable. Please try again later.', 'error');
+                      }
+                      
+                      const fileData = await fileToBase64(file, fileType);
+                      sectionData.files.push(fileData);
+                      totalFiles++;
+                      console.log(`✅ Converted ${file.name} (${(file.size/1024).toFixed(2)} KB)${fileType ? ` as ${fileType}` : ''}`);
+                    } catch (err) {
+                      console.error(`❌ Failed to convert ${file.name}:`, err);
+                    }
+                  }
+                }
+              }
+              
+              if (sectionData.files.length > 0) {
+                jsonData.documentSections.push(sectionData);
+              }
             }
-        }
-
-        function checkSubmitReady() {
-            if (photoTaken && locationData) {
-                document.getElementById('submitCheckin').style.display = 'inline-block';
+            
+            console.log(`📊 Total files converted: ${totalFiles}`);
+            
+            if (totalFiles === 0) {
+              throw new Error(suffix === 'Es' 
+                ? 'No se encontraron archivos para cargar'
+                : 'No files found to upload');
             }
-        }
-
-        async function submitCheckin() {
-            const submitBtn = document.getElementById('submitCheckin');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-
-            try {
-                const checkinData = {
-                    photo: canvas.toDataURL('image/jpeg', 0.8),
-                    location: locationData,
-                    timestamp: new Date().toISOString(),
-                    userAgent: navigator.userAgent
-                };
-
-                // For now, just simulate submission
-                console.log('Check-in data:', checkinData);
-
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 2000));
-
-                showStatus('✅ Check-in successful! Your photo and location have been recorded.', 'success');
-
-                // Reset the form
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
-
-            } catch (error) {
-                console.error('Error submitting check-in:', error);
-                showStatus('❌ Check-in failed. Please try again or call us directly.', 'error');
-
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Check-In';
+            
+            // Update progress message
+            errorMsg.textContent = suffix === 'Es' 
+              ? 'Enviando al servidor...'
+              : 'Sending to server...';
+            
+            // Google Apps Script Web App URL configured
+            const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbztNOgs3JN4ksI0xX66UOh0VeS_Sg31dUJKpM2OLd3BwEh-iJIElwX2XXUOBiSJTiBC/exec';
+            
+            console.log('🌐 Sending JSON to Apps Script:', APPS_SCRIPT_URL);
+            console.log('📦 Payload size:', JSON.stringify(jsonData).length, 'characters');
+            
+            // Send as JSON exactly like bail-bond-application does
+            const response = await fetch(APPS_SCRIPT_URL, {
+              method: 'POST',
+              mode: 'no-cors', // Same as bail-bond-application
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(jsonData)
+            });
+            
+            // With no-cors, we can't read response but that's ok
+            console.log('✅ Upload request sent successfully');
+            
+            // Show success message
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'block';
+            successMsg.textContent = suffix === 'Es'
+              ? '¡Documentos enviados exitosamente!'
+              : 'Documents uploaded successfully!';
+            
+            // Reset form
+            form.reset();
+            form.querySelectorAll('.file-list').forEach(el => el.textContent = '');
+            
+            // Clear dynamic sections
+            const dynamicContainer = document.getElementById('dynamicDocumentSections' + suffix);
+            if (dynamicContainer) {
+              dynamicContainer.innerHTML = '';
             }
-        }
+          } catch (error) {
+            console.error('❌ Upload error:', error);
+            console.error('❌ Error stack:', error.stack);
+            
+            // Reset error message background to red
+            errorMsg.style.background = 'var(--error)';
+            
+            if (error.message === 'Apps Script URL not configured yet') {
+              errorMsg.textContent = suffix === 'Es'
+                ? 'Carga aún no configurada. Por favor envíe sus fotos por texto a 561-247-0018.'
+                : 'Upload not configured yet. Please text your photos to 561-247-0018.';
+            } else if (error.message.includes('HTTP error')) {
+              errorMsg.innerHTML = suffix === 'Es'
+                ? `<strong>❌ Error de conexión:</strong><br>${error.message}<br>Por favor envíe sus fotos por texto a <span style="white-space: nowrap;">561-247-0018</span>`
+                : `<strong>❌ Connection Error:</strong><br>${error.message}<br>Please text your photos to <span style="white-space: nowrap;">561-247-0018</span>`;
+            } else if (error.message.includes('Invalid response')) {
+              errorMsg.innerHTML = suffix === 'Es'
+                ? `<strong>❌ Error de respuesta del servidor:</strong><br>Revise la consola para más detalles<br>Por favor envíe sus fotos por texto a <span style="white-space: nowrap;">561-247-0018</span>`
+                : `<strong>❌ Server Response Error:</strong><br>Check console for details<br>Please text your photos to <span style="white-space: nowrap;">561-247-0018</span>`;
+            } else {
+              errorMsg.innerHTML = suffix === 'Es'
+                ? `<strong>❌ Error al subir archivos:</strong><br>${error.message}<br>Por favor envíe sus fotos por texto a <span style="white-space: nowrap;">561-247-0018</span>`
+                : `<strong>❌ Upload Error:</strong><br>${error.message}<br>Please text your photos to <span style="white-space: nowrap;">561-247-0018</span>`;
+            }
+            errorMsg.style.display = 'block';
+          } finally {
+            // Re-enable submit button
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = suffix === 'Es' ? 'Enviar' : 'Submit';
+            }
+          }
+        });
+      }
+    })();
 
-        function showStatus(message, type) {
-            const statusEl = document.getElementById('statusMessage');
-            statusEl.textContent = message;
-            statusEl.className = `status ${type}`;
-            statusEl.style.display = 'block';
+    // Additional debugging
+    window.addEventListener('load', function() {
+      console.log('Page fully loaded');
+      console.log('Dropzones found:', document.querySelectorAll('.dropzone').length);
+      console.log('Upload forms found:', document.querySelectorAll('#uploadFormEn, #uploadFormEs').length);
+    });
 
-            statusEl.scrollIntoView({ behavior: 'smooth' });
+    // Modal preview functionality removed - keeping only in-box thumbnails
+  </script>
+
+<!-- Chatbot Widget -->
+<div class="chat-container">
+  <!-- Floating Chat Button -->
+  <button class="chat-button" id="chatButton">
+    <span class="chat-icon">💬</span>
+  </button>
+  
+  <!-- Expandable Chat Interface -->
+  <div class="chat-interface" id="chatInterface">
+    <div class="chat-header">
+      <div class="chat-title-area">
+        <div class="chat-title">AI Assistant</div>
+        <div class="chat-subtitle">Ask about bail bonds</div>
+      </div>
+      <button class="chat-close" id="chatClose">×</button>
+    </div>
+    
+    <div class="chat-messages" id="chatMessages">
+      <div class="welcome-message">
+        👋 Hi! I'm your AI assistant for <strong>Barbie's Bail Bonds</strong>.<br><br>
+        Ask me anything about:<br>
+        • Bail costs & processes<br>
+        • Court requirements<br>
+        • Payment options<br>
+        • Release procedures
+      </div>
+    </div>
+    
+    <div class="typing-indicator" id="typingIndicator">
+      🤖 Assistant is typing
+      <div class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+    
+    <div class="chat-input-container">
+      <input 
+        type="text" 
+        class="chat-input" 
+        id="chatInput" 
+        placeholder="Type your message..."
+        maxlength="500"
+      >
+      <button class="chat-send" id="chatSend">▶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // Get DOM elements
+  const chatButton = document.getElementById('chatButton');
+  const chatInterface = document.getElementById('chatInterface');
+  const chatClose = document.getElementById('chatClose');
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput = document.getElementById('chatInput');
+  const chatSend = document.getElementById('chatSend');
+  const typingIndicator = document.getElementById('typingIndicator');
+
+  // (Step 1) Use CSS clamp() on right to adapt to viewport width.
+  // No JS-based positioning needed here.
+
+  // Chatbot positioning now handled by CSS position:fixed - no JavaScript needed!
+
+  // Detect if this page is running inside an embed (e.g., Google Sites)
+  
+
+  const API_URL = 'https://script.google.com/macros/s/AKfycbyBDZhRuMme-LjdzVzW1nM6gl6wfqOlFWFm7YOY8ni6t0UAVQHhGYRQUb-3tv_mOZM0/exec';
+  
+  let isOpen = false;
+  let conversationHistory = [];
+  const MAX_HISTORY = 10; // Keep last 10 exchanges
+
+  // Toggle chat interface
+  function toggleChat() {
+    isOpen = !isOpen;
+    
+    if (isOpen) {
+      chatInterface.style.display = 'flex';
+      // Trigger animation after display change
+      setTimeout(() => {
+        chatInterface.classList.add('open');
+      }, 10);
+      chatButton.classList.add('active');
+      chatButton.innerHTML = '<span style="transform: rotate(45deg); display: inline-block;">✕</span>';
+      setTimeout(() => chatInput.focus(), 300);
+    } else {
+      chatInterface.classList.remove('open');
+      chatButton.classList.remove('active');
+      chatButton.innerHTML = '<span class="chat-icon">💬</span>';
+      // Hide after animation completes
+      setTimeout(() => {
+        if (!isOpen) chatInterface.style.display = 'none';
+      }, 300);
+    }
+  }
+
+  // Event listeners
+  chatButton.addEventListener('click', toggleChat);
+  chatClose.addEventListener('click', toggleChat);
+
+  // Send message function
+  function sendMessage() {
+    const message = chatInput.value.trim();
+    if (!message || chatSend.disabled) return;
+
+    // Add user message
+    addMessage('user', message);
+    chatInput.value = '';
+    chatSend.disabled = true;
+    showTyping();
+
+    // Send to AI backend
+    const callbackName = 'chatCallback_' + Date.now();
+    const script = document.createElement('script');
+    script.src = `${API_URL}?action=chat&query=${encodeURIComponent(message)}&history=${encodeURIComponent(JSON.stringify(conversationHistory))}&format=jsonp&callback=${callbackName}`;
+
+    window[callbackName] = function(response) {
+      hideTyping();
+      
+      let assistantResponse = '';
+      if (response && response.response) {
+        assistantResponse = response.response;
+        addMessage('assistant', assistantResponse);
+      } else if (response && response.error) {
+        assistantResponse = 'I apologize, but I encountered an error. Please try again or call us at 561-247-0018 for immediate assistance.';
+        addMessage('assistant', assistantResponse);
+        console.error('Chat API error:', response.error);
+      } else {
+        assistantResponse = 'I apologize, but I couldn\'t generate a response. Please try again or call us at 561-247-0018 for help.';
+        addMessage('assistant', assistantResponse);
+      }
+      
+      // Store conversation in history
+      conversationHistory.push({
+        user: message,
+        assistant: assistantResponse
+      });
+      
+      // Keep only last MAX_HISTORY exchanges
+      if (conversationHistory.length > MAX_HISTORY) {
+        conversationHistory = conversationHistory.slice(-MAX_HISTORY);
+      }
+      
+      // Clean up
+      document.head.removeChild(script);
+      delete window[callbackName];
+    };
+
+    script.onerror = function() {
+      hideTyping();
+      const errorResponse = 'I\'m having trouble connecting right now. Please try again or call us directly at 561-247-0018 for assistance.';
+      addMessage('assistant', errorResponse);
+      
+      // Store error in conversation history too
+      conversationHistory.push({
+        user: message,
+        assistant: errorResponse
+      });
+      
+      if (conversationHistory.length > MAX_HISTORY) {
+        conversationHistory = conversationHistory.slice(-MAX_HISTORY);
+      }
+      
+      document.head.removeChild(script);
+      delete window[callbackName];
+    };
+
+    // Timeout handler
+    setTimeout(() => {
+      if (window[callbackName]) {
+        hideTyping();
+        const timeoutResponse = 'Request timed out. Please call us at 561-247-0018 for immediate assistance.';
+        addMessage('assistant', timeoutResponse);
+        
+        // Store timeout in conversation history too
+        conversationHistory.push({
+          user: message,
+          assistant: timeoutResponse
+        });
+        
+        if (conversationHistory.length > MAX_HISTORY) {
+          conversationHistory = conversationHistory.slice(-MAX_HISTORY);
         }
-    </script>
+        
+        document.head.removeChild(script);
+        delete window[callbackName];
+      }
+    }, 15000);
+
+    document.head.appendChild(script);
+  }
+
+  // Add message to chat
+  function addMessage(sender, content) {
+    // Remove welcome message if it exists
+    const welcomeMsg = chatMessages.querySelector('.welcome-message');
+    if (welcomeMsg) welcomeMsg.remove();
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = sender === 'user' ? '👤' : '🤖';
+    
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+    
+    // Handle line breaks in content
+    const paragraphs = content.split('\n').filter(p => p.trim());
+    if (paragraphs.length > 1) {
+      bubble.innerHTML = paragraphs.map(p => p.trim()).join('<br>');
+    } else {
+      bubble.textContent = content;
+    }
+    
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(bubble);
+    chatMessages.appendChild(messageDiv);
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // Show typing indicator
+  function showTyping() {
+    typingIndicator.style.display = 'block';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // Hide typing indicator
+  function hideTyping() {
+    typingIndicator.style.display = 'none';
+    chatSend.disabled = false;
+  }
+
+  // Event listeners for sending messages
+  chatSend.addEventListener('click', sendMessage);
+  
+  chatInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // Close chat when clicking outside (optional)
+  document.addEventListener('click', function(e) {
+    if (isOpen && !chatInterface.contains(e.target) && !chatButton.contains(e.target)) {
+      // Uncomment the next line if you want to close chat when clicking outside
+      // toggleChat();
+    }
+  });
+  
+})();
+</script>
+
+<!-- Invisible spacer section to double page height -->
+<div class="invisible-spacer"></div>
+
 </body>
 </html>
