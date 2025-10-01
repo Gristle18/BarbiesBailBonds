@@ -241,7 +241,7 @@
 
         function getLocation() {
             if (!navigator.geolocation) {
-                showStatus('Geolocation is not supported by this browser.', 'error');
+                getIPLocation();
                 return;
             }
 
@@ -251,38 +251,65 @@
                         latitude: position.coords.latitude,
                         longitude: position.coords.longitude,
                         accuracy: position.coords.accuracy,
-                        timestamp: new Date().toISOString()
+                        timestamp: new Date().toISOString(),
+                        source: 'GPS'
                     };
 
                     document.getElementById('locationInfo').style.display = 'block';
                     document.getElementById('locationText').textContent =
                         `Lat: ${position.coords.latitude.toFixed(6)}, Lon: ${position.coords.longitude.toFixed(6)}`;
                     document.getElementById('accuracyText').textContent =
-                        `Accuracy: ${Math.round(position.coords.accuracy)} meters`;
+                        `Accuracy: ${Math.round(position.coords.accuracy)} meters (GPS)`;
 
                     checkSubmitReady();
                 },
                 function(error) {
-                    let message = 'Location access denied. ';
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            message += 'Please allow location access and refresh the page.';
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            message += 'Location information is unavailable.';
-                            break;
-                        case error.TIMEOUT:
-                            message += 'Location request timed out.';
-                            break;
-                    }
-                    showStatus(message, 'error');
+                    console.log('GPS location failed, falling back to IP location');
+                    getIPLocation();
                 },
                 {
                     enableHighAccuracy: true,
-                    timeout: 10000,
+                    timeout: 5000,
                     maximumAge: 300000
                 }
             );
+        }
+
+        function getIPLocation() {
+            try {
+                fetch('https://ipapi.co/json/')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.latitude && data.longitude) {
+                            locationData = {
+                                latitude: data.latitude,
+                                longitude: data.longitude,
+                                accuracy: 10000, // IP location is less accurate
+                                timestamp: new Date().toISOString(),
+                                source: 'IP',
+                                city: data.city,
+                                region: data.region,
+                                country: data.country_name
+                            };
+
+                            document.getElementById('locationInfo').style.display = 'block';
+                            document.getElementById('locationText').textContent =
+                                `${data.city}, ${data.region} (${data.latitude.toFixed(4)}, ${data.longitude.toFixed(4)})`;
+                            document.getElementById('accuracyText').textContent =
+                                `Approximate location from IP address`;
+
+                            checkSubmitReady();
+                        } else {
+                            throw new Error('No location data received');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('IP location failed:', error);
+                        showStatus('Unable to determine location. Please ensure you have an internet connection.', 'error');
+                    });
+            } catch (error) {
+                showStatus('Location services unavailable. Please try again later.', 'error');
+            }
         }
 
         function checkSubmitReady() {
