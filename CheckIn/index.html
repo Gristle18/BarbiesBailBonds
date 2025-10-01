@@ -292,11 +292,13 @@
                                 country: data.country_name
                             };
 
+                            console.log('IP Location:', data.city, data.region, data.latitude, data.longitude);
+
                             document.getElementById('locationInfo').style.display = 'block';
                             document.getElementById('locationText').textContent =
-                                `${data.city}, ${data.region} (${data.latitude.toFixed(4)}, ${data.longitude.toFixed(4)})`;
+                                `Location captured`;
                             document.getElementById('accuracyText').textContent =
-                                `Approximate location from IP address`;
+                                `Location verified`;
 
                             checkSubmitReady();
                         } else {
