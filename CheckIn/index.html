@@ -1003,13 +1003,13 @@
 
     function updatePageLanguage(language) {
       const isSpanish = language === 'es';
-      
+
       // Update page title and header
-      document.querySelector('.title').textContent = isSpanish ? 
-        'Subir ID y Documentos' : 'Upload ID & Documents';
-      document.querySelector('.subtitle').textContent = isSpanish ? 
-        'Envíe de forma segura su ID gubernamental y documentos para acelerar la aprobación de su fianza.' : 
-        'Securely send your government ID and paperwork to speed up your bond approval.';
+      document.querySelector('.title').textContent = isSpanish ?
+        'Registro' : 'Check In';
+      document.querySelector('.subtitle').textContent = isSpanish ?
+        'Tome una foto para registrarse con los requisitos de su fianza.' :
+        'Take a photo to check in with your bond requirements.';
       
       // Update How to Get to Us section
       const locationSection = document.querySelector('.location-content h2');
@@ -1061,8 +1061,8 @@
     
     function showLanguageSelection() {
       // Hide both forms
-      document.getElementById('uploadFormEn').style.display = 'none';
-      document.getElementById('uploadFormEs').style.display = 'none';
+      document.getElementById('checkinFormEn').style.display = 'none';
+      document.getElementById('checkinFormEs').style.display = 'none';
       
       // Reset page language to English
       updatePageLanguage('en');
@@ -1070,12 +1070,19 @@
       // Show language selection
       document.getElementById('languageSelection').style.display = 'block';
       
-      // Reset forms
-      document.getElementById('uploadFormEn').reset();
-      document.getElementById('uploadFormEs').reset();
+      // Reset check-in state
+      photoTaken = false;
+      locationData = null;
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
       
-      // Clear file lists
-      document.querySelectorAll('.file-list').forEach(el => el.textContent = '');
+      // Reset check-in UI elements
+      document.querySelectorAll('video, img[id*="photoPreview"], canvas').forEach(el => {
+        el.style.display = 'none';
+        if (el.tagName === 'IMG') el.src = '';
+      });
       
       // Hide messages
       ['successMsgEn', 'errorMsgEn', 'successMsgEs', 'errorMsgEs'].forEach(id => {
@@ -2414,7 +2421,7 @@
       }
 
       function initializeForm(suffix) {
-        const form = document.getElementById('uploadForm' + suffix);
+        const form = document.getElementById('checkinForm' + suffix);
         const submitBtn = document.getElementById('submitBtn' + suffix);
         const successMsg = document.getElementById('successMsg' + suffix);
         const errorMsg = document.getElementById('errorMsg' + suffix);
@@ -2737,7 +2744,7 @@
     window.addEventListener('load', function() {
       console.log('Page fully loaded');
       console.log('Dropzones found:', document.querySelectorAll('.dropzone').length);
-      console.log('Upload forms found:', document.querySelectorAll('#uploadFormEn, #uploadFormEs').length);
+      console.log('Check-in forms found:', document.querySelectorAll('#checkinFormEn, #checkinFormEs').length);
     });
 
     // Modal preview functionality removed - keeping only in-box thumbnails
