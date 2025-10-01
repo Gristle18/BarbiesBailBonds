@@ -255,11 +255,7 @@
                         source: 'GPS'
                     };
 
-                    document.getElementById('locationInfo').style.display = 'block';
-                    document.getElementById('locationText').textContent =
-                        `Lat: ${position.coords.latitude.toFixed(6)}, Lon: ${position.coords.longitude.toFixed(6)}`;
-                    document.getElementById('accuracyText').textContent =
-                        `Accuracy: ${Math.round(position.coords.accuracy)} meters (GPS)`;
+                    console.log('GPS Location:', position.coords.latitude, position.coords.longitude, position.coords.accuracy);
 
                     checkSubmitReady();
                 },
@@ -293,12 +289,6 @@
                             };
 
                             console.log('IP Location:', data.city, data.region, data.latitude, data.longitude);
-
-                            document.getElementById('locationInfo').style.display = 'block';
-                            document.getElementById('locationText').textContent =
-                                `Location captured`;
-                            document.getElementById('accuracyText').textContent =
-                                `Location verified`;
 
                             checkSubmitReady();
                         } else {
