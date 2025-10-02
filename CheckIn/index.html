@@ -2801,8 +2801,17 @@
 
     async function startCamera(lang) {
       try {
+        // Check if we're in an iframe and add permissions request
+        if (window.self !== window.top) {
+          console.log('Running in iframe, requesting camera permissions');
+        }
+
         stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' },
+          video: {
+            facingMode: 'user',
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          },
           audio: false
         });
 
@@ -2813,11 +2822,37 @@
         document.getElementById('startCamera' + lang).style.display = 'none';
         document.getElementById('takePhoto' + lang).style.display = 'inline-block';
       } catch (error) {
+        console.error('Camera error:', error);
         const isSpanish = lang === 'Es';
-        const message = isSpanish ?
-          'Acceso a la cámara denegado. Permita el acceso a la cámara e intente nuevamente.' :
-          'Camera access denied. Please allow camera access and try again.';
+
+        let message;
+        if (window.self !== window.top) {
+          // We're in an iframe (Google Sites)
+          message = isSpanish ?
+            'La cámara no está disponible en esta página. Por favor abra este enlace en una nueva pestaña: ' + window.location.href :
+            'Camera not available on this page. Please open this link in a new tab: ' + window.location.href;
+        } else {
+          message = isSpanish ?
+            'Acceso a la cámara denegado. Permita el acceso a la cámara e intente nuevamente.' :
+            'Camera access denied. Please allow camera access and try again.';
+        }
+
         showStatus(message, 'error', lang);
+
+        // Add a button to open in new tab if in iframe
+        if (window.self !== window.top) {
+          setTimeout(() => {
+            const buttonText = isSpanish ? 'Abrir en Nueva Pestaña' : 'Open in New Tab';
+            const openButton = document.createElement('button');
+            openButton.textContent = buttonText;
+            openButton.className = 'btn btn-primary';
+            openButton.style.marginTop = '10px';
+            openButton.onclick = () => window.open(window.location.href, '_blank');
+
+            const cameraSection = document.querySelector('#checkinForm' + lang + ' .camera-section');
+            cameraSection.appendChild(openButton);
+          }, 1000);
+        }
       }
     }
 
