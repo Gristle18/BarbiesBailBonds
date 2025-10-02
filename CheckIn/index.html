@@ -843,6 +843,11 @@
         This check-in requires photo verification for compliance with your bond requirements.
       </div>
 
+      <div style="margin-bottom: 30px;">
+        <label for="fullNameEn" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #333;">Your Full Name<span style="color:#dc3545">*</span></label>
+        <input id="fullNameEn" type="text" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; background:#fff; color:#111; min-height: 48px;" />
+      </div>
+
       <div class="camera-section" style="background: #f8f9fa; border-radius: 12px; padding: 30px; margin-bottom: 30px; border: 2px dashed #ddd; text-align: center;">
         <video id="videoEn" style="width: 100%; max-width: 300px; border-radius: 8px; margin-bottom: 20px; display: none;"></video>
         <canvas id="canvasEn" style="display: none;"></canvas>
@@ -869,6 +874,11 @@
       <div class="section-title">Registro</div>
       <div class="instructions" style="margin-bottom: 30px; text-align: center; color: #666;">
         Este registro requiere verificación fotográfica para cumplir con los requisitos de su fianza.
+      </div>
+
+      <div style="margin-bottom: 30px;">
+        <label for="fullNameEs" style="display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; color: #333;">Su Nombre Completo<span style="color:#dc3545">*</span></label>
+        <input id="fullNameEs" type="text" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; background:#fff; color:#111; min-height: 48px;" />
       </div>
 
       <div class="camera-section" style="background: #f8f9fa; border-radius: 12px; padding: 30px; margin-bottom: 30px; border: 2px dashed #ddd; text-align: center;">
@@ -1082,6 +1092,11 @@
       document.querySelectorAll('video, img[id*="photoPreview"], canvas').forEach(el => {
         el.style.display = 'none';
         if (el.tagName === 'IMG') el.src = '';
+      });
+
+      // Clear name fields
+      document.querySelectorAll('input[id*="fullName"]').forEach(el => {
+        el.value = '';
       });
       
       // Hide messages
@@ -2772,11 +2787,16 @@
       const takeBtn = document.getElementById('takePhoto' + lang);
       const retakeBtn = document.getElementById('retakePhoto' + lang);
       const submitBtn = document.getElementById('submitCheckin' + lang);
+      const nameField = document.getElementById('fullName' + lang);
 
       startBtn.addEventListener('click', () => startCamera(lang));
       takeBtn.addEventListener('click', () => takePhoto(lang));
       retakeBtn.addEventListener('click', () => retakePhoto(lang));
       submitBtn.addEventListener('click', () => submitCheckin(lang));
+
+      // Check submit readiness when name changes
+      nameField.addEventListener('input', () => checkSubmitReady(lang));
+      nameField.addEventListener('blur', () => checkSubmitReady(lang));
     }
 
     async function startCamera(lang) {
@@ -2911,8 +2931,13 @@
     }
 
     function checkSubmitReady(lang) {
-      if (photoTaken && locationData) {
+      const nameField = document.getElementById('fullName' + lang);
+      const hasName = nameField && nameField.value.trim() !== '';
+
+      if (photoTaken && locationData && hasName) {
         document.getElementById('submitCheckin' + lang).style.display = 'inline-block';
+      } else {
+        document.getElementById('submitCheckin' + lang).style.display = 'none';
       }
     }
 
@@ -2925,7 +2950,10 @@
 
       try {
         const canvas = document.getElementById('canvas' + lang);
+        const fullName = document.getElementById('fullName' + lang).value.trim();
+
         const checkinData = {
+          fullName: fullName,
           photo: canvas.toDataURL('image/jpeg', 0.8),
           location: locationData,
           timestamp: new Date().toISOString(),
