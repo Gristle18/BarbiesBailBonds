@@ -4,8 +4,9 @@
  */
 
 // Configuration
-const SPREADSHEET_NAME = 'Defendant Check Ins';
-const SHEET_NAME = 'Check In Records';
+const SPREADSHEET_ID = '1734AHsSyrGVOw6f5KG8dJw1Y2dfMKRmtuzPUXxzh8EY';
+const FOLDER_ID = '1nr8Gt5QCD-OOLuWwKb5MXS2aepgOydhC';
+const SHEET_NAME = 'Sheet1'; // Default sheet name, will use existing sheet
 
 /**
  * Main entry point for web requests
@@ -113,27 +114,36 @@ function processCheckin(data) {
   // Process location data
   const location = data.location || {};
   const locationString = formatLocationString(location);
+  const googleMapsLink = createGoogleMapsLink(location);
 
   // Process photo - save to Drive and get shareable link
   const photoInfo = processPhoto(data.photo, data.fullName, formattedTimestamp);
+
+  // Separate GPS and IP data
+  const gpsData = location.source === 'GPS' ? location : {};
+  const ipData = location.source === 'IP' ? location : {};
 
   // Prepare row data
   const rowData = [
     formattedTimestamp,              // A: Timestamp
     data.fullName || '',             // B: Full Name
-    locationString,                  // C: Location (formatted)
-    location.latitude || '',         // D: Latitude
-    location.longitude || '',        // E: Longitude
-    location.accuracy || '',         // F: Accuracy
-    location.source || '',           // G: Location Source (GPS/IP)
-    location.city || '',             // H: City
-    location.region || '',           // I: Region/State
-    location.country || '',          // J: Country
-    photoInfo.fileId || '',          // K: Photo File ID
-    photoInfo.url || '',             // L: Photo URL
-    data.language || 'en',           // M: Language
-    data.userAgent || '',            // N: User Agent
-    data.timestamp || formattedTimestamp  // O: Original Timestamp
+    locationString,                  // C: Location Summary
+    googleMapsLink,                  // D: Google Maps Link
+    photoInfo.url || '',             // E: Photo URL
+    data.language || 'en',           // F: Language
+    data.userAgent || '',            // G: User Agent
+    // GPS Data
+    gpsData.latitude || '',          // H: GPS Latitude
+    gpsData.longitude || '',         // I: GPS Longitude
+    gpsData.accuracy || '',          // J: GPS Accuracy
+    // IP Data
+    ipData.latitude || '',           // K: IP Latitude
+    ipData.longitude || '',          // L: IP Longitude
+    ipData.city || '',               // M: IP City
+    ipData.region || '',             // N: IP Region/State
+    ipData.country || '',            // O: IP Country
+    location.source || '',           // P: Location Source
+    data.timestamp || formattedTimestamp  // Q: Original Timestamp
   ];
 
   // Append the row
@@ -152,26 +162,15 @@ function processCheckin(data) {
 }
 
 /**
- * Get or create the spreadsheet
+ * Get the specified spreadsheet
  */
 function getOrCreateSpreadsheet() {
-  // Try to find existing spreadsheet
-  const files = DriveApp.getFilesByName(SPREADSHEET_NAME);
-
-  if (files.hasNext()) {
-    const file = files.next();
-    console.log('Using existing spreadsheet:', file.getId());
-    return SpreadsheetApp.openById(file.getId());
+  try {
+    console.log('Using existing spreadsheet:', SPREADSHEET_ID);
+    return SpreadsheetApp.openById(SPREADSHEET_ID);
+  } catch (error) {
+    throw new Error('Could not access spreadsheet: ' + error.toString());
   }
-
-  // Create new spreadsheet
-  console.log('Creating new spreadsheet:', SPREADSHEET_NAME);
-  const spreadsheet = SpreadsheetApp.create(SPREADSHEET_NAME);
-
-  // Set up the initial sheet
-  setupInitialSheet(spreadsheet);
-
-  return spreadsheet;
 }
 
 /**
@@ -180,8 +179,13 @@ function getOrCreateSpreadsheet() {
 function getOrCreateSheet(spreadsheet) {
   let sheet = spreadsheet.getSheetByName(SHEET_NAME);
 
+  // If Sheet1 doesn't exist, get the first sheet
   if (!sheet) {
-    sheet = spreadsheet.insertSheet(SHEET_NAME);
+    sheet = spreadsheet.getSheets()[0];
+  }
+
+  // Check if headers exist, if not, set them up
+  if (sheet.getLastRow() === 0) {
     setupSheetHeaders(sheet);
   }
 
@@ -205,21 +209,23 @@ function setupInitialSheet(spreadsheet) {
  */
 function setupSheetHeaders(sheet) {
   const headers = [
-    'Timestamp',
-    'Full Name',
-    'Location Summary',
-    'Latitude',
-    'Longitude',
-    'Accuracy (meters)',
-    'Location Source',
-    'City',
-    'Region/State',
-    'Country',
-    'Photo File ID',
-    'Photo URL',
-    'Language',
-    'User Agent',
-    'Original Timestamp'
+    'Timestamp',              // A
+    'Full Name',              // B
+    'Location Summary',       // C
+    'Google Maps Link',       // D
+    'Photo URL',              // E
+    'Language',               // F
+    'User Agent',             // G
+    'GPS Latitude',           // H
+    'GPS Longitude',          // I
+    'GPS Accuracy (m)',       // J
+    'IP Latitude',            // K
+    'IP Longitude',           // L
+    'IP City',                // M
+    'IP Region/State',        // N
+    'IP Country',             // O
+    'Location Source',        // P
+    'Original Timestamp'      // Q
   ];
 
   // Set headers
@@ -265,6 +271,32 @@ function formatLocationString(location) {
 }
 
 /**
+ * Create Google Maps link from location data
+ */
+function createGoogleMapsLink(location) {
+  if (!location || (!location.latitude && !location.longitude)) {
+    return '';
+  }
+
+  const lat = location.latitude;
+  const lng = location.longitude;
+
+  if (!lat || !lng) return '';
+
+  // Create Google Maps link with coordinates
+  const baseUrl = 'https://www.google.com/maps/search/';
+  const coords = `${lat},${lng}`;
+
+  // Add address if available for better context
+  let searchQuery = coords;
+  if (location.city && location.region) {
+    searchQuery = `${location.city}, ${location.region} ${coords}`;
+  }
+
+  return `${baseUrl}${encodeURIComponent(searchQuery)}`;
+}
+
+/**
  * Process and store photo in Google Drive
  */
 function processPhoto(photoData, fullName, timestamp) {
@@ -284,8 +316,8 @@ function processPhoto(photoData, fullName, timestamp) {
       `checkin_${sanitizeFilename(fullName)}_${timestamp.replace(/[:\s]/g, '-')}.jpg`
     );
 
-    // Create or get the check-ins folder
-    const folder = getOrCreateFolder('Defendant Check In Photos');
+    // Use the specified folder
+    const folder = DriveApp.getFolderById(FOLDER_ID);
 
     // Save the file
     const file = folder.createFile(blob);
@@ -313,17 +345,14 @@ function processPhoto(photoData, fullName, timestamp) {
 }
 
 /**
- * Get or create a folder in Google Drive
+ * Get the specified folder in Google Drive
  */
-function getOrCreateFolder(folderName) {
-  const folders = DriveApp.getFoldersByName(folderName);
-
-  if (folders.hasNext()) {
-    return folders.next();
+function getFolder() {
+  try {
+    return DriveApp.getFolderById(FOLDER_ID);
+  } catch (error) {
+    throw new Error('Could not access folder: ' + error.toString());
   }
-
-  console.log('Creating folder:', folderName);
-  return DriveApp.createFolder(folderName);
 }
 
 /**
@@ -342,7 +371,7 @@ function sanitizeFilename(filename) {
 function testCheckinProcessor() {
   const testData = {
     fullName: 'Test User',
-    photo: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAAAAA...',  // Truncated for brevity
+    photo: 'data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',  // 1x1 pixel test image
     location: {
       latitude: 26.7153,
       longitude: -80.0534,
