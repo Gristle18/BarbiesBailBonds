@@ -2963,8 +2963,18 @@
 
         console.log('Check-in data:', checkinData);
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Send to Google Apps Script
+        const response = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec', {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(checkinData)
+        });
+
+        // Note: no-cors mode means we can't read the response, so we assume success
+        console.log('Check-in submitted to server');
 
         const successMessage = isSpanish ?
           '✅ ¡Registro exitoso! Su foto ha sido grabada.' :
