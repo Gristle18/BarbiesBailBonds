@@ -993,8 +993,17 @@
     function showCheckinForm(language) {
       // Check if we're in an iframe (Google Sites embed)
       if (window.self !== window.top) {
-        // Open in new tab with language parameter
-        const newUrl = window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'lang=' + language;
+        // Get the actual page URL, not the iframe wrapper URL
+        let baseUrl = window.location.origin + window.location.pathname;
+
+        // If we're in a Google iframe, use the direct website URL
+        if (window.location.hostname.includes('googleusercontent.com')) {
+          // Replace with your actual website URL
+          baseUrl = 'https://barbiesbailbonds.com/CheckIn/';
+        }
+
+        const newUrl = baseUrl + '?lang=' + language;
+        console.log('Opening new tab with URL:', newUrl);
         window.open(newUrl, '_blank');
         return;
       }
