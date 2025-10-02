@@ -114,14 +114,16 @@ function processCheckin(data) {
   // Process location data
   const location = data.location || {};
   const locationString = formatLocationString(location);
-  const googleMapsLink = createGoogleMapsLink(location);
-
-  // Process photo - save to Drive and get shareable link
-  const photoInfo = processPhoto(data.photo, data.fullName, formattedTimestamp);
 
   // Separate GPS and IP data
   const gpsData = location.source === 'GPS' ? location : {};
   const ipData = location.source === 'IP' ? location : {};
+
+  // Google Maps link only uses GPS coordinates (more accurate)
+  const googleMapsLink = gpsData.latitude && gpsData.longitude ? createGoogleMapsLink(gpsData) : '';
+
+  // Process photo - save to Drive and get shareable link
+  const photoInfo = processPhoto(data.photo, data.fullName, formattedTimestamp);
 
   // Prepare row data
   const rowData = [

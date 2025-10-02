@@ -314,21 +314,33 @@
       const nameField = document.getElementById('fullName');
       const hasName = nameField && nameField.value.trim() !== '';
 
-      // All three requirements: name, photo, AND location
-      if (photoTaken && locationData && hasName) {
+      // Require GPS location specifically (not IP)
+      const hasGPSLocation = locationData && locationData.source === 'GPS';
+
+      if (photoTaken && hasGPSLocation && hasName) {
         document.getElementById('submitCheckin').style.display = 'inline-block';
       } else {
         document.getElementById('submitCheckin').style.display = 'none';
       }
 
-      // Show status if missing location
-      if (hasName && photoTaken && !locationData) {
-        showStatus('Esperando ubicación... Asegúrese de que los servicios de ubicación estén habilitados.', 'error');
+      // Show status if missing GPS location
+      if (hasName && photoTaken && !hasGPSLocation) {
+        if (locationData && locationData.source === 'IP') {
+          showStatus('Se requiere ubicación GPS. Habilite los servicios de ubicación y permita el acceso de ubicación precisa.', 'error');
+        } else {
+          showStatus('Esperando ubicación GPS... Asegúrese de que los servicios de ubicación estén habilitados.', 'error');
+        }
       }
     }
 
     async function submitCheckin() {
       const submitBtn = document.getElementById('submitCheckin');
+
+      // Double-check GPS location before submitting
+      if (!locationData || locationData.source !== 'GPS') {
+        showStatus('Se requiere ubicación GPS. Habilite los servicios de ubicación y permita el acceso de ubicación precisa.', 'error');
+        return;
+      }
 
       submitBtn.disabled = true;
       submitBtn.textContent = 'Enviando...';
