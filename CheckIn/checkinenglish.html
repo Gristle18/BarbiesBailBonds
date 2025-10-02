@@ -140,9 +140,9 @@
       </div>
 
       <div class="camera-section" style="background: #f8f9fa; border-radius: 12px; padding: 30px; margin-bottom: 30px; border: 2px dashed #ddd; text-align: center;">
-        <video id="video" style="width: 100%; max-width: 300px; border-radius: 8px; margin-bottom: 20px; display: none;"></video>
+        <video id="video" autoplay playsinline style="width: 100%; max-width: 400px; height: 300px; border-radius: 8px; margin-bottom: 20px; background: #000; display: none; object-fit: cover;"></video>
         <canvas id="canvas" style="display: none;"></canvas>
-        <img id="photoPreview" style="width: 100%; max-width: 300px; border-radius: 8px; margin: 20px auto; display: none;" alt="Photo preview">
+        <img id="photoPreview" style="width: 100%; max-width: 400px; height: 300px; border-radius: 8px; margin: 20px auto; display: none; object-fit: cover;" alt="Photo preview">
 
         <div id="cameraControls">
           <button type="button" id="startCamera" class="btn">Start Camera</button>
@@ -314,10 +314,16 @@
       const nameField = document.getElementById('fullName');
       const hasName = nameField && nameField.value.trim() !== '';
 
+      // All three requirements: name, photo, AND location
       if (photoTaken && locationData && hasName) {
         document.getElementById('submitCheckin').style.display = 'inline-block';
       } else {
         document.getElementById('submitCheckin').style.display = 'none';
+      }
+
+      // Show status if missing location
+      if (hasName && photoTaken && !locationData) {
+        showStatus('Waiting for location... Please ensure location services are enabled.', 'error');
       }
     }
 
