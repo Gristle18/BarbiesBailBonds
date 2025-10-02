@@ -991,6 +991,14 @@
 
     // Language selection functionality
     function showCheckinForm(language) {
+      // Check if we're in an iframe (Google Sites embed)
+      if (window.self !== window.top) {
+        // Open in new tab with language parameter
+        const newUrl = window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'lang=' + language;
+        window.open(newUrl, '_blank');
+        return;
+      }
+
       // Hide language selection
       document.getElementById('languageSelection').style.display = 'none';
 
@@ -1000,7 +1008,7 @@
 
       // Update page content based on language
       updatePageLanguage(language);
-      
+
       // Show the selected language form
       if (language === 'en') {
         document.getElementById('checkinFormEn').style.display = 'block';
@@ -2755,11 +2763,33 @@
       }
     })();
 
-    // Additional debugging
+    // Additional debugging and auto-language selection
     window.addEventListener('load', function() {
       console.log('Page fully loaded');
       console.log('Dropzones found:', document.querySelectorAll('.dropzone').length);
       console.log('Check-in forms found:', document.querySelectorAll('#checkinFormEn, #checkinFormEs').length);
+
+      // Check for language parameter in URL (from new tab opening)
+      const urlParams = new URLSearchParams(window.location.search);
+      const lang = urlParams.get('lang');
+
+      if (lang && (lang === 'en' || lang === 'es')) {
+        console.log('Auto-selecting language from URL:', lang);
+        // Directly show the form without iframe check since we're in a new tab
+        document.getElementById('languageSelection').style.display = 'none';
+        document.getElementById('checkinFormEn').style.display = 'none';
+        document.getElementById('checkinFormEs').style.display = 'none';
+
+        updatePageLanguage(lang);
+
+        if (lang === 'en') {
+          document.getElementById('checkinFormEn').style.display = 'block';
+          initializeCheckinEn();
+        } else {
+          document.getElementById('checkinFormEs').style.display = 'block';
+          initializeCheckinEs();
+        }
+      }
     });
 
     // Modal preview functionality removed - keeping only in-box thumbnails
@@ -2824,35 +2854,10 @@
       } catch (error) {
         console.error('Camera error:', error);
         const isSpanish = lang === 'Es';
-
-        let message;
-        if (window.self !== window.top) {
-          // We're in an iframe (Google Sites)
-          message = isSpanish ?
-            'La cámara no está disponible en esta página. Por favor abra este enlace en una nueva pestaña: ' + window.location.href :
-            'Camera not available on this page. Please open this link in a new tab: ' + window.location.href;
-        } else {
-          message = isSpanish ?
-            'Acceso a la cámara denegado. Permita el acceso a la cámara e intente nuevamente.' :
-            'Camera access denied. Please allow camera access and try again.';
-        }
-
+        const message = isSpanish ?
+          'Acceso a la cámara denegado. Permita el acceso a la cámara e intente nuevamente.' :
+          'Camera access denied. Please allow camera access and try again.';
         showStatus(message, 'error', lang);
-
-        // Add a button to open in new tab if in iframe
-        if (window.self !== window.top) {
-          setTimeout(() => {
-            const buttonText = isSpanish ? 'Abrir en Nueva Pestaña' : 'Open in New Tab';
-            const openButton = document.createElement('button');
-            openButton.textContent = buttonText;
-            openButton.className = 'btn btn-primary';
-            openButton.style.marginTop = '10px';
-            openButton.onclick = () => window.open(window.location.href, '_blank');
-
-            const cameraSection = document.querySelector('#checkinForm' + lang + ' .camera-section');
-            cameraSection.appendChild(openButton);
-          }, 1000);
-        }
       }
     }
 
